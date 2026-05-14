@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+    PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <settings>
+        <setting name="jdbcTypeForNull" value="NULL" />
+    </settings>
+
+    <typeAliases>
+<!--     	검사DTO -->
+        <typeAlias type="kr.or.saeroi.dto.InspectionDTO" alias="inspectionDTO" />
+<!--         불량DTO -->
+        <typeAlias type="kr.or.saeroi.dto.DefectDTO" alias="defectDTO" />
+    </typeAliases>
+</configuration>

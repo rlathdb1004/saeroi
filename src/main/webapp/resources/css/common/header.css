@@ -1,0 +1,176 @@
+@charset "UTF-8";
+/* CSS 파일에서 한글이 깨지지 않도록 설정한다. */
+
+.heHeader {
+    /* 헤더 전체 영역이다. */
+    margin-left: 240px;
+    /* 사이드바 너비만큼 헤더를 오른쪽으로 밀어준다. */
+    height: 150px;
+    /* 시간/온도 박스가 아래로 튀어나오지 않도록 헤더 높이를 넉넉하게 설정한다. */
+    background-color: #FFFFFF;
+    /* 헤더 배경색을 흰색으로 설정한다. */
+    border-bottom: 1px solid #DDE5E1;
+    /* 헤더 아래쪽에 연한 구분선을 넣는다. */
+    display: flex;
+    /* 왼쪽 메뉴 정보와 오른쪽 시간 정보를 나란히 배치한다. */
+    justify-content: space-between;
+    /* 왼쪽 영역은 왼쪽, 오른쪽 영역은 오른쪽으로 보낸다. */
+    align-items: flex-start;
+    /* 헤더 안의 내용을 위쪽 기준으로 정렬한다. */
+    padding: 28px 34px 0 34px;
+    /* 헤더 안쪽 여백을 위 28px, 좌우 34px로 설정한다. */
+    box-sizing: border-box;
+    /* padding과 border를 높이 계산에 포함한다. */
+}
+
+.heLeftBox {
+    /* 헤더 왼쪽 영역이다. */
+    display: flex;
+    /* 제목과 현재 메뉴를 세로로 배치하기 위해 flex를 사용한다. */
+    flex-direction: column;
+    /* 상위 메뉴명이 위, 현재 하위 메뉴가 아래로 오게 한다. */
+    justify-content: flex-start;
+    /* 내용이 위쪽부터 시작되게 한다. */
+}
+
+.hePageTitle {
+    /* 현재 상위 메뉴 제목이다. */
+    margin: 0;
+    /* h1 태그 기본 여백을 제거한다. */
+    color: #2F7D62;
+    /* 제목 글씨를 우리 메인 컬러로 설정한다. */
+    font-size: 30px;
+    /* 제목 글씨를 크게 설정한다. */
+    font-weight: 700;
+    /* 제목 글씨를 굵게 표시한다. */
+    line-height: 1.2;
+    /* 제목 줄 높이를 설정한다. */
+}
+
+.heCurrentMenuBox {
+    /* 현재 선택된 하위 메뉴 영역이다. */
+    display: flex;
+    /* 현재 하위 메뉴를 가로 정렬할 수 있게 한다. */
+    align-items: center;
+    /* 현재 하위 메뉴를 세로 가운데 정렬한다. */
+    margin-top: 28px;
+    /* 상위 메뉴명과 하위 메뉴 사이에 여백을 준다. */
+}
+
+.heCurrentMenu {
+    /* 현재 선택된 하위 메뉴 글씨이다. */
+    position: relative;
+    /* 아래 초록색 줄을 이 글자 기준으로 배치하기 위해 사용한다. */
+    display: inline-block;
+    /* 글자 크기만큼 영역을 잡는다. */
+    padding-bottom: 14px;
+    /* 글자 아래에 초록색 줄이 들어갈 공간을 만든다. */
+    color: #374151;
+    /* 기본 글자색을 진한 회색으로 설정한다. */
+    font-size: 16px;
+    /* 하위 메뉴 글씨 크기를 설정한다. */
+    font-weight: 600;
+    /* 하위 메뉴 글씨를 조금 굵게 설정한다. */
+    text-decoration: none;
+    /* a 태그의 밑줄을 제거한다. */
+}
+
+.heCurrentMenu.active {
+    /* 현재 선택된 하위 메뉴 디자인이다. */
+    color: #1F2933;
+    /* 현재 선택된 하위 메뉴 글자색을 검은색 계열로 설정한다. */
+    font-weight: 700;
+    /* 현재 선택된 하위 메뉴 글씨를 굵게 표시한다. */
+}
+
+.heCurrentMenu.active::after {
+    /* 현재 선택된 하위 메뉴 아래에 들어가는 초록색 줄이다. */
+    content: "";
+    /* 가상 요소를 화면에 보이게 하기 위해 빈 값을 넣는다. */
+    position: absolute;
+    /* 현재 하위 메뉴 글자 기준으로 줄 위치를 잡는다. */
+    left: 0;
+    /* 초록색 줄을 글자 왼쪽에 맞춘다. */
+    right: 0;
+    /* 초록색 줄을 글자 오른쪽에 맞춘다. */
+    bottom: 0;
+    /* 초록색 줄을 영역 아래쪽에 배치한다. */
+    height: 2px;
+    /* 초록색 줄 두께를 설정한다. */
+    background-color: #2F7D62;
+    /* 초록색 줄 색상을 메인 컬러로 설정한다. */
+    border-radius: 2px;
+    /* 줄 끝을 살짝 둥글게 만든다. */
+}
+
+.heRightBox {
+    /* 헤더 오른쪽 영역이다. */
+    display: flex;
+    /* 시간/온도 박스를 정렬하기 위해 flex를 사용한다. */
+    justify-content: flex-end;
+    /* 시간/온도 박스를 오른쪽 끝으로 보낸다. */
+    align-items: flex-start;
+    /* 시간/온도 박스를 위쪽 기준으로 맞춘다. */
+}
+
+.heInfoBox {
+    /* 현재시간과 오늘 온도가 들어가는 박스이다. */
+    width: 230px;
+    /* 정보 박스의 가로 길이를 설정한다. */
+    padding: 10px 18px;
+    /* 정보 박스 안쪽 여백을 설정한다. */
+    background-color: #FFFFFF;
+    /* 정보 박스 배경색을 흰색으로 설정한다. */
+    border: 1px solid #DDE5E1;
+    /* 정보 박스에 연한 테두리를 넣는다. */
+    border-radius: 12px;
+    /* 정보 박스 모서리를 둥글게 만든다. */
+    box-shadow: 0 2px 8px rgba(31, 41, 51, 0.04);
+    /* 정보 박스에 아주 연한 그림자를 넣는다. */
+    box-sizing: border-box;
+    /* padding과 border를 너비 계산에 포함한다. */
+    margin-top: -10px;
+    /* 현재시간/온도 박스 전체를 위로 10px 올린다. */
+}
+
+.heInfoLabel {
+    /* 현재 시간, 오늘 온도 같은 작은 제목 글씨이다. */
+    margin: 0;
+    /* p 태그 기본 여백을 제거한다. */
+    color: #6B7280;
+    /* 작은 제목 글씨를 회색으로 설정한다. */
+    font-size: 12px;
+    /* 작은 제목 글씨 크기를 설정한다. */
+    font-weight: 500;
+    /* 작은 제목 글씨를 중간 굵기로 설정한다. */
+    line-height: 1.3;
+    /* 작은 제목의 줄 높이를 설정한다. */
+}
+
+.heInfoText {
+    /* 실제 시간과 온도 값이 들어가는 글씨이다. */
+    margin: 4px 0 0 0;
+    /* 위쪽에만 작은 여백을 준다. */
+    color: #1F2933;
+    /* 실제 값 글씨를 진한 회색으로 설정한다. */
+    font-size: 15px;
+    /* 실제 값 글씨 크기를 설정한다. */
+    font-weight: 700;
+    /* 실제 값 글씨를 굵게 표시한다. */
+    line-height: 1.4;
+    /* 실제 값 글씨의 줄 높이를 설정한다. */
+    white-space: nowrap;
+    /* 날짜와 시간이 줄바꿈되지 않게 한다. */
+}
+
+.heWeatherLabel {
+    /* 오늘 온도 제목이다. */
+    margin-top: 10px;
+    /* 현재시간 영역과 온도 영역 사이에 위쪽 여백을 준다. */
+}
+
+.heHidden {
+    /* 화면에서 잠시 숨겨야 하는 요소에 사용하는 class이다. */
+    display: none;
+    /* 해당 요소를 화면에서 보이지 않게 한다. */
+}

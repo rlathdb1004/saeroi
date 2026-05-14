@@ -1,0 +1,412 @@
+@charset "UTF-8";
+/* CSS 파일에서 한글이 깨지지 않도록 설정한다. */
+
+@font-face {
+    /* Pretendard 기본 폰트를 등록한다. */
+    font-family: 'Pretendard';
+    /* CSS에서 사용할 폰트 이름을 Pretendard로 정한다. */
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Regular.woff2') format('woff2');
+    /* Pretendard Regular 폰트 파일을 불러온다. */
+    font-weight: 400;
+    /* 기본 굵기 400으로 사용한다. */
+    font-display: swap;
+    /* 폰트 로딩 전에는 기본 글씨를 보여주고, 로딩 후 Pretendard로 바꾼다. */
+}
+
+@font-face {
+    /* Pretendard Medium 폰트를 등록한다. */
+    font-family: 'Pretendard';
+    /* CSS에서 사용할 폰트 이름을 Pretendard로 정한다. */
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Medium.woff2') format('woff2');
+    /* Pretendard Medium 폰트 파일을 불러온다. */
+    font-weight: 500;
+    /* 중간 굵기 500으로 사용한다. */
+    font-display: swap;
+    /* 폰트 로딩 전에는 기본 글씨를 보여주고, 로딩 후 Pretendard로 바꾼다. */
+}
+
+@font-face {
+    /* Pretendard SemiBold 폰트를 등록한다. */
+    font-family: 'Pretendard';
+    /* CSS에서 사용할 폰트 이름을 Pretendard로 정한다. */
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-SemiBold.woff2') format('woff2');
+    /* Pretendard SemiBold 폰트 파일을 불러온다. */
+    font-weight: 600;
+    /* 세미볼드 굵기 600으로 사용한다. */
+    font-display: swap;
+    /* 폰트 로딩 전에는 기본 글씨를 보여주고, 로딩 후 Pretendard로 바꾼다. */
+}
+
+@font-face {
+    /* Pretendard Bold 폰트를 등록한다. */
+    font-family: 'Pretendard';
+    /* CSS에서 사용할 폰트 이름을 Pretendard로 정한다. */
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Bold.woff2') format('woff2');
+    /* Pretendard Bold 폰트 파일을 불러온다. */
+    font-weight: 700;
+    /* 굵은 글씨 700으로 사용한다. */
+    font-display: swap;
+    /* 폰트 로딩 전에는 기본 글씨를 보여주고, 로딩 후 Pretendard로 바꾼다. */
+}
+
+* {
+    /* 모든 태그에 공통으로 적용한다. */
+    box-sizing: border-box;
+    /* width와 height 계산할 때 padding과 border까지 포함해서 계산한다. */
+}
+
+body {
+    /* 화면 전체 body 영역을 설정한다. */
+    margin: 0;
+    /* 브라우저가 기본으로 주는 바깥 여백을 제거한다. */
+    background-color: #F7F9F8;
+    /* 전체 화면 배경색을 연한 민트 그레이로 설정한다. */
+    color: #1F2933;
+    /* 기본 글자색을 진한 회색으로 설정한다. */
+    font-family: 'Pretendard', Arial, sans-serif;
+    /* 기본 폰트를 Pretendard로 적용한다. */
+}
+
+button,
+input,
+select,
+textarea,
+a {
+    /* 버튼, 입력창, 선택창, 링크에도 폰트를 적용한다. */
+    font-family: 'Pretendard', Arial, sans-serif;
+    /* 각 태그의 기본 폰트를 Pretendard로 맞춘다. */
+}
+
+.siSidebar {
+    /* 사이드바 전체 영역이다. */
+    position: fixed;
+    /* 스크롤을 내려도 사이드바가 왼쪽에 고정되도록 한다. */
+    top: 0;
+    /* 화면 맨 위에 붙인다. */
+    left: 0;
+    /* 화면 맨 왼쪽에 붙인다. */
+    width: 240px;
+    /* 사이드바의 가로 길이를 240px로 설정한다. */
+    height: 100vh;
+    /* 사이드바 높이를 브라우저 화면 전체 높이로 설정한다. */
+    background-color: #FFFFFF;
+    /* 사이드바 배경을 흰색으로 설정한다. */
+    border-right: 1px solid #DDE5E1;
+    /* 사이드바 오른쪽에 연한 구분선을 넣는다. */
+    padding: 22px 16px;
+    /* 사이드바 안쪽 여백을 위아래 22px, 좌우 16px로 설정한다. */
+    z-index: 100;
+    /* 다른 화면 요소보다 사이드바가 앞에 보이도록 한다. */
+    overflow-y: auto;
+    /* 메뉴가 많아지면 사이드바 안에서 세로 스크롤이 생기게 한다. */
+}
+
+.siLogoBox {
+    /* 로고를 감싸는 영역이다. */
+    width: 100%;
+    /* 로고 영역의 가로 길이를 사이드바 전체에 맞춘다. */
+    margin-bottom: 24px;
+    /* 로고 아래쪽에 여백을 준다. */
+    text-align: center;
+    /* 로고와 설명 문구를 가운데 정렬한다. */
+}
+
+.siLogo {
+    /* 실제 로고 이미지이다. */
+    width: 132px;
+    /* 로고 이미지의 가로 크기를 설정한다. */
+    height: auto;
+    /* 이미지 비율이 깨지지 않도록 높이는 자동으로 설정한다. */
+    display: inline-block;
+    /* 이미지가 가운데 정렬될 수 있도록 inline-block으로 설정한다. */
+}
+
+.siLogoText {
+    /* 로고 아래 설명 문구이다. */
+    margin: 10px 0 0 0;
+    /* 로고와 설명 문구 사이에 위쪽 여백만 준다. */
+    font-size: 14px;
+    /* 설명 문구 글씨 크기를 잘 보이도록 설정한다. */
+    font-weight: 600;
+    /* 설명 문구를 조금 두껍게 만든다. */
+    color: #1F2933;
+    /* 설명 문구 색상을 진한 회색으로 설정한다. */
+    text-align: center;
+    /* 설명 문구를 가운데 정렬한다. */
+    line-height: 1.4;
+    /* 글자 줄 높이를 보기 좋게 설정한다. */
+}
+
+.siUserBox {
+    /* 사용자 정보 영역이다. */
+    background-color: #E6F2ED;
+    /* 사용자 정보 박스 배경을 연한 민트색으로 설정한다. */
+    border-radius: 12px;
+    /* 박스 모서리를 둥글게 만든다. */
+    padding: 14px 12px;
+    /* 박스 안쪽 여백을 설정한다. */
+    margin-bottom: 22px;
+    /* 사용자 정보 박스 아래쪽에 여백을 준다. */
+}
+
+.siUserName {
+    /* 사용자 이름 글씨이다. */
+    margin: 0;
+    /* p 태그가 기본으로 가지고 있는 여백을 제거한다. */
+    font-size: 15px;
+    /* 사용자 이름 글씨 크기를 설정한다. */
+    font-weight: 700;
+    /* 사용자 이름을 굵게 표시한다. */
+    color: #2F7D62;
+    /* 사용자 이름에 우리 메인 컬러를 적용한다. */
+}
+
+.siUserRole {
+    /* 사용자 역할 또는 시스템 이름 글씨이다. */
+    margin: 5px 0 0 0;
+    /* 위쪽에만 작은 여백을 주고 나머지는 제거한다. */
+    font-size: 13px;
+    /* 보조 글씨 크기를 설정한다. */
+    font-weight: 500;
+    /* 보조 글씨가 너무 연하지 않게 만든다. */
+    color: #374151;
+    /* 보조 글씨색을 진한 회색 계열로 설정한다. */
+}
+
+.siMenu {
+    /* 메뉴 전체 영역이다. */
+    width: 100%;
+    /* 메뉴 영역의 가로 길이를 사이드바에 맞춘다. */
+}
+
+.siMenuSingle {
+    /* 하위 메뉴가 없는 단일 메뉴이다. */
+    display: block;
+    /* a 태그를 한 줄 전체를 차지하는 박스처럼 만든다. */
+    width: 100%;
+    /* 메뉴 버튼의 가로 길이를 전체로 설정한다. */
+    padding: 11px 12px;
+    /* 메뉴 안쪽 여백을 설정한다. */
+    margin-bottom: 6px;
+    /* 메뉴 사이에 간격을 준다. */
+    border-radius: 10px;
+    /* 메뉴 박스의 모서리를 둥글게 만든다. */
+    color: #1F2933;
+    /* 메뉴 글자색을 진한 회색으로 설정한다. */
+    font-size: 16px;
+    /* 메뉴 글씨 크기를 설정한다. */
+    font-weight: 600;
+    /* 메뉴 글씨를 조금 굵게 설정한다. */
+    text-decoration: none;
+    /* a 태그의 밑줄을 제거한다. */
+}
+
+.siMenuSingle:hover {
+    /* 단일 메뉴에 마우스를 올렸을 때의 디자인이다. */
+    background-color: #E6F2ED;
+    /* 마우스를 올리면 연한 민트 배경이 보이게 한다. */
+    color: #2F7D62;
+    /* 마우스를 올리면 글씨색을 메인 컬러로 바꾼다. */
+}
+
+.siMenuGroup {
+    /* 큰 메뉴와 하위 메뉴를 묶는 영역이다. */
+    margin-bottom: 6px;
+    /* 메뉴 그룹 사이의 간격을 설정한다. */
+}
+
+.siMenuTitle {
+    /* 하위 메뉴를 여는 큰 메뉴 버튼이다. */
+    width: 100%;
+    /* 버튼의 가로 길이를 사이드바 메뉴 영역 전체로 설정한다. */
+    padding: 11px 12px;
+    /* 버튼 안쪽 여백을 설정한다. */
+    border: none;
+    /* 버튼 기본 테두리를 제거한다. */
+    border-radius: 10px;
+    /* 버튼 모서리를 둥글게 만든다. */
+    background-color: transparent;
+    /* 버튼 배경을 투명하게 설정한다. */
+    color: #1F2933;
+    /* 버튼 글자색을 진한 회색으로 설정한다. */
+    font-size: 16px;
+    /* 버튼 글씨 크기를 설정한다. */
+    font-weight: 600;
+    /* 큰 메뉴 글씨를 조금 굵게 설정한다. */
+    text-align: left;
+    /* 버튼 안의 글씨를 왼쪽 정렬한다. */
+    cursor: pointer;
+    /* 마우스를 올렸을 때 클릭 가능한 손가락 모양으로 보이게 한다. */
+    display: flex;
+    /* 메뉴명과 화살표를 한 줄에 나란히 배치한다. */
+    justify-content: space-between;
+    /* 메뉴명은 왼쪽, 화살표는 오른쪽 끝으로 보낸다. */
+    align-items: center;
+    /* 메뉴명과 화살표가 세로 가운데에 오도록 맞춘다. */
+}
+
+.siMenuTitle:hover {
+    /* 큰 메뉴 버튼에 마우스를 올렸을 때의 디자인이다. */
+    background-color: #E6F2ED;
+    /* 마우스를 올리면 연한 민트 배경이 보이게 한다. */
+    color: #2F7D62;
+    /* 마우스를 올리면 글씨색을 메인 컬러로 바꾼다. */
+}
+
+.siMenuArrow {
+    /* 큰 메뉴 오른쪽에 들어가는 SVG 화살표 영역이다. */
+    width: 18px;
+    /* 화살표 영역의 가로 크기를 설정한다. */
+    height: 18px;
+    /* 화살표 영역의 세로 크기를 설정한다. */
+    display: flex;
+    /* SVG 화살표를 가운데 배치하기 위해 flex를 사용한다. */
+    align-items: center;
+    /* SVG 화살표를 세로 가운데로 맞춘다. */
+    justify-content: center;
+    /* SVG 화살표를 가로 가운데로 맞춘다. */
+    color: #374151;
+    /* 닫힌 상태의 화살표 색상을 진한 회색으로 설정한다. */
+    transition: transform 0.2s ease;
+    /* 메뉴가 열리고 닫힐 때 화살표가 부드럽게 회전되도록 한다. */
+}
+
+.siMenuArrowSvg {
+    /* 실제 SVG 화살표이다. */
+    width: 16px;
+    /* SVG 화살표의 가로 크기를 설정한다. */
+    height: 16px;
+    /* SVG 화살표의 세로 크기를 설정한다. */
+    fill: none;
+    /* SVG 내부 색상 채우기를 없앤다. */
+    stroke: currentColor;
+    /* SVG 선 색상을 부모의 color 값과 같게 설정한다. */
+    stroke-width: 2.4;
+    /* SVG 선 두께를 설정한다. */
+    stroke-linecap: round;
+    /* SVG 선 끝을 둥글게 만든다. */
+    stroke-linejoin: round;
+    /* SVG 선이 꺾이는 부분을 둥글게 만든다. */
+}
+
+.siMenuGroup.open .siMenuTitle {
+    /* 하위 메뉴가 열린 상태일 때 큰 메뉴 버튼 디자인이다. */
+    background-color: #E6F2ED;
+    /* 열린 메뉴는 연한 민트 배경으로 표시한다. */
+    color: #2F7D62;
+    /* 열린 메뉴 글씨는 메인 컬러로 표시한다. */
+    font-weight: 700;
+    /* 열린 메뉴 글씨를 두껍게 표시한다. */
+}
+
+.siMenuGroup.open .siMenuArrow {
+    /* 하위 메뉴가 열린 상태일 때의 화살표이다. */
+    color: #2F7D62;
+    /* 메뉴가 열리면 화살표 색상을 메인 컬러로 바꾼다. */
+    transform: rotate(180deg);
+    /* 아래 방향 화살표를 위 방향처럼 보이도록 180도 회전시킨다. */
+}
+
+.siSubMenu {
+    /* 하위 메뉴 전체 영역이다. */
+    display: none;
+    /* 처음 화면에서는 하위 메뉴가 보이지 않도록 숨긴다. */
+    padding-top: 4px;
+    /* 하위 메뉴 위쪽에 작은 여백을 준다. */
+    padding-left: 10px;
+    /* 하위 메뉴가 큰 메뉴보다 살짝 안쪽에 들어가게 만든다. */
+}
+
+.siMenuGroup.open .siSubMenu {
+    /* 큰 메뉴가 open 상태일 때 그 안의 하위 메뉴를 보여준다. */
+    display: block;
+    /* 숨겨져 있던 하위 메뉴를 화면에 보여준다. */
+}
+
+.siSubMenuLink {
+    /* 하위 메뉴 하나하나의 링크이다. */
+    display: block;
+    /* a 태그를 한 줄 전체를 차지하는 박스처럼 만든다. */
+    padding: 9px 12px;
+    /* 하위 메뉴 안쪽 여백을 설정한다. */
+    margin-bottom: 3px;
+    /* 하위 메뉴 사이에 작은 간격을 준다. */
+    border-radius: 8px;
+    /* 하위 메뉴 모서리를 둥글게 만든다. */
+    color: #374151;
+    /* 하위 메뉴 글자색을 진한 회색으로 설정한다. */
+    font-size: 15px;
+    /* 하위 메뉴 글씨 크기를 설정한다. */
+    font-weight: 500;
+    /* 하위 메뉴 기본 글씨를 너무 얇지 않게 만든다. */
+    text-decoration: none;
+    /* a 태그의 밑줄을 제거한다. */
+}
+
+.siSubMenuLink:hover {
+    /* 하위 메뉴에 마우스를 올렸을 때의 디자인이다. */
+    background-color: #E6F2ED;
+    /* 마우스를 올리면 연한 민트 배경이 보이게 한다. */
+    color: #2F7D62;
+    /* 마우스를 올리면 글씨색을 메인 컬러로 바꾼다. */
+}
+
+.siSubMenuLink.active {
+    /* 현재 선택된 하위 메뉴 디자인이다. */
+    background-color: #E6F2ED;
+    /* 현재 선택된 하위 메뉴 배경을 연한 민트색으로 유지한다. */
+    color: #2F7D62;
+    /* 현재 선택된 하위 메뉴 글자색을 메인 컬러로 설정한다. */
+    font-weight: 700;
+    /* 현재 선택된 하위 메뉴 글씨를 두껍게 만든다. */
+}
+
+.siLogoutBox {
+    /* 로그아웃 영역이다. */
+    margin-top: 24px;
+    /* 메뉴가 끝난 뒤 로그아웃 버튼이 자연스럽게 아래에 오도록 위쪽 여백을 준다. */
+    padding-bottom: 20px;
+    /* 사이드바 맨 아래와 로그아웃 버튼 사이에 여유 공간을 준다. */
+}
+
+.siLogoutBtn {
+    /* 로그아웃 버튼이다. */
+    display: block;
+    /* a 태그를 박스처럼 만든다. */
+    width: 100%;
+    /* 로그아웃 버튼의 가로 길이를 전체로 설정한다. */
+    padding: 11px 12px;
+    /* 로그아웃 버튼 안쪽 여백을 설정한다. */
+    border-radius: 10px;
+    /* 로그아웃 버튼 모서리를 둥글게 만든다. */
+    background-color: #2F7D62;
+    /* 로그아웃 버튼 배경을 우리 메인 컬러로 설정한다. */
+    color: #FFFFFF;
+    /* 로그아웃 버튼 글자색을 흰색으로 설정한다. */
+    font-size: 14px;
+    /* 로그아웃 버튼 글씨 크기를 설정한다. */
+    font-weight: 700;
+    /* 로그아웃 버튼 글씨를 굵게 만든다. */
+    text-align: center;
+    /* 로그아웃 글씨를 가운데 정렬한다. */
+    text-decoration: none;
+    /* a 태그의 밑줄을 제거한다. */
+}
+
+.siLogoutBtn:hover {
+    /* 로그아웃 버튼에 마우스를 올렸을 때의 디자인이다. */
+    background-color: #276B54;
+    /* 마우스를 올리면 조금 더 진한 에메랄드 색으로 바꾼다. */
+}
+
+.main-content {
+    /* layout.jsp 안의 실제 본문 영역이다. */
+    margin-left: 240px;
+    /* 사이드바 너비만큼 본문을 오른쪽으로 밀어준다. */
+    padding: 30px;
+    /* 본문 안쪽 여백을 설정한다. */
+    min-height: 100vh;
+    /* 본문 최소 높이를 화면 전체 높이로 설정한다. */
+    background-color: #F7F9F8;
+    /* 본문 배경색을 우리 컬러가이드 배경색으로 설정한다. */
+}
