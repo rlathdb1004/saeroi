@@ -5,12 +5,23 @@
 
 <mapper namespace="mapper.quality">
 	<!-- 검사관리 리스트 -->
+<!-- 	조인해서 필요한 것: 품목명, LOT 번호, 검사자 -->
 	<select id="_select_Inspection" resultType="kr.or.saeroi.dto.InspectionDTO">
 		SELECT
-		1 AS inspId,
-		SYSDATE AS inspDate,
-		'가스켓' AS item_name,
-		'합격' AS result
-		FROM DUAL
+		i.insp_id,
+		i.insp_date,
+		it.item_name,
+		w.product_lot,
+		e.ename,
+		i.result
+				
+		FROM inspection i, production p,work_order w,
+				production_plan pr, item it, emp e
+		where i.prod_id = p.prod_id 
+		and p.order_id = w.order_id 
+		and w.prod_plan_id = pr.prod_plan_id
+		and pr.item_id = it.item_id 
+		and i.emp_id = e.emp_id
+			
 	</select>
 </mapper>
