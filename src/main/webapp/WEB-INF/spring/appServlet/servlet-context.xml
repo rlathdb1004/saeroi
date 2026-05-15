@@ -38,6 +38,10 @@
 		</beans:constructor-arg>
 	</beans:bean>
 
+
+	<!-- ai챗봇이 api키 제대로 읽을수 있게  -->
+	<context:property-placeholder location="classpath:application.properties" />
+	
 	<context:component-scan
 		base-package="kr.or.saeroi" />
 
