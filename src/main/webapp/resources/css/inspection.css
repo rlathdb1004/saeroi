@@ -1,0 +1,60 @@
+@charset "UTF-8";
+
+.qiPage {
+    width: 100%;
+}
+
+.qiSearchBox {
+    min-height: 132px;
+    margin-bottom: 72px;
+}
+
+.qiSearchRow {
+    display: flex;
+    align-items: flex-end;
+    gap: 22px;
+    flex-wrap: wrap;
+}
+
+.qiDateItem {
+    width: 300px;
+}
+
+.qiTypeItem {
+    width: 150px;
+}
+
+.qiKeywordItem {
+    width: 260px;
+}
+
+.qiDateBox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.qiDateBox .coInput {
+    width: 130px;
+}
+
+.qiDateDash {
+    color: #1f2933;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.qiPage .qiSearchBtnBox {
+    margin-left: 0;
+    align-self: flex-end;
+}
+
+.qiCheck {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.qiPage .coTableTop {
+    margin-bottom: 12px;
+}
