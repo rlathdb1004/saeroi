@@ -1,5 +1,7 @@
 package kr.or.saeroi.AiChatbot;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -19,11 +21,11 @@ public class aiChatService {
 	private String apikey;
 	
 	
-	public String getChatResponse(String prompt) {
+	public String getChatResponse(List<aiChatContents> history) {
 		System.out.println("현재 사용 중인 키: " + (apikey != null ? apikey.substring(0, 4) + "****" : "null"));
 		String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
 		try {
-			aiChatText requestBody = new aiChatText(prompt);
+			aiChatText requestBody = new aiChatText(history);
 			
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
@@ -33,6 +35,7 @@ public class aiChatService {
 			HttpEntity<aiChatText> entity = new HttpEntity<aiChatText>(requestBody,headers);
 			
 			ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+			
 			return response.getBody();
 		} catch (org.springframework.web.client.HttpClientErrorException e) {
 			System.out.println("구글 에러 응답: " + e.getResponseBodyAsString());
