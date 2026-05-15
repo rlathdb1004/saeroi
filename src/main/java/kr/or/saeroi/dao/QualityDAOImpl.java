@@ -16,7 +16,7 @@ public class QualityDAOImpl implements QualityDAO{
 	SqlSession sqlSession;
 	
 	@Override
-	public List<InspectionDTO> selectInspection(){
+	public List<InspectionDTO> _dao_select_Inspection(){
 		List<InspectionDTO> inspection_List = null;
 		//mybatis 도구 sqlSession, 여러줄 실행
 		inspection_List = sqlSession.selectList("mapper.quality._select_Inspection");
