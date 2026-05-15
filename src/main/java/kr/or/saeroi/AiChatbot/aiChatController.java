@@ -1,5 +1,7 @@
 package kr.or.saeroi.AiChatbot;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +25,14 @@ public class aiChatController {
 
 	@RequestMapping(value = "/gemini", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")
 	@ResponseBody
-	public String gemini(@RequestBody Map<String, String> params) {
-		String prompt = params.get("prompt");
-		System.out.println(prompt);
-		return aiChatservice.getChatResponse(prompt);
+	public String gemini(@RequestBody List<Map<String, Object>> params) {
+		List<aiChatContents> history = new ArrayList<aiChatContents>();
+		
+		for(Map<String, Object> msg : params) {
+			String role = (String) msg.get("role");
+			String text = (String) msg.get("text");
+			history.add(new aiChatContents(role,text));
+		}
+		return aiChatservice.getChatResponse(history);
 	}
 }

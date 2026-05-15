@@ -8,9 +8,8 @@ import java.util.List;
 public class aiChatText {
 	private List<aiChatContents> contents;
 	
-	public aiChatText(String text) {
-		this.contents = new ArrayList<aiChatContents>();
-		this.contents.add(new aiChatContents(text));
+	public aiChatText(List<aiChatContents> history) {
+		this.contents = history;
 	}
 	public List<aiChatContents> getContents(){
 		return contents;
