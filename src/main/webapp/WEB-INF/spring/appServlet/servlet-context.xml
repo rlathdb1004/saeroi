@@ -33,11 +33,15 @@
 			<beans:bean
 				class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">
 				<beans:property name="connectTimeout" value="5000" />
-				<beans:property name="readTimeout" value="5000" />
+				<beans:property name="readTimeout" value="60000" />
 			</beans:bean>
 		</beans:constructor-arg>
 	</beans:bean>
 
+
+	<!-- ai챗봇이 api키 제대로 읽을수 있게  -->
+	<context:property-placeholder location="classpath:application.properties" />
+	
 	<context:component-scan
 		base-package="kr.or.saeroi" />
 
