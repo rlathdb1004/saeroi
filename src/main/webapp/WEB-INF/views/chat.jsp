@@ -32,8 +32,8 @@
 				let text = await response.text()
 				let data = JSON.parse(text)
 				let aiResponse = data.candidates[0].content.parts[0].text;
-				chat.innerHTML += "유저: " + aiResponse
-				chat.innerHTML += "ai: " + aiResponse
+				chat.innerHTML += "유저: " + prompt.value + `<br>`
+				chat.innerHTML += "ai: " + aiResponse + `<br>`
 				prompt.value='';
 				
 		})

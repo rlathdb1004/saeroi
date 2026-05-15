@@ -372,7 +372,7 @@
     <div class="siLogoutBox">
     <%-- 로그아웃 버튼이 들어가는 영역이다. --%>
 
-        <a href="${pageContext.request.contextPath}/logout" class="siLogoutBtn">로그아웃</a>
+        <a href="${pageContext.request.contextPath}/login" class="siLogoutBtn">로그아웃</a>
         <%-- 로그아웃 버튼을 클릭하면 /logout 주소로 이동한다. --%>
 
     </div>

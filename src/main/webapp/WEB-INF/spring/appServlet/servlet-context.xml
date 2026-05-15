@@ -33,7 +33,7 @@
 			<beans:bean
 				class="org.springframework.http.client.HttpComponentsClientHttpRequestFactory">
 				<beans:property name="connectTimeout" value="5000" />
-				<beans:property name="readTimeout" value="5000" />
+				<beans:property name="readTimeout" value="60000" />
 			</beans:bean>
 		</beans:constructor-arg>
 	</beans:bean>
