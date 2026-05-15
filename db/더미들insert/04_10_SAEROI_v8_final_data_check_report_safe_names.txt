@@ -13,7 +13,7 @@
 - bom: 6건
 - bom_detail: 30건
 - client: 8건
-- comment: 4건
+- board_comment: 4건
 - defect: 6건
 - defect_list: 602건
 - emp: 12건
@@ -21,7 +21,7 @@
 - equipment_history: 2,000건
 - equipment_maintenance: 10건
 - equipment_trouble: 6건
-- file: 8건
+- attached_file: 8건
 - inspection: 1,013건
 - inventory: 19건
 - item: 16건
