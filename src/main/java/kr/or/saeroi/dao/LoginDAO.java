@@ -31,7 +31,7 @@ public class LoginDAO {
 
             if (rs.next()) {
                 login = new LoginDTO();                
-                login.setEmp_no(rs.getString("EMPNO"));
+                login.setEmpno(rs.getString("EMPNO"));
                 login.setEname(rs.getString("ENAME"));
                 login.setEmp_pw(rs.getString("EMP_PW"));
                 login.setDept(rs.getString("DEPT"));
