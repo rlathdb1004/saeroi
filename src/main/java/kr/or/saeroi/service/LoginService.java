@@ -19,14 +19,14 @@ public class LoginService {
     @Autowired
     private DataSource dataSource;
 
-    public LoginDTO login(String emp_no, String pw) {
+    public LoginDTO login(String empno, String pw) {
 
         Connection conn = null;
 
         try {
             conn = dataSource.getConnection();
 
-            LoginDTO login = loginDAO.FindEmpNo(conn, emp_no);
+            LoginDTO login = loginDAO.FindEmpNo(conn, empno);
 
             if(login == null) {
                 return null;
@@ -47,5 +47,9 @@ public class LoginService {
                 e.printStackTrace();
             }
         }
+    }
+    
+    public boolean checkUser(String empno, String email) {
+        return loginDAO.countByEmpNoAndEmail(empno, email) > 0;
     }
 }
