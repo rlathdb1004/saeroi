@@ -4,39 +4,50 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+
+import dev.langchain4j.memory.ChatMemory;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.service.AiServices;
 
 @Service
 public class aiChatService {
 
 	@Autowired
-	private RestTemplate restTemplate;
+	private ChatLanguageModel geminiModel;
+
+	@Autowired
+	private DbTool dbTool;
 	
 	@Value("${gemini.api.key}")
 	private String apikey;
 	
 	
 	public String getChatResponse(List<aiChatContents> history) {
-		System.out.println("현재 사용 중인 키: " + (apikey != null ? apikey.substring(0, 4) + "****" : "null"));
-		String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
+//		System.out.println("현재 사용 중인 키: " + (apikey != null ? apikey.substring(0, 4) + "****" : "null"));
+		//langchain4j방식으로 전환해서 주석 궁금하면 LangChain4j파일로
+//		String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
 		try {
-			aiChatText requestBody = new aiChatText(history);
-			
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			
-			headers.set("x-goog-api-key", apikey);
-			
-			HttpEntity<aiChatText> entity = new HttpEntity<aiChatText>(requestBody,headers);
-			
-			ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
-			
-			return response.getBody();
+			// 멀티턴을 langchain4j의 클래스가 대체
+//			aiChatText requestBody = new aiChatText(history); 	//기억할 채팅 히스토리
+			ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10);
+			System.out.println("dbTool확인: " + dbTool);
+			MesAssistant assistant = AiServices.builder(MesAssistant.class)
+				.chatLanguageModel(geminiModel)
+				.chatMemory(chatMemory)
+				.tools(dbTool)
+				.build();
+//			HttpHeaders headers = new HttpHeaders();
+//			headers.setContentType(MediaType.APPLICATION_JSON);
+			//langchain4j방식으로 전환해서 주석 궁금하면 LangChain4j파일로
+//			headers.set("x-goog-api-key", apikey);
+			//langchain4j방식으로 전환해서 주석 궁금하면 LangChain4j파일로
+//			HttpEntity<aiChatText> entity = new HttpEntity<aiChatText>(requestBody,headers);
+			//langchain4j방식으로 전환해서 주석 궁금하면 LangChain4j파일로
+//			ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+			String lastUserMsg = history.get(history.size()-1).getParts().get(0).getText();
+			return assistant.chat(lastUserMsg);
 		} catch (org.springframework.web.client.HttpClientErrorException e) {
 			System.out.println("구글 에러 응답: " + e.getResponseBodyAsString());
 		    return "에러 발생: " + e.getResponseBodyAsString();

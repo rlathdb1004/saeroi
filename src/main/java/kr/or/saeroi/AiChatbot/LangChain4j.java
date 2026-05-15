@@ -13,6 +13,7 @@ public class LangChain4j {
 	@Value("${gemini.api.key}")
 	private String apikey;
 	
+	// 기존엔 서비스에서 제미나이url을 땃지만 렝체인방식으로 간략화
 	@Bean
 	public ChatLanguageModel LangChainModel() {
 		return GoogleAiGeminiChatModel.builder()

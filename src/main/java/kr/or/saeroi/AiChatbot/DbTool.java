@@ -1,21 +1,30 @@
 package kr.or.saeroi.AiChatbot;
 
-import java.util.Map;
+import java.sql.Connection;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import dev.langchain4j.agent.tool.Tool;
-import kr.or.saeroi.dao.QualityDAO;
+import kr.or.saeroi.member.dao.LoginDAO;
+import kr.or.saeroi.member.dto.LoginDTO;
 
+@Component
 public class DbTool {
 
 	@Autowired
-	private QualityDAO qualityDAO;
-	
-	@Tool("이차전지 공장의 특정 생산 라인의 현재 배터리 재고를 조회합니다.")
-	public String getLineStatus(String lineName) {
-		
-		Map<String, Object> data = qualityDAO.selectLineStatus(lineName);
-		return data.toString();
+	private javax.sql.DataSource dataSource;
+
+	@Autowired
+	private LoginDAO loginDAO;
+
+	@Tool("사원 번호로 상세 정보를 조회합니다")
+	public String getemp(String empNo) {
+		try (Connection conn = dataSource.getConnection()) {
+			LoginDTO data = loginDAO.FindEmpNo(conn, empNo);
+			return data.toString();
+		} catch (Exception e) {
+			return "DB 조회 중 오류: " + e.getMessage();
+		}
 	}
 }
