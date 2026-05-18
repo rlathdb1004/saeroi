@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import dev.langchain4j.agent.tool.Tool;
+import kr.or.saeroi.dao.InoutDAO;
 import kr.or.saeroi.dao.LoginDAO;
 import kr.or.saeroi.dao.QualityDAO;
+import kr.or.saeroi.dto.InoutDTO;
 import kr.or.saeroi.dto.InspectionDTO;
 import kr.or.saeroi.dto.LoginDTO;
 
@@ -23,6 +25,9 @@ public class DbTool {
 
 	@Autowired
 	private QualityDAO qualityDAO;
+	
+	@Autowired
+	private InoutDAO inoutDAO;
 	
 	@Tool("사원 번호로 상세 정보를 조회합니다")
 	public String getemp(String empNo) {
@@ -48,5 +53,21 @@ public class DbTool {
 		} catch (Exception e) {
 			return "퀄리티 조회중 오류: " + e.getMessage();
 		}
+	}
+	
+	@Tool("입출고 기록을 조회합니다.페이징스타트(startRow)페이지엔드(endRow)를 언급하지않았다면, 무리하게 채우지말고 문자열(\"\")로 넘겨주어야 합니다." +
+			"만약 조회 시작일(startDate)과 종료일(endDate)을 언급하지 않았다면, 무리하게 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다." +
+			"")
+	public String getInOut(int startRow,
+							int endRow,
+							String searchType,
+							String keyword,
+							String startDate,
+							String endDate) {
+		String type = (searchType != null && !searchType.isEmpty()) ? searchType : null; 
+		String key = (keyword != null && !keyword.isEmpty()) ? keyword : null; 
+		
+		List<InoutDTO> list = inoutDAO.selectInoutList(startRow, endRow, type, key,startDate,endDate);
+		return list.isEmpty() ? "해당 조건으로 조회된 품질 검사 결과가 없습니다." :list.toString();
 	}
 }
