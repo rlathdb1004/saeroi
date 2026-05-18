@@ -5,55 +5,6 @@
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
 <style>
-	/* 버튼 영역 */
-	.inoutBtnArea {
-		text-align: right;
-		margin-bottom: 10px;
-	}
-
-	/* 등록, 검색 버튼 */
-	.inoutMainBtn {
-		background-color: #2F7D62;
-		color: white;
-		border: none;
-		border-radius: 7px;
-		padding: 8px 26px;
-		font-weight: bold;
-		cursor: pointer;
-	}
-
-	/* 선택삭제, 초기화, 상세보기 버튼 */
-	.inoutSubBtn {
-		background-color: white;
-		color: #1F2933;
-		border: 1px solid #cbd5df;
-		border-radius: 7px;
-		padding: 8px 18px;
-		font-weight: bold;
-		cursor: pointer;
-	}
-
-	/* 검색 영역 한 줄 */
-	.inoutSearchLine {
-		display: flex;
-		align-items: center;
-		gap: 12px;
-	}
-
-	/* 검색 select, input */
-	.inoutSearchLine select,
-	.inoutSearchLine input {
-		height: 42px;
-		border: 1px solid #d8e1ea;
-		border-radius: 12px;
-		padding: 0 14px;
-	}
-
-	/* 검색어 입력칸 */
-	.inoutKeyword {
-		width: 300px;
-	}
-
 	/* 테이블 너비 고정 */
 	.coTable {
 		table-layout: fixed;
@@ -158,85 +109,158 @@
 <div class="coPageWrap">
 
 	<!-- 검색 영역 -->
-	<div class="coSearchBox">
+	<form class="search-form"
+		method="get"
+		action="${pageContext.request.contextPath}/inventory/materialIn">
 
-		<form method="get"
-			action="${pageContext.request.contextPath}/inventory/materialIn">
+		<div class="search-box">
 
-			<div class="inoutSearchLine">
+			<div class="search-row">
 
-				<select name="searchType">
-					<option value="all"
-						<c:if test="${searchType eq 'all'}">selected</c:if>>
-						전체 / 품목코드 / 품목명
-					</option>
+				<!-- 구분 -->
+				<div class="search-item">
 
-					<option value="itemCode"
-						<c:if test="${searchType eq 'itemCode'}">selected</c:if>>
-						품목코드
-					</option>
+					<label class="search-label">
+						구분
+					</label>
 
-					<option value="itemName"
-						<c:if test="${searchType eq 'itemName'}">selected</c:if>>
-						품목명
-					</option>
-				</select>
+					<select name="searchType"
+						class="search-select">
 
-				<label>시작일</label>
-				<input type="date"
-					name="startDate"
-					value="${startDate}">
+						<option value="">
+							선택
+						</option>
 
-				<label>종료일</label>
-				<input type="date"
-					name="endDate"
-					value="${endDate}">
+						<option value="itemCode"
+							<c:if test="${searchType eq 'itemCode'}">selected</c:if>>
+							품목코드
+						</option>
 
-				<input type="text"
-					name="keyword"
-					class="inoutKeyword"
-					placeholder="검색키워드"
-					value="${keyword}">
+						<option value="itemName"
+							<c:if test="${searchType eq 'itemName'}">selected</c:if>>
+							품목명
+						</option>
 
-				<button type="submit"
-					class="inoutMainBtn">
-					검색
-				</button>
+					</select>
 
-				<button type="button"
-					class="inoutSubBtn"
-					onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
-					초기화
-				</button>
+				</div>
+
+				<!-- 시작일 -->
+				<div class="search-item">
+
+					<label class="search-label">
+						시작일
+					</label>
+
+					<input type="date"
+						name="startDate"
+						class="search-date"
+						value="${startDate}">
+
+				</div>
+
+				<!-- 종료일 -->
+				<div class="search-item">
+
+					<label class="search-label">
+						종료일
+					</label>
+
+					<input type="date"
+						name="endDate"
+						class="search-date"
+						value="${endDate}">
+
+				</div>
+
+				<!-- 검색어 -->
+				<div class="search-item">
+
+					<label class="search-label">
+						검색어
+					</label>
+
+					<input type="text"
+						name="keyword"
+						class="search-input"
+						placeholder="검색키워드"
+						value="${keyword}">
+
+				</div>
+
+				<!-- 검색 / 초기화 버튼 -->
+				<div class="search-btn-wrap">
+
+					<button type="submit"
+						class="search-btn search-btn-main">
+
+						<svg viewBox="0 0 24 24" fill="none">
+							<circle cx="10.5"
+								cy="10.5"
+								r="7.5"
+								stroke="currentColor"
+								stroke-width="2"></circle>
+
+							<path d="M16 16L21 21"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"></path>
+						</svg>
+
+						검색
+					</button>
+
+					<button type="button"
+						class="search-btn search-btn-sub search-reset-btn"
+						onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
+
+						<svg viewBox="0 0 24 24" fill="none">
+							<path d="M20 12C20 16.4 16.4 20 12 20C7.6 20 4 16.4 4 12C4 7.6 7.6 4 12 4C14.4 4 16.5 5.1 18 6.8"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"></path>
+
+							<path d="M18 4V7H21"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"></path>
+						</svg>
+
+						초기화
+					</button>
+
+				</div>
 
 			</div>
 
-		</form>
+		</div>
 
-	</div>
+	</form>
 
 	<!-- 삭제용 form -->
 	<form method="post"
 		id="deleteForm"
 		action="${pageContext.request.contextPath}/inventory/materialIn/delete">
 
-		<!-- 총 건수 / 버튼 영역 -->
+		<!-- 총 건수 / 등록 버튼 / 선택 삭제 버튼 -->
 		<div class="coTableTop">
 
 			<p class="coTotalCount">
 				총 ${pageInfo.totalCount}건
 			</p>
 
-			<div class="inoutBtnArea">
+			<!-- 팀장님 공통 버튼 위치 -->
+			<div class="search-btn-right">
 
 				<button type="button"
-					class="inoutMainBtn"
+					class="search-btn search-btn-main"
 					onclick="openInoutModal()">
 					등록
 				</button>
 
 				<button type="button"
-					class="inoutSubBtn"
+					class="search-btn search-btn-sub"
 					onclick="deleteCheck()">
 					선택 삭제
 				</button>
@@ -251,8 +275,13 @@
 			<table class="coTable">
 
 				<thead>
+
 					<tr>
-						<th><input type="checkbox" id="checkAll"></th>
+						<th>
+							<input type="checkbox"
+								id="checkAll">
+						</th>
+
 						<th>NO</th>
 						<th>입출고번호</th>
 						<th>입출고구분</th>
@@ -262,8 +291,9 @@
 						<th>입출고량</th>
 						<th>단위</th>
 						<th>일자</th>
-						<th>상세보기</th>
+						<th>보기</th>
 					</tr>
+
 				</thead>
 
 				<tbody>
@@ -279,7 +309,6 @@
 									value="${inout.inoutId}">
 							</td>
 
-							<!-- 화면 번호는 1번부터 다시 출력 -->
 							<td>${status.count}</td>
 
 							<td title="${inout.docNo}">
@@ -288,9 +317,17 @@
 
 							<td>
 								<c:choose>
-									<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
-									<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
-									<c:otherwise>${inout.inoutType}</c:otherwise>
+									<c:when test="${inout.inoutType eq 'MI'}">
+										입고
+									</c:when>
+
+									<c:when test="${inout.inoutType eq 'MO-PROD'}">
+										출고
+									</c:when>
+
+									<c:otherwise>
+										${inout.inoutType}
+									</c:otherwise>
 								</c:choose>
 							</td>
 
@@ -300,10 +337,21 @@
 
 							<td>
 								<c:choose>
-									<c:when test="${inout.itemType eq 'FG'}">완제품</c:when>
-									<c:when test="${inout.itemType eq 'RM'}">원자재</c:when>
-									<c:when test="${inout.itemType eq 'SM'}">부자재</c:when>
-									<c:otherwise>${inout.itemType}</c:otherwise>
+									<c:when test="${inout.itemType eq 'FG'}">
+										완제품
+									</c:when>
+
+									<c:when test="${inout.itemType eq 'RM'}">
+										원자재
+									</c:when>
+
+									<c:when test="${inout.itemType eq 'SM'}">
+										부자재
+									</c:when>
+
+									<c:otherwise>
+										${inout.itemType}
+									</c:otherwise>
 								</c:choose>
 							</td>
 
@@ -317,11 +365,12 @@
 
 							<td>
 								<button type="button"
-									class="inoutSubBtn"
+									class="search-btn search-btn-sub"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
-									상세보기
+									보기
 								</button>
 							</td>
+
 						</tr>
 
 					</c:forEach>
@@ -338,207 +387,3 @@
 	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 
 </div>
-
-<!-- 등록 모달 -->
-<div id="inoutModal"
-	class="inoutModalBg">
-
-	<div class="inoutModalBox">
-
-		<div class="inoutModalTitle">
-			<span>입출고 등록</span>
-			<span onclick="closeInoutModal()"
-				style="cursor:pointer;">×</span>
-		</div>
-
-		<div class="inoutModalContent">
-
-			<form method="post"
-				action="${pageContext.request.contextPath}/inventory/materialIn/insert">
-
-				<div class="inoutFormGrid">
-
-					<div class="inoutFormBox">
-						<label>품목 선택 *</label>
-						<select name="itemId"
-							id="itemSelect"
-							onchange="changeItemInfo()"
-							required>
-
-							<option value="">품목을 선택하세요</option>
-
-							<c:forEach var="item"
-								items="${itemList}">
-
-								<option value="${item.itemId}"
-									data-code="${item.itemCode}"
-									data-name="${item.itemName}"
-									data-type="${item.itemType}"
-									data-unit="${item.itemUnit}">
-
-									${item.itemName}
-
-								</option>
-
-							</c:forEach>
-
-						</select>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>품목코드</label>
-						<input type="text"
-							id="itemCode"
-							readonly>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>품목명</label>
-						<input type="text"
-							id="itemName"
-							readonly>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>품목 유형</label>
-						<input type="text"
-							id="itemType"
-							readonly>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>입출고구분</label>
-						<select name="inoutType">
-							<option value="MI">입고</option>
-							<option value="MO-PROD">출고</option>
-						</select>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>수량 *</label>
-						<input type="number"
-							name="inoutQty"
-							required>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>단위</label>
-						<input type="text"
-							id="itemUnit"
-							readonly>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>일자 *</label>
-						<input type="date"
-							name="inoutDate"
-							required>
-					</div>
-
-				</div>
-
-				<div class="inoutRemark">
-					<label>비고</label>
-					<textarea name="remark"></textarea>
-				</div>
-
-				<div class="inoutSaveArea">
-					<button type="submit"
-						class="inoutMainBtn">
-						저장
-					</button>
-				</div>
-
-			</form>
-
-		</div>
-
-	</div>
-
-</div>
-
-<script>
-
-	// 전체 체크박스 선택
-	document.getElementById("checkAll").onclick = function() {
-
-		var checks =
-			document.getElementsByName("inoutIds");
-
-		for (var i = 0; i < checks.length; i++) {
-
-			checks[i].checked = this.checked;
-		}
-	};
-
-	// 선택 삭제
-	function deleteCheck() {
-
-		var checks =
-			document.getElementsByName("inoutIds");
-
-		var checked = false;
-
-		for (var i = 0; i < checks.length; i++) {
-
-			if (checks[i].checked) {
-				checked = true;
-			}
-		}
-
-		if (!checked) {
-			alert("삭제할 항목을 선택해주세요.");
-			return;
-		}
-
-		if (confirm("선택한 항목을 삭제하시겠습니까?")) {
-			document.getElementById("deleteForm").submit();
-		}
-	}
-
-	// 등록 모달 열기
-	function openInoutModal() {
-
-		document.getElementById("inoutModal").style.display = "block";
-	}
-
-	// 등록 모달 닫기
-	function closeInoutModal() {
-
-		document.getElementById("inoutModal").style.display = "none";
-	}
-
-	// 품목 선택 시 품목 정보 자동 입력
-	function changeItemInfo() {
-
-		var select =
-			document.getElementById("itemSelect");
-
-		var option =
-			select.options[select.selectedIndex];
-
-		document.getElementById("itemCode").value =
-			option.getAttribute("data-code");
-
-		document.getElementById("itemName").value =
-			option.getAttribute("data-name");
-
-		var itemType =
-			option.getAttribute("data-type");
-
-		if (itemType == "FG") {
-			itemType = "완제품";
-		} else if (itemType == "RM") {
-			itemType = "원자재";
-		} else if (itemType == "SM") {
-			itemType = "부자재";
-		}
-
-		document.getElementById("itemType").value =
-			itemType;
-
-		document.getElementById("itemUnit").value =
-			option.getAttribute("data-unit");
-	}
-
-</script>

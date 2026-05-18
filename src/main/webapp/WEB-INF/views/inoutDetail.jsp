@@ -5,133 +5,44 @@
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
-<style>
-	/* 상세페이지 전체 영역 */
-	.inoutDetailWrap {
-		width: 100%;
-		margin-top: 20px;
-	}
-
-	/* 버튼 영역 */
-	.inoutDetailBtnArea {
-		text-align: right;
-		margin-bottom: 16px;
-	}
-
-	/* 메인 버튼 */
-	.inoutMainBtn {
-		background-color: #2F7D62;
-		color: white;
-		border: none;
-		border-radius: 8px;
-		padding: 10px 24px;
-		font-weight: bold;
-		cursor: pointer;
-	}
-
-	/* 보조 버튼 */
-	.inoutSubBtn {
-		background-color: white;
-		color: #1F2933;
-		border: 1px solid #cbd5df;
-		border-radius: 8px;
-		padding: 10px 24px;
-		font-weight: bold;
-		cursor: pointer;
-	}
-
-	/* 상세 테이블 */
-	.inoutDetailTable {
-		width: 100%;
-		border-collapse: separate;
-		border-spacing: 0;
-		border: 1px solid #d8e1ea;
-		border-radius: 14px;
-		overflow: hidden;
-		background-color: white;
-	}
-
-	/* 제목 칸 */
-	.inoutDetailTable th {
-		width: 180px;
-		background-color: #eaf2fb;
-		border-bottom: 1px solid #d8e1ea;
-		padding: 15px;
-		text-align: center;
-		font-weight: bold;
-	}
-
-	/* 내용 칸 */
-	.inoutDetailTable td {
-		border-bottom: 1px solid #d8e1ea;
-		padding: 15px;
-		font-weight: bold;
-	}
-
-	/* 마지막 줄 선 제거 */
-	.inoutDetailTable tr:last-child th,
-	.inoutDetailTable tr:last-child td {
-		border-bottom: none;
-	}
-
-	/* 수정 input */
-	.inoutEditInput,
-	.inoutEditSelect,
-	.inoutEditTextarea {
-		width: 100%;
-		border: 1px solid #cbd5df;
-		border-radius: 8px;
-		padding: 10px;
-		box-sizing: border-box;
-		font-weight: bold;
-	}
-
-	/* 비고 textarea */
-	.inoutEditTextarea {
-		height: 90px;
-		resize: none;
-	}
-</style>
-
 <div class="coPageWrap">
 
-	<div class="inoutDetailWrap">
+	<c:choose>
 
-		<c:choose>
+		<c:when test="${mode eq 'edit'}">
 
-			<c:when test="${mode eq 'edit'}">
+			<form method="post"
+				action="${pageContext.request.contextPath}/inventory/materialIn/update">
 
-				<!-- 수정 화면 form -->
-				<form method="post"
-					action="${pageContext.request.contextPath}/inventory/materialIn/update">
+				<input type="hidden"
+					name="inoutId"
+					value="${inout.inoutId}">
 
-					<input type="hidden"
-						name="inoutId"
-						value="${inout.inoutId}">
+				<div class="coTableTop">
 
-					<!-- 수정 중 버튼 -->
-					<div class="inoutDetailBtnArea">
+					<p class="coTotalCount">입출고 상세정보</p>
 
-						<button type="submit"
-							class="inoutMainBtn">
+					<div>
+						<button type="submit" class="coBtn coBtnPrimary">
 							수정완료
 						</button>
 
-						<button type="button"
-							class="inoutSubBtn"
+						<button type="button" class="coBtn coBtnReset"
 							onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
 							취소
 						</button>
 
-						<button type="button"
-							class="inoutSubBtn"
+						<button type="button" class="coBtn coBtnReset"
 							onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
 							목록
 						</button>
-
 					</div>
 
-					<table class="inoutDetailTable">
+				</div>
+
+				<div class="coTableWrap">
+
+					<table class="coTable">
 
 						<tr>
 							<th>입출고번호</th>
@@ -168,9 +79,7 @@
 						<tr>
 							<th>입출고구분</th>
 							<td>
-								<select name="inoutType"
-									class="inoutEditSelect">
-
+								<select name="inoutType" class="coSelect">
 									<option value="MI"
 										<c:if test="${inout.inoutType eq 'MI'}">selected</c:if>>
 										입고
@@ -180,7 +89,6 @@
 										<c:if test="${inout.inoutType eq 'MO-PROD'}">selected</c:if>>
 										출고
 									</option>
-
 								</select>
 							</td>
 						</tr>
@@ -190,7 +98,7 @@
 							<td>
 								<input type="number"
 									name="inoutQty"
-									class="inoutEditInput"
+									class="coInput"
 									value="${inout.inoutQty}">
 							</td>
 						</tr>
@@ -200,7 +108,7 @@
 							<td>
 								<input type="date"
 									name="inoutDate"
-									class="inoutEditInput"
+									class="coInput"
 									value="${inout.inoutDate}">
 							</td>
 						</tr>
@@ -218,37 +126,41 @@
 						<tr>
 							<th>비고</th>
 							<td>
-								<textarea name="remark"
-									class="inoutEditTextarea">${inout.remark}</textarea>
+								<textarea name="remark" class="coTextarea">${inout.remark}</textarea>
 							</td>
 						</tr>
 
 					</table>
 
-				</form>
+				</div>
 
-			</c:when>
+			</form>
 
-			<c:otherwise>
+		</c:when>
 
-				<!-- 조회 화면 버튼 -->
-				<div class="inoutDetailBtnArea">
+		<c:otherwise>
 
-					<button type="button"
-						class="inoutMainBtn"
+			<div class="coTableTop">
+
+				<p class="coTotalCount">입출고 상세정보</p>
+
+				<div>
+					<button type="button" class="coBtn coBtnPrimary"
 						onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}&mode=edit'">
 						수정
 					</button>
 
-					<button type="button"
-						class="inoutSubBtn"
+					<button type="button" class="coBtn coBtnReset"
 						onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
 						목록
 					</button>
-
 				</div>
 
-				<table class="inoutDetailTable">
+			</div>
+
+			<div class="coTableWrap">
+
+				<table class="coTable">
 
 					<tr>
 						<th>입출고번호</th>
@@ -320,10 +232,10 @@
 
 				</table>
 
-			</c:otherwise>
+			</div>
 
-		</c:choose>
+		</c:otherwise>
 
-	</div>
+	</c:choose>
 
 </div>
