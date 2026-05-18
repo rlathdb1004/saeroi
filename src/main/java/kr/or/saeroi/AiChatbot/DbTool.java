@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import dev.langchain4j.agent.tool.Tool;
-import kr.or.saeroi.member.dao.LoginDAO;
-import kr.or.saeroi.member.dto.LoginDTO;
+import kr.or.saeroi.dao.LoginDAO;
+import kr.or.saeroi.dto.LoginDTO;
 
 @Component
 public class DbTool {

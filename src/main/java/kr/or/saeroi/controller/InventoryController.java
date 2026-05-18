@@ -55,27 +55,16 @@ public class InventoryController {
 		model.addAttribute("list", list);
 		model.addAttribute("itemList", itemList);
 		model.addAttribute("pageInfo", pageInfo);
-
-		model.addAttribute(
-				"pageUrl",
-				"/inventory/materialIn");
+		model.addAttribute("pageUrl", "/inventory/materialIn");
 
 		model.addAttribute("searchType", searchType);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
 
-		model.addAttribute(
-				"contentPage",
-				"/WEB-INF/views/inoutManage.jsp");
-
-		model.addAttribute(
-				"headerTitle",
-				"자재/재고 관리");
-
-		model.addAttribute(
-				"headerSubTitle",
-				"자재입고 관리");
+		model.addAttribute("contentPage", "/WEB-INF/views/inoutManage.jsp");
+		model.addAttribute("headerTitle", "자재/재고 관리");
+		model.addAttribute("headerSubTitle", "자재입출고 관리");
 
 		return "layout";
 	}
@@ -100,5 +89,22 @@ public class InventoryController {
 		service.addInout(dto);
 
 		return "redirect:/inventory/materialIn";
+	}
+
+	// 상세보기 페이지
+	@RequestMapping("/inventory/materialIn/detail")
+	public String inoutDetail(
+			@RequestParam("inoutId") int inoutId,
+			Model model) {
+
+		InoutDTO inout = service.getInoutDetail(inoutId);
+
+		model.addAttribute("inout", inout);
+
+		model.addAttribute("contentPage", "/WEB-INF/views/inoutDetail.jsp");
+		model.addAttribute("headerTitle", "자재/재고 관리");
+		model.addAttribute("headerSubTitle", "입출고 상세보기");
+
+		return "layout";
 	}
 }

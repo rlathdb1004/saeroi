@@ -7,7 +7,7 @@ import kr.or.saeroi.dto.InoutDTO;
 // 입출고 DB 작업 이름 정하는 파일
 public interface InoutDAO {
 
-	// 입출고 목록 10개씩 조회
+	// 입출고 목록 조회
 	public List<InoutDTO> selectInoutList(
 			int startRow,
 			int endRow,
@@ -28,4 +28,7 @@ public interface InoutDAO {
 
 	// 입출고 등록
 	public int insertInout(InoutDTO dto);
+
+	// 입출고 상세조회
+	public InoutDTO selectInoutDetail(int inoutId);
 }
