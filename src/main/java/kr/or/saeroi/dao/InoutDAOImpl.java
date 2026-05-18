@@ -67,7 +67,6 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += "         ON MI.ITEM_ID = I.ITEM_ID ";
 			sql += "         WHERE 1 = 1 ";
 
-			// 검색어가 있을 때
 			if (keyword != null && !keyword.equals("")) {
 
 				if ("itemCode".equals(searchType)) {
@@ -79,12 +78,10 @@ public class InoutDAOImpl implements InoutDAO {
 				}
 			}
 
-			// 시작일이 있을 때
 			if (startDate != null && !startDate.equals("")) {
 				sql += " AND MI.INOUT_DATE >= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			// 종료일이 있을 때
 			if (endDate != null && !endDate.equals("")) {
 				sql += " AND MI.INOUT_DATE <= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
@@ -99,7 +96,6 @@ public class InoutDAOImpl implements InoutDAO {
 
 			int idx = 1;
 
-			// 검색어 값 넣기
 			if (keyword != null && !keyword.equals("")) {
 
 				if ("itemCode".equals(searchType)) {
@@ -112,20 +108,15 @@ public class InoutDAOImpl implements InoutDAO {
 				}
 			}
 
-			// 시작일 값 넣기
 			if (startDate != null && !startDate.equals("")) {
 				pstmt.setString(idx++, startDate);
 			}
 
-			// 종료일 값 넣기
 			if (endDate != null && !endDate.equals("")) {
 				pstmt.setString(idx++, endDate);
 			}
 
-			// 페이징 끝 번호
 			pstmt.setInt(idx++, endRow);
-
-			// 페이징 시작 번호
 			pstmt.setInt(idx++, startRow);
 
 			ResultSet rs = pstmt.executeQuery();
@@ -259,7 +250,6 @@ public class InoutDAOImpl implements InoutDAO {
 
 			sql += " SELECT ITEM_ID, ITEM_CODE, ITEM_NAME, ITEM_TYPE, ITEM_UNIT ";
 			sql += " FROM ITEM ";
-			sql += " WHERE USE_YN = 'Y' ";
 			sql += " ORDER BY ITEM_ID ASC ";
 
 			PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -298,7 +288,6 @@ public class InoutDAOImpl implements InoutDAO {
 		try {
 			Connection conn = getConnection();
 
-			// 입출고 ID 만들기
 			int inoutId = 1;
 
 			String idSql = " SELECT NVL(MAX(INOUT_ID), 0) + 1 FROM MATERIAL_INOUT ";
@@ -313,12 +302,10 @@ public class InoutDAOImpl implements InoutDAO {
 			idRs.close();
 			idPstmt.close();
 
-			// 품목유형 가져오기
 			String itemType = "";
-			String itemUnit = "";
 
 			String itemSql = "";
-			itemSql += " SELECT ITEM_TYPE, ITEM_UNIT ";
+			itemSql += " SELECT ITEM_TYPE ";
 			itemSql += " FROM ITEM ";
 			itemSql += " WHERE ITEM_ID = ? ";
 
@@ -329,27 +316,22 @@ public class InoutDAOImpl implements InoutDAO {
 
 			if (itemRs.next()) {
 				itemType = itemRs.getString("ITEM_TYPE");
-				itemUnit = itemRs.getString("ITEM_UNIT");
 			}
 
 			itemRs.close();
 			itemPstmt.close();
 
-			// 날짜 문자열 만들기
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 			String dateText = sdf.format(dto.getInoutDate());
 
-			// 입고/출고 구분 만들기
 			String typeText = "MI";
 
 			if ("MO-PROD".equals(dto.getInoutType())) {
 				typeText = "MO";
 			}
 
-			// 입출고번호 앞부분
 			String docPrefix = itemType + "-" + typeText + "-" + dateText;
 
-			// 순번 만들기
 			int docSeq = 1;
 
 			String seqSql = "";
@@ -369,13 +351,10 @@ public class InoutDAOImpl implements InoutDAO {
 			seqRs.close();
 			seqPstmt.close();
 
-			// 입출고번호 완성
 			String docNo = docPrefix + "-" + String.format("%04d", docSeq);
 
-			// LOT 번호 임시 생성
-			String lotNo = "RMLOT-" + dateText + "-" + String.format("%04d", docSeq);
+			String lotNo = "LOT-" + dateText + "-" + String.format("%04d", docSeq);
 
-			// INSERT
 			String sql = "";
 
 			sql += " INSERT INTO MATERIAL_INOUT ( ";
@@ -412,5 +391,74 @@ public class InoutDAOImpl implements InoutDAO {
 		}
 
 		return result;
+	}
+
+	// 입출고 상세조회
+	@Override
+	public InoutDTO selectInoutDetail(int inoutId) {
+
+		InoutDTO dto = null;
+
+		try {
+			Connection conn = getConnection();
+
+			String sql = "";
+
+			sql += " SELECT ";
+			sql += "     MI.INOUT_ID, ";
+			sql += "     MI.INOUT_TYPE, ";
+			sql += "     MI.MATERIAL_LOT, ";
+			sql += "     MI.INOUT_QTY, ";
+			sql += "     MI.INOUT_DATE, ";
+			sql += "     MI.REMARK, ";
+			sql += "     MI.STATUS, ";
+			sql += "     MI.ITEM_ID, ";
+			sql += "     MI.DOC_NO, ";
+			sql += "     MI.DOC_SEQ, ";
+			sql += "     I.ITEM_CODE, ";
+			sql += "     I.ITEM_NAME, ";
+			sql += "     I.ITEM_TYPE, ";
+			sql += "     I.ITEM_UNIT ";
+			sql += " FROM MATERIAL_INOUT MI ";
+			sql += " JOIN ITEM I ";
+			sql += " ON MI.ITEM_ID = I.ITEM_ID ";
+			sql += " WHERE MI.INOUT_ID = ? ";
+
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			pstmt.setInt(1, inoutId);
+
+			ResultSet rs = pstmt.executeQuery();
+
+			if (rs.next()) {
+
+				dto = new InoutDTO();
+
+				dto.setInoutId(rs.getInt("INOUT_ID"));
+				dto.setInoutType(rs.getString("INOUT_TYPE"));
+				dto.setMaterialLot(rs.getString("MATERIAL_LOT"));
+				dto.setInoutQty(rs.getInt("INOUT_QTY"));
+				dto.setInoutDate(rs.getDate("INOUT_DATE"));
+				dto.setRemark(rs.getString("REMARK"));
+				dto.setStatus(rs.getString("STATUS"));
+				dto.setItemId(rs.getInt("ITEM_ID"));
+
+				dto.setDocNo(rs.getString("DOC_NO"));
+				dto.setDocSeq(rs.getInt("DOC_SEQ"));
+
+				dto.setItemCode(rs.getString("ITEM_CODE"));
+				dto.setItemName(rs.getString("ITEM_NAME"));
+				dto.setItemType(rs.getString("ITEM_TYPE"));
+				dto.setItemUnit(rs.getString("ITEM_UNIT"));
+			}
+
+			rs.close();
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return dto;
 	}
 }

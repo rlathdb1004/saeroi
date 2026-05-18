@@ -306,8 +306,10 @@
 						<td>${inout.inoutDate}</td>
 
 						<td>
+							<!-- 상세보기 페이지로 이동 -->
 							<button type="button"
-								class="inoutSubBtn">
+								class="inoutSubBtn"
+								onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
 								상세보기
 							</button>
 						</td>

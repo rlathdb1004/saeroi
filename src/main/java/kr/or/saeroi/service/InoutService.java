@@ -28,4 +28,7 @@ public interface InoutService {
 
 	// 입출고 등록
 	public int addInout(InoutDTO dto);
+
+	// 입출고 상세조회
+	public InoutDTO getInoutDetail(int inoutId);
 }
