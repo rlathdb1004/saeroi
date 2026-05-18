@@ -138,39 +138,123 @@ a {
 }
 
 .siUserBox {
-    /* 사용자 정보 영역이다. */
-    background-color: #E6F2ED;
-    /* 사용자 정보 박스 배경을 연한 민트색으로 설정한다. */
-    border-radius: 12px;
-    /* 박스 모서리를 둥글게 만든다. */
-    padding: 14px 12px;
+    /* 로그인 사용자 정보를 감싸는 전체 박스이다. */
+    width: 100%;
+
+    /* 사용자 박스 높이를 설정한다. */
+    min-height: 70px;
+
+    /* 사용자 박스 아래에 메뉴와의 간격을 준다. */
+    margin-bottom: 28px;
+
     /* 박스 안쪽 여백을 설정한다. */
-    margin-bottom: 22px;
-    /* 사용자 정보 박스 아래쪽에 여백을 준다. */
+    padding: 10px 12px;
+
+    /* 예전 디자인처럼 연한 민트 배경으로 설정한다. */
+    background-color: #E6F2ED;
+
+    /* 검은색 테두리는 제거한다. */
+    border: none;
+
+    /* 예전 박스처럼 부드러운 둥근 모서리를 준다. */
+    border-radius: 8px;
+
+    /* 프로필 사진, 로그인 정보, 알림 아이콘을 가로로 배치한다. */
+    display: flex;
+
+    /* 세 요소를 세로 가운데 정렬한다. */
+    align-items: center;
+
+    /* 요소 사이 간격을 준다. */
+    gap: 10px;
+}
+
+.siUserProfileIcon {
+    /* 왼쪽 프로필 사진이 들어가는 원형 영역이다. */
+    width: 46px;
+    height: 46px;
+
+    border: 1px solid #CFE3DA;
+    border-radius: 50%;
+    overflow: hidden;
+
+    flex-shrink: 0;
+    background-color: #FFFFFF;
+}
+
+.siUserProfileIcon img {
+    /* 프로필 영역 안에 들어가는 실제 이미지이다. */
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.siUserInfoText {
+    /* 로그인 글씨 두 줄을 감싸는 가운데 영역이다. */
+    flex: 1;
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .siUserName {
-    /* 사용자 이름 글씨이다. */
-    margin: 0;
-    /* p 태그가 기본으로 가지고 있는 여백을 제거한다. */
-    font-size: 15px;
-    /* 사용자 이름 글씨 크기를 설정한다. */
-    font-weight: 700;
-    /* 사용자 이름을 굵게 표시한다. */
-    color: #2F7D62;
-    /* 사용자 이름에 우리 메인 컬러를 적용한다. */
+    /* 로그인 - 성함 글씨이다. */
+    margin: 0 0 6px 0;
+    font-size: 13px;
+    font-weight: 600;
+    color: #222222;
+    line-height: 1.2;
+    white-space: nowrap;
 }
 
 .siUserRole {
-    /* 사용자 역할 또는 시스템 이름 글씨이다. */
-    margin: 5px 0 0 0;
-    /* 위쪽에만 작은 여백을 주고 나머지는 제거한다. */
+    /* 부서명 + 직급 글씨이다. */
+    margin: 0;
     font-size: 13px;
-    /* 보조 글씨 크기를 설정한다. */
-    font-weight: 500;
-    /* 보조 글씨가 너무 연하지 않게 만든다. */
-    color: #374151;
-    /* 보조 글씨색을 진한 회색 계열로 설정한다. */
+    font-weight: 600;
+    color: #222222;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.siNoticeBtn {
+    /* 오른쪽 알림 아이콘 버튼이다. */
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    flex-shrink: 0;
+
+    /* 글씨 쪽으로 붙지 않고 오른쪽에 고정되도록 한다. */
+    margin-left: auto;
+}
+
+.siNoticeIcon {
+    /* 실제 알림 SVG 아이콘이다. */
+    width: 24px;
+    height: 24px;
+
+    fill: none;
+    stroke: #2F7D62;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.siNoticeIcon path {
+    /* 알림 SVG 안쪽 path도 선으로만 보이게 한다. */
+    fill: none;
+    stroke: #2F7D62;
 }
 
 .siMenu {
@@ -219,30 +303,45 @@ a {
     /* 하위 메뉴를 여는 큰 메뉴 버튼이다. */
     width: 100%;
     /* 버튼의 가로 길이를 사이드바 메뉴 영역 전체로 설정한다. */
-    padding: 11px 12px;
-    /* 버튼 안쪽 여백을 설정한다. */
+
+    padding: 11px 12px 11px 22px;
+    /* 왼쪽 짝대기 표시가 들어갈 공간을 만들기 위해 왼쪽 여백을 조금 더 준다. */
+
     border: none;
     /* 버튼 기본 테두리를 제거한다. */
+
     border-radius: 10px;
     /* 버튼 모서리를 둥글게 만든다. */
+
     background-color: transparent;
     /* 버튼 배경을 투명하게 설정한다. */
+
     color: #1F2933;
     /* 버튼 글자색을 진한 회색으로 설정한다. */
+
     font-size: 16px;
     /* 버튼 글씨 크기를 설정한다. */
+
     font-weight: 600;
     /* 큰 메뉴 글씨를 조금 굵게 설정한다. */
+
     text-align: left;
     /* 버튼 안의 글씨를 왼쪽 정렬한다. */
+
     cursor: pointer;
     /* 마우스를 올렸을 때 클릭 가능한 손가락 모양으로 보이게 한다. */
+
     display: flex;
     /* 메뉴명과 화살표를 한 줄에 나란히 배치한다. */
+
     justify-content: space-between;
     /* 메뉴명은 왼쪽, 화살표는 오른쪽 끝으로 보낸다. */
+
     align-items: center;
     /* 메뉴명과 화살표가 세로 가운데에 오도록 맞춘다. */
+
+    position: relative;
+    /* 선택된 큰 메뉴 앞에 짝대기 표시를 넣기 위한 기준 위치이다. */
 }
 
 .siMenuTitle:hover {
@@ -299,6 +398,36 @@ a {
     /* 열린 메뉴 글씨를 두껍게 표시한다. */
 }
 
+.siMenuGroup.open .siMenuTitle::before {
+    /* 현재 열린 큰 메뉴 왼쪽에 표시되는 초록색 짝대기이다. */
+    content: "";
+    /* 가상 요소를 화면에 표시하기 위해 비워 둔 content를 넣는다. */
+
+    position: absolute;
+    /* 큰 메뉴 버튼 안에서 원하는 위치에 고정하기 위해 absolute를 사용한다. */
+
+    left: 12px;
+    /* 짝대기를 메뉴 박스 왼쪽 안쪽에 배치한다. */
+
+    top: 50%;
+    /* 짝대기의 세로 위치를 버튼 가운데 기준으로 맞춘다. */
+
+    width: 3px;
+    /* 짝대기의 가로 두께를 설정한다. */
+
+    height: 18px;
+    /* 짝대기의 세로 길이를 설정한다. */
+
+    background-color: #2F7D62;
+    /* 짝대기 색상을 우리 메인 초록색으로 설정한다. */
+
+    border-radius: 10px;
+    /* 짝대기 끝부분을 둥글게 만든다. */
+
+    transform: translateY(-50%);
+    /* top 50% 기준에서 정확히 세로 가운데에 오도록 보정한다. */
+}
+
 .siMenuGroup.open .siMenuArrow {
     /* 하위 메뉴가 열린 상태일 때의 화살표이다. */
     color: #2F7D62;
@@ -327,20 +456,30 @@ a {
     /* 하위 메뉴 하나하나의 링크이다. */
     display: block;
     /* a 태그를 한 줄 전체를 차지하는 박스처럼 만든다. */
-    padding: 9px 12px;
-    /* 하위 메뉴 안쪽 여백을 설정한다. */
+
+    padding: 9px 12px 9px 22px;
+    /* 왼쪽 짝대기 표시가 들어갈 공간을 만들기 위해 왼쪽 여백을 조금 더 준다. */
+
     margin-bottom: 3px;
     /* 하위 메뉴 사이에 작은 간격을 준다. */
+
     border-radius: 8px;
     /* 하위 메뉴 모서리를 둥글게 만든다. */
+
     color: #374151;
     /* 하위 메뉴 글자색을 진한 회색으로 설정한다. */
+
     font-size: 15px;
     /* 하위 메뉴 글씨 크기를 설정한다. */
+
     font-weight: 500;
     /* 하위 메뉴 기본 글씨를 너무 얇지 않게 만든다. */
+
     text-decoration: none;
     /* a 태그의 밑줄을 제거한다. */
+
+    position: relative;
+    /* 선택된 하위 메뉴 앞에 짝대기 표시를 넣기 위한 기준 위치이다. */
 }
 
 .siSubMenuLink:hover {
@@ -355,10 +494,42 @@ a {
     /* 현재 선택된 하위 메뉴 디자인이다. */
     background-color: #E6F2ED;
     /* 현재 선택된 하위 메뉴 배경을 연한 민트색으로 유지한다. */
+
     color: #2F7D62;
     /* 현재 선택된 하위 메뉴 글자색을 메인 컬러로 설정한다. */
+
     font-weight: 700;
     /* 현재 선택된 하위 메뉴 글씨를 두껍게 만든다. */
+}
+
+.siSubMenuLink.active::before {
+    /* 현재 선택된 하위 메뉴 왼쪽에 표시되는 초록색 짝대기이다. */
+    content: "";
+    /* 가상 요소를 화면에 표시하기 위해 비워 둔 content를 넣는다. */
+
+    position: absolute;
+    /* 하위 메뉴 링크 안에서 원하는 위치에 고정하기 위해 absolute를 사용한다. */
+
+    left: 12px;
+    /* 짝대기를 하위 메뉴 박스 왼쪽 안쪽에 배치한다. */
+
+    top: 50%;
+    /* 짝대기의 세로 위치를 하위 메뉴 가운데 기준으로 맞춘다. */
+
+    width: 3px;
+    /* 짝대기의 가로 두께를 설정한다. */
+
+    height: 16px;
+    /* 하위 메뉴용 짝대기 길이를 큰 메뉴보다 살짝 작게 설정한다. */
+
+    background-color: #2F7D62;
+    /* 짝대기 색상을 우리 메인 초록색으로 설정한다. */
+
+    border-radius: 10px;
+    /* 짝대기 끝부분을 둥글게 만든다. */
+
+    transform: translateY(-50%);
+    /* top 50% 기준에서 정확히 세로 가운데에 오도록 보정한다. */
 }
 
 .siLogoutBox {
