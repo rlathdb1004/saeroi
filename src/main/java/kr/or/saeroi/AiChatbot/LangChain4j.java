@@ -18,7 +18,8 @@ public class LangChain4j {
 	public ChatLanguageModel LangChainModel() {
 		return GoogleAiGeminiChatModel.builder()
 				.apiKey(apikey)
-				.modelName("gemini-3-flash-preview")
+//				.modelName("gemini-3-flash-preview") 주석하고 아래꺼로 변경
+				.modelName("gemini-2.5-flash")
 				.build();
 	}
 }
