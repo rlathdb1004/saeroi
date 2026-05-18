@@ -9,5 +9,5 @@ public interface QualityDAO {
     List<InspectionDTO> _dao_select_Inspection(String startDate, String endDate, String searchType, String keyword);
 
     // 구분 옵션
-    List<String> _dao_option_Inspection(String startDate, String endDate, String searchType, int optionPage, int optionSize);
+    List<InspectionDTO> _dao_option_Inspection(String startDate, String endDate, String searchType, int optionPage, int optionSize);
 }

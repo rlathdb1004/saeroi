@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -69,13 +70,15 @@ public class QualityController {
 //	구분 10개씩 기능 메서드
 	@ResponseBody
 	@RequestMapping("/inspection/option")
-	public List<String> inspection_option(Model model, @RequestParam(defaultValue = "1") int optionPage,
+	public List<InspectionDTO> inspection_option(Model model, @RequestParam(defaultValue = "1") int optionPage,
 			@RequestParam(defaultValue = "10") int optionSize,
 			// 없어도 괜찮은 값이므로(필수X)
 			@RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate,
 			@RequestParam(required = false) String searchType) {
-
-		return null;
+		
+		List<InspectionDTO> option_list = qualityService._ser_option_Inspection(startDate, endDate, searchType, optionPage, optionSize);
+		
+		return option_list;
 	}
 
 	@RequestMapping("/defect")
@@ -85,5 +88,12 @@ public class QualityController {
 
 		return "defect.tiles";
 	}
-
+	
+	//등록 메서드(등록/수정/삭제용 post 방식 추가)
+	@RequestMapping(value = "/inspection/add", method = RequestMethod.POST)
+	public String inspection_add() {
+		
+		
+		return null;
+	}
 }

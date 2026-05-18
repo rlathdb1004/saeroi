@@ -144,15 +144,16 @@
 
 </div>
 <%-- 본문 전체 영역을 끝낸다. --%>
+
 <!-- 검사 등록 모달 -->
 <div class="qiModal qiRegisterModal">
-	<%-- 등록 버튼을 눌렀을 때 열리는 모달 배경이다. --%>
+	<%-- 등록 버튼을 눌렀을 때 열리는 모달 배경 --%>
 
 	<div class="qiModalBox qiRegisterModalBox">
-		<%-- 실제 모달 내용 영역이다. --%>
+		<%-- 실제 모달 내용 영역 --%>
 
 		<div class="qiModalHeader">
-			<%-- 모달 제목과 닫기 버튼 영역이다. --%>
+			<%-- 모달 제목과 닫기 버튼 영역 --%>
 
 			<h3 class="qiModalTitle">검사 등록</h3>
 
@@ -161,7 +162,7 @@
 
 		<form class="qiModalForm" method="post"
 			action="${pageContext.request.contextPath}/quality/inspection/add">
-			<%-- 검사 등록 정보를 입력하는 영역이다. --%>
+			<%-- 검사 등록 정보를 입력하는 영역 --%>
 
 			<div class="qiModalBody qiRegisterModalBody">
 
@@ -171,18 +172,17 @@
 				</div>
 
 				<div class="qiFormRow">
-					<label class="qiFormLabel">품목명</label> <select name="item_id"
+					<label class="qiFormLabel">품목명</label> <select name="prod_id"
 						class="coSelect qiFormInput">
 						<option value="">선택</option>
-						<%-- 품목 목록은 나중에 DB에서 조회해서 option으로 반복 출력한다. --%>
 					</select>
 				</div>
+
 
 				<div class="qiFormRow">
 					<label class="qiFormLabel">검사자</label> <select name="emp_id"
 						class="coSelect qiFormInput">
 						<option value="">선택</option>
-						<%-- 검사자 목록은 나중에 DB에서 조회해서 option으로 반복 출력한다. --%>
 					</select>
 				</div>
 
@@ -201,9 +201,6 @@
 					<label class="qiFormLabel">검사결과</label> <select name="result"
 						class="coSelect qiFormInput">
 						<option value="">선택</option>
-						<option value="합격">합격</option>
-						<option value="불합격">불합격</option>
-						<option value="조건부">조건부</option>
 					</select>
 				</div>
 
@@ -221,18 +218,13 @@
 					<label class="qiFormLabel">검사 상세</label> <select name="remark"
 						class="coSelect qiFormInput">
 						<option value="">선택</option>
-						<option value="외관검사 완료">외관검사 완료</option>
-						<option value="치수검사 완료">치수검사 완료</option>
-						<option value="품질판정 완료">품질판정 완료</option>
-						<option value="불량상세 확인">불량상세 확인</option>
-						<option value="재검대상 확인">재검대상 확인</option>
 					</select>
 				</div>
 
 			</div>
 
 			<div class="qiModalFooter">
-				<%-- 등록/취소 버튼 영역이다. --%>
+				<%-- 등록/취소 버튼 영역 --%>
 
 				<button type="button" class="coBtn coBtnReset qiModalCancelBtn">취소</button>
 				<button type="submit" class="coBtn coBtnPrimary">등록</button>

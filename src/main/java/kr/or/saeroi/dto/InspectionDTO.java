@@ -11,6 +11,16 @@ public class InspectionDTO {
 	private String product_lot;
 	private String ename;
 	private String result;
+	
+	//검사 - 등록 시 필요 필드
+	private int prod_id;
+	private int emp_id;
+	private String insp_type;
+	private String insp_status;
+	private int inspection_qty;
+	private int good_qty;
+	private String remark;
+	
 	public int getInsp_id() {
 		return insp_id;
 	}
@@ -53,11 +63,57 @@ public class InspectionDTO {
 	public void setResult(String result) {
 		this.result = result;
 	}
+	public int getProd_id() {
+		return prod_id;
+	}
+	public void setProd_id(int prod_id) {
+		this.prod_id = prod_id;
+	}
+	public int getEmp_id() {
+		return emp_id;
+	}
+	public void setEmp_id(int emp_id) {
+		this.emp_id = emp_id;
+	}
+	public String getInsp_type() {
+		return insp_type;
+	}
+	public void setInsp_type(String insp_type) {
+		this.insp_type = insp_type;
+	}
+	public String getInsp_status() {
+		return insp_status;
+	}
+	public void setInsp_status(String insp_status) {
+		this.insp_status = insp_status;
+	}
+	public int getInspection_qty() {
+		return inspection_qty;
+	}
+	public void setInspection_qty(int inspection_qty) {
+		this.inspection_qty = inspection_qty;
+	}
+	public int getGood_qty() {
+		return good_qty;
+	}
+	public void setGood_qty(int good_qty) {
+		this.good_qty = good_qty;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 	@Override
 	public String toString() {
 		return "InspectionDTO [insp_id=" + insp_id + ", doc_no=" + doc_no + ", insp_date=" + insp_date + ", item_name="
-				+ item_name + ", product_lot=" + product_lot + ", ename=" + ename + ", result=" + result + "]";
+				+ item_name + ", product_lot=" + product_lot + ", ename=" + ename + ", result=" + result + ", prod_id="
+				+ prod_id + ", emp_id=" + emp_id + ", insp_type=" + insp_type + ", insp_status=" + insp_status
+				+ ", inspection_qty=" + inspection_qty + ", good_qty=" + good_qty + ", remark=" + remark + "]";
 	}
+	
+	
 	
 	
 }
