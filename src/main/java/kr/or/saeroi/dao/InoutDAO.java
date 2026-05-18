@@ -34,4 +34,7 @@ public interface InoutDAO {
 
 	// 선택 삭제
 	public int deleteInout(String[] inoutIds);
+
+	// 입출고 수정
+	public int updateInout(InoutDTO dto);
 }

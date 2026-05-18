@@ -496,4 +496,53 @@ public class InoutDAOImpl implements InoutDAO {
 
 		return result;
 	}
+	// 입출고 수정
+	@Override
+	public int updateInout(InoutDTO dto) {
+
+		int result = 0;
+
+		try {
+			Connection conn = getConnection();
+
+			String sql = "";
+
+			sql += " UPDATE MATERIAL_INOUT ";
+			sql += " SET ";
+			sql += "     INOUT_TYPE = ?, ";
+			sql += "     INOUT_QTY = ?, ";
+			sql += "     INOUT_DATE = ?, ";
+			sql += "     REMARK = ?, ";
+			sql += "     UPDATED_DATE = SYSDATE ";
+			sql += " WHERE INOUT_ID = ? ";
+
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+
+			// 입출고구분
+			pstmt.setString(1, dto.getInoutType());
+
+			// 수량
+			pstmt.setInt(2, dto.getInoutQty());
+
+			// 일자
+			pstmt.setDate(3, new Date(dto.getInoutDate().getTime()));
+
+			// 비고
+			pstmt.setString(4, dto.getRemark());
+
+			// 입출고 ID
+			pstmt.setInt(5, dto.getInoutId());
+
+			// 수정 실행
+			result = pstmt.executeUpdate();
+
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
 }

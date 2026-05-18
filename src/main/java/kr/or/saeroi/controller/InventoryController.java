@@ -23,13 +23,12 @@ public class InventoryController {
 	@RequestMapping("/inventory/materialIn")
 	public String materialIn(
 			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "10") int size,
 			@RequestParam(value = "searchType", defaultValue = "all") String searchType,
 			@RequestParam(value = "keyword", defaultValue = "") String keyword,
 			@RequestParam(value = "startDate", defaultValue = "") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "") String endDate,
 			Model model) {
-
-		int size = 10;
 
 		// 전체 개수 조회
 		int totalCount = service.getInoutCount(
@@ -118,6 +117,7 @@ public class InventoryController {
 	@RequestMapping("/inventory/materialIn/detail")
 	public String inoutDetail(
 			@RequestParam("inoutId") int inoutId,
+			@RequestParam(value = "mode", defaultValue = "view") String mode,
 			Model model) {
 
 		// 상세 조회
@@ -126,7 +126,35 @@ public class InventoryController {
 		// JSP로 보낼 값
 		model.addAttribute("inout", inout);
 
+		// view면 조회 화면, edit면 수정 화면
+		model.addAttribute("mode", mode);
+
 		// Tiles 주소
 		return "inoutDetail.tiles";
+	}
+
+	// 입출고 수정
+	@RequestMapping("/inventory/materialIn/update")
+	public String updateInout(
+			@RequestParam("inoutId") int inoutId,
+			@RequestParam("inoutType") String inoutType,
+			@RequestParam("inoutQty") int inoutQty,
+			@RequestParam("inoutDate") String inoutDate,
+			@RequestParam(value = "remark", defaultValue = "") String remark) {
+
+		InoutDTO dto = new InoutDTO();
+
+		// 수정할 값 담기
+		dto.setInoutId(inoutId);
+		dto.setInoutType(inoutType);
+		dto.setInoutQty(inoutQty);
+		dto.setInoutDate(Date.valueOf(inoutDate));
+		dto.setRemark(remark);
+
+		// DB 수정
+		service.modifyInout(dto);
+
+		// 수정 후 상세보기로 이동
+		return "redirect:/inventory/materialIn/detail?inoutId=" + inoutId;
 	}
 }
