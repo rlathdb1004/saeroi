@@ -10,6 +10,7 @@ public class InoutDTO {
 	private String materialLot;   // LOT 번호
 	private int inoutQty;         // 입출고량
 	private Date inoutDate;       // 입출고 일자
+	private String remark;        // 비고
 	private String status;        // 상태
 	private int itemId;           // 품목 ID
 
@@ -21,42 +22,115 @@ public class InoutDTO {
 	private String docNo;         // 입출고번호
 	private int docSeq;           // 입출고 순번
 
-	public int getInoutId() { return inoutId; }
-	public void setInoutId(int inoutId) { this.inoutId = inoutId; }
+	public int getInoutId() {
+		return inoutId;
+	}
 
-	public String getInoutType() { return inoutType; }
-	public void setInoutType(String inoutType) { this.inoutType = inoutType; }
+	public void setInoutId(int inoutId) {
+		this.inoutId = inoutId;
+	}
 
-	public String getMaterialLot() { return materialLot; }
-	public void setMaterialLot(String materialLot) { this.materialLot = materialLot; }
+	public String getInoutType() {
+		return inoutType;
+	}
 
-	public int getInoutQty() { return inoutQty; }
-	public void setInoutQty(int inoutQty) { this.inoutQty = inoutQty; }
+	public void setInoutType(String inoutType) {
+		this.inoutType = inoutType;
+	}
 
-	public Date getInoutDate() { return inoutDate; }
-	public void setInoutDate(Date inoutDate) { this.inoutDate = inoutDate; }
+	public String getMaterialLot() {
+		return materialLot;
+	}
 
-	public String getStatus() { return status; }
-	public void setStatus(String status) { this.status = status; }
+	public void setMaterialLot(String materialLot) {
+		this.materialLot = materialLot;
+	}
 
-	public int getItemId() { return itemId; }
-	public void setItemId(int itemId) { this.itemId = itemId; }
+	public int getInoutQty() {
+		return inoutQty;
+	}
 
-	public String getItemCode() { return itemCode; }
-	public void setItemCode(String itemCode) { this.itemCode = itemCode; }
+	public void setInoutQty(int inoutQty) {
+		this.inoutQty = inoutQty;
+	}
 
-	public String getItemName() { return itemName; }
-	public void setItemName(String itemName) { this.itemName = itemName; }
+	public Date getInoutDate() {
+		return inoutDate;
+	}
 
-	public String getItemType() { return itemType; }
-	public void setItemType(String itemType) { this.itemType = itemType; }
+	public void setInoutDate(Date inoutDate) {
+		this.inoutDate = inoutDate;
+	}
 
-	public String getItemUnit() { return itemUnit; }
-	public void setItemUnit(String itemUnit) { this.itemUnit = itemUnit; }
+	public String getRemark() {
+		return remark;
+	}
 
-	public String getDocNo() { return docNo; }
-	public void setDocNo(String docNo) { this.docNo = docNo; }
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 
-	public int getDocSeq() { return docSeq; }
-	public void setDocSeq(int docSeq) { this.docSeq = docSeq; }
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public int getItemId() {
+		return itemId;
+	}
+
+	public void setItemId(int itemId) {
+		this.itemId = itemId;
+	}
+
+	public String getItemCode() {
+		return itemCode;
+	}
+
+	public void setItemCode(String itemCode) {
+		this.itemCode = itemCode;
+	}
+
+	public String getItemName() {
+		return itemName;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
+	public String getItemType() {
+		return itemType;
+	}
+
+	public void setItemType(String itemType) {
+		this.itemType = itemType;
+	}
+
+	public String getItemUnit() {
+		return itemUnit;
+	}
+
+	public void setItemUnit(String itemUnit) {
+		this.itemUnit = itemUnit;
+	}
+
+	public String getDocNo() {
+		return docNo;
+	}
+
+	public void setDocNo(String docNo) {
+		this.docNo = docNo;
+	}
+
+	public int getDocSeq() {
+		return docSeq;
+	}
+
+	public void setDocSeq(int docSeq) {
+		this.docSeq = docSeq;
+	}
 }

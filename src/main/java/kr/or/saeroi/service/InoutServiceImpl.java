@@ -11,11 +11,47 @@ public class InoutServiceImpl implements InoutService {
 
 	private InoutDAO dao = new InoutDAOImpl();
 
-	public List<InoutDTO> getInoutList(int startRow, int endRow) {
-		return dao.selectInoutList(startRow, endRow);
+	// 입출고 목록 조회
+	public List<InoutDTO> getInoutList(
+			int startRow,
+			int endRow,
+			String searchType,
+			String keyword,
+			String startDate,
+			String endDate) {
+
+		return dao.selectInoutList(
+				startRow,
+				endRow,
+				searchType,
+				keyword,
+				startDate,
+				endDate);
 	}
 
-	public int getInoutCount() {
-		return dao.selectInoutCount();
+	// 전체 개수 조회
+	public int getInoutCount(
+			String searchType,
+			String keyword,
+			String startDate,
+			String endDate) {
+
+		return dao.selectInoutCount(
+				searchType,
+				keyword,
+				startDate,
+				endDate);
+	}
+
+	// 품목 목록 조회
+	public List<InoutDTO> getItemList() {
+
+		return dao.selectItemList();
+	}
+
+	// 입출고 등록
+	public int addInout(InoutDTO dto) {
+
+		return dao.insertInout(dto);
 	}
 }

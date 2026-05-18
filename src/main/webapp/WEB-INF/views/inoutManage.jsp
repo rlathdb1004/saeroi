@@ -1,13 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="c"
+	uri="http://java.sun.com/jsp/jstl/core"%>
 
 <style>
 	/* 상단 등록/삭제 버튼 영역 */
 	.inoutBtnArea {
 		text-align: right;
-		margin-bottom: 30px;
+		margin-bottom: 25px;
 	}
 
 	/* 메인 버튼 */
@@ -16,7 +17,7 @@
 		color: white;
 		border: none;
 		border-radius: 8px;
-		padding: 11px 24px;
+		padding: 10px 22px;
 		font-weight: bold;
 		cursor: pointer;
 	}
@@ -27,13 +28,12 @@
 		color: #1F2933;
 		border: 1px solid #cbd5df;
 		border-radius: 8px;
-		padding: 8px 14px;
+		padding: 9px 16px;
 		font-weight: bold;
-		font-size: 12px;
 		cursor: pointer;
 	}
 
-	/* 검색 조건 한 줄 정렬 */
+	/* 검색 영역 한 줄 */
 	.inoutSearchLine {
 		display: flex;
 		align-items: center;
@@ -49,18 +49,18 @@
 		padding: 0 14px;
 	}
 
-	/* 검색 키워드 input 크기 */
+	/* 검색어 입력칸 */
 	.inoutKeyword {
-		width: 340px;
+		width: 300px;
 	}
 
-	/* 테이블 전체 너비 고정 */
+	/* 테이블 너비 고정 */
 	.coTable {
 		table-layout: fixed;
 		width: 100%;
 	}
 
-	/* 테이블 글자/간격 줄이기 */
+	/* 테이블 글자 줄임 */
 	.coTable th,
 	.coTable td {
 		font-size: 12px;
@@ -70,45 +70,172 @@
 		text-overflow: ellipsis;
 		text-align: center;
 	}
+
+	/* 모달 배경 */
+	.inoutModalBg {
+		display: none;
+		position: fixed;
+		left: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		background-color: rgba(0, 0, 0, 0.55);
+		z-index: 1000;
+	}
+
+	/* 모달 박스 */
+	.inoutModalBox {
+		width: 720px;
+		background-color: white;
+		margin: 70px auto;
+		border-radius: 18px;
+		overflow: hidden;
+	}
+
+	/* 모달 제목 */
+	.inoutModalTitle {
+		background-color: #1F2933;
+		color: white;
+		padding: 20px;
+		font-size: 22px;
+		font-weight: bold;
+		display: flex;
+		justify-content: space-between;
+	}
+
+	/* 모달 내용 */
+	.inoutModalContent {
+		padding: 25px;
+	}
+
+	/* 모달 입력 줄 */
+	.inoutFormGrid {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 15px;
+	}
+
+	/* 모달 label */
+	.inoutFormBox label {
+		font-weight: bold;
+		display: block;
+		margin-bottom: 8px;
+	}
+
+	/* 모달 input, select */
+	.inoutFormBox input,
+	.inoutFormBox select {
+		width: 100%;
+		height: 42px;
+		border: 1px solid #cbd5df;
+		border-radius: 10px;
+		padding: 0 12px;
+		box-sizing: border-box;
+	}
+
+	/* 비고 */
+	.inoutRemark {
+		margin-top: 15px;
+	}
+
+	.inoutRemark textarea {
+		width: 100%;
+		height: 85px;
+		border: 1px solid #cbd5df;
+		border-radius: 10px;
+		padding: 12px;
+		box-sizing: border-box;
+		resize: none;
+	}
+
+	/* 저장 버튼 영역 */
+	.inoutSaveArea {
+		text-align: right;
+		margin-top: 20px;
+	}
 </style>
 
 <div class="coPageWrap">
 
 	<!-- 등록 / 선택 삭제 버튼 -->
 	<div class="inoutBtnArea">
-		<button type="button" class="inoutMainBtn">등록</button>
-		<button type="button" class="inoutSubBtn">선택 삭제</button>
+
+		<button type="button"
+			class="inoutMainBtn"
+			onclick="openInoutModal()">
+			등록
+		</button>
+
+		<button type="button"
+			class="inoutSubBtn">
+			선택 삭제
+		</button>
+
 	</div>
 
 	<!-- 검색 영역 -->
 	<div class="coSearchBox">
 
-		<div class="inoutSearchLine">
+		<form method="get"
+			action="${pageContext.request.contextPath}/inventory/materialIn">
 
-			<select>
-				<option>전체 / 품목코드 / 품목명</option>
-				<option>품목코드</option>
-				<option>품목명</option>
-			</select>
+			<div class="inoutSearchLine">
 
-			<label>시작일</label>
-			<input type="date">
+				<select name="searchType">
+					<option value="all"
+						<c:if test="${searchType eq 'all'}">selected</c:if>>
+						전체 / 품목코드 / 품목명
+					</option>
 
-			<label>종료일</label>
-			<input type="date">
+					<option value="itemCode"
+						<c:if test="${searchType eq 'itemCode'}">selected</c:if>>
+						품목코드
+					</option>
 
-			<input type="text" class="inoutKeyword" placeholder="검색키워드">
+					<option value="itemName"
+						<c:if test="${searchType eq 'itemName'}">selected</c:if>>
+						품목명
+					</option>
+				</select>
 
-			<button type="button" class="inoutMainBtn">검색</button>
-			<button type="button" class="inoutSubBtn">초기화</button>
+				<label>시작일</label>
+				<input type="date"
+					name="startDate"
+					value="${startDate}">
 
-		</div>
+				<label>종료일</label>
+				<input type="date"
+					name="endDate"
+					value="${endDate}">
+
+				<input type="text"
+					name="keyword"
+					class="inoutKeyword"
+					placeholder="검색키워드"
+					value="${keyword}">
+
+				<button type="submit"
+					class="inoutMainBtn">
+					검색
+				</button>
+
+				<button type="button"
+					class="inoutSubBtn"
+					onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
+					초기화
+				</button>
+
+			</div>
+
+		</form>
 
 	</div>
 
 	<!-- 총 건수 -->
 	<div class="coTableTop">
-		<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
+		<p class="coTotalCount">
+			총 ${pageInfo.totalCount}건
+		</p>
 	</div>
 
 	<!-- 테이블 -->
@@ -134,91 +261,58 @@
 
 			<tbody>
 
-				<c:forEach var="inout" items="${list}">
-					<tr>
+				<c:forEach var="inout"
+					items="${list}">
 
-						<!-- 체크박스 -->
+					<tr>
 						<td>
-							<input type="checkbox" name="rowCheck">
+							<input type="checkbox"
+								name="rowCheck">
 						</td>
 
-						<!-- 번호 -->
 						<td>${inout.inoutId}</td>
 
-						<!-- 입출고번호 -->
-						<td>${inout.docNo}</td>
+						<td title="${inout.docNo}">
+							${inout.docNo}
+						</td>
 
-						<!-- 입고/출고 표시 -->
 						<td>
 							<c:choose>
-
-								<c:when test="${inout.docNo.contains('-MI-')}">
-									입고
-								</c:when>
-
-								<c:when test="${inout.docNo.contains('-MO-')}">
-									출고
-								</c:when>
-
-								<c:when test="${inout.inoutType eq 'MI'}">
-									입고
-								</c:when>
-
-								<c:otherwise>
-									출고
-								</c:otherwise>
-
+								<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
+								<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
+								<c:otherwise>${inout.inoutType}</c:otherwise>
 							</c:choose>
 						</td>
 
-						<!-- 품목코드 -->
-						<td>${inout.itemCode}</td>
-
-						<!-- 품목유형 -->
-						<td>
-
-							<c:choose>
-
-								<c:when test="${inout.itemType eq 'FG'}">
-									완제품
-								</c:when>
-
-								<c:when test="${inout.itemType eq 'RM'}">
-									원자재
-								</c:when>
-
-								<c:when test="${inout.itemType eq 'SM'}">
-									부자재
-								</c:when>
-
-								<c:otherwise>
-									${inout.itemType}
-								</c:otherwise>
-
-							</c:choose>
-
+						<td title="${inout.itemCode}">
+							${inout.itemCode}
 						</td>
 
-						<!-- 품목명 -->
-						<td>${inout.itemName}</td>
+						<td>
+							<c:choose>
+								<c:when test="${inout.itemType eq 'FG'}">완제품</c:when>
+								<c:when test="${inout.itemType eq 'RM'}">원자재</c:when>
+								<c:when test="${inout.itemType eq 'SM'}">부자재</c:when>
+								<c:otherwise>${inout.itemType}</c:otherwise>
+							</c:choose>
+						</td>
 
-						<!-- 입출고량 -->
+						<td title="${inout.itemName}">
+							${inout.itemName}
+						</td>
+
 						<td>${inout.inoutQty}</td>
-
-						<!-- 단위 -->
 						<td>${inout.itemUnit}</td>
-
-						<!-- 날짜 -->
 						<td>${inout.inoutDate}</td>
 
-						<!-- 상세보기 버튼 -->
 						<td>
-							<button type="button" class="inoutSubBtn">
+							<button type="button"
+								class="inoutSubBtn">
 								상세보기
 							</button>
 						</td>
-
 					</tr>
+
 				</c:forEach>
 
 			</tbody>
@@ -232,16 +326,181 @@
 
 </div>
 
+<!-- 등록 모달 -->
+<div id="inoutModal"
+	class="inoutModalBg">
+
+	<div class="inoutModalBox">
+
+		<div class="inoutModalTitle">
+			<span>입출고 등록</span>
+			<span onclick="closeInoutModal()"
+				style="cursor:pointer;">×</span>
+		</div>
+
+		<div class="inoutModalContent">
+
+			<form method="post"
+				action="${pageContext.request.contextPath}/inventory/materialIn/insert">
+
+				<div class="inoutFormGrid">
+
+					<div class="inoutFormBox">
+						<label>품목 선택 *</label>
+						<select name="itemId"
+							id="itemSelect"
+							onchange="changeItemInfo()"
+							required>
+
+							<option value="">품목을 선택하세요</option>
+
+							<c:forEach var="item"
+								items="${itemList}">
+
+								<option value="${item.itemId}"
+									data-code="${item.itemCode}"
+									data-name="${item.itemName}"
+									data-type="${item.itemType}"
+									data-unit="${item.itemUnit}">
+
+									${item.itemName}
+
+								</option>
+
+							</c:forEach>
+
+						</select>
+					</div>
+
+					<div class="inoutFormBox">
+						<label>품목코드</label>
+						<input type="text"
+							id="itemCode"
+							readonly>
+					</div>
+
+					<div class="inoutFormBox">
+						<label>품목명</label>
+						<input type="text"
+							id="itemName"
+							readonly>
+					</div>
+
+					<div class="inoutFormBox">
+						<label>품목 유형</label>
+						<input type="text"
+							id="itemType"
+							readonly>
+					</div>
+
+					<div class="inoutFormBox">
+						<label>입출고구분</label>
+						<select name="inoutType">
+							<option value="MI">입고</option>
+							<option value="MO-PROD">출고</option>
+						</select>
+					</div>
+
+					<div class="inoutFormBox">
+						<label>수량 *</label>
+						<input type="number"
+							name="inoutQty"
+							required>
+					</div>
+
+					<div class="inoutFormBox">
+						<label>단위</label>
+						<input type="text"
+							id="itemUnit"
+							readonly>
+					</div>
+
+					<div class="inoutFormBox">
+						<label>일자 *</label>
+						<input type="date"
+							name="inoutDate"
+							required>
+					</div>
+
+				</div>
+
+				<div class="inoutRemark">
+					<label>비고</label>
+					<textarea name="remark"></textarea>
+				</div>
+
+				<div class="inoutSaveArea">
+					<button type="submit"
+						class="inoutMainBtn">
+						저장
+					</button>
+				</div>
+
+			</form>
+
+		</div>
+
+	</div>
+
+</div>
+
 <script>
 
 	// 전체 체크박스 선택
 	document.getElementById("checkAll").onclick = function() {
 
-		var checks = document.getElementsByName("rowCheck");
+		var checks =
+			document.getElementsByName("rowCheck");
 
 		for (var i = 0; i < checks.length; i++) {
+
 			checks[i].checked = this.checked;
 		}
 	};
+
+	// 등록 모달 열기
+	function openInoutModal() {
+
+		document.getElementById("inoutModal").style.display = "block";
+	}
+
+	// 등록 모달 닫기
+	function closeInoutModal() {
+
+		document.getElementById("inoutModal").style.display = "none";
+	}
+
+	// 품목 선택 시 품목 정보 자동 입력
+	function changeItemInfo() {
+
+		var select =
+			document.getElementById("itemSelect");
+
+		var option =
+			select.options[select.selectedIndex];
+
+		document.getElementById("itemCode").value =
+			option.getAttribute("data-code");
+
+		document.getElementById("itemName").value =
+			option.getAttribute("data-name");
+
+		var itemType =
+			option.getAttribute("data-type");
+
+		if (itemType == "FG") {
+			itemType = "완제품";
+		} else if (itemType == "RM") {
+			itemType = "원자재";
+		} else if (itemType == "SM") {
+			itemType = "부자재";
+		}
+
+		document.getElementById("itemType").value =
+			itemType;
+
+		document.getElementById("itemUnit").value =
+			option.getAttribute("data-unit");
+	}
 
 </script>

@@ -7,8 +7,6 @@ import java.sql.SQLException;
 
 import org.springframework.stereotype.Repository;
 
-import kr.or.saeroi.member.dto.LoginDTO;
-
 @Repository
 public class LoginDAO {
 
