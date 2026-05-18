@@ -7,64 +7,65 @@
 <div class="coPageWrap qiPage">
 	<%-- 본문 전체를 감싸는 영역이다. --%>
 
-	<form class="coSearchBox qiSearchBox" method="get"
+	<form class="search-form" method="get"
 		action="${pageContext.request.contextPath}/quality/inspection">
 		<%-- 검색 조건들이 들어가는 영역이다. --%>
 
-		<div class="coSearchRow qiSearchRow">
+		<div class="search-box">
+			<div class="search-row">
 
-			<div class="coSearchItem qiDateItem">
-				<%-- 검사일자 검색 영역이다. --%>
+				<div class="search-item qiDateItem">
+					<%-- 검사일자 검색 영역이다. --%>
 
-				<label class="coLabel">검사일자</label>
+					<label class="search-label">검사일자</label>
 
-				<div class="qiDateBox">
-					<input type="date" name="startDate" class="coInput coDate"
-						value="${startDate}"> <span class="qiDateDash">~</span> <input
-						type="date" name="endDate" class="coInput coDate"
-						value="${endDate}">
+					<div class="qiDateBox">
+						<input type="date" name="startDate" class="search-date"
+							value="${startDate}"> <span class="qiDateDash">~</span> <input
+							type="date" name="endDate" class="search-date" value="${endDate}">
+					</div>
 				</div>
+
+				<div class="search-item qiTypeItem">
+					<%-- 검색 구분 선택 영역이다. --%>
+
+					<label class="search-label">구분</label> <select name="searchType"
+						class="search-select">
+						<option value="">선택</option>
+						<option value="insp_id"
+							<c:if test="${searchType == 'insp_id'}">selected</c:if>>검사번호</option>
+						<option value="itemName"
+							<c:if test="${searchType == 'itemName'}">selected</c:if>>품목명</option>
+						<option value="productLot"
+							<c:if test="${searchType == 'productLot'}">selected</c:if>>LOT번호</option>
+						<option value="ename"
+							<c:if test="${searchType == 'ename'}">selected</c:if>>검사자</option>
+						<option value="result"
+							<c:if test="${searchType == 'result'}">selected</c:if>>검사결과</option>
+					</select>
+
+				</div>
+
+				<div class="search-item qiKeywordItem">
+					<%-- 검색어 입력 영역이다. --%>
+
+					<label class="search-label">&nbsp;</label> <input type="text"
+						name="keyword" class="search-input" placeholder="내용을 입력하세요."
+						value="${keyword}">
+
+				</div>
+
+				<div class="search-btn-wrap qiSearchBtnBox">
+					<%-- 검색 버튼과 초기화 버튼 영역이다. --%>
+
+					<button type="submit" class="search-btn search-btn-main">검색</button>
+					<!-- 기본 주소/특정주소 -->
+					<a href="${pageContext.request.contextPath}/quality/inspection"
+						class="search-btn search-btn-sub search-reset-btn">초기화</a>
+
+				</div>
+
 			</div>
-
-			<div class="coSearchItem qiTypeItem">
-				<%-- 검색 구분 선택 영역이다. --%>
-
-				<label class="coLabel">구분</label> <select name="searchType"
-					class="coSelect">
-					<option value="">선택</option>
-					<option value="insp_id"
-						<c:if test="${searchType == 'insp_id'}">selected</c:if>>검사번호</option>
-					<option value="itemName"
-						<c:if test="${searchType == 'itemName'}">selected</c:if>>품목명</option>
-					<option value="productLot"
-						<c:if test="${searchType == 'productLot'}">selected</c:if>>LOT번호</option>
-					<option value="ename"
-						<c:if test="${searchType == 'ename'}">selected</c:if>>검사자</option>
-					<option value="result"
-						<c:if test="${searchType == 'result'}">selected</c:if>>검사결과</option>
-				</select>
-
-			</div>
-
-			<div class="coSearchItem qiKeywordItem">
-				<%-- 검색어 입력 영역이다. --%>
-
-				<label class="coLabel">&nbsp;</label> <input type="text"
-					name="keyword" class="coInput" placeholder="내용을 입력하세요."
-					value="${keyword}">
-
-			</div>
-
-			<div class="coSearchBtnBox qiSearchBtnBox">
-				<%-- 검색 버튼과 초기화 버튼 영역이다. --%>
-
-				<button type="submit" class="coBtn coBtnSearch">검색</button>
-				<!-- 기본 주소/특정주소 -->
-				<a href="${pageContext.request.contextPath}/quality/inspection"
-					class="coBtn coBtnReset">초기화</a>
-
-			</div>
-
 		</div>
 
 	</form>
@@ -73,7 +74,7 @@
 
 	<div class="coTableTop">
 		<%-- 총 건수와 등록 버튼이 들어가는 영역이다. --%>
-
+    
 		<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
 		<%-- DB에서 조회한 전체 데이터 개수를 보여준다. --%>
 
@@ -233,7 +234,6 @@
 		</form>
 	</div>
 </div>
-
 
 
 <script
