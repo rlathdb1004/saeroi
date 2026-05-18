@@ -41,6 +41,7 @@ public class DbTool {
 	}
 	
 	@Tool("품질 검사 내역 목록을 조회합니다. 사용자가 특정 품목이나 검색어를 언급하면 keyword에 넣고, searchType은 '품목명' 등으로 지정합니다. " +
+			"만약 날짜를 조회했다면 YYYY-MM-DD의 형식을 지켜줘"+
 		      "만약 조회 시작일(startDate)과 종료일(endDate)을 언급하지 않았다면, 무리하게 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. " +
 		      "출력 개수 제한(limit)이나 정렬 방식(orderBy)에 대한 요구사항이 있다면 해당 매개변수에 값을 채워줍니다.")
 	public String getQualitySelect(String startDate, String endDate, String searchType, String keyword) {
@@ -55,7 +56,9 @@ public class DbTool {
 		}
 	}
 	
-	@Tool("만약 조회 시작일(startDate)과 종료일(endDate)을 언급하지 않았다면, 무리하게 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다." +
+	@Tool("입출고 기록을 조회합니다. "+
+			"만약 조회 시작일(startDate)과 종료일(endDate)을 언급하지 않았다면, 무리하게 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다." +
+			"만약 날짜를 조회했다면 YYYY-MM-DD의 형식을 지켜줘"+
 			"사용자가 특정 품목이나 검색어를 언급하면 keyword에 넣고, searchType은 '품목명' 등으로 지정합니다."+
 			"사용자가 '출고 기록' 혹은 '입고 기록'을 요청하면 keyword에 넣지 말고, 반드시 searchType에 '구분'을 넣고 keyword에는 '출고' 또는 '입고'를 넣으세요.")
 	public String getInOut(

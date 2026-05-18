@@ -29,6 +29,7 @@ public class aiChatService {
 	
 	@Autowired
     public void init() {
+		
 		this.assistant = AiServices.builder(MesAssistant.class)
 						.chatLanguageModel(geminiModel)
 						.chatMemory(chatMemory)
