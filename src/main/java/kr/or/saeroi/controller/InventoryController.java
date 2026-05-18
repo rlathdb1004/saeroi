@@ -30,36 +30,38 @@ public class InventoryController {
 			@RequestParam(value = "endDate", defaultValue = "") String endDate,
 			Model model) {
 
-		// 전체 개수 조회
-		int totalCount = service.getInoutCount(
-				searchType,
-				keyword,
-				startDate,
-				endDate);
-
-		// 페이징 정보 만들기
-		PageDTO pageInfo = new PageDTO(page, size, totalCount);
-
-		// 시작 번호
-		int startRow = (page - 1) * size + 1;
-
-		// 끝 번호
-		int endRow = page * size;
-
-		// 목록 조회
+		// 입출고 전체 목록 조회
 		List<InoutDTO> list = service.getInoutList(
-				startRow,
-				endRow,
 				searchType,
 				keyword,
 				startDate,
 				endDate);
+
+		// 페이징 기능
+		int totalCount = list.size();
+
+		int startIndex = (page - 1) * size;
+
+		int endIndex = startIndex + size;
+
+		if (endIndex > totalCount) {
+			endIndex = totalCount;
+		}
+
+		// 현재 페이지에 보여줄 목록
+		List<InoutDTO> page_list =
+				list.subList(startIndex, endIndex);
+
+		// 공통 페이징 정보
+		PageDTO pageInfo =
+				new PageDTO(page, size, totalCount);
 
 		// 등록 모달 품목 목록
-		List<InoutDTO> itemList = service.getItemList();
+		List<InoutDTO> itemList =
+				service.getItemList();
 
 		// JSP로 보낼 값
-		model.addAttribute("list", list);
+		model.addAttribute("list", page_list);
 		model.addAttribute("itemList", itemList);
 		model.addAttribute("pageInfo", pageInfo);
 		model.addAttribute("pageUrl", "/inventory/materialIn");
@@ -121,7 +123,8 @@ public class InventoryController {
 			Model model) {
 
 		// 상세 조회
-		InoutDTO inout = service.getInoutDetail(inoutId);
+		InoutDTO inout =
+				service.getInoutDetail(inoutId);
 
 		// JSP로 보낼 값
 		model.addAttribute("inout", inout);

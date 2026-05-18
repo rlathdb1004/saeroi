@@ -9,8 +9,6 @@ public interface InoutService {
 
 	// 입출고 목록 조회
 	public List<InoutDTO> getInoutList(
-			int startRow,
-			int endRow,
 			String searchType,
 			String keyword,
 			String startDate,
