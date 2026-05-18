@@ -32,7 +32,7 @@ public class DbTool {
 	@Tool("사원 번호로 상세 정보를 조회합니다")
 	public String getemp(String empNo) {
 		try (Connection conn = dataSource.getConnection()) {
-			LoginDTO data = loginDAO.Find_empno(conn, empNo);
+			LoginDTO data = loginDAO.find_empno(empNo);
 //			return (data !=null) ? "해당 조회내용은 없습니다" : data.toString();
 			return (data == null) ? "해당 조회내용은 없습니다" : data.toString();
 		} catch (Exception e) {
