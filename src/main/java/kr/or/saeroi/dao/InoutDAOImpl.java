@@ -9,9 +9,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
 import kr.or.saeroi.dto.InoutDTO;
 
 // 입출고 DAO 구현 클래스
+@Repository
 public class InoutDAOImpl implements InoutDAO {
 
 	// DB 연결
