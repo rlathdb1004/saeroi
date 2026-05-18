@@ -2,6 +2,19 @@
 	contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
+<style>
+	/* 상세페이지 목록 버튼 */
+	.inoutDetailListBtn {
+		background-color: #2F7D62;
+		color: white;
+		border: none;
+		border-radius: 7px;
+		padding: 8px 22px;
+		font-weight: bold;
+		cursor: pointer;
+	}
+</style>
+
 <div class="coPageWrap">
 
 	<div class="coTableTop">
@@ -12,7 +25,7 @@
 
 		<div>
 			<button type="button"
-				class="inoutSubBtn"
+				class="inoutDetailListBtn"
 				onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
 				목록
 			</button>
@@ -30,7 +43,13 @@
 					<th>입출고번호</th>
 					<td>${inout.docNo}</td>
 					<th>입출고구분</th>
-					<td>${inout.inoutType}</td>
+					<td>
+						<c:choose>
+							<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
+							<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
+							<c:otherwise>${inout.inoutType}</c:otherwise>
+						</c:choose>
+					</td>
 				</tr>
 
 				<tr>
@@ -42,7 +61,14 @@
 
 				<tr>
 					<th>품목유형</th>
-					<td>${inout.itemType}</td>
+					<td>
+						<c:choose>
+							<c:when test="${inout.itemType eq 'FG'}">완제품</c:when>
+							<c:when test="${inout.itemType eq 'RM'}">원자재</c:when>
+							<c:when test="${inout.itemType eq 'SM'}">부자재</c:when>
+							<c:otherwise>${inout.itemType}</c:otherwise>
+						</c:choose>
+					</td>
 					<th>단위</th>
 					<td>${inout.itemUnit}</td>
 				</tr>
