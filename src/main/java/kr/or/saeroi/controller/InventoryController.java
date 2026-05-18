@@ -31,17 +31,23 @@ public class InventoryController {
 
 		int size = 10;
 
+		// 전체 개수 조회
 		int totalCount = service.getInoutCount(
 				searchType,
 				keyword,
 				startDate,
 				endDate);
 
+		// 페이징 정보 만들기
 		PageDTO pageInfo = new PageDTO(page, size, totalCount);
 
+		// 시작 번호
 		int startRow = (page - 1) * size + 1;
+
+		// 끝 번호
 		int endRow = page * size;
 
+		// 목록 조회
 		List<InoutDTO> list = service.getInoutList(
 				startRow,
 				endRow,
@@ -50,23 +56,23 @@ public class InventoryController {
 				startDate,
 				endDate);
 
+		// 등록 모달 품목 목록
 		List<InoutDTO> itemList = service.getItemList();
 
+		// JSP로 보낼 값
 		model.addAttribute("list", list);
 		model.addAttribute("itemList", itemList);
 		model.addAttribute("pageInfo", pageInfo);
 		model.addAttribute("pageUrl", "/inventory/materialIn");
 
+		// 검색값 유지
 		model.addAttribute("searchType", searchType);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
 
-		model.addAttribute("contentPage", "/WEB-INF/views/inoutManage.jsp");
-		model.addAttribute("headerTitle", "자재/재고 관리");
-		model.addAttribute("headerSubTitle", "자재입출고 관리");
-
-		return "layout";
+		// Tiles 주소
+		return "inoutManage.tiles";
 	}
 
 	// 입출고 등록
@@ -80,14 +86,31 @@ public class InventoryController {
 
 		InoutDTO dto = new InoutDTO();
 
+		// 입력값 DTO에 담기
 		dto.setItemId(itemId);
 		dto.setInoutType(inoutType);
 		dto.setInoutQty(inoutQty);
 		dto.setInoutDate(Date.valueOf(inoutDate));
 		dto.setRemark(remark);
 
+		// DB 저장
 		service.addInout(dto);
 
+		// 저장 후 목록으로 이동
+		return "redirect:/inventory/materialIn";
+	}
+
+	// 선택 삭제
+	@RequestMapping("/inventory/materialIn/delete")
+	public String deleteInout(
+			@RequestParam(value = "inoutIds", required = false) String[] inoutIds) {
+
+		// 선택한 값이 있을 때만 삭제
+		if (inoutIds != null) {
+			service.removeInout(inoutIds);
+		}
+
+		// 삭제 후 목록으로 이동
 		return "redirect:/inventory/materialIn";
 	}
 
@@ -97,14 +120,13 @@ public class InventoryController {
 			@RequestParam("inoutId") int inoutId,
 			Model model) {
 
+		// 상세 조회
 		InoutDTO inout = service.getInoutDetail(inoutId);
 
+		// JSP로 보낼 값
 		model.addAttribute("inout", inout);
 
-		model.addAttribute("contentPage", "/WEB-INF/views/inoutDetail.jsp");
-		model.addAttribute("headerTitle", "자재/재고 관리");
-		model.addAttribute("headerSubTitle", "입출고 상세보기");
-
-		return "layout";
+		// Tiles 주소
+		return "inoutDetail.tiles";
 	}
 }

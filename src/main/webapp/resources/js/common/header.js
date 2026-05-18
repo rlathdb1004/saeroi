@@ -6,7 +6,6 @@ function heAddZero(number) {
 
         return "0" + number;
         // 10보다 작으면 앞에 0을 붙여서 반환한다.
-
     }
     // if문을 끝낸다.
 
@@ -65,7 +64,7 @@ function heShowCurrentTime() {
         // 요일 번호가 4이면 목요일이다.
 
         dayText = "목";
-        // 요일 글자를 목으로 저장한다.
+        // 요일 글자를 목로 저장한다.
 
     } else if (dayNumber == 5) {
         // 요일 번호가 5이면 금요일이다.
@@ -107,11 +106,14 @@ function heShowCurrentTime() {
 // heShowCurrentTime 함수를 끝낸다.
 
 
-function heShowTodayTemp() {
-    // 오늘 온도를 WeatherController에서 가져오는 함수이다.
+function heShowTodayWeather() {
+    // 오늘 온도와 날씨 아이콘을 WeatherController에서 가져오는 함수이다.
 
     var tempBox = document.getElementById("heTodayTemp");
     // 오늘 온도를 넣을 HTML 요소를 찾는다.
+
+    var iconBox = document.getElementById("heWeatherIcon");
+    // 날씨 아이콘을 넣을 img 요소를 찾는다.
 
     if (tempBox == null) {
         // 온도를 넣을 HTML 요소가 없으면 실행한다.
@@ -124,48 +126,83 @@ function heShowTodayTemp() {
     tempBox.innerHTML = "불러오는 중";
     // 온도 요청 전에는 불러오는 중이라고 표시한다.
 
-    fetch(contextPath + "/weather/today")
-    // 우리 Spring WeatherController의 /weather/today 주소로 요청을 보낸다.
+    if (iconBox != null) {
+        // 날씨 아이콘 요소가 있으면 실행한다.
+
+        iconBox.style.display = "none";
+        // API 결과를 받기 전까지는 아이콘을 숨긴다.
+    }
+    // if문을 끝낸다.
+
+    fetch(contextPath + "/weather/current")
+    // 우리 Spring WeatherController의 /weather/current 주소로 요청을 보낸다.
+    // OpenWeatherMap에서 가져온 온도, 설명, 아이콘 주소를 JSON으로 받는 주소이다.
 
     .then(function(response) {
         // Controller에서 응답이 돌아오면 실행한다.
 
-        return response.text();
-        // 응답 내용을 글자 형태로 받는다.
+        return response.json();
+        // 응답 내용을 JSON 형태로 받는다.
     })
     // 첫 번째 then을 끝낸다.
 
     .then(function(data) {
-        // 응답으로 받은 온도 데이터를 처리한다.
+        // 응답으로 받은 날씨 데이터를 처리한다.
 
-        if (data == "온도 확인 불가") {
-    // 서버에서 온도 확인 불가 문구가 오면 실행한다.
+        if (data.temp == null) {
+            // 온도 값이 없으면 실행한다.
 
-    tempBox.innerHTML = data;
-    // 에러 문구는 그대로 화면에 보여준다.
+            tempBox.innerHTML = "온도 확인 불가";
+            // 화면에 온도 확인 불가 문구를 보여준다.
 
-} else {
-    // 서버에서 정상 온도 숫자가 오면 실행한다.
+            return;
+            // 더 이상 진행하지 않고 함수를 끝낸다.
+        }
+        // if문을 끝낸다.
 
-    tempBox.innerHTML = data + "&deg;C";
-    // 온도 숫자 뒤에 섭씨 표시를 붙여서 화면에 보여준다.
-    // &deg;는 HTML에서 ° 기호를 안전하게 표시하는 코드이다.
-}
+        tempBox.innerHTML = data.temp + "&deg;C";
+        // 온도 숫자 뒤에 섭씨 표시를 붙여서 화면에 보여준다.
+        // &deg;는 HTML에서 ° 기호를 안전하게 표시하는 코드이다.
+
+        if (iconBox != null && data.iconUrl != null) {
+            // 날씨 아이콘 요소가 있고, 서버에서 아이콘 주소를 받았으면 실행한다.
+
+            iconBox.src = data.iconUrl;
+            // OpenWeatherMap 아이콘 이미지 주소를 img 태그에 넣는다.
+
+            iconBox.alt = data.description;
+            // 이미지 설명을 날씨 설명으로 넣는다.
+
+            iconBox.title = data.description;
+            // 마우스를 올렸을 때 날씨 설명이 보이게 한다.
+
+            iconBox.style.display = "inline-block";
+            // 숨겨두었던 날씨 아이콘을 화면에 보여준다.
+        }
+        // if문을 끝낸다.
     })
     // 두 번째 then을 끝낸다.
 
     .catch(function(error) {
-        // 온도 요청 중 문제가 생기면 실행한다.
+        // 날씨 요청 중 문제가 생기면 실행한다.
 
         console.error(error);
         // 개발자 도구 콘솔에 에러 내용을 출력한다.
 
         tempBox.innerHTML = "온도 확인 불가";
         // 화면에는 온도를 가져오지 못했다고 표시한다.
+
+        if (iconBox != null) {
+            // 날씨 아이콘 요소가 있으면 실행한다.
+
+            iconBox.style.display = "none";
+            // 에러가 났을 때는 날씨 아이콘을 숨긴다.
+        }
+        // if문을 끝낸다.
     });
     // fetch 요청을 끝낸다.
 }
-// heShowTodayTemp 함수를 끝낸다.
+// heShowTodayWeather 함수를 끝낸다.
 
 
 heShowCurrentTime();
@@ -174,5 +211,5 @@ heShowCurrentTime();
 setInterval(heShowCurrentTime, 1000);
 // 1초마다 heShowCurrentTime 함수를 다시 실행해서 초까지 갱신한다.
 
-heShowTodayTemp();
-// 페이지가 열리자마자 오늘 온도를 한 번 가져온다.
+heShowTodayWeather();
+// 페이지가 열리자마자 오늘 온도와 날씨 아이콘을 한 번 가져온다.

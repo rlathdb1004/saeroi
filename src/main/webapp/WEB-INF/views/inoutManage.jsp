@@ -5,30 +5,30 @@
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
 <style>
-	/* 상단 등록/삭제 버튼 영역 */
+	/* 버튼 영역 */
 	.inoutBtnArea {
 		text-align: right;
-		margin-bottom: 25px;
+		margin-bottom: 10px;
 	}
 
-	/* 메인 버튼 */
+	/* 등록, 검색 버튼 */
 	.inoutMainBtn {
 		background-color: #2F7D62;
 		color: white;
 		border: none;
-		border-radius: 8px;
-		padding: 10px 22px;
+		border-radius: 7px;
+		padding: 8px 26px;
 		font-weight: bold;
 		cursor: pointer;
 	}
 
-	/* 보조 버튼 */
+	/* 선택삭제, 초기화, 상세보기 버튼 */
 	.inoutSubBtn {
 		background-color: white;
 		color: #1F2933;
 		border: 1px solid #cbd5df;
-		border-radius: 8px;
-		padding: 9px 16px;
+		border-radius: 7px;
+		padding: 8px 18px;
 		font-weight: bold;
 		cursor: pointer;
 	}
@@ -157,22 +157,6 @@
 
 <div class="coPageWrap">
 
-	<!-- 등록 / 선택 삭제 버튼 -->
-	<div class="inoutBtnArea">
-
-		<button type="button"
-			class="inoutMainBtn"
-			onclick="openInoutModal()">
-			등록
-		</button>
-
-		<button type="button"
-			class="inoutSubBtn">
-			선택 삭제
-		</button>
-
-	</div>
-
 	<!-- 검색 영역 -->
 	<div class="coSearchBox">
 
@@ -231,97 +215,124 @@
 
 	</div>
 
-	<!-- 총 건수 -->
-	<div class="coTableTop">
-		<p class="coTotalCount">
-			총 ${pageInfo.totalCount}건
-		</p>
-	</div>
+	<!-- 삭제용 form -->
+	<form method="post"
+		id="deleteForm"
+		action="${pageContext.request.contextPath}/inventory/materialIn/delete">
 
-	<!-- 테이블 -->
-	<div class="coTableWrap">
+		<!-- 총 건수 / 버튼 영역 -->
+		<div class="coTableTop">
 
-		<table class="coTable">
+			<p class="coTotalCount">
+				총 ${pageInfo.totalCount}건
+			</p>
 
-			<thead>
-				<tr>
-					<th><input type="checkbox" id="checkAll"></th>
-					<th>NO</th>
-					<th>입출고번호</th>
-					<th>입출고구분</th>
-					<th>품목코드</th>
-					<th>품목유형</th>
-					<th>품목명</th>
-					<th>입출고량</th>
-					<th>단위</th>
-					<th>일자</th>
-					<th>상세보기</th>
-				</tr>
-			</thead>
+			<div class="inoutBtnArea">
 
-			<tbody>
+				<button type="button"
+					class="inoutMainBtn"
+					onclick="openInoutModal()">
+					등록
+				</button>
 
-				<c:forEach var="inout"
-					items="${list}">
+				<button type="button"
+					class="inoutSubBtn"
+					onclick="deleteCheck()">
+					선택 삭제
+				</button>
 
+			</div>
+
+		</div>
+
+		<!-- 테이블 -->
+		<div class="coTableWrap">
+
+			<table class="coTable">
+
+				<thead>
 					<tr>
-						<td>
-							<input type="checkbox"
-								name="rowCheck">
-						</td>
-
-						<td>${inout.inoutId}</td>
-
-						<td title="${inout.docNo}">
-							${inout.docNo}
-						</td>
-
-						<td>
-							<c:choose>
-								<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
-								<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
-								<c:otherwise>${inout.inoutType}</c:otherwise>
-							</c:choose>
-						</td>
-
-						<td title="${inout.itemCode}">
-							${inout.itemCode}
-						</td>
-
-						<td>
-							<c:choose>
-								<c:when test="${inout.itemType eq 'FG'}">완제품</c:when>
-								<c:when test="${inout.itemType eq 'RM'}">원자재</c:when>
-								<c:when test="${inout.itemType eq 'SM'}">부자재</c:when>
-								<c:otherwise>${inout.itemType}</c:otherwise>
-							</c:choose>
-						</td>
-
-						<td title="${inout.itemName}">
-							${inout.itemName}
-						</td>
-
-						<td>${inout.inoutQty}</td>
-						<td>${inout.itemUnit}</td>
-						<td>${inout.inoutDate}</td>
-
-						<td>
-							<!-- 상세보기 페이지로 이동 -->
-							<button type="button"
-								class="inoutSubBtn"
-								onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
-								상세보기
-							</button>
-						</td>
+						<th><input type="checkbox" id="checkAll"></th>
+						<th>NO</th>
+						<th>입출고번호</th>
+						<th>입출고구분</th>
+						<th>품목코드</th>
+						<th>품목유형</th>
+						<th>품목명</th>
+						<th>입출고량</th>
+						<th>단위</th>
+						<th>일자</th>
+						<th>상세보기</th>
 					</tr>
+				</thead>
 
-				</c:forEach>
+				<tbody>
 
-			</tbody>
+					<c:forEach var="inout"
+						items="${list}"
+						varStatus="status">
 
-		</table>
+						<tr>
+							<td>
+								<input type="checkbox"
+									name="inoutIds"
+									value="${inout.inoutId}">
+							</td>
 
-	</div>
+							<!-- 화면 번호는 1번부터 다시 출력 -->
+							<td>${status.count}</td>
+
+							<td title="${inout.docNo}">
+								${inout.docNo}
+							</td>
+
+							<td>
+								<c:choose>
+									<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
+									<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
+									<c:otherwise>${inout.inoutType}</c:otherwise>
+								</c:choose>
+							</td>
+
+							<td title="${inout.itemCode}">
+								${inout.itemCode}
+							</td>
+
+							<td>
+								<c:choose>
+									<c:when test="${inout.itemType eq 'FG'}">완제품</c:when>
+									<c:when test="${inout.itemType eq 'RM'}">원자재</c:when>
+									<c:when test="${inout.itemType eq 'SM'}">부자재</c:when>
+									<c:otherwise>${inout.itemType}</c:otherwise>
+								</c:choose>
+							</td>
+
+							<td title="${inout.itemName}">
+								${inout.itemName}
+							</td>
+
+							<td>${inout.inoutQty}</td>
+							<td>${inout.itemUnit}</td>
+							<td>${inout.inoutDate}</td>
+
+							<td>
+								<button type="button"
+									class="inoutSubBtn"
+									onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
+									상세보기
+								</button>
+							</td>
+						</tr>
+
+					</c:forEach>
+
+				</tbody>
+
+			</table>
+
+		</div>
+
+	</form>
 
 	<!-- 공통 페이징 -->
 	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
@@ -452,13 +463,38 @@
 	document.getElementById("checkAll").onclick = function() {
 
 		var checks =
-			document.getElementsByName("rowCheck");
+			document.getElementsByName("inoutIds");
 
 		for (var i = 0; i < checks.length; i++) {
 
 			checks[i].checked = this.checked;
 		}
 	};
+
+	// 선택 삭제
+	function deleteCheck() {
+
+		var checks =
+			document.getElementsByName("inoutIds");
+
+		var checked = false;
+
+		for (var i = 0; i < checks.length; i++) {
+
+			if (checks[i].checked) {
+				checked = true;
+			}
+		}
+
+		if (!checked) {
+			alert("삭제할 항목을 선택해주세요.");
+			return;
+		}
+
+		if (confirm("선택한 항목을 삭제하시겠습니까?")) {
+			document.getElementById("deleteForm").submit();
+		}
+	}
 
 	// 등록 모달 열기
 	function openInoutModal() {

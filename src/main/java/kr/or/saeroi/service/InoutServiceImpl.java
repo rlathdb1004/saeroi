@@ -52,4 +52,8 @@ public class InoutServiceImpl implements InoutService {
 	public InoutDTO getInoutDetail(int inoutId) {
 		return dao.selectInoutDetail(inoutId);
 	}
+
+	public int removeInout(String[] inoutIds) {
+		return dao.deleteInout(inoutIds);
+	}
 }
