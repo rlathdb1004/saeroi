@@ -35,7 +35,9 @@ public class DbTool {
 		}
 	}
 	
-	@Tool("조회 시작일, 종료일, 검색 조건(searchType), 키워드(keyword)를 기반으로 상세 품질 검사 목록을 조회합니다. 날짜 형식은 주로 'YYYY-MM-DD'입니다.")
+	@Tool("품질 검사 내역 목록을 조회합니다. " +
+		      "조회 시작일(startDate)과 종료일(endDate)은 반드시 필수(Required)로 입력되어야 합니다. (형식: YYYY-MM-DD) " +
+		      "만약 사용자가 검색 조건(searchType)이나 키워드(keyword)를 언급하지 않았다면, 무리해서 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다.")
 	public String getQualitySelect(String startDate, String endDate, String searchType, String keyword) {
 		try {
 			String type = (searchType != null && !searchType.isEmpty()) ? searchType : null; 

@@ -61,9 +61,9 @@ public class QualityController {
 		model.addAttribute("keyword", keyword);
 
 		// JSP 지정
-		model.addAttribute("contentPage", "/WEB-INF/views/inspection.jsp");
+//		model.addAttribute("contentPage", "/WEB-INF/views/inspection.jsp");
 
-		return "layout";
+		return "inspection.tiles";
 	}
 
 //	구분 10개씩 기능 메서드
@@ -83,7 +83,7 @@ public class QualityController {
 
 		model.addAttribute("contentPage", "/WEB-INF/views/quality/defect.jsp");
 
-		return "layout";
+		return "defect.tiles";
 	}
 
 }
