@@ -10,6 +10,8 @@
     background-color: #FFFFFF;
     box-sizing: border-box;
     overflow-x: auto;
+    margin-bottom: 12px;
+    /* 검색 박스와 총 건수 영역 사이 간격을 설정한다. */
 }
 
 /* 검색 form */
