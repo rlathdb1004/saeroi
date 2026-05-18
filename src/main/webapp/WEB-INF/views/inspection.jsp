@@ -77,7 +77,8 @@
 		<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
 		<%-- DB에서 조회한 전체 데이터 개수를 보여준다. --%>
 
-		<button type="button" class="coBtn coBtnPrimary">+ 등록</button>
+		<button type="button" class="coBtn coBtnPrimary qiRegisterOpenBtn">등록</button>
+
 
 	</div>
 	<%-- 테이블 상단 영역을 끝낸다. --%>
@@ -143,6 +144,105 @@
 
 </div>
 <%-- 본문 전체 영역을 끝낸다. --%>
+<!-- 검사 등록 모달 -->
+<div class="qiModal qiRegisterModal">
+	<%-- 등록 버튼을 눌렀을 때 열리는 모달 배경이다. --%>
+
+	<div class="qiModalBox qiRegisterModalBox">
+		<%-- 실제 모달 내용 영역이다. --%>
+
+		<div class="qiModalHeader">
+			<%-- 모달 제목과 닫기 버튼 영역이다. --%>
+
+			<h3 class="qiModalTitle">검사 등록</h3>
+
+			<button type="button" class="qiModalCloseBtn">×</button>
+		</div>
+
+		<form class="qiModalForm" method="post"
+			action="${pageContext.request.contextPath}/quality/inspection/add">
+			<%-- 검사 등록 정보를 입력하는 영역이다. --%>
+
+			<div class="qiModalBody qiRegisterModalBody">
+
+				<div class="qiFormRow">
+					<label class="qiFormLabel">검사일시</label> <input type="date"
+						name="insp_date" class="coInput qiFormInput">
+				</div>
+
+				<div class="qiFormRow">
+					<label class="qiFormLabel">품목명</label> <select name="item_id"
+						class="coSelect qiFormInput">
+						<option value="">선택</option>
+						<%-- 품목 목록은 나중에 DB에서 조회해서 option으로 반복 출력한다. --%>
+					</select>
+				</div>
+
+				<div class="qiFormRow">
+					<label class="qiFormLabel">검사자</label> <select name="emp_id"
+						class="coSelect qiFormInput">
+						<option value="">선택</option>
+						<%-- 검사자 목록은 나중에 DB에서 조회해서 option으로 반복 출력한다. --%>
+					</select>
+				</div>
+
+				<div class="qiFormRow">
+					<label class="qiFormLabel">검사구분</label> <select name="insp_type"
+						class="coSelect qiFormInput">
+						<option value="">선택</option>
+						<option value="외관검사">외관검사</option>
+						<option value="치수검사">치수검사</option>
+						<option value="품질판정">품질판정</option>
+						<option value="재검사">재검사</option>
+					</select>
+				</div>
+
+				<div class="qiFormRow">
+					<label class="qiFormLabel">검사결과</label> <select name="result"
+						class="coSelect qiFormInput">
+						<option value="">선택</option>
+						<option value="합격">합격</option>
+						<option value="불합격">불합격</option>
+						<option value="조건부">조건부</option>
+					</select>
+				</div>
+
+				<div class="qiFormRow">
+					<label class="qiFormLabel">검사수량</label> <input type="number"
+						name="inspection_qty" class="coInput qiFormInput" min="0">
+				</div>
+
+				<div class="qiFormRow">
+					<label class="qiFormLabel">양품수량</label> <input type="number"
+						name="good_qty" class="coInput qiFormInput" min="0">
+				</div>
+
+				<div class="qiFormRow">
+					<label class="qiFormLabel">검사 상세</label> <select name="remark"
+						class="coSelect qiFormInput">
+						<option value="">선택</option>
+						<option value="외관검사 완료">외관검사 완료</option>
+						<option value="치수검사 완료">치수검사 완료</option>
+						<option value="품질판정 완료">품질판정 완료</option>
+						<option value="불량상세 확인">불량상세 확인</option>
+						<option value="재검대상 확인">재검대상 확인</option>
+					</select>
+				</div>
+
+			</div>
+
+			<div class="qiModalFooter">
+				<%-- 등록/취소 버튼 영역이다. --%>
+
+				<button type="button" class="coBtn coBtnReset qiModalCancelBtn">취소</button>
+				<button type="submit" class="coBtn coBtnPrimary">등록</button>
+			</div>
+
+		</form>
+	</div>
+</div>
+
+
 
 <script
 	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script>

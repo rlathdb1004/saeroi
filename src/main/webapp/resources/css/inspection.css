@@ -58,3 +58,199 @@
 .qiPage .coTableTop {
     margin-bottom: 12px;
 }
+/* 검사 등록 모달 */
+.qiModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.36);
+}
+
+.qiModal.isOpen {
+    display: flex;
+}
+
+.qiModalBox {
+    width: 640px;
+    max-width: calc(100vw - 40px);
+    background: #fff;
+    border: 1px solid #d9e3df;
+    border-radius: 8px;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+}
+
+.qiModalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid #e5ece8;
+}
+
+.qiModalTitle {
+    margin: 0;
+    color: #1f7a58;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.qiModalCloseBtn {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    background: transparent;
+    color: #475569;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.qiModalBody {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 18px;
+    padding: 22px;
+}
+
+.qiFormRow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.qiFormRowFull {
+    grid-column: 1 / -1;
+}
+
+.qiFormLabel {
+    color: #1f2933;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.qiFormInput {
+    width: 100%;
+}
+
+.qiFormTextarea {
+    width: 100%;
+    min-height: 92px;
+    padding: 10px 12px;
+    border: 1px solid #d5ded9;
+    border-radius: 6px;
+    color: #111827;
+    font-size: 14px;
+    resize: vertical;
+    box-sizing: border-box;
+}
+
+.qiFormTextarea:focus {
+    outline: none;
+    border-color: #2f8f68;
+}
+
+/* 검사 등록 모달 */
+.qiModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.35);
+}
+
+.qiModal.isOpen {
+    display: flex;
+}
+
+.qiModalBox {
+    width: 680px;
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 56px);
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #d9e3df;
+    border-radius: 8px;
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+}
+
+.qiModalHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 22px;
+    border-bottom: 1px solid #e5ece8;
+}
+
+.qiModalTitle {
+    margin: 0;
+    color: #1f7a58;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.qiModalCloseBtn {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    background: transparent;
+    color: #475569;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.qiModalForm {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 132px);
+}
+
+.qiModalBody {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 18px;
+    padding: 22px;
+    overflow-y: auto;
+}
+
+.qiFormRow {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.qiFormLabel {
+    color: #1f2933;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.qiFormInput {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.qiModalFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 16px 22px 20px;
+    border-top: 1px solid #e5ece8;
+    background: #fff;
+}
+
+@media (max-width: 720px) {
+    .qiModalBody {
+        grid-template-columns: 1fr;
+    }
+
+    .qiModalBox {
+        width: calc(100vw - 24px);
+    }
+}
+
