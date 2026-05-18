@@ -29,10 +29,42 @@ public class InoutDAOImpl implements InoutDAO {
 		return DriverManager.getConnection(url, id, pw);
 	}
 
+	// 팀장님 Tool 코드용
+	@Override
+	public List<InoutDTO> selectInoutList(
+			String searchType,
+			String keyword,
+			String startDate,
+			String endDate) {
+
+		String inoutType = "";
+
+		// 구분 검색일 때 입고/출고 값 바꾸기
+		if ("구분".equals(searchType)) {
+
+			if ("입고".equals(keyword)) {
+				inoutType = "MI";
+				keyword = "";
+
+			} else if ("출고".equals(keyword)) {
+				inoutType = "MO-PROD";
+				keyword = "";
+			}
+		}
+
+		return selectInoutList(
+				searchType,
+				inoutType,
+				keyword,
+				startDate,
+				endDate);
+	}
+
 	// 입출고 목록 조회
 	@Override
 	public List<InoutDTO> selectInoutList(
 			String searchType,
+			String inoutType,
 			String keyword,
 			String startDate,
 			String endDate) {
@@ -64,24 +96,32 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += " ON MI.ITEM_ID = I.ITEM_ID ";
 			sql += " WHERE 1 = 1 ";
 
+			// 입출고구분 검색
+			if (inoutType != null && !inoutType.equals("")) {
+				sql += " AND MI.INOUT_TYPE = ? ";
+			}
+
 			// 검색어가 있을 때
 			if (keyword != null && !keyword.equals("")) {
 
 				if ("itemCode".equals(searchType)) {
 					sql += " AND I.ITEM_CODE LIKE ? ";
+
 				} else if ("itemName".equals(searchType)) {
 					sql += " AND I.ITEM_NAME LIKE ? ";
+
 				} else {
-					sql += " AND (I.ITEM_CODE LIKE ? OR I.ITEM_NAME LIKE ?) ";
+					sql += " AND (I.ITEM_CODE LIKE ? ";
+					sql += " OR I.ITEM_NAME LIKE ?) ";
 				}
 			}
 
-			// 시작일이 있을 때
+			// 시작일 검색
 			if (startDate != null && !startDate.equals("")) {
 				sql += " AND MI.INOUT_DATE >= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			// 종료일이 있을 때
+			// 종료일 검색
 			if (endDate != null && !endDate.equals("")) {
 				sql += " AND MI.INOUT_DATE <= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
@@ -89,18 +129,24 @@ public class InoutDAOImpl implements InoutDAO {
 			// 최신순 정렬
 			sql += " ORDER BY MI.INOUT_ID DESC ";
 
-			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+			PreparedStatement pstmt = conn.prepareStatement(sql);
 
 			int idx = 1;
+
+			// 입출고구분 값 넣기
+			if (inoutType != null && !inoutType.equals("")) {
+				pstmt.setString(idx++, inoutType);
+			}
 
 			// 검색어 값 넣기
 			if (keyword != null && !keyword.equals("")) {
 
 				if ("itemCode".equals(searchType)) {
 					pstmt.setString(idx++, "%" + keyword + "%");
+
 				} else if ("itemName".equals(searchType)) {
 					pstmt.setString(idx++, "%" + keyword + "%");
+
 				} else {
 					pstmt.setString(idx++, "%" + keyword + "%");
 					pstmt.setString(idx++, "%" + keyword + "%");
@@ -117,13 +163,11 @@ public class InoutDAOImpl implements InoutDAO {
 				pstmt.setString(idx++, endDate);
 			}
 
-			ResultSet rs =
-					pstmt.executeQuery();
+			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {
 
-				InoutDTO dto =
-						new InoutDTO();
+				InoutDTO dto = new InoutDTO();
 
 				dto.setInoutId(rs.getInt("INOUT_ID"));
 				dto.setInoutType(rs.getString("INOUT_TYPE"));
@@ -160,6 +204,7 @@ public class InoutDAOImpl implements InoutDAO {
 	@Override
 	public int selectInoutCount(
 			String searchType,
+			String inoutType,
 			String keyword,
 			String startDate,
 			String endDate) {
@@ -177,21 +222,32 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += " ON MI.ITEM_ID = I.ITEM_ID ";
 			sql += " WHERE 1 = 1 ";
 
+			// 입출고구분 검색
+			if (inoutType != null && !inoutType.equals("")) {
+				sql += " AND MI.INOUT_TYPE = ? ";
+			}
+
+			// 검색어가 있을 때
 			if (keyword != null && !keyword.equals("")) {
 
 				if ("itemCode".equals(searchType)) {
 					sql += " AND I.ITEM_CODE LIKE ? ";
+
 				} else if ("itemName".equals(searchType)) {
 					sql += " AND I.ITEM_NAME LIKE ? ";
+
 				} else {
-					sql += " AND (I.ITEM_CODE LIKE ? OR I.ITEM_NAME LIKE ?) ";
+					sql += " AND (I.ITEM_CODE LIKE ? ";
+					sql += " OR I.ITEM_NAME LIKE ?) ";
 				}
 			}
 
+			// 시작일 검색
 			if (startDate != null && !startDate.equals("")) {
 				sql += " AND MI.INOUT_DATE >= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
+			// 종료일 검색
 			if (endDate != null && !endDate.equals("")) {
 				sql += " AND MI.INOUT_DATE <= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
@@ -200,22 +256,32 @@ public class InoutDAOImpl implements InoutDAO {
 
 			int idx = 1;
 
+			// 입출고구분 값 넣기
+			if (inoutType != null && !inoutType.equals("")) {
+				pstmt.setString(idx++, inoutType);
+			}
+
+			// 검색어 값 넣기
 			if (keyword != null && !keyword.equals("")) {
 
 				if ("itemCode".equals(searchType)) {
 					pstmt.setString(idx++, "%" + keyword + "%");
+
 				} else if ("itemName".equals(searchType)) {
 					pstmt.setString(idx++, "%" + keyword + "%");
+
 				} else {
 					pstmt.setString(idx++, "%" + keyword + "%");
 					pstmt.setString(idx++, "%" + keyword + "%");
 				}
 			}
 
+			// 시작일 값 넣기
 			if (startDate != null && !startDate.equals("")) {
 				pstmt.setString(idx++, startDate);
 			}
 
+			// 종료일 값 넣기
 			if (endDate != null && !endDate.equals("")) {
 				pstmt.setString(idx++, endDate);
 			}
@@ -495,6 +561,7 @@ public class InoutDAOImpl implements InoutDAO {
 
 		return result;
 	}
+
 	// 입출고 수정
 	@Override
 	public int updateInout(InoutDTO dto) {
