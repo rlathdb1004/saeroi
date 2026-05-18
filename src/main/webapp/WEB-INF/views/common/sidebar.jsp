@@ -39,13 +39,20 @@
 		<div class="siUserInfoText">
 			<%-- 사용자 이름, 부서명, 직급을 세로로 보여주기 위한 글자 영역이다. --%>
 
-			<p class="siUserName">로그인 · 성함</p>
-			<%-- 나중에 로그인 세션값이 생기면 실제 사용자 이름으로 바꿀 부분이다. --%>
+			<p class="siUserName">
+        		${not empty sessionScope.loginUser 
+            	? sessionScope.loginUser.ename.concat(' 님') 
+            	: '로그인 필요'}
+    		</p>
 
-			<p class="siUserRole">부서명 + 직급</p>
-			<%-- 나중에 로그인 세션값이 생기면 실제 부서명과 직급으로 바꿀 부분이다. --%>
+			<p class="siUserRole">
+        		${not empty sessionScope.loginUser 
+           		? sessionScope.loginUser.dept.concat('  ').concat(sessionScope.loginUser.job) 
+            	: ''}
+    		</p>
 
 		</div>
+		
 		<%-- 사용자 글자 영역을 끝낸다. --%>
 
 		<button type="button" class="siNoticeBtn" aria-label="알림">
@@ -345,7 +352,7 @@
 	<div class="siLogoutBox">
 		<%-- 로그아웃 버튼이 들어가는 영역이다. --%>
 
-		<a href="${pageContext.request.contextPath}/login" class="siLogoutBtn">로그아웃</a>
+		<a href="${pageContext.request.contextPath}/logout" class="siLogoutBtn">로그아웃</a>
 		<%-- 현재는 로그인 화면으로 이동한다. 실제 로그아웃 기능이 생기면 /logout 주소로 바꾸면 된다. --%>
 
 	</div>
