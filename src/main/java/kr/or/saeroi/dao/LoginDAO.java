@@ -3,8 +3,10 @@ package kr.or.saeroi.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
+import javax.sql.DataSource;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import kr.or.saeroi.dto.LoginDTO;
@@ -12,88 +14,168 @@ import kr.or.saeroi.dto.LoginDTO;
 @Repository
 public class LoginDAO {
 
-	public LoginDTO Find_empno(Connection conn, String empno) {
-		LoginDTO login = null;
-		PreparedStatement ps = null;
-		ResultSet rs = null;
+    @Autowired
+    private DataSource dataSource;
+    
+    public LoginDTO find_empno(String empno) {
 
-		String sql = "" + "SELECT EMPNO, EMP_PW, ENAME, DEPT, JOB, HIRE_DATE,"
-				+ "       EMP_TEL, EMAIL, STATUS, ROLE,  " + "       CREATED_DATE, UPDATED_DATE " + "FROM EMP "
-				+ "WHERE EMPNO = ? ";
+        LoginDTO login = null;
 
-		try {
-			ps = conn.prepareStatement(sql);
-			ps.setString(1, empno);
-			rs = ps.executeQuery();
+        String sql =
+            "SELECT EMPNO, EMP_PW, ENAME, DEPT, JOB, HIRE_DATE, " +
+            "EMP_TEL, EMAIL, STATUS, ROLE, CREATED_DATE, UPDATED_DATE " +
+            "FROM EMP WHERE EMPNO = ?";
 
-			if (rs.next()) {
-				login = new LoginDTO();
-				login.setEmpno(rs.getString("EMPNO"));
-				login.setEname(rs.getString("ENAME"));
-				login.setEmp_pw(rs.getString("EMP_PW"));
-				login.setDept(rs.getString("DEPT"));
-				login.setJob(rs.getString("JOB"));
-				login.setEmail(rs.getString("EMAIL"));
-				login.setEmp_tel(rs.getString("EMP_TEL"));
-				login.setStatus(rs.getString("STATUS"));
-				login.setRole(rs.getString("ROLE"));
-				login.setHire_date(rs.getTimestamp("HIRE_DATE"));
-				login.setCreated_date(rs.getTimestamp("CREATED_DATE"));
-				login.setUpdated_date(rs.getTimestamp("UPDATED_DATE"));
-			}
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
 
-		} catch (Exception e) {
-			throw new RuntimeException("사번 조회 실패", e);
-		} finally {
-			try {
-				if (rs != null)
-					rs.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
+            ps.setString(1, empno);
 
-		return login;
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+
+                    login = new LoginDTO();
+                    login.setEmpno(rs.getString("EMPNO"));
+                    login.setEname(rs.getString("ENAME"));
+                    login.setEmp_pw(rs.getString("EMP_PW"));
+                    login.setDept(rs.getString("DEPT"));
+                    login.setJob(rs.getString("JOB"));
+                    login.setEmail(rs.getString("EMAIL"));
+                    login.setEmp_tel(rs.getString("EMP_TEL"));
+                    login.setStatus(rs.getString("STATUS"));
+                    login.setRole(rs.getString("ROLE"));
+                    login.setHire_date(rs.getTimestamp("HIRE_DATE"));
+                    login.setCreated_date(rs.getTimestamp("CREATED_DATE"));
+                    login.setUpdated_date(rs.getTimestamp("UPDATED_DATE"));
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("사번 조회 실패", e);
+        }
+
+        return login;
+    }    
+    
+    public int check_empno_email(String empno, String email) {
+
+        int count = 0;
+
+        String sql =
+            "SELECT COUNT(*) CNT FROM EMP WHERE EMPNO = ? AND EMAIL = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, empno);
+            ps.setString(2, email);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+                    count = rs.getInt("CNT");
+                }
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("사번/이메일 확인 실패", e);
+        }
+
+        return count;
+    }
+    
+    public void update_pw(String empno, String tempPw) {
+
+        String sql =
+            "UPDATE EMP SET EMP_PW = ?, UPDATED_DATE = SYSDATE WHERE EMPNO = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, tempPw);
+            ps.setString(2, empno);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException("비밀번호 변경 실패", e);
+        }
+    }
+    
+	public void update_auto_login_token(String empno, String token) {
+
+	    String sql =
+	        "UPDATE EMP " +
+	        "SET AUTO_LOGIN_TOKEN = ? " +
+	        "WHERE EMPNO = ?";
+
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setString(1, token);
+	        ps.setString(2, empno);
+
+	        ps.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
 	}
 
-	public int countByEmpNoAndEmail(String empno, String email) {
+	public LoginDTO find_token(String token) {
 
-		return 0;
+	    LoginDTO login = null;
+
+	    String sql =
+	        "SELECT EMPNO, EMP_PW, ENAME, DEPT, JOB, HIRE_DATE, " +
+	        "EMP_TEL, EMAIL, STATUS, ROLE, CREATED_DATE, UPDATED_DATE " +
+	        "FROM EMP WHERE AUTO_LOGIN_TOKEN = ?";
+
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setString(1, token);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+
+	            if (rs.next()) {
+
+	                login = new LoginDTO();
+	                login.setEmpno(rs.getString("EMPNO"));
+	                login.setEmp_pw(rs.getString("EMP_PW"));
+	                login.setEname(rs.getString("ENAME"));
+	                login.setDept(rs.getString("DEPT"));
+	                login.setJob(rs.getString("JOB"));
+	                login.setEmail(rs.getString("EMAIL"));
+	                login.setEmp_tel(rs.getString("EMP_TEL"));
+	                login.setStatus(rs.getString("STATUS"));
+	                login.setRole(rs.getString("ROLE"));
+	                login.setHire_date(rs.getTimestamp("HIRE_DATE"));
+	                login.setCreated_date(rs.getTimestamp("CREATED_DATE"));
+	                login.setUpdated_date(rs.getTimestamp("UPDATED_DATE"));
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("자동로그인 조회 실패", e);
+	    }
+
+	    return login;
 	}
+	
+	public void clear_auto_login_token(String empno) {
 
-	public void update_pw(Connection conn, String empno, String temp_pw) {
+	    String sql = "UPDATE EMP SET AUTO_LOGIN_TOKEN = NULL WHERE EMPNO = ?";
 
-		PreparedStatement ps = null;
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
 
-		String sql = "" 
-				+ "UPDATE EMP " + "SET EMP_PW = ?, " 
-				+ "    UPDATED_DATE = SYSDATE " 
-				+ "WHERE EMPNO = ?";
+	        ps.setString(1, empno);
+	        ps.executeUpdate();
 
-		try {
-
-			ps = conn.prepareStatement(sql);
-
-			ps.setString(1, temp_pw);
-			ps.setString(2, empno);
-
-			ps.executeUpdate();
-
-		} catch (Exception e) {
-			throw new RuntimeException("비밀번호 변경 실패", e);
-		} finally {
-			try {
-				if (ps != null)
-					ps.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
+	    } catch (Exception e) {
+	        throw new RuntimeException("토큰 삭제 실패", e);
+	    }
 	}
 }

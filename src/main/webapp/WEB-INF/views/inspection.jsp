@@ -1,70 +1,89 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/inspection.css">
-
-<div class="coPageWrap qiPage">
+<div class="coPageWrap">
 	<%-- 본문 전체를 감싸는 영역이다. --%>
 
-	<form class="coSearchBox qiSearchBox" method="get"
+	<form class="search-form" method="get"
 		action="${pageContext.request.contextPath}/quality/inspection">
 		<%-- 검색 조건들이 들어가는 영역이다. --%>
 
-		<div class="coSearchRow qiSearchRow">
+		<div class="search-box">
+			<div class="search-row">
 
-			<div class="coSearchItem qiDateItem">
-				<%-- 검사일자 검색 영역이다. --%>
+				<div class="search-item">
+					<%-- 검사일자 검색 영역이다. --%>
 
-				<label class="coLabel">검사일자</label>
-
-				<div class="qiDateBox">
-					<input type="date" name="startDate" class="coInput coDate"
-						value="${startDate}"> <span class="qiDateDash">~</span> <input
-						type="date" name="endDate" class="coInput coDate"
-						value="${endDate}">
+					<label class="search-label">시작일</label> <input type="date"
+						name="startDate" class="search-date" value="${startDate}">
 				</div>
+
+				<div class="search-item">
+					<%-- 검사일자 검색 영역이다. --%>
+
+					<label class="search-label">종료일</label> <input type="date"
+						name="endDate" class="search-date" value="${endDate}">
+				</div>
+
+				<div class="search-item">
+					<%-- 검색 구분 선택 영역이다. --%>
+
+					<label class="search-label">구분</label> <select name="searchType"
+						class="search-select">
+						<option value="">선택</option>
+						<option value="insp_id"
+							<c:if test="${searchType == 'insp_id'}">selected</c:if>>검사번호</option>
+						<option value="itemName"
+							<c:if test="${searchType == 'itemName'}">selected</c:if>>품목명</option>
+						<option value="productLot"
+							<c:if test="${searchType == 'productLot'}">selected</c:if>>LOT번호</option>
+						<option value="ename"
+							<c:if test="${searchType == 'ename'}">selected</c:if>>검사자</option>
+						<option value="result"
+							<c:if test="${searchType == 'result'}">selected</c:if>>검사결과</option>
+					</select>
+
+				</div>
+
+				<div class="search-item">
+					<%-- 검색어 입력 영역이다. --%>
+
+					<label class="search-label">검색어</label> <input type="text"
+						name="keyword" class="search-input" placeholder="내용을 입력하세요."
+						value="${keyword}">
+
+				</div>
+
+				<!-- 검색, 초기화 버튼 -->
+				<div class="search-btn-wrap">
+					<%-- 검색 버튼과 초기화 버튼 영역이다. --%>
+
+					<button type="submit" class="search-btn search-btn-main">
+						<svg viewBox="0 0 24 24" fill="none">
+							<circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor"
+								stroke-width="2"></circle>
+							<path d="M16 16L21 21" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round"></path>
+						</svg>
+						검색
+					</button>
+
+					<button type="button"
+						class="search-btn search-btn-sub search-reset-btn"
+						onclick="location.href='${pageContext.request.contextPath}/quality/inspection'">
+						<svg viewBox="0 0 24 24" fill="none">
+							<path
+								d="M20 12C20 16.4 16.4 20 12 20C7.6 20 4 16.4 4 12C4 7.6 7.6 4 12 4C14.4 4 16.5 5.1 18 6.8"
+								stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+							<path d="M18 4V7H21" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round" stroke-linejoin="round"></path>
+						</svg>
+						초기화
+					</button>
+
+				</div>
+
 			</div>
-
-			<div class="coSearchItem qiTypeItem">
-				<%-- 검색 구분 선택 영역이다. --%>
-
-				<label class="coLabel">구분</label> <select name="searchType"
-					class="coSelect">
-					<option value="">선택</option>
-					<option value="insp_id"
-						<c:if test="${searchType == 'insp_id'}">selected</c:if>>검사번호</option>
-					<option value="itemName"
-						<c:if test="${searchType == 'itemName'}">selected</c:if>>품목명</option>
-					<option value="productLot"
-						<c:if test="${searchType == 'productLot'}">selected</c:if>>LOT번호</option>
-					<option value="ename"
-						<c:if test="${searchType == 'ename'}">selected</c:if>>검사자</option>
-					<option value="result"
-						<c:if test="${searchType == 'result'}">selected</c:if>>검사결과</option>
-				</select>
-
-			</div>
-
-			<div class="coSearchItem qiKeywordItem">
-				<%-- 검색어 입력 영역이다. --%>
-
-				<label class="coLabel">&nbsp;</label> <input type="text"
-					name="keyword" class="coInput" placeholder="내용을 입력하세요."
-					value="${keyword}">
-
-			</div>
-
-			<div class="coSearchBtnBox qiSearchBtnBox">
-				<%-- 검색 버튼과 초기화 버튼 영역이다. --%>
-
-				<button type="submit" class="coBtn coBtnSearch">검색</button>
-				<!-- 기본 주소/특정주소 -->
-				<a href="${pageContext.request.contextPath}/quality/inspection"
-					class="coBtn coBtnReset">초기화</a>
-
-			</div>
-
 		</div>
 
 	</form>
@@ -73,12 +92,11 @@
 
 	<div class="coTableTop">
 		<%-- 총 건수와 등록 버튼이 들어가는 영역이다. --%>
-
+		
 		<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
 		<%-- DB에서 조회한 전체 데이터 개수를 보여준다. --%>
 
-		<button type="button" class="coBtn coBtnPrimary qiRegisterOpenBtn">등록</button>
-
+		
 
 	</div>
 	<%-- 테이블 상단 영역을 끝낸다. --%>
@@ -109,7 +127,7 @@
 
 					<tr>
 						<td><input type="checkbox" name="insp_id"
-							value="${inspection.insp_id}" class="qiCheck"></td>
+							value="${inspection.insp_id}"></td>
 						<td>${inspection.doc_no}</td>
 						<td>${inspection.insp_date}</td>
 						<td class="coTextLeft">${inspection.item_name}</td>
@@ -236,5 +254,5 @@
 
 
 
-<script
-	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script>
+<!-- <script -->
+<%-- 	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script> --%>

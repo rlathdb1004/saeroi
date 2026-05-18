@@ -18,55 +18,38 @@ public class LoginService {
 
     @Autowired
     private LoginDAO loginDAO;
-
-    @Autowired
-    private DataSource dataSource;
     
     @Autowired
     private JavaMailSender mailSender;
 
     public LoginDTO login(String empno, String pw) {
 
-        Connection conn = null;
+        LoginDTO login = loginDAO.find_empno(empno);
 
-        try {
-            conn = dataSource.getConnection();
-
-            LoginDTO login = loginDAO.Find_empno(conn, empno);
-
-            if(login == null) {
-                return null;
-            }
-
-            if(login.getEmp_pw().equals(pw)) {
-                return login;
-            }
-
+        if(login == null) {
             return null;
-
-        } catch (Exception e) {
-            throw new RuntimeException("로그인 실패", e);
-        } finally {
-            try {
-                if(conn != null) conn.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
+
+        if(login.getEmp_pw().equals(pw)) {
+            return login;
+        }
+
+        return null;
     }
     
     public boolean check_user(String empno, String email) {
-        return loginDAO.countByEmpNoAndEmail(empno, email) > 0;
+        return loginDAO.check_empno_email(empno, email) > 0;
     }
 
 	
-	public String reset_pw(String empno) {
-		String temp_pw = UUID.randomUUID().toString().substring(0, 8);
+    public String reset_pw(String empno) {
 
-	    loginDAO.update_pw(null, empno, temp_pw);
+        String temp_pw = UUID.randomUUID().toString().substring(0, 8);
 
-	    return temp_pw;		
-	}
+        loginDAO.update_pw(empno, temp_pw);
+
+        return temp_pw;
+    }
 
 	public void send_temp_pw(String email, String tempPw) {
 		
@@ -76,5 +59,19 @@ public class LoginService {
 	    msg.setText("임시 비밀번호는 [" + tempPw + "] 입니다.");
 
 	    mailSender.send(msg);
+	}
+
+	public void update_auto_login_token(String empno, String token) {
+
+	    loginDAO.update_auto_login_token(empno, token);
+	}
+
+	public LoginDTO find_token(String token) {
+
+	    return loginDAO.find_token(token);
+	}
+	
+	public void clear_auto_login_token(String empno) {
+	    loginDAO.clear_auto_login_token(empno);
 	}
 }

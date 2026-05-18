@@ -43,12 +43,12 @@ public class QualityController {
 		int totalCount = list.size();
 		int startIndex = (page - 1) * size;
 		int endIndex = startIndex + size;
-
+		//마지막 페이지에서 범위 넘어가는 것 방지
 		if (endIndex > totalCount) {
 			endIndex = totalCount;
 		}
 		List<InspectionDTO> page_list = list.subList(startIndex, endIndex);
-		PageDTO pageInfo = new PageDTO(page, size, totalCount);
+		PageDTO pageInfo = new PageDTO(page, size, totalCount);//페이징 jsp 버튼 만들 수 있는 정보 담는 곳
 		model.addAttribute("list", page_list);
 
 		// jsp에서 검색 조건 남아있게 하기
@@ -89,7 +89,7 @@ public class QualityController {
 		return "defect.tiles";
 	}
 	
-	//등록 메서드(등록/수정/삭제용 post 방식 추가)
+	//등록 메서드(등록 post 방식 추가)
 	@RequestMapping(value = "/inspection/add", method = RequestMethod.POST)
 	public String inspection_add() {
 		
