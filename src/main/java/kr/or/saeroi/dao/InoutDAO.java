@@ -8,9 +8,8 @@ import kr.or.saeroi.dto.InoutDTO;
 public interface InoutDAO {
 
 	// 입출고 목록 조회
+	// DAO 파라미터에 int startRow, int endRow 넣지 않음
 	public List<InoutDTO> selectInoutList(
-			int startRow,
-			int endRow,
 			String searchType,
 			String keyword,
 			String startDate,

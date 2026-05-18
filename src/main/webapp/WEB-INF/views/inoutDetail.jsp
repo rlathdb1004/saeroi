@@ -5,7 +5,93 @@
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
+<style>
+	/* 상세페이지 전체 영역 */
+	.inoutDetailWrap {
+		width: 100%;
+		margin-top: 20px;
+	}
 
+	/* 버튼 영역 */
+	.inoutDetailBtnArea {
+		text-align: right;
+		margin-bottom: 16px;
+	}
+
+	/* 메인 버튼 */
+	.inoutMainBtn {
+		background-color: #2F7D62;
+		color: white;
+		border: none;
+		border-radius: 8px;
+		padding: 10px 24px;
+		font-weight: bold;
+		cursor: pointer;
+	}
+
+	/* 보조 버튼 */
+	.inoutSubBtn {
+		background-color: white;
+		color: #1F2933;
+		border: 1px solid #cbd5df;
+		border-radius: 8px;
+		padding: 10px 24px;
+		font-weight: bold;
+		cursor: pointer;
+	}
+
+	/* 상세 테이블 */
+	.inoutDetailTable {
+		width: 100%;
+		border-collapse: separate;
+		border-spacing: 0;
+		border: 1px solid #d8e1ea;
+		border-radius: 14px;
+		overflow: hidden;
+		background-color: white;
+	}
+
+	/* 제목 칸 */
+	.inoutDetailTable th {
+		width: 180px;
+		background-color: #eaf2fb;
+		border-bottom: 1px solid #d8e1ea;
+		padding: 15px;
+		text-align: center;
+		font-weight: bold;
+	}
+
+	/* 내용 칸 */
+	.inoutDetailTable td {
+		border-bottom: 1px solid #d8e1ea;
+		padding: 15px;
+		font-weight: bold;
+	}
+
+	/* 마지막 줄 선 제거 */
+	.inoutDetailTable tr:last-child th,
+	.inoutDetailTable tr:last-child td {
+		border-bottom: none;
+	}
+
+	/* 수정 input */
+	.inoutEditInput,
+	.inoutEditSelect,
+	.inoutEditTextarea {
+		width: 100%;
+		border: 1px solid #cbd5df;
+		border-radius: 8px;
+		padding: 10px;
+		box-sizing: border-box;
+		font-weight: bold;
+	}
+
+	/* 비고 textarea */
+	.inoutEditTextarea {
+		height: 90px;
+		resize: none;
+	}
+</style>
 
 <div class="coPageWrap">
 

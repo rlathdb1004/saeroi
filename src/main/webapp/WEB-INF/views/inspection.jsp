@@ -74,7 +74,7 @@
 
 	<div class="coTableTop">
 		<%-- 총 건수와 등록 버튼이 들어가는 영역이다. --%>
-
+    
 		<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
 		<%-- DB에서 조회한 전체 데이터 개수를 보여준다. --%>
 
@@ -234,7 +234,6 @@
 		</form>
 	</div>
 </div>
-
 
 
 <script
