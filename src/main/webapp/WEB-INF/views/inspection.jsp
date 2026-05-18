@@ -262,5 +262,5 @@
 
 
 
-<!-- <script -->
-<%-- 	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script> --%>
+<script
+	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script>
