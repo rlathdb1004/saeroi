@@ -1,4 +1,4 @@
-package kr.or.saeroi.member.dto;
+package kr.or.saeroi.dto;
 
 import lombok.Data;
 
