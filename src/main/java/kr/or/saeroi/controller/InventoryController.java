@@ -25,6 +25,10 @@ public class InventoryController {
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "size", defaultValue = "10") int size,
 			@RequestParam(value = "searchType", defaultValue = "all") String searchType,
+
+			// 입출고구분 추가
+			@RequestParam(value = "inoutType", defaultValue = "") String inoutType,
+
 			@RequestParam(value = "keyword", defaultValue = "") String keyword,
 			@RequestParam(value = "startDate", defaultValue = "") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "") String endDate,
@@ -33,6 +37,7 @@ public class InventoryController {
 		// 입출고 전체 목록 조회
 		List<InoutDTO> list = service.getInoutList(
 				searchType,
+				inoutType,
 				keyword,
 				startDate,
 				endDate);
@@ -68,6 +73,10 @@ public class InventoryController {
 
 		// 검색값 유지
 		model.addAttribute("searchType", searchType);
+
+		// 입출고구분 유지
+		model.addAttribute("inoutType", inoutType);
+
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
