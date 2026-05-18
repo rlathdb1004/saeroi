@@ -5,6 +5,7 @@
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
 <style>
+
 	/* 테이블 너비 고정 */
 	.coTable {
 		table-layout: fixed;
@@ -104,11 +105,16 @@
 		text-align: right;
 		margin-top: 20px;
 	}
+
 </style>
 
 <div class="coPageWrap">
 
+	<!-- ========================= -->
 	<!-- 검색 영역 -->
+	<!-- 팀장님 공통 검색 코드 -->
+	<!-- ========================= -->
+
 	<form class="search-form"
 		method="get"
 		action="${pageContext.request.contextPath}/inventory/materialIn">
@@ -195,6 +201,7 @@
 						class="search-btn search-btn-main">
 
 						<svg viewBox="0 0 24 24" fill="none">
+
 							<circle cx="10.5"
 								cy="10.5"
 								r="7.5"
@@ -205,9 +212,11 @@
 								stroke="currentColor"
 								stroke-width="2"
 								stroke-linecap="round"></path>
+
 						</svg>
 
 						검색
+
 					</button>
 
 					<button type="button"
@@ -215,6 +224,7 @@
 						onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
 
 						<svg viewBox="0 0 24 24" fill="none">
+
 							<path d="M20 12C20 16.4 16.4 20 12 20C7.6 20 4 16.4 4 12C4 7.6 7.6 4 12 4C14.4 4 16.5 5.1 18 6.8"
 								stroke="currentColor"
 								stroke-width="2"
@@ -225,9 +235,11 @@
 								stroke-width="2"
 								stroke-linecap="round"
 								stroke-linejoin="round"></path>
+
 						</svg>
 
 						초기화
+
 					</button>
 
 				</div>
@@ -243,33 +255,42 @@
 		id="deleteForm"
 		action="${pageContext.request.contextPath}/inventory/materialIn/delete">
 
-		<!-- 총 건수 / 등록 버튼 / 선택 삭제 버튼 -->
+		<!-- 총 건수 / 버튼 -->
 		<div class="coTableTop">
 
 			<p class="coTotalCount">
 				총 ${pageInfo.totalCount}건
 			</p>
 
-			<!-- 팀장님 공통 버튼 위치 -->
+			<!-- 팀장님 공통 버튼 -->
 			<div class="search-btn-right">
 
+				<!-- 등록 -->
 				<button type="button"
 					class="search-btn search-btn-main"
 					onclick="openInoutModal()">
+
 					등록
+
 				</button>
 
+				<!-- 선택 삭제 -->
 				<button type="button"
 					class="search-btn search-btn-sub"
 					onclick="deleteCheck()">
+
 					선택 삭제
+
 				</button>
 
 			</div>
 
 		</div>
 
+		<!-- ========================= -->
 		<!-- 테이블 -->
+		<!-- ========================= -->
+
 		<div class="coTableWrap">
 
 			<table class="coTable">
@@ -277,6 +298,7 @@
 				<thead>
 
 					<tr>
+
 						<th>
 							<input type="checkbox"
 								id="checkAll">
@@ -291,7 +313,10 @@
 						<th>입출고량</th>
 						<th>단위</th>
 						<th>일자</th>
-						<th>보기</th>
+
+						<!-- 팀원 공통 상세 -->
+						<th>상세</th>
+
 					</tr>
 
 				</thead>
@@ -303,10 +328,13 @@
 						varStatus="status">
 
 						<tr>
+
 							<td>
+
 								<input type="checkbox"
 									name="inoutIds"
 									value="${inout.inoutId}">
+
 							</td>
 
 							<td>${status.count}</td>
@@ -316,7 +344,9 @@
 							</td>
 
 							<td>
+
 								<c:choose>
+
 									<c:when test="${inout.inoutType eq 'MI'}">
 										입고
 									</c:when>
@@ -328,7 +358,9 @@
 									<c:otherwise>
 										${inout.inoutType}
 									</c:otherwise>
+
 								</c:choose>
+
 							</td>
 
 							<td title="${inout.itemCode}">
@@ -336,7 +368,9 @@
 							</td>
 
 							<td>
+
 								<c:choose>
+
 									<c:when test="${inout.itemType eq 'FG'}">
 										완제품
 									</c:when>
@@ -352,7 +386,9 @@
 									<c:otherwise>
 										${inout.itemType}
 									</c:otherwise>
+
 								</c:choose>
+
 							</td>
 
 							<td title="${inout.itemName}">
@@ -360,15 +396,22 @@
 							</td>
 
 							<td>${inout.inoutQty}</td>
+
 							<td>${inout.itemUnit}</td>
+
 							<td>${inout.inoutDate}</td>
 
+							<!-- 상세 버튼 -->
 							<td>
+
 								<button type="button"
-									class="search-btn search-btn-sub"
+									class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
+
 									보기
+
 								</button>
+
 							</td>
 
 						</tr>
@@ -387,3 +430,307 @@
 	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 
 </div>
+
+<!-- ========================= -->
+<!-- 등록 모달 -->
+<!-- ========================= -->
+
+<div id="inoutModal"
+	class="inoutModalBg">
+
+	<div class="inoutModalBox">
+
+		<!-- 모달 제목 -->
+		<div class="inoutModalTitle">
+
+			<span>
+				입출고 등록
+			</span>
+
+			<!-- 닫기 -->
+			<span onclick="closeInoutModal()"
+				style="cursor:pointer;">
+
+				×
+
+			</span>
+
+		</div>
+
+		<!-- 모달 내용 -->
+		<div class="inoutModalContent">
+
+			<form method="post"
+				action="${pageContext.request.contextPath}/inventory/materialIn/insert">
+
+				<div class="inoutFormGrid">
+
+					<!-- 품목 선택 -->
+					<div class="inoutFormBox">
+
+						<label>
+							품목 선택 *
+						</label>
+
+						<select name="itemId"
+							id="itemSelect"
+							onchange="changeItemInfo()"
+							required>
+
+							<option value="">
+								품목을 선택하세요
+							</option>
+
+							<c:forEach var="item"
+								items="${itemList}">
+
+								<option value="${item.itemId}"
+									data-code="${item.itemCode}"
+									data-name="${item.itemName}"
+									data-type="${item.itemType}"
+									data-unit="${item.itemUnit}">
+
+									${item.itemName}
+
+								</option>
+
+							</c:forEach>
+
+						</select>
+
+					</div>
+
+					<!-- 품목코드 -->
+					<div class="inoutFormBox">
+
+						<label>
+							품목코드
+						</label>
+
+						<input type="text"
+							id="itemCode"
+							readonly>
+
+					</div>
+
+					<!-- 품목명 -->
+					<div class="inoutFormBox">
+
+						<label>
+							품목명
+						</label>
+
+						<input type="text"
+							id="itemName"
+							readonly>
+
+					</div>
+
+					<!-- 품목유형 -->
+					<div class="inoutFormBox">
+
+						<label>
+							품목유형
+						</label>
+
+						<input type="text"
+							id="itemType"
+							readonly>
+
+					</div>
+
+					<!-- 입출고구분 -->
+					<div class="inoutFormBox">
+
+						<label>
+							입출고구분
+						</label>
+
+						<select name="inoutType">
+
+							<option value="MI">
+								입고
+							</option>
+
+							<option value="MO-PROD">
+								출고
+							</option>
+
+						</select>
+
+					</div>
+
+					<!-- 수량 -->
+					<div class="inoutFormBox">
+
+						<label>
+							수량 *
+						</label>
+
+						<input type="number"
+							name="inoutQty"
+							required>
+
+					</div>
+
+					<!-- 단위 -->
+					<div class="inoutFormBox">
+
+						<label>
+							단위
+						</label>
+
+						<input type="text"
+							id="itemUnit"
+							readonly>
+
+					</div>
+
+					<!-- 일자 -->
+					<div class="inoutFormBox">
+
+						<label>
+							일자 *
+						</label>
+
+						<input type="date"
+							name="inoutDate"
+							required>
+
+					</div>
+
+				</div>
+
+				<!-- 비고 -->
+				<div class="inoutRemark">
+
+					<label>
+						비고
+					</label>
+
+					<textarea name="remark"></textarea>
+
+				</div>
+
+				<!-- 저장 버튼 -->
+				<div class="inoutSaveArea">
+
+					<button type="submit"
+						class="search-btn search-btn-main">
+
+						저장
+
+					</button>
+
+				</div>
+
+			</form>
+
+		</div>
+
+	</div>
+
+</div>
+
+<!-- ========================= -->
+<!-- script -->
+<!-- ========================= -->
+
+<script>
+
+	// 전체 체크박스
+	document.getElementById("checkAll").onclick = function() {
+
+		var checks =
+			document.getElementsByName("inoutIds");
+
+		for (var i = 0; i < checks.length; i++) {
+
+			checks[i].checked = this.checked;
+		}
+	};
+
+	// 선택 삭제
+	function deleteCheck() {
+
+		var checks =
+			document.getElementsByName("inoutIds");
+
+		var checked = false;
+
+		for (var i = 0; i < checks.length; i++) {
+
+			if (checks[i].checked) {
+
+				checked = true;
+			}
+		}
+
+		if (!checked) {
+
+			alert("삭제할 항목을 선택해주세요.");
+
+			return;
+		}
+
+		if (confirm("선택한 항목을 삭제하시겠습니까?")) {
+
+			document.getElementById("deleteForm").submit();
+		}
+	}
+
+	// 등록 모달 열기
+	function openInoutModal() {
+
+		document.getElementById("inoutModal").style.display = "block";
+	}
+
+	// 등록 모달 닫기
+	function closeInoutModal() {
+
+		document.getElementById("inoutModal").style.display = "none";
+	}
+
+	// 품목 선택 시 자동 입력
+	function changeItemInfo() {
+
+		var select =
+			document.getElementById("itemSelect");
+
+		var option =
+			select.options[select.selectedIndex];
+
+		// 품목코드
+		document.getElementById("itemCode").value =
+			option.getAttribute("data-code");
+
+		// 품목명
+		document.getElementById("itemName").value =
+			option.getAttribute("data-name");
+
+		// 품목유형
+		var itemType =
+			option.getAttribute("data-type");
+
+		if (itemType == "FG") {
+
+			itemType = "완제품";
+
+		} else if (itemType == "RM") {
+
+			itemType = "원자재";
+
+		} else if (itemType == "SM") {
+
+			itemType = "부자재";
+		}
+
+		document.getElementById("itemType").value =
+			itemType;
+
+		// 단위
+		document.getElementById("itemUnit").value =
+			option.getAttribute("data-unit");
+	}
+
+</script>
