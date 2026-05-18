@@ -34,10 +34,10 @@ public class aiChatService {
 			ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10);
 			System.out.println("dbTool확인: " + dbTool);
 			MesAssistant assistant = AiServices.builder(MesAssistant.class)
-				.chatLanguageModel(geminiModel)
-				.chatMemory(chatMemory)
-				.tools(dbTool)
-				.build();
+										.chatLanguageModel(geminiModel)
+										.chatMemory(chatMemory)
+										.tools(dbTool)
+										.build();
 //			HttpHeaders headers = new HttpHeaders();
 //			headers.setContentType(MediaType.APPLICATION_JSON);
 			//langchain4j방식으로 전환해서 주석 궁금하면 LangChain4j파일로
