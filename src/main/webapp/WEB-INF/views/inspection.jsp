@@ -95,7 +95,10 @@
 		
 		<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
 		<%-- DB에서 조회한 전체 데이터 개수를 보여준다. --%>
-
+		<div class="search-btn-right">
+        <button type="button" class="search-btn search-btn-main">등록</button>
+        <button type="button" class="search-btn search-btn-sub">선택 삭제</button>
+    </div> 
 		
 
 	</div>
