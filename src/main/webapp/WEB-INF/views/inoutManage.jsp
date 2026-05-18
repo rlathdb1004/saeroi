@@ -106,7 +106,7 @@
 
 			<div class="search-row">
 
-				<!-- 구분 -->
+				<!-- 검색구분 -->
 				<div class="search-item">
 
 					<label class="search-label">구분</label>
@@ -115,7 +115,7 @@
 						class="search-select">
 
 						<option value="">
-							선택
+							전체
 						</option>
 
 						<option value="itemCode"
@@ -128,10 +128,30 @@
 							품목명
 						</option>
 
-						<!-- 입고 / 출고 검색용 -->
-						<option value="inoutType"
-							<c:if test="${searchType eq 'inoutType'}">selected</c:if>>
-							입출고구분
+					</select>
+
+				</div>
+
+				<!-- 입출고구분 -->
+				<div class="search-item">
+
+					<label class="search-label">입출고구분</label>
+
+					<select name="inoutType"
+						class="search-select">
+
+						<option value="">
+							전체
+						</option>
+
+						<option value="MI"
+							<c:if test="${inoutType eq 'MI'}">selected</c:if>>
+							입고
+						</option>
+
+						<option value="MO-PROD"
+							<c:if test="${inoutType eq 'MO-PROD'}">selected</c:if>>
+							출고
 						</option>
 
 					</select>

@@ -24,8 +24,11 @@ public class InventoryController {
 	public String materialIn(
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "size", defaultValue = "10") int size,
-			@RequestParam(value = "searchType", defaultValue = "") String searchType,
+			@RequestParam(value = "searchType", defaultValue = "all") String searchType,
+
+			// 입출고구분 추가
 			@RequestParam(value = "inoutType", defaultValue = "") String inoutType,
+
 			@RequestParam(value = "keyword", defaultValue = "") String keyword,
 			@RequestParam(value = "startDate", defaultValue = "") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "") String endDate,
@@ -50,11 +53,11 @@ public class InventoryController {
 			endIndex = totalCount;
 		}
 
-		// 현재 페이지 목록
+		// 현재 페이지에 보여줄 목록
 		List<InoutDTO> page_list =
 				list.subList(startIndex, endIndex);
 
-		// 페이징 정보
+		// 공통 페이징 정보
 		PageDTO pageInfo =
 				new PageDTO(page, size, totalCount);
 
@@ -70,7 +73,10 @@ public class InventoryController {
 
 		// 검색값 유지
 		model.addAttribute("searchType", searchType);
+
+		// 입출고구분 유지
 		model.addAttribute("inoutType", inoutType);
+
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);

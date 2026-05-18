@@ -29,6 +29,37 @@ public class InoutDAOImpl implements InoutDAO {
 		return DriverManager.getConnection(url, id, pw);
 	}
 
+	// 팀장님 Tool 코드용
+	@Override
+	public List<InoutDTO> selectInoutList(
+			String searchType,
+			String keyword,
+			String startDate,
+			String endDate) {
+
+		String inoutType = "";
+
+		// 구분 검색일 때 입고/출고 값 바꾸기
+		if ("구분".equals(searchType)) {
+
+			if ("입고".equals(keyword)) {
+				inoutType = "MI";
+				keyword = "";
+
+			} else if ("출고".equals(keyword)) {
+				inoutType = "MO-PROD";
+				keyword = "";
+			}
+		}
+
+		return selectInoutList(
+				searchType,
+				inoutType,
+				keyword,
+				startDate,
+				endDate);
+	}
+
 	// 입출고 목록 조회
 	@Override
 	public List<InoutDTO> selectInoutList(
@@ -65,7 +96,7 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += " ON MI.ITEM_ID = I.ITEM_ID ";
 			sql += " WHERE 1 = 1 ";
 
-			// 입출고구분이 있을 때
+			// 입출고구분 검색
 			if (inoutType != null && !inoutType.equals("")) {
 				sql += " AND MI.INOUT_TYPE = ? ";
 			}
@@ -73,27 +104,24 @@ public class InoutDAOImpl implements InoutDAO {
 			// 검색어가 있을 때
 			if (keyword != null && !keyword.equals("")) {
 
-				// 품목코드 검색
 				if ("itemCode".equals(searchType)) {
 					sql += " AND I.ITEM_CODE LIKE ? ";
 
-				// 품목명 검색
 				} else if ("itemName".equals(searchType)) {
 					sql += " AND I.ITEM_NAME LIKE ? ";
 
-				// 전체 검색
 				} else {
 					sql += " AND (I.ITEM_CODE LIKE ? ";
 					sql += " OR I.ITEM_NAME LIKE ?) ";
 				}
 			}
 
-			// 시작일이 있을 때
+			// 시작일 검색
 			if (startDate != null && !startDate.equals("")) {
 				sql += " AND MI.INOUT_DATE >= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			// 종료일이 있을 때
+			// 종료일 검색
 			if (endDate != null && !endDate.equals("")) {
 				sql += " AND MI.INOUT_DATE <= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
@@ -101,8 +129,7 @@ public class InoutDAOImpl implements InoutDAO {
 			// 최신순 정렬
 			sql += " ORDER BY MI.INOUT_ID DESC ";
 
-			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+			PreparedStatement pstmt = conn.prepareStatement(sql);
 
 			int idx = 1;
 
@@ -136,13 +163,11 @@ public class InoutDAOImpl implements InoutDAO {
 				pstmt.setString(idx++, endDate);
 			}
 
-			ResultSet rs =
-					pstmt.executeQuery();
+			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {
 
-				InoutDTO dto =
-						new InoutDTO();
+				InoutDTO dto = new InoutDTO();
 
 				dto.setInoutId(rs.getInt("INOUT_ID"));
 				dto.setInoutType(rs.getString("INOUT_TYPE"));
@@ -197,7 +222,7 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += " ON MI.ITEM_ID = I.ITEM_ID ";
 			sql += " WHERE 1 = 1 ";
 
-			// 입출고구분이 있을 때
+			// 입출고구분 검색
 			if (inoutType != null && !inoutType.equals("")) {
 				sql += " AND MI.INOUT_TYPE = ? ";
 			}
@@ -217,18 +242,17 @@ public class InoutDAOImpl implements InoutDAO {
 				}
 			}
 
-			// 시작일이 있을 때
+			// 시작일 검색
 			if (startDate != null && !startDate.equals("")) {
 				sql += " AND MI.INOUT_DATE >= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			// 종료일이 있을 때
+			// 종료일 검색
 			if (endDate != null && !endDate.equals("")) {
 				sql += " AND MI.INOUT_DATE <= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+			PreparedStatement pstmt = conn.prepareStatement(sql);
 
 			int idx = 1;
 
@@ -262,8 +286,7 @@ public class InoutDAOImpl implements InoutDAO {
 				pstmt.setString(idx++, endDate);
 			}
 
-			ResultSet rs =
-					pstmt.executeQuery();
+			ResultSet rs = pstmt.executeQuery();
 
 			if (rs.next()) {
 				count = rs.getInt(1);
@@ -295,16 +318,12 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += " FROM ITEM ";
 			sql += " ORDER BY ITEM_ID ASC ";
 
-			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
-
-			ResultSet rs =
-					pstmt.executeQuery();
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+			ResultSet rs = pstmt.executeQuery();
 
 			while (rs.next()) {
 
-				InoutDTO dto =
-						new InoutDTO();
+				InoutDTO dto = new InoutDTO();
 
 				dto.setItemId(rs.getInt("ITEM_ID"));
 				dto.setItemCode(rs.getString("ITEM_CODE"));
@@ -337,14 +356,10 @@ public class InoutDAOImpl implements InoutDAO {
 
 			int inoutId = 1;
 
-			String idSql =
-					" SELECT NVL(MAX(INOUT_ID), 0) + 1 FROM MATERIAL_INOUT ";
+			String idSql = " SELECT NVL(MAX(INOUT_ID), 0) + 1 FROM MATERIAL_INOUT ";
 
-			PreparedStatement idPstmt =
-					conn.prepareStatement(idSql);
-
-			ResultSet idRs =
-					idPstmt.executeQuery();
+			PreparedStatement idPstmt = conn.prepareStatement(idSql);
+			ResultSet idRs = idPstmt.executeQuery();
 
 			if (idRs.next()) {
 				inoutId = idRs.getInt(1);
@@ -360,13 +375,10 @@ public class InoutDAOImpl implements InoutDAO {
 			itemSql += " FROM ITEM ";
 			itemSql += " WHERE ITEM_ID = ? ";
 
-			PreparedStatement itemPstmt =
-					conn.prepareStatement(itemSql);
-
+			PreparedStatement itemPstmt = conn.prepareStatement(itemSql);
 			itemPstmt.setInt(1, dto.getItemId());
 
-			ResultSet itemRs =
-					itemPstmt.executeQuery();
+			ResultSet itemRs = itemPstmt.executeQuery();
 
 			if (itemRs.next()) {
 				itemType = itemRs.getString("ITEM_TYPE");
@@ -375,11 +387,8 @@ public class InoutDAOImpl implements InoutDAO {
 			itemRs.close();
 			itemPstmt.close();
 
-			SimpleDateFormat sdf =
-					new SimpleDateFormat("yyyyMMdd");
-
-			String dateText =
-					sdf.format(dto.getInoutDate());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+			String dateText = sdf.format(dto.getInoutDate());
 
 			String typeText = "MI";
 
@@ -387,8 +396,7 @@ public class InoutDAOImpl implements InoutDAO {
 				typeText = "MO";
 			}
 
-			String docPrefix =
-					itemType + "-" + typeText + "-" + dateText;
+			String docPrefix = itemType + "-" + typeText + "-" + dateText;
 
 			int docSeq = 1;
 
@@ -397,13 +405,10 @@ public class InoutDAOImpl implements InoutDAO {
 			seqSql += " FROM MATERIAL_INOUT ";
 			seqSql += " WHERE DOC_NO LIKE ? ";
 
-			PreparedStatement seqPstmt =
-					conn.prepareStatement(seqSql);
-
+			PreparedStatement seqPstmt = conn.prepareStatement(seqSql);
 			seqPstmt.setString(1, docPrefix + "%");
 
-			ResultSet seqRs =
-					seqPstmt.executeQuery();
+			ResultSet seqRs = seqPstmt.executeQuery();
 
 			if (seqRs.next()) {
 				docSeq = seqRs.getInt(1);
@@ -412,11 +417,9 @@ public class InoutDAOImpl implements InoutDAO {
 			seqRs.close();
 			seqPstmt.close();
 
-			String docNo =
-					docPrefix + "-" + String.format("%04d", docSeq);
+			String docNo = docPrefix + "-" + String.format("%04d", docSeq);
 
-			String lotNo =
-					"LOT-" + dateText + "-" + String.format("%04d", docSeq);
+			String lotNo = "LOT-" + dateText + "-" + String.format("%04d", docSeq);
 
 			String sql = "";
 
@@ -432,8 +435,7 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += "     NULL, ?, ?, ? ";
 			sql += " ) ";
 
-			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+			PreparedStatement pstmt = conn.prepareStatement(sql);
 
 			pstmt.setInt(1, inoutId);
 			pstmt.setString(2, dto.getInoutType());
@@ -488,13 +490,10 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += " ON MI.ITEM_ID = I.ITEM_ID ";
 			sql += " WHERE MI.INOUT_ID = ? ";
 
-			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
-
+			PreparedStatement pstmt = conn.prepareStatement(sql);
 			pstmt.setInt(1, inoutId);
 
-			ResultSet rs =
-					pstmt.executeQuery();
+			ResultSet rs = pstmt.executeQuery();
 
 			if (rs.next()) {
 
@@ -542,8 +541,7 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += " DELETE FROM MATERIAL_INOUT ";
 			sql += " WHERE INOUT_ID = ? ";
 
-			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+			PreparedStatement pstmt = conn.prepareStatement(sql);
 
 			for (int i = 0; i < inoutIds.length; i++) {
 
@@ -584,8 +582,7 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += "     UPDATED_DATE = SYSDATE ";
 			sql += " WHERE INOUT_ID = ? ";
 
-			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+			PreparedStatement pstmt = conn.prepareStatement(sql);
 
 			// 입출고구분
 			pstmt.setString(1, dto.getInoutType());
