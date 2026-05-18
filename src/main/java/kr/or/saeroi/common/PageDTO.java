@@ -34,8 +34,8 @@ public class PageDTO {
             // 잘못된 page 값은 1페이지로 바꾼다.
         }
 
-        if (size != 5 && size != 10 && size != 30) {
-            // size가 5, 10, 30이 아니면 잘못된 값이다.
+        if (size != 5 && size != 10 && size != 20 && size != 30) {
+            // size가 5, 10, 20, 30이 아니면 잘못된 값이다.
             size = 10;
             // 잘못된 size 값은 기본값 10으로 바꾼다.
         }
