@@ -21,9 +21,9 @@ public class QualityServiceImpl implements QualityService {
 	}
 	@Override
 	//	구분 옵션 메서드
-	public List<String> _ser_option_Inspection(String startDate,String endDate, String searchType, int optionPage, int optionSize){
+	public List<InspectionDTO> _ser_option_Inspection(String startDate,String endDate, String searchType, int optionPage, int optionSize){
 		
-		List<String> result_list_opiton = qualityDAO._dao_option_Inspection(startDate, endDate, searchType, optionPage, optionSize);
+		List<InspectionDTO> result_list_opiton = qualityDAO._dao_option_Inspection(startDate, endDate, searchType, optionPage, optionSize);
 		System.out.println("result_list_opiton 실행 됨");
 		return result_list_opiton;
 		

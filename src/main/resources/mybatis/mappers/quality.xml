@@ -83,6 +83,9 @@
 			<when test="searchType == 'result'">
 				i.result
 			</when>
+			<when test="searchType == 'remark'">
+				i.remark
+			</when>
 			<otherwise>
 				NULL
 			</otherwise>
@@ -117,5 +120,6 @@
 		AND (#{optionPage} * #{optionSize})
 	</select>
 
-
+	<!-- 등록 쿼리 -->
+	
 </mapper>

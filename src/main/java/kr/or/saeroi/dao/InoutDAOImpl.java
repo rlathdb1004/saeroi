@@ -32,8 +32,6 @@ public class InoutDAOImpl implements InoutDAO {
 	// 입출고 목록 조회
 	@Override
 	public List<InoutDTO> selectInoutList(
-			int startRow,
-			int endRow,
 			String searchType,
 			String keyword,
 			String startDate,
@@ -46,30 +44,27 @@ public class InoutDAOImpl implements InoutDAO {
 
 			String sql = "";
 
-			sql += " SELECT * ";
-			sql += " FROM ( ";
-			sql += "     SELECT ROWNUM rnum, A.* ";
-			sql += "     FROM ( ";
-			sql += "         SELECT ";
-			sql += "             MI.INOUT_ID, ";
-			sql += "             MI.INOUT_TYPE, ";
-			sql += "             MI.MATERIAL_LOT, ";
-			sql += "             MI.INOUT_QTY, ";
-			sql += "             MI.INOUT_DATE, ";
-			sql += "             MI.REMARK, ";
-			sql += "             MI.STATUS, ";
-			sql += "             MI.ITEM_ID, ";
-			sql += "             MI.DOC_NO, ";
-			sql += "             MI.DOC_SEQ, ";
-			sql += "             I.ITEM_CODE, ";
-			sql += "             I.ITEM_NAME, ";
-			sql += "             I.ITEM_TYPE, ";
-			sql += "             I.ITEM_UNIT ";
-			sql += "         FROM MATERIAL_INOUT MI ";
-			sql += "         JOIN ITEM I ";
-			sql += "         ON MI.ITEM_ID = I.ITEM_ID ";
-			sql += "         WHERE 1 = 1 ";
+			sql += " SELECT ";
+			sql += "     MI.INOUT_ID, ";
+			sql += "     MI.INOUT_TYPE, ";
+			sql += "     MI.MATERIAL_LOT, ";
+			sql += "     MI.INOUT_QTY, ";
+			sql += "     MI.INOUT_DATE, ";
+			sql += "     MI.REMARK, ";
+			sql += "     MI.STATUS, ";
+			sql += "     MI.ITEM_ID, ";
+			sql += "     MI.DOC_NO, ";
+			sql += "     MI.DOC_SEQ, ";
+			sql += "     I.ITEM_CODE, ";
+			sql += "     I.ITEM_NAME, ";
+			sql += "     I.ITEM_TYPE, ";
+			sql += "     I.ITEM_UNIT ";
+			sql += " FROM MATERIAL_INOUT MI ";
+			sql += " JOIN ITEM I ";
+			sql += " ON MI.ITEM_ID = I.ITEM_ID ";
+			sql += " WHERE 1 = 1 ";
 
+			// 검색어가 있을 때
 			if (keyword != null && !keyword.equals("")) {
 
 				if ("itemCode".equals(searchType)) {
@@ -81,25 +76,25 @@ public class InoutDAOImpl implements InoutDAO {
 				}
 			}
 
+			// 시작일이 있을 때
 			if (startDate != null && !startDate.equals("")) {
 				sql += " AND MI.INOUT_DATE >= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
+			// 종료일이 있을 때
 			if (endDate != null && !endDate.equals("")) {
 				sql += " AND MI.INOUT_DATE <= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			// 등록한 데이터가 제일 위에 나오게 최신순 정렬
-			sql += "         ORDER BY MI.INOUT_ID DESC ";
-			sql += "     ) A ";
-			sql += "     WHERE ROWNUM <= ? ";
-			sql += " ) ";
-			sql += " WHERE rnum >= ? ";
+			// 최신순 정렬
+			sql += " ORDER BY MI.INOUT_ID DESC ";
 
-			PreparedStatement pstmt = conn.prepareStatement(sql);
+			PreparedStatement pstmt =
+					conn.prepareStatement(sql);
 
 			int idx = 1;
 
+			// 검색어 값 넣기
 			if (keyword != null && !keyword.equals("")) {
 
 				if ("itemCode".equals(searchType)) {
@@ -112,22 +107,23 @@ public class InoutDAOImpl implements InoutDAO {
 				}
 			}
 
+			// 시작일 값 넣기
 			if (startDate != null && !startDate.equals("")) {
 				pstmt.setString(idx++, startDate);
 			}
 
+			// 종료일 값 넣기
 			if (endDate != null && !endDate.equals("")) {
 				pstmt.setString(idx++, endDate);
 			}
 
-			pstmt.setInt(idx++, endRow);
-			pstmt.setInt(idx++, startRow);
-
-			ResultSet rs = pstmt.executeQuery();
+			ResultSet rs =
+					pstmt.executeQuery();
 
 			while (rs.next()) {
 
-				InoutDTO dto = new InoutDTO();
+				InoutDTO dto =
+						new InoutDTO();
 
 				dto.setInoutId(rs.getInt("INOUT_ID"));
 				dto.setInoutType(rs.getString("INOUT_TYPE"));
