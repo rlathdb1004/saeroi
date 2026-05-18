@@ -226,18 +226,19 @@
 			<version>3.0.8</version>
 		</dependency>
 
-		<!-- langChain4j RAG방식으로 ai를 활용하기위한 라이브러리 -->
+		<!-- 메일 발송 -->
 		<dependency>
-			<groupId>dev.langchain4j</groupId>
-			<artifactId>langchain4j</artifactId>
-			<version>0.35.0</version>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+			<version>5.3.30</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4.7</version>
 		</dependency>
 
-		<dependency>
-			<groupId>dev.langchain4j</groupId>
-			<artifactId>langchain4j-google-ai-gemini</artifactId>
-			<version>0.35.0</version>
-		</dependency>
+
 	</dependencies>
 	<build>
 		<plugins>

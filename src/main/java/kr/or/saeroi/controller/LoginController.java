@@ -48,7 +48,7 @@ public class LoginController {
         return "login";
     }
     
-    @RequestMapping(value="/findPw", method=RequestMethod.POST)
+    @RequestMapping(value="/find_pw", method=RequestMethod.POST)
     public Map<String, Object> findPassword(@RequestBody FindPwDTO dto) {
 
         Map<String, Object> result = new HashMap<>();
