@@ -1,5 +1,5 @@
 //초기화 버튼
-const coBtnReset = document.querySelector('.coBtnReset');
+const coBtnReset = document.querySelector('.search-reset-btn');
 
 coBtnReset.addEventListener('click', function () {
     //초기화 버튼 클릭 시 시작일과 종료일 초기화

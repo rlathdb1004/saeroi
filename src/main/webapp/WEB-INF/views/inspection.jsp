@@ -4,6 +4,9 @@
 <div class="coPageWrap">
 	<%-- 본문 전체를 감싸는 영역이다. --%>
 
+	<link rel="stylesheet"
+		href="${pageContext.request.contextPath}/resources/css/inspection.css">
+
 	<form class="search-form" method="get"
 		action="${pageContext.request.contextPath}/quality/inspection">
 		<%-- 검색 조건들이 들어가는 영역이다. --%>
@@ -92,11 +95,15 @@
 
 	<div class="coTableTop">
 		<%-- 총 건수와 등록 버튼이 들어가는 영역이다. --%>
-		
-		<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
-		<%-- DB에서 조회한 전체 데이터 개수를 보여준다. --%>
 
-		
+		<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
+		<%-- DB에서 조회한 전체 데이터 개수를 보여줌 --%>
+
+		<div class="search-btn-right">
+			<button type="button" class="search-btn search-btn-main">등록</button>
+			<button type="button" class="search-btn search-btn-sub">선택
+				삭제</button>
+		</div>
 
 	</div>
 	<%-- 테이블 상단 영역을 끝낸다. --%>
@@ -123,7 +130,7 @@
 
 			<tbody>
 				<c:forEach var="inspection" items="${list}">
-					<%-- Controller에서 보낸 검사 목록을 한 줄씩 반복한다. --%>
+					<%-- Controller에서 보낸 검사 목록을 한 줄씩 반복 --%>
 
 					<tr>
 						<td><input type="checkbox" name="insp_id"
@@ -142,7 +149,7 @@
 				</c:forEach>
 
 				<c:if test="${empty list}">
-					<%-- 조회된 검사 목록이 없을 때 보여주는 줄이다. --%>
+					<%-- 조회된 검사 목록이 없을 때 보여주는 줄 --%>
 
 					<tr>
 						<td colspan="8">조회된 검사 내역이 없습니다.</td>
@@ -164,7 +171,8 @@
 <%-- 본문 전체 영역을 끝낸다. --%>
 
 <!-- 검사 등록 모달 -->
-<div class="qiModal qiRegisterModal">
+<!-- 임시로 none 준 상태  -->
+<div class="qiModal qiRegisterModal" style="display: none;">
 	<%-- 등록 버튼을 눌렀을 때 열리는 모달 배경 --%>
 
 	<div class="qiModalBox qiRegisterModalBox">
