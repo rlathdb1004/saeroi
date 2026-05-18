@@ -31,4 +31,10 @@ public interface InoutDAO {
 
 	// 입출고 상세조회
 	public InoutDTO selectInoutDetail(int inoutId);
+
+	// 선택 삭제
+	public int deleteInout(String[] inoutIds);
+
+	// 입출고 수정
+	public int updateInout(InoutDTO dto);
 }

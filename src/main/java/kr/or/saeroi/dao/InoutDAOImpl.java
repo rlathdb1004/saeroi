@@ -9,9 +9,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.stereotype.Repository;
+
 import kr.or.saeroi.dto.InoutDTO;
 
 // 입출고 DAO 구현 클래스
+@Repository
 public class InoutDAOImpl implements InoutDAO {
 
 	// DB 연결
@@ -86,7 +89,8 @@ public class InoutDAOImpl implements InoutDAO {
 				sql += " AND MI.INOUT_DATE <= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			sql += "         ORDER BY MI.INOUT_ID ASC ";
+			// 등록한 데이터가 제일 위에 나오게 최신순 정렬
+			sql += "         ORDER BY MI.INOUT_ID DESC ";
 			sql += "     ) A ";
 			sql += "     WHERE ROWNUM <= ? ";
 			sql += " ) ";
@@ -460,5 +464,88 @@ public class InoutDAOImpl implements InoutDAO {
 		}
 
 		return dto;
+	}
+
+	// 선택 삭제
+	@Override
+	public int deleteInout(String[] inoutIds) {
+
+		int result = 0;
+
+		try {
+			Connection conn = getConnection();
+
+			String sql = "";
+			sql += " DELETE FROM MATERIAL_INOUT ";
+			sql += " WHERE INOUT_ID = ? ";
+
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+
+			for (int i = 0; i < inoutIds.length; i++) {
+
+				// 선택한 입출고 ID 넣기
+				pstmt.setInt(1, Integer.parseInt(inoutIds[i]));
+
+				// 삭제 실행
+				result += pstmt.executeUpdate();
+			}
+
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+	// 입출고 수정
+	@Override
+	public int updateInout(InoutDTO dto) {
+
+		int result = 0;
+
+		try {
+			Connection conn = getConnection();
+
+			String sql = "";
+
+			sql += " UPDATE MATERIAL_INOUT ";
+			sql += " SET ";
+			sql += "     INOUT_TYPE = ?, ";
+			sql += "     INOUT_QTY = ?, ";
+			sql += "     INOUT_DATE = ?, ";
+			sql += "     REMARK = ?, ";
+			sql += "     UPDATED_DATE = SYSDATE ";
+			sql += " WHERE INOUT_ID = ? ";
+
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+
+			// 입출고구분
+			pstmt.setString(1, dto.getInoutType());
+
+			// 수량
+			pstmt.setInt(2, dto.getInoutQty());
+
+			// 일자
+			pstmt.setDate(3, new Date(dto.getInoutDate().getTime()));
+
+			// 비고
+			pstmt.setString(4, dto.getRemark());
+
+			// 입출고 ID
+			pstmt.setInt(5, dto.getInoutId());
+
+			// 수정 실행
+			result = pstmt.executeUpdate();
+
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 }

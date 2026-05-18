@@ -23,6 +23,18 @@ public class aiChatService {
 	@Value("${gemini.api.key}")
 	private String apikey;
 	
+	ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10); //질문내용 전역변수로 고정
+	
+	MesAssistant assistant;
+	
+	@Autowired
+    public void init() {
+		this.assistant = AiServices.builder(MesAssistant.class)
+						.chatLanguageModel(geminiModel)
+						.chatMemory(chatMemory)
+						.tools(dbTool)
+						.build();
+    }
 	
 	public String getChatResponse(List<aiChatContents> history) {
 //		System.out.println("현재 사용 중인 키: " + (apikey != null ? apikey.substring(0, 4) + "****" : "null"));
@@ -31,13 +43,12 @@ public class aiChatService {
 		try {
 			// 멀티턴을 langchain4j의 클래스가 대체
 //			aiChatText requestBody = new aiChatText(history); 	//기억할 채팅 히스토리
-			ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10);
-			System.out.println("dbTool확인: " + dbTool);
-			MesAssistant assistant = AiServices.builder(MesAssistant.class)
-										.chatLanguageModel(geminiModel)
-										.chatMemory(chatMemory)
-										.tools(dbTool)
-										.build();
+//			System.out.println("dbTool확인: " + dbTool);
+//			assistant = AiServices.builder(MesAssistant.class)
+//						.chatLanguageModel(geminiModel)
+//						.chatMemory(chatMemory)
+//						.tools(dbTool)
+//						.build();
 //			HttpHeaders headers = new HttpHeaders();
 //			headers.setContentType(MediaType.APPLICATION_JSON);
 			//langchain4j방식으로 전환해서 주석 궁금하면 LangChain4j파일로
