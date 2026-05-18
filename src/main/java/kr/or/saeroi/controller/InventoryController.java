@@ -13,13 +13,11 @@ import kr.or.saeroi.dto.InoutDTO;
 import kr.or.saeroi.service.InoutService;
 import kr.or.saeroi.service.InoutServiceImpl;
 
-// 자재/재고 Controller
 @Controller
 public class InventoryController {
 
 	private InoutService service = new InoutServiceImpl();
 
-	// 자재입고관리 클릭 시 입출고관리 화면
 	@RequestMapping("/inventory/materialIn")
 	public String materialIn(
 			@RequestParam(value = "page", defaultValue = "1") int page,
@@ -32,10 +30,7 @@ public class InventoryController {
 		int size = 10;
 
 		int totalCount = service.getInoutCount(
-				searchType,
-				keyword,
-				startDate,
-				endDate);
+				searchType, keyword, startDate, endDate);
 
 		PageDTO pageInfo = new PageDTO(page, size, totalCount);
 
@@ -43,12 +38,7 @@ public class InventoryController {
 		int endRow = page * size;
 
 		List<InoutDTO> list = service.getInoutList(
-				startRow,
-				endRow,
-				searchType,
-				keyword,
-				startDate,
-				endDate);
+				startRow, endRow, searchType, keyword, startDate, endDate);
 
 		List<InoutDTO> itemList = service.getItemList();
 
@@ -62,14 +52,10 @@ public class InventoryController {
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
 
-		model.addAttribute("contentPage", "/WEB-INF/views/inoutManage.jsp");
-		model.addAttribute("headerTitle", "자재/재고 관리");
-		model.addAttribute("headerSubTitle", "자재입출고 관리");
-
-		return "layout";
+		// Tiles 주소
+		return "ioRegInq";
 	}
 
-	// 입출고 등록
 	@RequestMapping("/inventory/materialIn/insert")
 	public String insertInout(
 			@RequestParam("itemId") int itemId,
@@ -91,7 +77,6 @@ public class InventoryController {
 		return "redirect:/inventory/materialIn";
 	}
 
-	// 상세보기 페이지
 	@RequestMapping("/inventory/materialIn/detail")
 	public String inoutDetail(
 			@RequestParam("inoutId") int inoutId,
@@ -101,10 +86,7 @@ public class InventoryController {
 
 		model.addAttribute("inout", inout);
 
-		model.addAttribute("contentPage", "/WEB-INF/views/inoutDetail.jsp");
-		model.addAttribute("headerTitle", "자재/재고 관리");
-		model.addAttribute("headerSubTitle", "입출고 상세보기");
-
-		return "layout";
+		// Tiles 주소
+		return "ioRegDetail";
 	}
 }
