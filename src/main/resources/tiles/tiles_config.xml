@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+"-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN"
+"http://tiles.apache.org/dtds/tiles-config_2_0.dtd">
+
+<tiles-definitions>
+
+	<!-- 모든 화면이 공통으로 사용할 기본 레이아웃 파일을 지정한다. -->
+	<definition name="baseLayout" template="/WEB-INF/views/layout.jsp">
+
+		<!-- 화면 상단에 들어갈 header.jsp 파일을 지정한다. -->
+		<put-attribute name="header" value="/WEB-INF/views/common/header.jsp" />
+
+		<!-- 화면 왼쪽에 들어갈 sidebar.jsp 파일을 지정한다. -->
+		<put-attribute name="sidebar" value="/WEB-INF/views/common/sidebar.jsp" />
+
+		<!-- 브라우저 탭에 표시할 기본 제목을 지정한다. -->
+		<put-attribute name="title" value="SAEROI MES" />
+
+	</definition>
+
+	<!--
+		Controller에서 return "dashboard.tiles" 처럼 보냈을 때 사용하는 규칙이다.
+		예를 들어 return "dashboard.tiles"를 하면 /WEB-INF/views/dashboard.jsp 파일이 content 자리에 들어간다.
+	-->
+	<definition name="*.tiles" extends="baseLayout">
+		<put-attribute name="content" value="/WEB-INF/views/{1}.jsp" />
+	</definition>
+
+	<!--
+		Controller에서 return "quality/inspection.tiles" 처럼 보냈을 때 사용하는 규칙이다.
+		나중에 폴더를 나눠서 JSP를 만들 경우를 대비해서 남겨둔다.
+	-->
+	<definition name="*/*.tiles" extends="baseLayout">
+		<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp" />
+	</definition>
+
+</tiles-definitions>
