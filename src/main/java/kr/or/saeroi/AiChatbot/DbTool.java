@@ -55,9 +55,10 @@ public class DbTool {
 		}
 	}
 	
-	@Tool("입출고 기록을 조회합니다.페이징스타트(startRow)페이지엔드(endRow)를 언급하지않았다면, 무리하게 채우지말고 문자열(\"\")로 넘겨주어야 합니다." +
+	@Tool("입출고 기록을 조회합니다.시작행(startRow) 종료행(endRow)을 언급하지않았다면 무리하게 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다." +
 			"만약 조회 시작일(startDate)과 종료일(endDate)을 언급하지 않았다면, 무리하게 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다." +
-			"")
+			"사용자가 특정 품목이나 검색어를 언급하면 keyword에 넣고, searchType은 '품목명' 등으로 지정합니다."+
+			"사용자가 '출고 기록' 혹은 '입고 기록'을 요청하면 keyword에 넣지 말고, 반드시 searchType에 '구분'을 넣고 keyword에는 '출고' 또는 '입고'를 넣으세요.")
 	public String getInOut(int startRow,
 							int endRow,
 							String searchType,
@@ -68,6 +69,6 @@ public class DbTool {
 		String key = (keyword != null && !keyword.isEmpty()) ? keyword : null; 
 		
 		List<InoutDTO> list = inoutDAO.selectInoutList(startRow, endRow, type, key,startDate,endDate);
-		return list.isEmpty() ? "해당 조건으로 조회된 품질 검사 결과가 없습니다." :list.toString();
+		return list.isEmpty() ? "해당 조건으로 조회된 입출고 기록이 없습니다." :list.toString();
 	}
 }
