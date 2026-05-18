@@ -121,5 +121,27 @@
 	</select>
 
 	<!-- 등록 쿼리 -->
-	
+	<!-- insert의 경우 parameterType 사용 -->
+	<insert id="_insert_Inspection"
+		parameterType="kr.or.saeroi.dto.InspectionDTO">
+
+		INSERT INTO inspection (
+		insp_id,
+		emp_id,
+		prod_id,
+		insp_type,
+		insp_date,
+		insp_status,
+		result,
+		inspection_qty,
+		good_qty,
+		remark,
+		created_date,
+		updated_date
+		)
+		VALUES (
+		(
+		)
+	</insert>
+
 </mapper>

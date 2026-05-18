@@ -32,7 +32,7 @@ public class QualityDAOImpl implements QualityDAO{
 		
 		return inspection_List;
 	}
-	//구분 옵션 기능 메서드(셀렉트 박스로 하게 될 경우)
+	//구분 옵션 기능 메서드(모달에서 목록 보여줄 때 쓰임으로 바뀜)
 	public List<InspectionDTO> _dao_option_Inspection(String startDate,String endDate, String searchType, int optionPage, int optionSize){
 		
 		Map<String, Object> param = new HashMap<String, Object>();
