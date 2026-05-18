@@ -86,7 +86,8 @@ public class InoutDAOImpl implements InoutDAO {
 				sql += " AND MI.INOUT_DATE <= TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			sql += "         ORDER BY MI.INOUT_ID ASC ";
+			// 등록한 데이터가 제일 위에 나오게 최신순 정렬
+			sql += "         ORDER BY MI.INOUT_ID DESC ";
 			sql += "     ) A ";
 			sql += "     WHERE ROWNUM <= ? ";
 			sql += " ) ";
@@ -460,5 +461,39 @@ public class InoutDAOImpl implements InoutDAO {
 		}
 
 		return dto;
+	}
+
+	// 선택 삭제
+	@Override
+	public int deleteInout(String[] inoutIds) {
+
+		int result = 0;
+
+		try {
+			Connection conn = getConnection();
+
+			String sql = "";
+			sql += " DELETE FROM MATERIAL_INOUT ";
+			sql += " WHERE INOUT_ID = ? ";
+
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+
+			for (int i = 0; i < inoutIds.length; i++) {
+
+				// 선택한 입출고 ID 넣기
+				pstmt.setInt(1, Integer.parseInt(inoutIds[i]));
+
+				// 삭제 실행
+				result += pstmt.executeUpdate();
+			}
+
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return result;
 	}
 }

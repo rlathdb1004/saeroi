@@ -100,6 +100,20 @@ public class InventoryController {
 		return "redirect:/inventory/materialIn";
 	}
 
+	// 선택 삭제
+	@RequestMapping("/inventory/materialIn/delete")
+	public String deleteInout(
+			@RequestParam(value = "inoutIds", required = false) String[] inoutIds) {
+
+		// 선택한 값이 있을 때만 삭제
+		if (inoutIds != null) {
+			service.removeInout(inoutIds);
+		}
+
+		// 삭제 후 목록으로 이동
+		return "redirect:/inventory/materialIn";
+	}
+
 	// 상세보기 페이지
 	@RequestMapping("/inventory/materialIn/detail")
 	public String inoutDetail(

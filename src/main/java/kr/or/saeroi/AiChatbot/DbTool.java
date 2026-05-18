@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import dev.langchain4j.agent.tool.Tool;
+import kr.or.saeroi.dao.InoutDAO;
 import kr.or.saeroi.dao.LoginDAO;
 import kr.or.saeroi.dao.QualityDAO;
+import kr.or.saeroi.dto.InoutDTO;
 import kr.or.saeroi.dto.InspectionDTO;
 import kr.or.saeroi.dto.LoginDTO;
 
@@ -24,6 +26,9 @@ public class DbTool {
 	@Autowired
 	private QualityDAO qualityDAO;
 	
+	@Autowired
+	private InoutDAO inoutDAO;
+	
 	@Tool("사원 번호로 상세 정보를 조회합니다")
 	public String getemp(String empNo) {
 		try (Connection conn = dataSource.getConnection()) {
@@ -35,9 +40,9 @@ public class DbTool {
 		}
 	}
 	
-	@Tool("품질 검사 내역 목록을 조회합니다. " +
-		      "조회 시작일(startDate)과 종료일(endDate)은 반드시 필수(Required)로 입력되어야 합니다. (형식: YYYY-MM-DD) " +
-		      "만약 사용자가 검색 조건(searchType)이나 키워드(keyword)를 언급하지 않았다면, 무리해서 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다.")
+	@Tool("품질 검사 내역 목록을 조회합니다. 사용자가 특정 품목이나 검색어를 언급하면 keyword에 넣고, searchType은 '품목명' 등으로 지정합니다. " +
+		      "만약 조회 시작일(startDate)과 종료일(endDate)을 언급하지 않았다면, 무리하게 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. " +
+		      "출력 개수 제한(limit)이나 정렬 방식(orderBy)에 대한 요구사항이 있다면 해당 매개변수에 값을 채워줍니다.")
 	public String getQualitySelect(String startDate, String endDate, String searchType, String keyword) {
 		try {
 			String type = (searchType != null && !searchType.isEmpty()) ? searchType : null; 
@@ -48,5 +53,21 @@ public class DbTool {
 		} catch (Exception e) {
 			return "퀄리티 조회중 오류: " + e.getMessage();
 		}
+	}
+	
+	@Tool("입출고 기록을 조회합니다.페이징스타트(startRow)페이지엔드(endRow)를 언급하지않았다면, 무리하게 채우지말고 문자열(\"\")로 넘겨주어야 합니다." +
+			"만약 조회 시작일(startDate)과 종료일(endDate)을 언급하지 않았다면, 무리하게 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다." +
+			"")
+	public String getInOut(int startRow,
+							int endRow,
+							String searchType,
+							String keyword,
+							String startDate,
+							String endDate) {
+		String type = (searchType != null && !searchType.isEmpty()) ? searchType : null; 
+		String key = (keyword != null && !keyword.isEmpty()) ? keyword : null; 
+		
+		List<InoutDTO> list = inoutDAO.selectInoutList(startRow, endRow, type, key,startDate,endDate);
+		return list.isEmpty() ? "해당 조건으로 조회된 품질 검사 결과가 없습니다." :list.toString();
 	}
 }

@@ -31,4 +31,7 @@ public interface InoutService {
 
 	// 입출고 상세조회
 	public InoutDTO getInoutDetail(int inoutId);
+
+	// 선택 삭제
+	public int removeInout(String[] inoutIds);
 }
