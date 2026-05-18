@@ -25,7 +25,9 @@
 
 	<%-- 대시보드 화면 전용 디자인을 적용하는 CSS 파일이다. --%>
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/dashboard.css">
-
+	
+	<%-- 각페이지 상단 테이블 CSS 파일이다. --%>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/searchtable.css">
 </head>
 
 <body>
@@ -71,6 +73,9 @@
 
     <%-- 사이드바 메뉴 펼침/접힘 동작을 담당하는 JS 파일이다. --%>
     <script src="${pageContext.request.contextPath}/resources/js/common/sidebar.js"></script>
+    
+    <%-- 상단 테이블의 JS 파일이다. --%>
+    <script src="${pageContext.request.contextPath}/resources/js/common/searchtable.js"></script>
 
 </body>
 </html>
