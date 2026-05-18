@@ -33,7 +33,7 @@ public class QualityDAOImpl implements QualityDAO{
 		return inspection_List;
 	}
 	//구분 옵션 기능 메서드(셀렉트 박스로 하게 될 경우)
-	public List<String> _dao_option_Inspection(String startDate,String endDate, String searchType, int optionPage, int optionSize){
+	public List<InspectionDTO> _dao_option_Inspection(String startDate,String endDate, String searchType, int optionPage, int optionSize){
 		
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("startDate", startDate);
@@ -43,7 +43,7 @@ public class QualityDAOImpl implements QualityDAO{
 		param.put("optionSize", optionSize);
 		
 		//구분에 맞는 값 따로 DB에사 가져옴
-		List<String> inspection_List_option = sqlSession.selectList("mapper.quality._select_Inspection_option",param);
+		List<InspectionDTO> inspection_List_option = sqlSession.selectList("mapper.quality._select_Inspection_option",param);
 		
 		return inspection_List_option;
 		
