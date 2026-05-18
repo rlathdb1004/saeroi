@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.or.saeroi.common.PageDTO;
 import kr.or.saeroi.dto.InspectionDTO;
@@ -20,26 +22,60 @@ public class QualityController {
 	QualityService qualityService;
 
 	@RequestMapping("/inspection")
-	public String inspection(Model model) {
+	public String inspection(Model model, @RequestParam(defaultValue = "1") int page,
+	        @RequestParam(defaultValue = "10") int size,
+	        @RequestParam(required = false) String startDate,
+	        @RequestParam(required = false) String endDate,
+	        @RequestParam(required = false) String searchType,
+	        @RequestParam(required = false) String keyword) {
 //		검사 목록 
-		List<InspectionDTO> list = qualityService._dto_select_Inspection();
+		List<InspectionDTO> list = qualityService._ser_select_Inspection(startDate, endDate, searchType, keyword);
 		System.out.println("검사 목록 list 실행 됨");
-		
-		//페이징 기능
-	    int page = 1;
-	    int size = 10;
-	    int totalCount = list.size();
 
-	    PageDTO pageInfo = new PageDTO(page, size, totalCount);
+		// 날짜 잘 들어왔나 값 확인(콘솔)
+		System.out.println("startDate: " + startDate);
+		System.out.println("endDate: " + endDate);
+		System.out.println("searchType: " + searchType);
+		System.out.println("keyword: " + keyword);
 
-	    model.addAttribute("list", list);
+		// 페이징 기능
+		int totalCount = list.size();
+		int startIndex = (page - 1) * size;
+		int endIndex = startIndex + size;
 
-	    model.addAttribute("pageInfo", pageInfo);
+		if (endIndex > totalCount) {
+			endIndex = totalCount;
+		}
+		List<InspectionDTO> page_list = list.subList(startIndex, endIndex);
+		PageDTO pageInfo = new PageDTO(page, size, totalCount);
+		model.addAttribute("list", page_list);
+
+		// jsp에서 검색 조건 남아있게 하기
+		model.addAttribute("startDate", startDate);
+		model.addAttribute("endDate", endDate);
+
+		model.addAttribute("pageInfo", pageInfo);
+		model.addAttribute("pageUrl", "/quality/inspection");
+
+		model.addAttribute("searchType", searchType);
+		model.addAttribute("keyword", keyword);
 
 		// JSP 지정
 		model.addAttribute("contentPage", "/WEB-INF/views/inspection.jsp");
 
 		return "layout";
+	}
+
+//	구분 10개씩 기능 메서드
+	@ResponseBody
+	@RequestMapping("/inspection/option")
+	public List<String> inspection_option(Model model, @RequestParam(defaultValue = "1") int optionPage,
+			@RequestParam(defaultValue = "10") int optionSize,
+			// 없어도 괜찮은 값이므로(필수X)
+			@RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate,
+			@RequestParam(required = false) String searchType) {
+
+		return null;
 	}
 
 	@RequestMapping("/defect")
@@ -49,5 +85,5 @@ public class QualityController {
 
 		return "layout";
 	}
-	
+
 }
