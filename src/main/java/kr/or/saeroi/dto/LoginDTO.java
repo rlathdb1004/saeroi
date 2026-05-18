@@ -1,11 +1,11 @@
-package kr.or.saeroi.member.dto;
+package kr.or.saeroi.dto;
 
 import java.sql.Timestamp;
 import lombok.Data;
 
 @Data
 public class LoginDTO {	
-	private String emp_no;
+	private String empno;
 	private String emp_pw;
 	private String ename;	
 	private String dept;
@@ -18,3 +18,4 @@ public class LoginDTO {
 	private Timestamp created_date;
 	private Timestamp updated_date;	
 }
+

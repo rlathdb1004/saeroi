@@ -1,4 +1,4 @@
-package kr.or.saeroi.member.service;
+package kr.or.saeroi.service;
 
 import java.sql.Connection;
 
@@ -7,8 +7,8 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import kr.or.saeroi.member.dao.LoginDAO;
-import kr.or.saeroi.member.dto.LoginDTO;
+import kr.or.saeroi.dao.LoginDAO;
+import kr.or.saeroi.dto.LoginDTO;
 
 @Service
 public class LoginService {
@@ -19,14 +19,14 @@ public class LoginService {
     @Autowired
     private DataSource dataSource;
 
-    public LoginDTO login(String emp_no, String pw) {
+    public LoginDTO login(String empno, String pw) {
 
         Connection conn = null;
 
         try {
             conn = dataSource.getConnection();
 
-            LoginDTO login = loginDAO.FindEmpNo(conn, emp_no);
+            LoginDTO login = loginDAO.FindEmpNo(conn, empno);
 
             if(login == null) {
                 return null;
@@ -48,4 +48,19 @@ public class LoginService {
             }
         }
     }
+    
+    public boolean check_user(String empno, String email) {
+        return loginDAO.countByEmpNoAndEmail(empno, email) > 0;
+    }
+
+	
+	public String reset_pw(String empno) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void send_temp_pw(String email, String tempPw) {
+		// TODO Auto-generated method stub
+		
+	}
 }
