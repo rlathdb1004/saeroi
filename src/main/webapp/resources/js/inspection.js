@@ -1,13 +1,18 @@
-const lookupBtn = document.querySelector('.qiSmallSearchBtn');//조회 버튼
-const qiLookupModal = document.querySelector('.qiLookupModal');//조회 모달
+//초기화 버튼
+const coBtnReset = document.querySelector('.coBtnReset');
 
-lookupBtn.addEventListener('click',function(){
-    qiLookupModal.style.display = 'flex';
+coBtnReset.addEventListener('click', function(){
+    //초기화 버튼 클릭 시 시작일과 종료일 초기화
+    document.getElementsByName('startDate')[0].value = '';
+    document.getElementsByName('endDate')[0].value = '';
+    document.getElementsByName('searchType')[0].value = '';
+    document.getElementsByName('keyword')[0].value = '';
 });
 
-//종료일 달력 선택 시 종료일이 시작일 포함 이전으로 선택 못 하게
-
-//name으로 값 가져오기
-var endDate = document.getElementsByName('endDate')[0].value;
-
-
+//등록 버튼 클릭 시 모달 띄움
+const qiRegisterOpenBtn = document.querySelector('.qiRegisterOpenBtn');
+const qiRegisterModal = document.querySelector('.qiRegisterModal');
+qiRegisterOpenBtn.addEventListener('click', function(){
+    
+    qiRegisterModal.style.display = 'flex';
+});

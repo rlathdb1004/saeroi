@@ -13,11 +13,20 @@ public class QualityServiceImpl implements QualityService {
 	QualityDAO qualityDAO;
 
 	@Override
-	public List<InspectionDTO> _dto_select_Inspection(){
+	public List<InspectionDTO> _ser_select_Inspection(String startDate, String endDate, String searchType, String keyword) {
 		
 		System.out.println("result_list 실행 됨");
-		List<InspectionDTO> result_list = qualityDAO._dao_select_Inspection();
+		List<InspectionDTO> result_list = qualityDAO._dao_select_Inspection(startDate, endDate, searchType, keyword);
 		return result_list;
+	}
+	@Override
+	//	구분 옵션 메서드
+	public List<String> _ser_option_Inspection(String startDate,String endDate, String searchType, int optionPage, int optionSize){
+		
+		List<String> result_list_opiton = qualityDAO._dao_option_Inspection(startDate, endDate, searchType, optionPage, optionSize);
+		System.out.println("result_list_opiton 실행 됨");
+		return result_list_opiton;
+		
 	}
 
 }
