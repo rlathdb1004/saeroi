@@ -1,4 +1,4 @@
-package kr.or.saeroi.member.controller;
+package kr.or.saeroi.controller;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import kr.or.saeroi.member.dto.LoginDTO;
-import kr.or.saeroi.member.service.LoginService;
+import kr.or.saeroi.dto.FindPwDTO;
+import kr.or.saeroi.dto.LoginDTO;
+import kr.or.saeroi.service.LoginService;
 
 @Controller
 public class LoginController {
@@ -52,7 +53,7 @@ public class LoginController {
 
         Map<String, Object> result = new HashMap<>();
 
-        boolean exists = loginService.checkUser(dto.getEmpno(), dto.getEmail());
+        boolean exists = loginService.check_user(dto.getEmpno(), dto.getEmail());
 
         if (!exists) {
             result.put("success", false);
@@ -60,9 +61,9 @@ public class LoginController {
             return result;
         }
 
-        String tempPw = memberService.resetPassword(dto.getEmpNo());
+        String tempPw = loginService.reset_pw(dto.getEmpno());
 
-        emailService.sendTempPassword(dto.getEmail(), tempPw);
+        loginService.send_temp_pw(dto.getEmail(), tempPw);
 
         result.put("success", true);
         result.put("message", "임시 비밀번호가 이메일로 발송되었습니다.");

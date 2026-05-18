@@ -1,4 +1,4 @@
-package kr.or.saeroi.member.dto;
+package kr.or.saeroi.dto;
 
 import java.sql.Timestamp;
 import lombok.Data;

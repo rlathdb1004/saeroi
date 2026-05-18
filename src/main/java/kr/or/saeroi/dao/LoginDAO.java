@@ -1,4 +1,4 @@
-package kr.or.saeroi.member.dao;
+package kr.or.saeroi.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 import org.springframework.stereotype.Repository;
 
-import kr.or.saeroi.member.dto.LoginDTO;
+import kr.or.saeroi.dto.LoginDTO;
 
 @Repository
 public class LoginDAO {
@@ -61,5 +61,10 @@ public class LoginDAO {
         }
 
         return login;
+	}
+
+	public int countByEmpNoAndEmail(String empno, String email) {
+		
+		return 0;
 	}
 }
