@@ -4,8 +4,9 @@
 <div class="coPageWrap">
 	<%-- 본문 전체를 감싸는 영역이다. --%>
 
-	<link rel="stylesheet"
-		href="${pageContext.request.contextPath}/resources/css/inspection.css">
+
+<!-- 	<link rel="stylesheet" -->
+<%-- 		href="${pageContext.request.contextPath}/resources/css/inspection.css"> --%>
 
 	<form class="search-form" method="get"
 		action="${pageContext.request.contextPath}/quality/inspection">
@@ -100,7 +101,9 @@
 		<%-- DB에서 조회한 전체 데이터 개수를 보여줌 --%>
 
 		<div class="search-btn-right">
-			<button type="button" class="search-btn search-btn-main">등록</button>
+			<button type="button"
+				class="search-btn search-btn-main modal_open_btn"
+				data_modal_target="#modal_insert">등록</button>
 			<button type="button" class="search-btn search-btn-sub">선택
 				삭제</button>
 		</div>
@@ -171,95 +174,94 @@
 <%-- 본문 전체 영역을 끝낸다. --%>
 
 <!-- 검사 등록 모달 -->
-<!-- 임시로 none 준 상태  -->
-<div class="qiModal qiRegisterModal" style="display: none;">
-	<%-- 등록 버튼을 눌렀을 때 열리는 모달 배경 --%>
+<div id="modal_sample" class="modal_wrap" aria-hidden="true">
+	<%-- 등록 버튼을 눌렀을 때 열리는 공통 모달 배경이다. --%>
 
-	<div class="qiModalBox qiRegisterModalBox">
-		<%-- 실제 모달 내용 영역 --%>
+	<div class="modal_box" role="dialog" aria-modal="true">
+		<%-- 실제 모달 내용이 들어가는 영역이다. --%>
 
-		<div class="qiModalHeader">
-			<%-- 모달 제목과 닫기 버튼 영역 --%>
+		<div class="modal_header">
+			<%-- 모달 상단 제목 영역이다. --%>
 
-			<h3 class="qiModalTitle">검사 등록</h3>
-
-			<button type="button" class="qiModalCloseBtn">×</button>
+			<h3 class="modal_title">검사 등록</h3>
 		</div>
 
-		<form class="qiModalForm" method="post"
-			action="${pageContext.request.contextPath}/quality/inspection/add">
-			<%-- 검사 등록 정보를 입력하는 영역 --%>
+		<form class="modal_form" method="post" action="">
+			<%-- 등록 정보를 입력하는 영역이다. --%>
 
-			<div class="qiModalBody qiRegisterModalBody">
+			<div class="modal_body modal_body_2col">
 
-				<div class="qiFormRow">
-					<label class="qiFormLabel">검사일시</label> <input type="date"
-						name="insp_date" class="coInput qiFormInput">
+				<div class="modal_item">
+					<label class="modal_label"> 검사일시<span
+						class="modal_required"></span>
+					</label> <input type="date" name="insp_date"
+						class="modal_input modal_today" required>
 				</div>
 
-				<div class="qiFormRow">
-					<label class="qiFormLabel">품목명</label> <select name="prod_id"
-						class="coSelect qiFormInput">
+				<div class="modal_item">
+					<label class="modal_label"> 품목명<span class="modal_required"></span>
+					</label> <select name="item_name" class="modal_select" required>
 						<option value="">선택</option>
 					</select>
 				</div>
 
-
-				<div class="qiFormRow">
-					<label class="qiFormLabel">검사자</label> <select name="emp_id"
-						class="coSelect qiFormInput">
+				<div class="modal_item">
+					<label class="modal_label"> 검사자<span class="modal_required">*</span>
+					</label> <select name="inspector" class="modal_select" required>
+						<option value="">선택</option>
+					</select>
+				</div>
+				<div class="modal_item">
+					<label class="modal_label"> 검사구분<span
+						class="modal_required"></span>
+					</label> <select name="inspection_type" class="modal_select" required>
 						<option value="">선택</option>
 					</select>
 				</div>
 
-				<div class="qiFormRow">
-					<label class="qiFormLabel">검사구분</label> <select name="insp_type"
-						class="coSelect qiFormInput">
-						<option value="">선택</option>
-						<option value="외관검사">외관검사</option>
-						<option value="치수검사">치수검사</option>
-						<option value="품질판정">품질판정</option>
-						<option value="재검사">재검사</option>
-					</select>
-				</div>
-
-				<div class="qiFormRow">
-					<label class="qiFormLabel">검사결과</label> <select name="result"
-						class="coSelect qiFormInput">
+				<div class="modal_item">
+					<label class="modal_label"> 검사결과<span
+						class="modal_required"></span>
+					</label> <select name="inspection_result" class="modal_select" required>
 						<option value="">선택</option>
 					</select>
 				</div>
 
-				<div class="qiFormRow">
-					<label class="qiFormLabel">검사수량</label> <input type="number"
-						name="inspection_qty" class="coInput qiFormInput" min="0">
+				<div class="modal_item">
+					<label class="modal_label"> 검사수량<span
+						class="modal_required"></span>
+					</label> <input type="number" name="inspection_qty" class="modal_input"
+						min="0" required>
 				</div>
 
-				<div class="qiFormRow">
-					<label class="qiFormLabel">양품수량</label> <input type="number"
-						name="good_qty" class="coInput qiFormInput" min="0">
+				<div class="modal_item">
+					<label class="modal_label"> 양품수량<span
+						class="modal_required"></span>
+					</label> <input type="number" name="good_qty" class="modal_input" min="0"
+						required>
 				</div>
 
-				<div class="qiFormRow">
-					<label class="qiFormLabel">검사 상세</label> <select name="remark"
-						class="coSelect qiFormInput">
+				<div class="modal_item">
+					<label class="modal_label">검사 상세</label> <select
+						name="inspection_detail" class="modal_select">
 						<option value="">선택</option>
 					</select>
 				</div>
-
 			</div>
 
-			<div class="qiModalFooter">
-				<%-- 등록/취소 버튼 영역 --%>
+			<div class="modal_footer">
+				<%-- 취소 버튼은 모달을 닫는 역할을 한다. --%>
 
-				<button type="button" class="coBtn coBtnReset qiModalCancelBtn">취소</button>
-				<button type="submit" class="coBtn coBtnPrimary">등록</button>
+				<button type="button"
+					class="modal_btn modal_btn_cancel modal_close_btn">취소</button>
+
+				<button type="submit" class="modal_btn modal_btn_submit">
+					등록</button>
 			</div>
 
 		</form>
 	</div>
 </div>
-
 
 
 <script

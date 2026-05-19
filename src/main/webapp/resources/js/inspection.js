@@ -10,12 +10,25 @@ coBtnReset.addEventListener('click', function () {
 });
 
 //등록 버튼 클릭 시 모달 띄움
-const qiRegisterOpenBtn = document.querySelector('.qiRegisterOpenBtn');
+const qiRegisterOpenBtn = document.querySelector('.search-btn-right .search-btn-main');
 const qiRegisterModal = document.querySelector('.qiRegisterModal');
-qiRegisterOpenBtn.addEventListener('click', function () {
+const qiModalCloseBtn = document.querySelector('.qiModalCloseBtn');
+const qiModalCancelBtn = document.querySelector('.qiModalCancelBtn');
 
-    qiRegisterModal.style.display = 'flex';
+qiRegisterOpenBtn.addEventListener('click', function () {
+    qiRegisterModal.classList.add('isOpen');
 });
+
+qiModalCloseBtn.addEventListener('click', function () {
+    qiRegisterModal.classList.remove('isOpen');
+});
+
+qiModalCancelBtn.addEventListener('click', function () {
+    qiRegisterModal.classList.remove('isOpen');
+});
+
+
+
 
 //품목명 select 클릭 시 품목명 목록 띄우기
 //등록 시 검사 테이블 컬럼 명이 prod_id 이므로 
@@ -127,3 +140,14 @@ remark.addEventListener('click', function () {
 			remarkLoaded = true;
         });
 });
+
+//날짜 현재 날짜 기준으로 고정값
+const today = new Date();
+
+//년, 월, 일로 따로 받아와야 함
+const year = today.getFullYear();
+const month = (today.getMonth()+1).toString().padStart(2,'0');//0~11까지 12개
+const day = today.getDate().toString().padStart(2,'0');
+
+const formattedDate = `${year}-${month}-${day}`;
+consle.log(formattedDate);
