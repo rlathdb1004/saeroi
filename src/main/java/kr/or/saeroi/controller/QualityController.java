@@ -24,11 +24,9 @@ public class QualityController {
 
 	@RequestMapping("/inspection")
 	public String inspection(Model model, @RequestParam(defaultValue = "1") int page,
-	        @RequestParam(defaultValue = "10") int size,
-	        @RequestParam(required = false) String startDate,
-	        @RequestParam(required = false) String endDate,
-	        @RequestParam(required = false) String searchType,
-	        @RequestParam(required = false) String keyword) {
+			@RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String startDate,
+			@RequestParam(required = false) String endDate, @RequestParam(required = false) String searchType,
+			@RequestParam(required = false) String keyword) {
 //		검사 목록 
 		List<InspectionDTO> list = qualityService._ser_select_Inspection(startDate, endDate, searchType, keyword);
 		System.out.println("검사 목록 list 실행 됨");
@@ -43,12 +41,12 @@ public class QualityController {
 		int totalCount = list.size();
 		int startIndex = (page - 1) * size;
 		int endIndex = startIndex + size;
-		//마지막 페이지에서 범위 넘어가는 것 방지
+		// 마지막 페이지에서 범위 넘어가는 것 방지
 		if (endIndex > totalCount) {
 			endIndex = totalCount;
 		}
 		List<InspectionDTO> page_list = list.subList(startIndex, endIndex);
-		PageDTO pageInfo = new PageDTO(page, size, totalCount);//페이징 jsp 버튼 만들 수 있는 정보 담는 곳
+		PageDTO pageInfo = new PageDTO(page, size, totalCount);// 페이징 jsp 버튼 만들 수 있는 정보 담는 곳
 		model.addAttribute("list", page_list);
 
 		// jsp에서 검색 조건 남아있게 하기
@@ -75,9 +73,10 @@ public class QualityController {
 			// 없어도 괜찮은 값이므로(필수X)
 			@RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate,
 			@RequestParam(required = false) String searchType) {
-		
-		List<InspectionDTO> option_list = qualityService._ser_option_Inspection(startDate, endDate, searchType, optionPage, optionSize);
-		
+
+		List<InspectionDTO> option_list = qualityService._ser_option_Inspection(startDate, endDate, searchType,
+				optionPage, optionSize);
+
 		return option_list;
 	}
 
@@ -88,12 +87,21 @@ public class QualityController {
 
 		return "defect.tiles";
 	}
-	
-	//등록 메서드(등록 post 방식 추가)
+
+	// 등록 메서드(등록 post 방식 추가)
+	// redirect: DB에 저장하고 다시 목록 페이지로 이동시키기 위해서
 	@RequestMapping(value = "/inspection/add", method = RequestMethod.POST)
-	public String inspection_add() {
-		
-		
-		return null;
+	public String inspection_add(Model model, @RequestParam(required = false) String insp_date,
+			@RequestParam(required = false) String prod_id, @RequestParam(required = false) String emp_id,
+			@RequestParam(required = false) String insp_type, @RequestParam(required = false) String result,
+			@RequestParam(required = false) String inspection_qty, @RequestParam(required = false) String good_qty,
+			@RequestParam(required = false) String remark) {
+
+		int insert_result = qualityService._ser_insert_Inspection(insp_date, prod_id, emp_id, insp_type, result,
+				inspection_qty, good_qty, remark);
+
+		System.out.println("insert_result: " + insert_result);
+
+		return "redirect:/quality/inspection";
 	}
 }

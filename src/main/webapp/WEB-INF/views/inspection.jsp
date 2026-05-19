@@ -187,7 +187,8 @@
 			<h3 class="modal_title">검사 등록</h3>
 		</div>
 
-		<form class="modal_form" method="post" action="${pageContext.request.contextPath}/quality/inspection/add">
+		<form class="modal_form" method="post" accept-charset="UTF-8"
+			action="${pageContext.request.contextPath}/quality/inspection/add">
 			<%-- 등록 정보를 입력하는 영역이다. --%>
 
 			<div class="modal_body modal_body_2col">
@@ -215,7 +216,7 @@
 				<div class="modal_item">
 					<label class="modal_label"> 검사구분<span
 						class="modal_required"></span>
-					</label> <select name="inspection_type" class="modal_select" required>
+					</label> <select name="insp_type" class="modal_select" required>
 						<option value="">선택</option>
 					</select>
 				</div>
