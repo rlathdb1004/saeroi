@@ -21,4 +21,7 @@
 			</props>
 		</property>
 	</bean>
+	<!-- 비밀번호 hash처리-->
+	<bean id="passwordEncoder"
+      class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
 </beans>
