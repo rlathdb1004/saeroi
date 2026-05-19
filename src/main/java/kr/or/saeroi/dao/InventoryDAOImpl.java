@@ -109,8 +109,8 @@ public class InventoryDAOImpl implements InventoryDAO {
 				sql += " TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			// 최신순 정렬
-			sql += " ORDER BY IV.INVENTORY_ID DESC ";
+			// 재고번호 1번부터 나오게 정렬
+			sql += " ORDER BY IV.INVENTORY_ID ASC ";
 
 			PreparedStatement pstmt =
 					conn.prepareStatement(sql);
@@ -236,13 +236,18 @@ public class InventoryDAOImpl implements InventoryDAO {
 			String sql = "";
 
 			sql += " SELECT ";
-			sql += "     ITEM_ID, ";
-			sql += "     ITEM_CODE, ";
-			sql += "     ITEM_NAME, ";
-			sql += "     ITEM_TYPE, ";
-			sql += "     ITEM_UNIT ";
-			sql += " FROM ITEM ";
-			sql += " ORDER BY ITEM_ID ASC ";
+			sql += "     I.ITEM_ID, ";
+			sql += "     I.ITEM_CODE, ";
+			sql += "     I.ITEM_NAME, ";
+			sql += "     I.ITEM_TYPE, ";
+			sql += "     I.ITEM_UNIT, ";
+			sql += "     ( ";
+			sql += "         SELECT MAX(IV.STOCK_LOCATION) ";
+			sql += "         FROM INVENTORY IV ";
+			sql += "         WHERE IV.ITEM_ID = I.ITEM_ID ";
+			sql += "     ) AS STOCK_LOCATION ";
+			sql += " FROM ITEM I ";
+			sql += " ORDER BY I.ITEM_ID ASC ";
 
 			PreparedStatement pstmt =
 					conn.prepareStatement(sql);
@@ -269,6 +274,10 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 				dto.setItemUnit(
 						rs.getString("ITEM_UNIT"));
+
+				// 품목 선택 시 창고위치를 자동으로 보여주기 위해 넣는다.
+				dto.setStockLocation(
+						rs.getString("STOCK_LOCATION"));
 
 				list.add(dto);
 			}
