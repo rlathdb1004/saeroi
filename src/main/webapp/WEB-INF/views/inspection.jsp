@@ -5,8 +5,8 @@
 	<%-- 본문 전체를 감싸는 영역이다. --%>
 
 
-<!-- 	<link rel="stylesheet" -->
-<%-- 		href="${pageContext.request.contextPath}/resources/css/inspection.css"> --%>
+	<!-- 	<link rel="stylesheet" -->
+	<%-- 		href="${pageContext.request.contextPath}/resources/css/inspection.css"> --%>
 
 	<form class="search-form" method="get"
 		action="${pageContext.request.contextPath}/quality/inspection">
@@ -174,7 +174,8 @@
 <%-- 본문 전체 영역을 끝낸다. --%>
 
 <!-- 검사 등록 모달 -->
-<div id="modal_sample" class="modal_wrap" aria-hidden="true">
+<div id="modal_insert" class="modal_wrap" aria-hidden="true">
+
 	<%-- 등록 버튼을 눌렀을 때 열리는 공통 모달 배경이다. --%>
 
 	<div class="modal_box" role="dialog" aria-modal="true">
@@ -242,10 +243,11 @@
 				</div>
 
 				<div class="modal_item">
-					<label class="modal_label">검사 상세</label> <select
+					<label class="modal_label">비고</label> 
+					<insert
 						name="inspection_detail" class="modal_select">
-						<option value="">선택</option>
-					</select>
+						
+					</insert>
 				</div>
 			</div>
 
