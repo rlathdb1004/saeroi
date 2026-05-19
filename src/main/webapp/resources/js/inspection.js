@@ -1,99 +1,90 @@
-//초기화 버튼
 const coBtnReset = document.querySelector('.search-reset-btn');
-
-coBtnReset.addEventListener('click', function () {
-    //초기화 버튼 클릭 시 시작일과 종료일 초기화
-    document.getElementsByName('startDate')[0].value = '';
-    document.getElementsByName('endDate')[0].value = '';
-    document.getElementsByName('searchType')[0].value = '';
-    document.getElementsByName('keyword')[0].value = '';
-});
-
-
-//품목명 select 클릭 시 품목명 목록 띄우기
+//초기화 기능
+if (coBtnReset) {
+    coBtnReset.addEventListener('click', function () {
+        document.getElementsByName('startDate')[0].value = '';
+        document.getElementsByName('endDate')[0].value = '';
+        document.getElementsByName('searchType')[0].value = '';
+        document.getElementsByName('keyword')[0].value = '';
+    });
+}
+// 모달 안에 있는 select 태그들 가져오기
 const prodId = document.getElementsByName('prod_id')[0];
-
+const empId = document.getElementsByName('emp_id')[0];
+const inspectionType = document.getElementsByName('insp_type')[0];
+const result = document.getElementsByName('result')[0];
+// 옵션을 이미 불러왔는지 확인하는 변수
 let prodLoaded = false;
-
-prodId.addEventListener('click', function () {
-
-    if (prodLoaded) {
+let empLoaded = false;
+// select 태그를 비우고 기본 옵션을 넣는 함수
+function addDefaultOption(selectTag) {
+    selectTag.innerHTML = '';
+    selectTag.innerHTML += '<option value="">\uC120\uD0DD</option>';
+}
+//품목명 목록 불러옴 DB에서
+function loadProdOptions() {
+    if (!prodId || prodLoaded) {
         return;
     }
 
     fetch(contextPath + '/quality/inspection/option?searchType=itemName')
         .then(response => response.json())
         .then(data => {
-            prodId.innerHTML = '';
-            prodId.innerHTML += '<option value="">선택</option>';
+            addDefaultOption(prodId);
 
             data.forEach(item => {
-                prodId.innerHTML += `<option value="${item}">${item}</option>`;
+                prodId.innerHTML += `<option value="${item.prod_id}">${item.item_name}</option>`;
             });
 
             prodLoaded = true;
         });
-});
-
-
-//검사자 select 클릭 시 검사자 목록 띄우기
-const empId = document.getElementsByName('emp_id')[0];
-
-let empLoaded = false;
-
-empId.addEventListener('click', function () {
-
-    if (empLoaded) {
+}
+//검사자 목록 불러옴 DB에서
+function loadEmpOptions() {
+    if (!empId || empLoaded) {
         return;
     }
 
     fetch(contextPath + '/quality/inspection/option?searchType=ename')
         .then(response => response.json())
         .then(data => {
-            empId.innerHTML = '';
-            empId.innerHTML += '<option value="">선택</option>';
+            console.log('emp option data:', data);
 
-            data.forEach(name => {
-                empId.innerHTML += `<option value="${name}">${name}</option>`;
+            addDefaultOption(empId);
+
+            data.forEach(emp => {
+                empId.innerHTML += `<option value="${emp.emp_id}">${emp.ename}</option>`;
             });
 
             empLoaded = true;
         });
-});
-
-
-//검사구분 select 기본 목록 넣기
-const inspectionType = document.getElementsByName('inspection_type')[0];
-
-inspectionType.innerHTML = '';
-inspectionType.innerHTML += '<option value="">선택</option>';
-inspectionType.innerHTML += '<option value="외관검사">외관검사</option>';
-inspectionType.innerHTML += '<option value="치수검사">치수검사</option>';
-inspectionType.innerHTML += '<option value="품질판정">품질판정</option>';
-inspectionType.innerHTML += '<option value="재검사">재검사</option>';
-
-
-//검사결과 select 클릭 시 검사결과 목록 띄우기
-const result = document.getElementsByName('result')[0];
-
-let resultLoaded = false;
-
-result.addEventListener('click', function () {
-
-    if (resultLoaded) {
-        return;
-    }
-
-    fetch(contextPath + '/quality/inspection/option?searchType=result')
-        .then(response => response.json())
-        .then(data => {
-            result.innerHTML = '';
-            result.innerHTML += '<option value="">선택</option>';
-
-            data.forEach(resultValue => {
-                result.innerHTML += `<option value="${resultValue}">${resultValue}</option>`;
-            });
-
-            resultLoaded = true;
-        });
-});
+}
+// 품목명 select 클릭 또는 포커스 시 품목명 옵션 불러오기
+if (prodId) {
+    prodId.addEventListener('focus', loadProdOptions);
+    prodId.addEventListener('click', loadProdOptions);
+}
+// 검사자 select 클릭 또는 포커스 시 검사자 옵션 불러오기
+if (empId) {
+    empId.addEventListener('focus', loadEmpOptions);
+    empId.addEventListener('click', loadEmpOptions);
+}
+// 검사구분 select에 고정 옵션 넣기
+if (inspectionType) {
+    inspectionType.innerHTML = '';
+    inspectionType.innerHTML += '<option value="">\uC120\uD0DD</option>';
+    inspectionType.innerHTML += '<option value="\uC678\uAD00\uAC80\uC0AC">\uC678\uAD00\uAC80\uC0AC</option>';
+    inspectionType.innerHTML += '<option value="\uCE58\uC218\uAC80\uC0AC">\uCE58\uC218\uAC80\uC0AC</option>';
+    inspectionType.innerHTML += '<option value="\uD488\uC9C8\uD310\uC815">\uD488\uC9C8\uD310\uC815</option>';
+    inspectionType.innerHTML += '<option value="\uC7AC\uAC80\uC0AC">\uC7AC\uAC80\uC0AC</option>';
+}
+// 검사결과 select에 고정 옵션 넣기
+if (result) {
+    result.innerHTML = '';
+    result.innerHTML += '<option value="">\uC120\uD0DD</option>';
+    result.innerHTML += '<option value="\uD569\uACA9">\uD569\uACA9</option>';
+    result.innerHTML += '<option value="\uC870\uAC74\uBD80">\uC870\uAC74\uBD80</option>';
+}
+// 페이지가 열리면 품목명, 검사자 옵션 미리 불러오기
+loadProdOptions();
+loadEmpOptions();
