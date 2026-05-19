@@ -12,6 +12,27 @@
     margin-bottom: 20px;
 }
 
+/* 디테일 버튼 안의 SVG 아이콘 */
+.detail_btn_icon {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    flex-shrink: 0;
+}
+
+/* 목록으로 버튼과 수정 버튼 내부 정렬 */
+.detail_btn_line,
+.detail_btn_green {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
 /* 디테일 페이지 제목 */
 .detail_title {
     margin: 0;
@@ -35,8 +56,9 @@
 
 /* 목록으로 버튼 */
 .detail_btn_line {
+    width: 118px;
     height: 36px;
-    padding: 0 20px;
+    padding: 0 16px;
     border: 1px solid #d1d5db;
     border-radius: 7px;
     background-color: #ffffff;
@@ -44,20 +66,20 @@
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
-}
+    box-sizing: border-box;
 
-/* 목록으로 버튼에 마우스를 올렸을 때 */
-.detail_btn_line:hover {
-    background-color: #f3f4f6;
-    border-color: #c5cbd3;
-    color: #111827;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
 }
 
 /* 수정 버튼 */
 .detail_btn_green {
+     width: 118px;
     height: 36px;
-    padding: 0 20px;
+    padding: 0 16px;
     border: 1px solid #2f7d62;
     border-radius: 7px;
     background-color: #2f7d62;
@@ -65,15 +87,15 @@
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    box-sizing: border-box;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
 }
 
-/* 수정 버튼에 마우스를 올렸을 때 */
-.detail_btn_green:hover {
-    background-color: #e5e7eb;
-    border-color: #c5cbd3;
-    color: #111827;
-}
 
 /* 공통 카드 */
 .detail_card {
