@@ -178,4 +178,31 @@ public class LoginDAO {
 	        throw new RuntimeException("토큰 삭제 실패", e);
 	    }
 	}
+	
+	public int update_my_page(LoginDTO dto) {
+
+	    int result = 0;
+
+	    String sql =
+	        "UPDATE EMP " +
+	        "SET EMAIL = ?, " +
+	        "EMP_TEL = ?, " +
+	        "UPDATED_DATE = SYSTIMESTAMP " +
+	        "WHERE EMPNO = ?";
+
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setString(1, dto.getEmail());
+	        ps.setString(2, dto.getEmp_tel());
+	        ps.setString(3, dto.getEmpno());
+
+	        result = ps.executeUpdate();
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("마이페이지 수정 실패", e);
+	    }
+
+	    return result;
+	}
 }

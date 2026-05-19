@@ -6,6 +6,9 @@
 <head>
     <meta charset="UTF-8">
 
+    <%-- 모바일 화면에서 실제 기기 너비 기준으로 페이지가 보이도록 설정한다. --%>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <%-- tiles_config.xml에서 설정한 title 값이 브라우저 탭 제목으로 들어온다. --%>
     <title>
         <tiles:insertAttribute name="title" />
@@ -31,6 +34,9 @@
 
 	<%-- 공통 모달 디자인을 적용하는 CSS 파일이다. --%>
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/modal.css">
+
+	<%-- 모바일 공통 CSS이다. 기존 CSS를 덮어써야 하므로 가장 마지막에 연결한다. --%>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/mobile.css">
 
 </head>
 

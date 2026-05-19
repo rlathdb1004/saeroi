@@ -48,5 +48,25 @@ public class QualityDAOImpl implements QualityDAO{
 		return inspection_List_option;
 		
 	}
+	@Override
+	//등록에 필요한
+	public int _dao_insert_Inspection(String insp_date, String prod_id, String emp_id, String insp_type,
+			String result, String inspection_qty, String good_qty, String remark){
+		
+		//DB에서 가져옴
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("insp_date", insp_date);
+		param.put("prod_id", prod_id);
+		param.put("emp_id", emp_id);
+		param.put("insp_type", insp_type);
+		param.put("result", result);
+		param.put("inspection_qty", inspection_qty);
+		param.put("good_qty", good_qty);
+		param.put("remark", remark);
+		
+		int insert_list = sqlSession.insert("mapper.quality._insert_Inspection",param);
+		
+		return insert_list;
+	}
 	
 }
