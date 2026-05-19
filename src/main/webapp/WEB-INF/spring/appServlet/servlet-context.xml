@@ -81,8 +81,7 @@
 	<context:property-placeholder
 		location="classpath:application.properties" />
 
-	<context:component-scan
-		base-package="kr.or.saeroi" />
+	<context:component-scan	base-package="kr.or.saeroi" />
 
 	<!--자동로그인 -->	
 	<mvc:interceptors>
