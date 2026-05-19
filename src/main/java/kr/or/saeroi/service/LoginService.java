@@ -87,8 +87,4 @@ public class LoginService {
 	public void clear_auto_login_token(String empno) {
 	    loginDAO.clear_auto_login_token(empno);
 	}
-	
-	public int update_my_page(LoginDTO dto) {
-	    return loginDAO.update_my_page(dto);
-	}
 }
