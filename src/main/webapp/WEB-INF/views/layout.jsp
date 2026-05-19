@@ -28,6 +28,10 @@
 	
 	<%-- 각페이지 상단 테이블 CSS 파일이다. --%>
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/searchtable.css">
+
+	<%-- 공통 모달 디자인을 적용하는 CSS 파일이다. --%>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/modal.css">
+
 </head>
 
 <body>
@@ -76,6 +80,9 @@
     
     <%-- 상단 테이블의 JS 파일이다. --%>
     <script src="${pageContext.request.contextPath}/resources/js/common/searchtable.js"></script>
+
+	<%-- 공통 모달 열기, 닫기, 오늘 날짜 세팅을 담당하는 JS 파일이다. --%>
+	<script src="${pageContext.request.contextPath}/resources/js/common/modal.js"></script>
 
 </body>
 </html>

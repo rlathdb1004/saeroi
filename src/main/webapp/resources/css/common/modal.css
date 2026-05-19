@@ -1,0 +1,266 @@
+@charset "UTF-8";
+/* 공통 모달 CSS */
+
+/* 모달 전체 배경 */
+.modal_wrap {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 28px;
+    background-color: rgba(15, 23, 42, 0.35);
+    box-sizing: border-box;
+}
+
+/* 모달이 열렸을 때 적용되는 상태 */
+.modal_wrap.modal_is_open {
+    display: flex;
+}
+
+/* 모달이 열렸을 때 body 스크롤을 막기 위한 클래스 */
+.modal_body_lock {
+    overflow: hidden;
+}
+
+/* 실제 모달 박스 */
+.modal_box {
+    width: 820px;
+    max-width: calc(100vw - 48px);
+    max-height: calc(100vh - 56px);
+    overflow: hidden;
+    background-color: #FFFFFF;
+    border: 1px solid #DDE5E1;
+    border-top: 5px solid #2F7D62;
+    border-radius: 10px;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+    box-sizing: border-box;
+}
+
+/* 모달 상단 영역 */
+.modal_header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 34px 22px;
+    border-bottom: 1px solid #DDE5E1;
+    box-sizing: border-box;
+}
+
+/* 모달 제목 */
+.modal_title {
+    margin: 0;
+    color: #1F2933;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+/* 모달 form */
+.modal_form {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 150px);
+}
+
+/* 모달 본문 영역 */
+.modal_body {
+    padding: 30px 34px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* 모달 본문 2열 구조 */
+.modal_body_2col {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 28px;
+}
+
+/* 모달 본문 1열 구조 */
+.modal_body_1col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 22px;
+}
+
+/* 입력 항목 하나 */
+.modal_item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+/* 2열 구조에서 한 줄 전체를 쓰는 항목 */
+.modal_item_full {
+    grid-column: 1 / -1;
+}
+
+/* 입력 라벨 */
+.modal_label {
+    color: #1F2933;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* 필수값 별표 */
+.modal_required {
+    margin-left: 4px;
+    color: #EF4444;
+    font-weight: 800;
+}
+
+/* input, select 공통 */
+.modal_input,
+.modal_select {
+    width: 100%;
+    height: 42px;
+    padding: 0 13px;
+    border: 1px solid #D6DEE0;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    color: #1F2933;
+    font-size: 14px;
+    font-weight: 500;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* textarea 공통 */
+.modal_textarea {
+    width: 100%;
+    min-height: 96px;
+    padding: 12px 13px;
+    border: 1px solid #D6DEE0;
+    border-radius: 8px;
+    background-color: #FFFFFF;
+    color: #1F2933;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* placeholder 색상 */
+.modal_input::placeholder,
+.modal_textarea::placeholder {
+    color: #9CA3AF;
+}
+
+/* input, select, textarea에 마우스를 올렸을 때 회색 계열로 변경 */
+.modal_input:hover,
+.modal_select:hover,
+.modal_textarea:hover {
+    background-color: #F7F9F8;
+    border-color: #C9CFD1;
+}
+
+/* input, select, textarea를 클릭했을 때 너무 튀지 않게 회색 계열로 표시 */
+.modal_input:focus,
+.modal_select:focus,
+.modal_textarea:focus {
+    background-color: #FFFFFF;
+    border-color: #9AA5A1;
+}
+
+/* 날짜 input */
+.modal_input[type="date"] {
+    color: #1F2933;
+}
+
+/* 숫자 input */
+.modal_input[type="number"] {
+    padding-right: 13px;
+}
+
+/* 모달 하단 영역 */
+.modal_footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px 34px 22px;
+    border-top: 1px solid #DDE5E1;
+    background-color: #FFFFFF;
+    box-sizing: border-box;
+}
+
+/* 모달 버튼 공통 */
+.modal_btn {
+    height: 40px;
+    min-width: 96px;
+    padding: 0 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid transparent;
+}
+
+/* 취소 버튼 */
+.modal_btn_cancel {
+    border-color: #C9CFD1;
+    background-color: #FFFFFF;
+    color: #1F2933;
+}
+
+/* 취소 버튼 hover */
+.modal_btn_cancel:hover {
+    background-color: #F5F7F6;
+    border-color: #C9CFD1;
+}
+
+/* 등록, 저장 버튼 */
+.modal_btn_submit {
+    border-color: #2F7D62;
+    background-color: #2F7D62;
+    color: #FFFFFF;
+}
+
+/* 등록, 저장 버튼 hover */
+.modal_btn_submit:hover {
+    background-color: #276B54;
+    border-color: #276B54;
+}
+
+/* 모바일 화면 */
+@media (max-width: 760px) {
+    .modal_wrap {
+        padding: 16px;
+    }
+
+    .modal_box {
+        width: calc(100vw - 32px);
+        max-width: calc(100vw - 32px);
+    }
+
+    .modal_header {
+        padding: 22px 24px 20px;
+    }
+
+    .modal_title {
+        font-size: 22px;
+    }
+
+    .modal_body {
+        padding: 24px;
+    }
+
+    .modal_body_2col {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .modal_footer {
+        padding: 18px 24px 20px;
+    }
+}
