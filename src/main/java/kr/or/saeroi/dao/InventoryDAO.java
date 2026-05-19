@@ -1,31 +1,5 @@
 package kr.or.saeroi.dao;
 
-import java.util.List;
+public class InventoryDAO {
 
-import kr.or.saeroi.dto.InventoryDTO;
-
-// 재고 DB 작업 이름 정하는 파일
-public interface InventoryDAO {
-
-	// 재고 목록 조회
-	public List<InventoryDTO> selectInventoryList(
-			String searchType,
-			String keyword,
-			String startDate,
-			String endDate);
-
-	// 품목 목록 조회
-	public List<InventoryDTO> selectItemList();
-
-	// 재고 등록
-	public int insertInventory(InventoryDTO dto);
-
-	// 재고 상세조회
-	public InventoryDTO selectInventoryDetail(int inventoryId);
-
-	// 재고 선택 삭제
-	public int deleteInventory(String[] inventoryIds);
-
-	// 재고 수정
-	public int updateInventory(InventoryDTO dto);
 }

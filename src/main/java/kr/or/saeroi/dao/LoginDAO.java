@@ -85,7 +85,7 @@ public class LoginDAO {
         return count;
     }
     
-    public void update_pw(String empno, String tempPw) {
+    public void update_pw(String empno, String hashPw) {
 
         String sql =
             "UPDATE EMP SET EMP_PW = ?, UPDATED_DATE = SYSDATE WHERE EMPNO = ?";
@@ -93,7 +93,7 @@ public class LoginDAO {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ps.setString(1, tempPw);
+            ps.setString(1, hashPw);
             ps.setString(2, empno);
 
             ps.executeUpdate();
