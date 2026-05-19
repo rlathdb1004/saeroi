@@ -11,53 +11,53 @@ coBtnReset.addEventListener('click', function () {
 
 
 //품목명 select 클릭 시 품목명 목록 띄우기
-const itemName = document.getElementsByName('item_name')[0];
+const prodId = document.getElementsByName('prod_id')[0];
 
-let itemNameLoaded = false;
+let prodLoaded = false;
 
-itemName.addEventListener('click', function () {
+prodId.addEventListener('click', function () {
 
-    if (itemNameLoaded) {
+    if (prodLoaded) {
         return;
     }
 
     fetch(contextPath + '/quality/inspection/option?searchType=itemName')
         .then(response => response.json())
         .then(data => {
-            itemName.innerHTML = '';
-            itemName.innerHTML += '<option value="">선택</option>';
+            prodId.innerHTML = '';
+            prodId.innerHTML += '<option value="">선택</option>';
 
             data.forEach(item => {
-                itemName.innerHTML += `<option value="${item}">${item}</option>`;
+                prodId.innerHTML += `<option value="${item}">${item}</option>`;
             });
 
-            itemNameLoaded = true;
+            prodLoaded = true;
         });
 });
 
 
 //검사자 select 클릭 시 검사자 목록 띄우기
-const inspector = document.getElementsByName('inspector')[0];
+const empId = document.getElementsByName('emp_id')[0];
 
-let inspectorLoaded = false;
+let empLoaded = false;
 
-inspector.addEventListener('click', function () {
+empId.addEventListener('click', function () {
 
-    if (inspectorLoaded) {
+    if (empLoaded) {
         return;
     }
 
     fetch(contextPath + '/quality/inspection/option?searchType=ename')
         .then(response => response.json())
         .then(data => {
-            inspector.innerHTML = '';
-            inspector.innerHTML += '<option value="">선택</option>';
+            empId.innerHTML = '';
+            empId.innerHTML += '<option value="">선택</option>';
 
             data.forEach(name => {
-                inspector.innerHTML += `<option value="${name}">${name}</option>`;
+                empId.innerHTML += `<option value="${name}">${name}</option>`;
             });
 
-            inspectorLoaded = true;
+            empLoaded = true;
         });
 });
 
@@ -74,11 +74,11 @@ inspectionType.innerHTML += '<option value="재검사">재검사</option>';
 
 
 //검사결과 select 클릭 시 검사결과 목록 띄우기
-const inspectionResult = document.getElementsByName('inspection_result')[0];
+const result = document.getElementsByName('result')[0];
 
 let resultLoaded = false;
 
-inspectionResult.addEventListener('click', function () {
+result.addEventListener('click', function () {
 
     if (resultLoaded) {
         return;
@@ -87,39 +87,13 @@ inspectionResult.addEventListener('click', function () {
     fetch(contextPath + '/quality/inspection/option?searchType=result')
         .then(response => response.json())
         .then(data => {
-            inspectionResult.innerHTML = '';
-            inspectionResult.innerHTML += '<option value="">선택</option>';
+            result.innerHTML = '';
+            result.innerHTML += '<option value="">선택</option>';
 
-            data.forEach(result => {
-                inspectionResult.innerHTML += `<option value="${result}">${result}</option>`;
+            data.forEach(resultValue => {
+                result.innerHTML += `<option value="${resultValue}">${resultValue}</option>`;
             });
 
             resultLoaded = true;
-        });
-});
-
-
-//검사상세 select 클릭 시 검사상세 목록 띄우기
-const inspectionDetail = document.getElementsByName('inspection_detail')[0];
-
-let detailLoaded = false;
-
-inspectionDetail.addEventListener('click', function () {
-
-    if (detailLoaded) {
-        return;
-    }
-
-    fetch(contextPath + '/quality/inspection/option?searchType=remark')
-        .then(response => response.json())
-        .then(data => {
-            inspectionDetail.innerHTML = '';
-            inspectionDetail.innerHTML += '<option value="">선택</option>';
-
-            data.forEach(detail => {
-                inspectionDetail.innerHTML += `<option value="${detail}">${detail}</option>`;
-            });
-
-            detailLoaded = true;
         });
 });

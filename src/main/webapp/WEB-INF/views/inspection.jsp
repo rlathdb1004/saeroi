@@ -187,7 +187,7 @@
 			<h3 class="modal_title">검사 등록</h3>
 		</div>
 
-		<form class="modal_form" method="post" action="">
+		<form class="modal_form" method="post" action="${pageContext.request.contextPath}/quality/inspection/add">
 			<%-- 등록 정보를 입력하는 영역이다. --%>
 
 			<div class="modal_body modal_body_2col">
@@ -201,14 +201,14 @@
 
 				<div class="modal_item">
 					<label class="modal_label"> 품목명<span class="modal_required"></span>
-					</label> <select name="item_name" class="modal_select" required>
+					</label> <select name="prod_id" class="modal_select" required>
 						<option value="">선택</option>
 					</select>
 				</div>
 
 				<div class="modal_item">
 					<label class="modal_label"> 검사자<span class="modal_required">*</span>
-					</label> <select name="inspector" class="modal_select" required>
+					</label> <select name="emp_id" class="modal_select" required>
 						<option value="">선택</option>
 					</select>
 				</div>
@@ -223,7 +223,7 @@
 				<div class="modal_item">
 					<label class="modal_label"> 검사결과<span
 						class="modal_required"></span>
-					</label> <select name="inspection_result" class="modal_select" required>
+					</label> <select name="result" class="modal_select" required>
 						<option value="">선택</option>
 					</select>
 				</div>
@@ -244,10 +244,10 @@
 
 				<div class="modal_item">
 					<label class="modal_label">비고</label> 
-					<insert
-						name="inspection_detail" class="modal_select">
+					<input
+						name="remark" class="modal_select">
 						
-					</insert>
+					</input>
 				</div>
 			</div>
 
