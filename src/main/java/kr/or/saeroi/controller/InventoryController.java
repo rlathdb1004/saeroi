@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.or.saeroi.common.PageDTO;
 import kr.or.saeroi.dto.InoutDTO;
+import kr.or.saeroi.dto.InventoryDTO;
 import kr.or.saeroi.service.InoutService;
 import kr.or.saeroi.service.InoutServiceImpl;
+import kr.or.saeroi.service.InventoryService;
+import kr.or.saeroi.service.InventoryServiceImpl;
 
 // 자재/재고 Controller
 @Controller
@@ -19,22 +22,21 @@ public class InventoryController {
 
 	private InoutService service = new InoutServiceImpl();
 
+	// 재고조회 Service
+	private InventoryService inventoryService = new InventoryServiceImpl();
+
 	// 자재입고관리 클릭 시 입출고관리 화면
 	@RequestMapping("/inventory/materialIn")
 	public String materialIn(
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "size", defaultValue = "10") int size,
 			@RequestParam(value = "searchType", defaultValue = "all") String searchType,
-
-			// 입출고구분 추가
 			@RequestParam(value = "inoutType", defaultValue = "") String inoutType,
-
 			@RequestParam(value = "keyword", defaultValue = "") String keyword,
 			@RequestParam(value = "startDate", defaultValue = "") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "") String endDate,
 			Model model) {
 
-		// 입출고 전체 목록 조회
 		List<InoutDTO> list = service.getInoutList(
 				searchType,
 				inoutType,
@@ -42,46 +44,34 @@ public class InventoryController {
 				startDate,
 				endDate);
 
-		// 페이징 기능
 		int totalCount = list.size();
-
 		int startIndex = (page - 1) * size;
-
 		int endIndex = startIndex + size;
 
 		if (endIndex > totalCount) {
 			endIndex = totalCount;
 		}
 
-		// 현재 페이지에 보여줄 목록
 		List<InoutDTO> page_list =
 				list.subList(startIndex, endIndex);
 
-		// 공통 페이징 정보
 		PageDTO pageInfo =
 				new PageDTO(page, size, totalCount);
 
-		// 등록 모달 품목 목록
 		List<InoutDTO> itemList =
 				service.getItemList();
 
-		// JSP로 보낼 값
 		model.addAttribute("list", page_list);
 		model.addAttribute("itemList", itemList);
 		model.addAttribute("pageInfo", pageInfo);
 		model.addAttribute("pageUrl", "/inventory/materialIn");
 
-		// 검색값 유지
 		model.addAttribute("searchType", searchType);
-
-		// 입출고구분 유지
 		model.addAttribute("inoutType", inoutType);
-
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
 
-		// Tiles 주소
 		return "inoutManage.tiles";
 	}
 
@@ -96,17 +86,14 @@ public class InventoryController {
 
 		InoutDTO dto = new InoutDTO();
 
-		// 입력값 DTO에 담기
 		dto.setItemId(itemId);
 		dto.setInoutType(inoutType);
 		dto.setInoutQty(inoutQty);
 		dto.setInoutDate(Date.valueOf(inoutDate));
 		dto.setRemark(remark);
 
-		// DB 저장
 		service.addInout(dto);
 
-		// 저장 후 목록으로 이동
 		return "redirect:/inventory/materialIn";
 	}
 
@@ -115,12 +102,10 @@ public class InventoryController {
 	public String deleteInout(
 			@RequestParam(value = "inoutIds", required = false) String[] inoutIds) {
 
-		// 선택한 값이 있을 때만 삭제
 		if (inoutIds != null) {
 			service.removeInout(inoutIds);
 		}
 
-		// 삭제 후 목록으로 이동
 		return "redirect:/inventory/materialIn";
 	}
 
@@ -131,17 +116,12 @@ public class InventoryController {
 			@RequestParam(value = "mode", defaultValue = "view") String mode,
 			Model model) {
 
-		// 상세 조회
 		InoutDTO inout =
 				service.getInoutDetail(inoutId);
 
-		// JSP로 보낼 값
 		model.addAttribute("inout", inout);
-
-		// view면 조회 화면, edit면 수정 화면
 		model.addAttribute("mode", mode);
 
-		// Tiles 주소
 		return "inoutDetail.tiles";
 	}
 
@@ -156,17 +136,150 @@ public class InventoryController {
 
 		InoutDTO dto = new InoutDTO();
 
-		// 수정할 값 담기
 		dto.setInoutId(inoutId);
 		dto.setInoutType(inoutType);
 		dto.setInoutQty(inoutQty);
 		dto.setInoutDate(Date.valueOf(inoutDate));
 		dto.setRemark(remark);
 
-		// DB 수정
 		service.modifyInout(dto);
 
-		// 수정 후 상세보기로 이동
 		return "redirect:/inventory/materialIn/detail?inoutId=" + inoutId;
+	}
+
+	// ==================================================
+	// 여기부터 재고조회 코드
+	// ==================================================
+
+	// 재고조회 목록
+	@RequestMapping({
+		"/inventory/inventoryStatus",
+		"/inventory/stockList",
+		"/inventory/inventoryList",
+		"/inventory/stock",
+		"/inventory/inventory"
+	})
+	public String inventoryList(
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "searchType", defaultValue = "") String searchType,
+			@RequestParam(value = "keyword", defaultValue = "") String keyword,
+			@RequestParam(value = "startDate", defaultValue = "") String startDate,
+			@RequestParam(value = "endDate", defaultValue = "") String endDate,
+			Model model) {
+
+		// 재고 목록 조회
+		List<InventoryDTO> list =
+				inventoryService.getInventoryList(
+						searchType,
+						keyword,
+						startDate,
+						endDate);
+
+		// 페이징 기능
+		int totalCount = list.size();
+		int startIndex = (page - 1) * size;
+		int endIndex = startIndex + size;
+
+		if (endIndex > totalCount) {
+			endIndex = totalCount;
+		}
+
+		// 현재 페이지 목록
+		List<InventoryDTO> page_list =
+				list.subList(startIndex, endIndex);
+
+		// 공통 페이징 정보
+		PageDTO pageInfo =
+				new PageDTO(page, size, totalCount);
+
+		// 등록 모달 품목 목록
+		List<InventoryDTO> itemList =
+				inventoryService.getItemList();
+
+		// JSP로 보낼 값
+		model.addAttribute("list", page_list);
+		model.addAttribute("itemList", itemList);
+		model.addAttribute("pageInfo", pageInfo);
+
+		// 공통 페이징 URL
+		model.addAttribute("pageUrl", "/inventory/inventoryStatus");
+
+		// 검색값 유지
+		model.addAttribute("searchType", searchType);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("startDate", startDate);
+		model.addAttribute("endDate", endDate);
+
+		// 재고조회 Tiles 주소
+		return "inventoryManage.tiles";
+	}
+
+	// 재고 등록
+	@RequestMapping("/inventory/stockList/insert")
+	public String insertInventory(
+			@RequestParam("itemId") int itemId,
+			@RequestParam("inventoryStock") int inventoryStock,
+			@RequestParam("stockLocation") String stockLocation,
+			@RequestParam(value = "remark", defaultValue = "") String remark) {
+
+		InventoryDTO dto = new InventoryDTO();
+
+		dto.setItemId(itemId);
+		dto.setInventoryStock(inventoryStock);
+		dto.setStockLocation(stockLocation);
+		dto.setRemark(remark);
+
+		inventoryService.addInventory(dto);
+
+		return "redirect:/inventory/inventoryStatus";
+	}
+
+	// 재고 선택 삭제
+	@RequestMapping("/inventory/stockList/delete")
+	public String deleteInventory(
+			@RequestParam(value = "inventoryIds", required = false) String[] inventoryIds) {
+
+		if (inventoryIds != null) {
+			inventoryService.removeInventory(inventoryIds);
+		}
+
+		return "redirect:/inventory/inventoryStatus";
+	}
+
+	// 재고 상세
+	@RequestMapping("/inventory/stockList/detail")
+	public String inventoryDetail(
+			@RequestParam("inventoryId") int inventoryId,
+			@RequestParam(value = "mode", defaultValue = "view") String mode,
+			Model model) {
+
+		InventoryDTO inventory =
+				inventoryService.getInventoryDetail(inventoryId);
+
+		model.addAttribute("inventory", inventory);
+		model.addAttribute("mode", mode);
+
+		return "inventoryDetail.tiles";
+	}
+
+	// 재고 수정
+	@RequestMapping("/inventory/stockList/update")
+	public String updateInventory(
+			@RequestParam("inventoryId") int inventoryId,
+			@RequestParam("inventoryStock") int inventoryStock,
+			@RequestParam("stockLocation") String stockLocation,
+			@RequestParam(value = "remark", defaultValue = "") String remark) {
+
+		InventoryDTO dto = new InventoryDTO();
+
+		dto.setInventoryId(inventoryId);
+		dto.setInventoryStock(inventoryStock);
+		dto.setStockLocation(stockLocation);
+		dto.setRemark(remark);
+
+		inventoryService.modifyInventory(dto);
+
+		return "redirect:/inventory/stockList/detail?inventoryId=" + inventoryId;
 	}
 }

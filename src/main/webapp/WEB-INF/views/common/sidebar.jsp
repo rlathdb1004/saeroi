@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%-- 이 JSP 파일에서 한글이 깨지지 않도록 UTF-8로 설정한다. --%>
 
-<aside class="siSidebar">
+<aside id="siSidebar" class="siSidebar">
 	<%-- 사이드바 전체를 감싸는 영역이다. layout.jsp에서 Tiles로 불러와 모든 화면에 공통으로 표시된다. --%>
 
 	<div class="siLogoBox">

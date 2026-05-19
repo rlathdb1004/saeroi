@@ -213,3 +213,34 @@ setInterval(heShowCurrentTime, 1000);
 
 heShowTodayWeather();
 // 페이지가 열리자마자 오늘 온도와 날씨 아이콘을 한 번 가져온다.
+
+// 모바일 햄버거 버튼으로 사이드바를 열고 닫는 기능이다.
+document.addEventListener("DOMContentLoaded", function () {
+
+    // 모바일 햄버거 버튼을 가져온다.
+    const mobileMenuBtn = document.getElementById("heMobileMenuBtn");
+
+    // 모바일에서 열고 닫을 사이드바를 가져온다.
+    const sidebar = document.getElementById("siSidebar");
+
+    // 햄버거 버튼이나 사이드바가 없으면 기능을 실행하지 않는다.
+    if (!mobileMenuBtn || !sidebar) {
+        return;
+    }
+
+    // 햄버거 버튼을 클릭하면 사이드바와 버튼의 열림 상태를 같이 바꾼다.
+    mobileMenuBtn.addEventListener("click", function () {
+
+        // 사이드바를 열거나 닫는다.
+        sidebar.classList.toggle("is-open");
+
+        // 햄버거 버튼을 X 모양으로 바꾸거나 다시 햄버거 모양으로 되돌린다.
+        mobileMenuBtn.classList.toggle("is-open");
+
+        // 현재 메뉴가 열려 있는지 확인한다.
+        const isOpen = sidebar.classList.contains("is-open");
+
+        // 접근성 문구를 현재 상태에 맞게 바꾼다.
+        mobileMenuBtn.setAttribute("aria-label", isOpen ? "메뉴 닫기" : "메뉴 열기");
+    });
+});

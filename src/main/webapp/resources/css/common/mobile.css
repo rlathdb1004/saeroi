@@ -1,0 +1,320 @@
+/* 모바일 공통 CSS 파일이다. */
+/* 기존 공통 CSS는 유지하고, 모바일 화면에서 필요한 부분만 여기서 덮어쓴다. */
+
+/* PC 화면에서는 모바일 햄버거 버튼을 숨긴다. */
+.heMobileMenuBtn {
+	display: none;
+}
+
+@media screen and (max-width: 768px) {
+
+	/* 모바일에서는 화면이 기기 너비보다 넓어지지 않도록 기본값을 잡는다. */
+	body {
+		min-width: 0;
+		overflow-x: hidden;
+	}
+
+	/* 모바일에서는 사이드바를 처음에는 화면 밖에 숨긴다. */
+	.siSidebar {
+		position: fixed;
+		top: 0;
+		left: -100%;
+		width: 280px;
+		max-width: 80%;
+		height: 100vh;
+		z-index: 999;
+		overflow-y: auto;
+		transition: left 0.25s ease;
+		box-shadow: 4px 0 14px rgba(0, 0, 0, 0.12);
+	}
+
+	/* 햄버거 버튼을 눌렀을 때 사이드바를 화면 안으로 보여준다. */
+	.siSidebar.is-open {
+		left: 0;
+	}
+
+	/* 모바일에서는 사이드바 내부 메뉴 여백을 줄인다. */
+	.sidebar_menu {
+		padding: 10px 0;
+	}
+
+	/* 모바일에서는 사이드바 메뉴 글씨와 간격을 조정한다. */
+	.sidebar_menu a {
+		padding: 10px 16px;
+		font-size: 14px;
+	}
+
+	/* 모바일 헤더 전체 영역이다. */
+	.heHeader {
+		margin-left: 0;
+		width: 100%;
+		height: auto;
+		min-height: auto;
+		padding: 14px 16px 12px;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-start;
+		gap: 10px;
+		box-sizing: border-box;
+	}
+
+	/* 모바일에서는 대메뉴, 하위메뉴, 햄버거 버튼을 한 줄에 정렬한다. */
+	.heLeftBox {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		min-width: 0;
+		box-sizing: border-box;
+		flex-wrap: nowrap;
+	}
+
+	/* 모바일에서는 대메뉴명을 제목처럼 크게 보여준다. */
+	.hePageTitle {
+		order: 1;
+		white-space: nowrap;
+		word-break: keep-all;
+		font-size: 21px;
+		font-weight: 700;
+		line-height: 1.3;
+		margin: 0;
+		color: #267650;
+		flex-shrink: 0;
+	}
+
+	/* 모바일에서도 대메뉴와 하위메뉴 사이 구분선을 보여준다. */
+	.heTitleDivider {
+		order: 2;
+		display: inline-block;
+		width: 1px;
+		height: 20px;
+		background-color: #267650;
+		flex-shrink: 0;
+	}
+
+	/* 모바일에서는 하위 메뉴명을 대메뉴 옆에 배치한다. */
+	.heCurrentMenuBox {
+		order: 3;
+		display: flex;
+		align-items: center;
+		min-width: 0;
+		flex-shrink: 1;
+		width: auto;
+		margin-top: 0;
+	}
+
+	/* 모바일에서는 하위 메뉴명이 길면 말줄임 처리한다. */
+	.heCurrentMenu {
+		white-space: nowrap;
+		word-break: keep-all;
+		font-size: 14px;
+		font-weight: 600;
+		line-height: 1.3;
+		color: #111;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 190px;
+	}
+
+	/* 모바일에서는 햄버거 버튼을 오른쪽 끝에 배치한다. */
+	.heMobileMenuBtn {
+		order: 4;
+		display: inline-flex;
+		width: 34px;
+		height: 34px;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		gap: 5px;
+		border: none;
+		background: transparent;
+		cursor: pointer;
+		padding: 0;
+		margin-left: auto;
+		flex-shrink: 0;
+		z-index: 1001;
+	}
+
+	/* 햄버거 버튼 안의 줄 모양이다. */
+	.heMobileMenuBtn span {
+		width: 22px;
+		height: 2px;
+		background-color: #333;
+		border-radius: 10px;
+		display: block;
+		transition: 0.2s ease;
+	}
+
+	/* 메뉴가 열린 상태에서는 첫 번째 줄을 X 모양으로 회전한다. */
+	.heMobileMenuBtn.is-open span:nth-child(1) {
+		transform: translateY(7px) rotate(45deg);
+	}
+
+	/* 메뉴가 열린 상태에서는 가운데 줄을 숨긴다. */
+	.heMobileMenuBtn.is-open span:nth-child(2) {
+		opacity: 0;
+	}
+
+	/* 메뉴가 열린 상태에서는 세 번째 줄을 X 모양으로 회전한다. */
+	.heMobileMenuBtn.is-open span:nth-child(3) {
+		transform: translateY(-7px) rotate(-45deg);
+	}
+
+	/* 모바일에서는 날씨와 시간 영역을 메뉴명 아래 줄로 내린다. */
+	.heRightBox {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		min-width: 0;
+		font-size: 13px;
+		box-sizing: border-box;
+	}
+
+	/* 모바일에서는 날씨와 시간 간격을 줄인다. */
+	.heInfoBox {
+		width: 100%;
+		display: flex;
+		align-items: center;
+		gap: 24px;
+		flex-wrap: wrap;
+		min-width: 0;
+	}
+
+	/* 모바일에서는 정보 항목이 너무 넓게 잡히지 않도록 한다. */
+	.heInfoItem {
+		flex-shrink: 0;
+	}
+
+	/* 모바일에서는 정보 라벨 글씨 크기를 줄인다. */
+	.heInfoLabel {
+		font-size: 12px;
+		line-height: 1.2;
+	}
+
+	/* 모바일에서는 온도와 시간 글씨가 세로로 깨지지 않도록 한다. */
+	.heInfoText {
+		font-size: 14px;
+		line-height: 1.3;
+		white-space: nowrap;
+	}
+
+	/* 모바일에서는 날씨 아이콘 크기를 줄인다. */
+	.heWeatherIcon {
+		width: 18px;
+		height: 18px;
+	}
+
+	/* 모바일에서는 본문이 사이드바 너비만큼 밀리지 않도록 왼쪽 여백을 제거한다. */
+	.main-content {
+		margin-left: 0;
+		width: 100%;
+		padding: 16px;
+		min-height: auto;
+		box-sizing: border-box;
+	}
+
+	/* 모바일에서는 공통 검색 박스의 안쪽 여백을 줄인다. */
+	.coSearchBox,
+	.search-box {
+		padding: 16px;
+		margin-bottom: 18px;
+		overflow-x: visible;
+		box-sizing: border-box;
+	}
+
+	/* 모바일에서는 검색 조건들이 한 줄에 억지로 들어가지 않고 아래로 내려가도록 한다. */
+	.coSearchRow,
+	.search-row {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 14px;
+		flex-wrap: nowrap;
+	}
+
+	/* 모바일에서는 검색 조건 하나가 화면 전체 너비를 사용하도록 한다. */
+	.coSearchItem,
+	.coSearchItemLarge,
+	.coSearchItemMiddle,
+	.coSearchItemSmall,
+	.search-item {
+		width: 100%;
+		min-width: 0;
+		flex: none;
+		box-sizing: border-box;
+	}
+
+	/* 모바일에서는 input, select, date가 화면 밖으로 나가지 않도록 한다. */
+	.coInput,
+	.coSelect,
+	.search-input,
+	.search-select,
+	.search-date {
+		width: 100%;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+
+	/* 모바일에서는 검색 버튼 영역도 전체 너비 기준으로 정렬한다. */
+	.coSearchBtnBox,
+	.search-btn-wrap {
+		width: 100%;
+		margin-left: 0;
+		display: flex;
+		justify-content: flex-end;
+		gap: 8px;
+		box-sizing: border-box;
+	}
+
+	/* 모바일에서는 검색/초기화 버튼 크기를 균등하게 맞춘다. */
+	.coSearchBtnBox .coBtn,
+	.search-btn-wrap .search-btn {
+		flex: 1;
+		min-width: 0;
+		height: 40px;
+	}
+
+	/* 모바일에서는 테이블이 화면 밖으로 나가지 않도록 감싸는 영역에 가로 스크롤을 준다. */
+	.coTableWrap,
+	.table-wrap,
+	.table_area,
+	.detail_table_area {
+		width: 100%;
+		overflow-x: auto;
+		box-sizing: border-box;
+	}
+
+	/* 모바일에서도 테이블 구조가 무너지지 않도록 최소 너비를 유지한다. */
+	.coTable,
+	.list-table,
+	.detail_table {
+		min-width: 700px;
+	}
+
+	/* 모바일에서는 테이블 글씨와 여백을 조금 줄인다. */
+	.coTable th,
+	.coTable td,
+	.list-table th,
+	.list-table td,
+	.detail_table th,
+	.detail_table td {
+		padding: 10px 8px;
+		font-size: 13px;
+		white-space: nowrap;
+	}
+}
+
+@media screen and (max-width: 480px) {
+
+	/* 작은 모바일에서는 대메뉴가 화면을 너무 많이 차지하지 않도록 살짝 줄인다. */
+	.hePageTitle {
+		font-size: 19px;
+	}
+
+	/* 작은 모바일에서는 하위메뉴 말줄임 폭을 줄인다. */
+	.heCurrentMenu {
+		font-size: 13px;
+		max-width: 150px;
+	}
+}
