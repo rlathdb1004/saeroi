@@ -19,80 +19,6 @@
 		text-overflow: ellipsis;
 		text-align: center;
 	}
-
-	.inoutModalBg {
-		display: none;
-		position: fixed;
-		left: 0;
-		top: 0;
-		width: 100%;
-		height: 100%;
-		background-color: rgba(0, 0, 0, 0.55);
-		z-index: 1000;
-	}
-
-	.inoutModalBox {
-		width: 720px;
-		background-color: white;
-		margin: 70px auto;
-		border-radius: 18px;
-		overflow: hidden;
-	}
-
-	.inoutModalTitle {
-		background-color: #1F2933;
-		color: white;
-		padding: 20px;
-		font-size: 22px;
-		font-weight: bold;
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.inoutModalContent {
-		padding: 25px;
-	}
-
-	.inoutFormGrid {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 15px;
-	}
-
-	.inoutFormBox label {
-		font-weight: bold;
-		display: block;
-		margin-bottom: 8px;
-	}
-
-	.inoutFormBox input,
-	.inoutFormBox select {
-		width: 100%;
-		height: 42px;
-		border: 1px solid #cbd5df;
-		border-radius: 10px;
-		padding: 0 12px;
-		box-sizing: border-box;
-	}
-
-	.inoutRemark {
-		margin-top: 15px;
-	}
-
-	.inoutRemark textarea {
-		width: 100%;
-		height: 85px;
-		border: 1px solid #cbd5df;
-		border-radius: 10px;
-		padding: 12px;
-		box-sizing: border-box;
-		resize: none;
-	}
-
-	.inoutSaveArea {
-		text-align: right;
-		margin-top: 20px;
-	}
 </style>
 
 <div class="coPageWrap">
@@ -244,9 +170,10 @@
 
 			<div class="search-btn-right">
 
+				<!-- 등록 버튼 : 팀장님 공통 모달 버튼 사용 -->
 				<button type="button"
-					class="search-btn search-btn-main"
-					onclick="openInoutModal()">
+					class="search-btn search-btn-main modal_open_btn"
+					data_modal_target="#modal_insert">
 					등록
 				</button>
 
@@ -354,109 +281,174 @@
 
 </div>
 
-<!-- 등록 모달 -->
-<div id="inoutModal"
-	class="inoutModalBg">
+<!-- 등록 모달 : 팀장님 공통 모달 사용 -->
+<div id="modal_insert"
+	class="modal_wrap"
+	aria-hidden="true">
 
-	<div class="inoutModalBox">
+	<div class="modal_box"
+		role="dialog"
+		aria-modal="true">
 
-		<div class="inoutModalTitle">
-			<span>입출고 등록</span>
-			<span onclick="closeInoutModal()"
-				style="cursor:pointer;">×</span>
+		<div class="modal_header">
+			<h3 class="modal_title">입출고 등록</h3>
 		</div>
 
-		<div class="inoutModalContent">
+		<form class="modal_form"
+			method="post"
+			action="${pageContext.request.contextPath}/inventory/materialIn/insert">
 
-			<form method="post"
-				action="${pageContext.request.contextPath}/inventory/materialIn/insert">
+			<div class="modal_body modal_body_2col">
 
-				<div class="inoutFormGrid">
+				<!-- 품목 선택 -->
+				<div class="modal_item">
+					<label class="modal_label">
+						품목명<span class="modal_required">*</span>
+					</label>
 
-					<div class="inoutFormBox">
-						<label>품목 선택 *</label>
+					<select name="itemId"
+						id="itemSelect"
+						class="modal_select"
+						onchange="changeItemInfo()"
+						required>
 
-						<select name="itemId"
-							id="itemSelect"
-							onchange="changeItemInfo()"
-							required>
+						<option value="">
+							선택
+						</option>
 
-							<option value="">
-								품목을 선택하세요
+						<c:forEach var="item"
+							items="${itemList}">
+
+							<option value="${item.itemId}"
+								data-code="${item.itemCode}"
+								data-name="${item.itemName}"
+								data-type="${item.itemType}"
+								data-unit="${item.itemUnit}">
+								${item.itemName}
 							</option>
 
-							<c:forEach var="item"
-								items="${itemList}">
+						</c:forEach>
 
-								<option value="${item.itemId}"
-									data-code="${item.itemCode}"
-									data-name="${item.itemName}"
-									data-type="${item.itemType}"
-									data-unit="${item.itemUnit}">
-									${item.itemName}
-								</option>
-
-							</c:forEach>
-
-						</select>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>품목코드</label>
-						<input type="text" id="itemCode" readonly>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>품목명</label>
-						<input type="text" id="itemName" readonly>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>품목유형</label>
-						<input type="text" id="itemType" readonly>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>입출고구분</label>
-
-						<select name="inoutType">
-							<option value="MI">입고</option>
-							<option value="MO-PROD">출고</option>
-						</select>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>수량 *</label>
-						<input type="number" name="inoutQty" required>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>단위</label>
-						<input type="text" id="itemUnit" readonly>
-					</div>
-
-					<div class="inoutFormBox">
-						<label>일자 *</label>
-						<input type="date" name="inoutDate" required>
-					</div>
-
+					</select>
 				</div>
 
-				<div class="inoutRemark">
-					<label>비고</label>
-					<textarea name="remark"></textarea>
+				<!-- 품목코드 -->
+				<div class="modal_item">
+					<label class="modal_label">
+						품목코드
+					</label>
+
+					<input type="text"
+						id="itemCode"
+						class="modal_input"
+						readonly>
 				</div>
 
-				<div class="inoutSaveArea">
-					<button type="submit"
-						class="search-btn search-btn-main">
-						저장
-					</button>
+				<!-- 품목명 -->
+				<div class="modal_item">
+					<label class="modal_label">
+						품목명
+					</label>
+
+					<input type="text"
+						id="itemName"
+						class="modal_input"
+						readonly>
 				</div>
 
-			</form>
+				<!-- 품목유형 -->
+				<div class="modal_item">
+					<label class="modal_label">
+						품목유형
+					</label>
 
-		</div>
+					<input type="text"
+						id="itemType"
+						class="modal_input"
+						readonly>
+				</div>
+
+				<!-- 입출고구분 -->
+				<div class="modal_item">
+					<label class="modal_label">
+						입출고구분<span class="modal_required">*</span>
+					</label>
+
+					<select name="inoutType"
+						class="modal_select"
+						required>
+
+						<option value="MI">입고</option>
+						<option value="MO-PROD">출고</option>
+
+					</select>
+				</div>
+
+				<!-- 수량 -->
+				<div class="modal_item">
+					<label class="modal_label">
+						수량<span class="modal_required">*</span>
+					</label>
+
+					<input type="number"
+						name="inoutQty"
+						class="modal_input"
+						min="0"
+						required>
+				</div>
+
+				<!-- 단위 -->
+				<div class="modal_item">
+					<label class="modal_label">
+						단위
+					</label>
+
+					<input type="text"
+						id="itemUnit"
+						class="modal_input"
+						readonly>
+				</div>
+
+				<!-- 일자 -->
+				<div class="modal_item">
+					<label class="modal_label">
+						일자<span class="modal_required">*</span>
+					</label>
+
+					<input type="date"
+						name="inoutDate"
+						class="modal_input modal_today"
+						required>
+				</div>
+
+				<!-- 비고 -->
+				<div class="modal_item">
+					<label class="modal_label">
+						비고
+					</label>
+
+					<input type="text"
+						name="remark"
+						class="modal_input">
+				</div>
+
+			</div>
+
+			<div class="modal_footer">
+
+				<button type="button"
+					class="modal_btn modal_btn_cancel modal_close_btn">
+					취소
+				</button>
+
+				<button type="submit"
+					class="modal_btn modal_btn_submit">
+					등록
+				</button>
+
+			</div>
+
+		</form>
 
 	</div>
 
@@ -496,16 +488,6 @@
 		if (confirm("선택한 항목을 삭제하시겠습니까?")) {
 			document.getElementById("deleteForm").submit();
 		}
-	}
-
-	// 등록 모달 열기
-	function openInoutModal() {
-		document.getElementById("inoutModal").style.display = "block";
-	}
-
-	// 등록 모달 닫기
-	function closeInoutModal() {
-		document.getElementById("inoutModal").style.display = "none";
 	}
 
 	// 품목 선택 시 자동 입력

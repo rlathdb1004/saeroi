@@ -26,9 +26,7 @@ import kr.or.saeroi.service.LoginService;
 @Controller
 public class LoginController {
 	 @Autowired
-	    private LoginService loginService;
-	 @Autowired
-	    private DataSource dataSource;
+	    private LoginService loginService;	
 
 	 @RequestMapping(value="/login", method=RequestMethod.GET)
 	 public String login(HttpSession session) {
@@ -116,7 +114,7 @@ public class LoginController {
         }
 
         session.invalidate();
-        Cookie cookie = new Cookie("autoLogin", null);
+        Cookie cookie = new Cookie("autoLogin", "");
         cookie.setMaxAge(0);
         cookie.setPath("/");
         response.addCookie(cookie);
