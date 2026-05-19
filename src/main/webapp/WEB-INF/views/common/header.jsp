@@ -5,7 +5,16 @@
 	<%-- 화면 상단 헤더 전체 영역이다. --%>
 
 	<div class="heLeftBox">
-		<%-- 헤더 왼쪽 영역이다. 현재 선택된 대메뉴와 하위 메뉴가 들어간다. --%>
+		<%-- 헤더 왼쪽 영역이다. 모바일 햄버거 버튼과 현재 선택된 메뉴명이 들어간다. --%>
+
+		<button type="button" id="heMobileMenuBtn" class="heMobileMenuBtn" aria-label="메뉴 열기">
+			<%-- 모바일 화면에서 사이드바 메뉴를 여는 햄버거 버튼이다. --%>
+
+			<span></span>
+			<span></span>
+			<span></span>
+		</button>
+		<%-- 모바일 햄버거 버튼을 끝낸다. --%>
 
 		<h1 id="hePageTitle" class="hePageTitle">대시보드</h1>
 		<%-- 사이드바에서 클릭한 대메뉴명이 들어갈 자리이다. 처음에는 대시보드로 보여준다. --%>
@@ -31,7 +40,6 @@
 		<div class="heInfoBox">
 			<%-- 현재시간과 온도 정보를 가로로 감싸는 박스이다. --%>
 
-
 			<div class="heInfoItem">
 				<%-- 오늘 온도 영역이다. --%>
 
@@ -52,7 +60,7 @@
 
 			</div>
 			<%-- 오늘 온도 영역을 끝낸다. --%>
-			
+
 			<div class="heInfoItem">
 				<%-- 현재시간 영역이다. --%>
 
