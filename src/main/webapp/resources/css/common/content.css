@@ -506,6 +506,54 @@
 	/* padding과 border를 너비 계산에 포함한다. */
 }
 
+/* 공통 테이블 컬럼 너비 조절 기준 */
+.coTable th {
+	position: relative;
+	/* 컬럼 조절 핸들의 위치 기준을 th로 잡는다. */
+
+	user-select: none;
+	/* 컬럼 조절 중 제목 글씨가 드래그 선택되지 않게 한다. */
+}
+
+/* 공통 테이블 컬럼 조절 핸들 */
+.coTable .column-resizer {
+	position: absolute;
+	/* th 오른쪽 끝에 고정하기 위해 absolute를 사용한다. */
+
+	top: 0;
+	/* th의 위쪽부터 시작한다. */
+
+	right: 0;
+	/* th의 오른쪽 끝에 배치한다. */
+
+	width: 7px;
+	/* 마우스로 잡기 쉬운 영역 너비이다. */
+
+	height: 100%;
+	/* th 높이 전체를 드래그 영역으로 사용한다. */
+
+	cursor: col-resize;
+	/* 마우스를 올렸을 때 컬럼 조절 커서로 보여준다. */
+
+	z-index: 5;
+	/* th 안의 글씨보다 위에 올라오게 한다. */
+}
+
+/* 공통 테이블 컬럼 조절 핸들 hover */
+.coTable .column-resizer:hover {
+	background-color: rgba(47, 125, 96, 0.18);
+	/* 마우스를 올렸을 때 조절 가능한 영역을 은은하게 표시한다. */
+}
+
+/* 컬럼 조절 중 텍스트 선택 방지 */
+body.is-column-resizing {
+	user-select: none;
+	/* 드래그 중 화면 글씨가 선택되지 않게 한다. */
+
+	cursor: col-resize;
+	/* 드래그 중에도 컬럼 조절 커서를 유지한다. */
+}
+
 .coTable td {
 	height: 54px;
 	/* 테이블 내용 셀 높이를 설정한다. */

@@ -161,15 +161,28 @@
 
 				<thead>
 					<tr>
-						<th class="col-check"><input type="checkbox" id="checkAll"
-							onclick="toggleAllItems(this);" /></th>
-						<th class="col-code">품목코드</th>
-						<th class="col-name">품목명</th>
-						<th class="col-type">품목구분</th>
-						<th class="col-supplier">공급처</th>
-						<th class="col-client">납품처</th>
-						<th class="col-use">사용여부</th>
-						<th class="col-detail">상세</th>
+						<%--
+							모바일 표시 컬럼 1: 선택
+							- 선택삭제 기능을 위해 모바일에서도 표시한다.
+							- 컬럼명 "선택"을 클릭하면 현재 목록의 체크박스를 전체 선택/해제한다.
+							- 별도 버튼 태그를 만들지 않고 th 자체를 클릭하게 해서 공용 coTable th 스타일을 그대로 사용한다.
+						--%>
+						<th class="mobile_show" onclick="toggleAllCheckByTitle();"
+							title="전체 선택/해제">선택</th>
+
+						<th class="mobile_show">품목코드</th>
+
+						<th class="mobile_show">품목명</th>
+
+						<th class="mobile_show">품목구분</th>
+
+						<th class="mobile_hidden">공급처</th>
+
+						<th class="mobile_hidden">납품처</th>
+
+						<th class="mobile_hidden">사용여부</th>
+
+						<th class="mobile_show">상세</th>
 					</tr>
 				</thead>
 
@@ -179,42 +192,78 @@
 						<c:when test="${not empty itemList}">
 							<c:forEach var="item" items="${itemList}">
 								<tr>
-									<%-- PC 전용 체크박스 --%>
-									<td class="col-check"><input type="checkbox"
-										name="itemIdList" value="${item.itemId}" /></td>
+									<%--
+										모바일 표시 컬럼 1: 체크박스
+										- 선택삭제 기능을 위해 모바일에서도 표시한다.
+									--%>
+									<td class="mobile_show"><input type="checkbox"
+										name="itemIdList" value="${item.itemId}"></td>
 
-									<%-- 모바일에서도 표시 --%>
-									<td class="col-code" title="${item.itemCode}">
+									<%--
+										모바일 표시 컬럼 2: 품목코드
+										- 긴 값은 공용 CSS에서 말줄임 처리된다.
+										- title 속성으로 마우스 오버 시 전체 값을 확인할 수 있다.
+									--%>
+									<td class="mobile_show" title="${item.itemCode}">
 										${item.itemCode}</td>
 
-									<%-- 모바일에서도 표시 --%>
-									<td class="col-name" title="${item.itemName}">
+									<%--
+										모바일 표시 컬럼 3: 품목명
+										- 품목 식별에 가장 중요한 표시값이다.
+									--%>
+									<td class="mobile_show" title="${item.itemName}">
 										${item.itemName}</td>
 
-									<%-- 모바일에서도 표시 --%>
-									<td class="col-type"><span class="coStatus coStatusUse">
-											${item.itemTypeName} </span></td>
+									<%--
+										모바일 표시 컬럼 4: 품목구분
+										- 사용여부 대신 모바일 목록에 표시한다.
+									--%>
+									<td class="mobile_show"><c:choose>
+											<c:when test="${item.itemType == 'FG'}">
+												<span class="coStatus coStatusUse">완제품</span>
+											</c:when>
+											<c:when test="${item.itemType == 'RM'}">
+												<span class="coStatus coStatusUse">원자재</span>
+											</c:when>
+											<c:when test="${item.itemType == 'SM'}">
+												<span class="coStatus coStatusUse">부자재</span>
+											</c:when>
+											<c:otherwise>
+												<span class="coStatus">${item.itemType}</span>
+											</c:otherwise>
+										</c:choose></td>
 
-									<%-- PC 전용 --%>
-									<td class="col-supplier" title="${item.supplierName}"><c:choose>
+									<%--
+										모바일 숨김 컬럼: 공급처
+										- PC 목록에서는 표시
+										- 모바일에서는 상세 화면에서 확인
+									--%>
+									<td class="mobile_hidden" title="${item.supplierName}"><c:choose>
 											<c:when test="${not empty item.supplierName}">
-                                                ${item.supplierName}
-                                            </c:when>
+												${item.supplierName}
+											</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose></td>
 
-									<%-- PC 전용 --%>
-									<td class="col-client" title="${item.deliveryClientName}">
+									<%--
+										모바일 숨김 컬럼: 납품처
+										- 원자재/부자재는 납품처가 없을 수 있으므로 모바일 우선순위에서 제외한다.
+									--%>
+									<td class="mobile_hidden" title="${item.deliveryClientName}">
 										<c:choose>
 											<c:when test="${not empty item.deliveryClientName}">
-                                                ${item.deliveryClientName}
-                                            </c:when>
+											${item.deliveryClientName}
+										</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose>
 									</td>
 
-									<%-- PC 전용 --%>
-									<td class="col-use"><c:choose>
+									<%--
+										모바일 숨김 컬럼: 사용여부
+										- PC에서는 표시
+										- 모바일에서는 5컬럼 기준 때문에 숨김 처리한다.
+									--%>
+									<td class="mobile_hidden"><c:choose>
 											<c:when test="${item.useYn == 'Y'}">
 												<span class="coStatus coStatusUse">사용</span>
 											</c:when>
@@ -223,8 +272,11 @@
 											</c:otherwise>
 										</c:choose></td>
 
-									<%-- 모바일에서도 표시 --%>
-									<td class="col-detail"><a
+									<%--
+										모바일 표시 컬럼 5: 상세
+										- 상세 컬럼은 모바일에서도 반드시 표시한다.
+									--%>
+									<td class="mobile_show"><a
 										href="${contextPath}/master/item/detail?itemId=${item.itemId}"
 										class="coDetailBtn"> 보기 </a></td>
 								</tr>
@@ -522,139 +574,15 @@
      - 공용 CSS 수정 없이 현재 화면에만 적용
      ============================================================= --%>
 <style>
-/* 긴 텍스트 말줄임 처리 */
-.item-table td {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
+/* =========================================================
+   item.jsp 전용 CSS
+   공용 CSS에 없는 기능만 작성한다.
+   - 품목코드 구성 select 영역
+   - 거래처 자동완성 박스
+   - 목록 테이블 컬럼폭 드래그 핸들
+   ========================================================= */
 
-/* 품목코드 자동생성 input + 버튼 배치 */
-.item-code-generate-box {
-	display: flex;
-	gap: 8px;
-	width: 100%;
-}
-
-.item-code-generate-box .modal_input {
-	flex: 1;
-}
-
-.item-code-btn {
-	height: 42px;
-	min-width: 96px;
-}
-
-/* 자동완성 영역 기준점 */
-.autocomplete-wrap {
-	position: relative;
-}
-
-/* 자동완성 후보 목록 */
-.autocomplete-list {
-	display: none;
-	position: absolute;
-	top: 72px;
-	left: 0;
-	right: 0;
-	z-index: 1100;
-	max-height: 180px;
-	overflow-y: auto;
-	background-color: #FFFFFF;
-	border: 1px solid #D6DEE0;
-	border-radius: 8px;
-	box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
-}
-
-.autocomplete-item {
-	padding: 10px 12px;
-	font-size: 14px;
-	color: #1F2933;
-	cursor: pointer;
-}
-
-.autocomplete-item:hover {
-	background-color: #E6F2ED;
-	color: #2F7D62;
-}
-
-.autocomplete-name {
-	font-weight: 600;
-}
-
-.autocomplete-code {
-	margin-left: 6px;
-	color: #6B7280;
-	font-size: 12px;
-}
-
-/* 선택된 ID 표시 */
-.autocomplete-id-text {
-	margin: 4px 0 0 2px;
-	color: #6B7280;
-	font-size: 12px;
-	line-height: 1.2;
-}
-
-#itemListTable {
-	table-layout: fixed;
-	width: 100% !important;
-	max-width: 100% !important;
-	min-width: 0 !important;
-}
-
-#itemListTable th, #itemListTable td {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-#itemListTable th {
-	position: relative;
-	user-select: none;
-}
-
-.column-resizer {
-	position: absolute;
-	top: 0;
-	right: 0;
-	width: 7px;
-	height: 100%;
-	cursor: col-resize;
-	z-index: 5;
-}
-
-.column-resizer:hover {
-	background-color: rgba(47, 125, 96, 0.18);
-}
-
-@media ( max-width : 760px) {
-	/*
-            모바일 목록 기준:
-            - 체크박스 제외
-            - 상세 포함 최대 4개 컬럼
-            - 품목코드, 품목명, 품목구분, 상세 표시
-        */
-	.item-table .col-check, .item-table .col-supplier, .item-table .col-client,
-		.item-table .col-use {
-		display: none;
-	}
-
-	/* 모바일에서는 선택삭제 기능 제외 */
-	.pc-only-delete-btn {
-		display: none;
-	}
-	.item-table .col-name {
-		max-width: 150px;
-	}
-	.item-code-generate-box {
-		flex-direction: column;
-	}
-	.item-code-btn {
-		width: 100%;
-	}
-}
-
+/* 품목코드 구성 선택 영역 */
 .item-code-option-group {
 	display: none;
 	margin-top: 6px;
@@ -662,7 +590,7 @@
 
 .item-code-select-grid {
 	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 	gap: 8px;
 }
 
@@ -674,12 +602,60 @@
 	font-weight: 600;
 }
 
-@media ( max-width : 760px) {
-	.item-code-select-grid {
-		grid-template-columns: 1fr;
-	}
+/* 자동완성 선택 후 ID 안내 문구 */
+.autocomplete-id-text {
+	margin: 4px 0 0 2px;
+	color: #6B7280;
+	font-size: 12px;
+	line-height: 1.4;
 }
+
+/* 공급처/납품처 자동완성 박스 */
+#supplierAutoCompleteBox, #deliveryClientAutoCompleteBox {
+	display: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 100%;
+	z-index: 20;
+	max-height: 180px;
+	overflow-y: auto;
+	margin-top: 4px;
+	border: 1px solid #D6DEE0;
+	border-radius: 8px;
+	background-color: #FFFFFF;
+	box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+	box-sizing: border-box;
+}
+
+/* 자동완성 input 감싸는 영역 */
+.autocomplete-wrap {
+	position: relative;
+}
+
+/* 자동완성 목록 한 줄 */
+.autocomplete-item {
+	padding: 9px 12px;
+	color: #1F2933;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.4;
+	cursor: pointer;
+	border-bottom: 1px solid #EEF2F0;
+	box-sizing: border-box;
+}
+
+.autocomplete-item:last-child {
+	border-bottom: none;
+}
+
+.autocomplete-item:hover {
+	background-color: #F7F9F8;
+	color: #2F7D62;
+}
+
 </style>
+
 
 
 <%-- =============================================================
@@ -725,14 +701,58 @@
 
 
     /**
-     * 전체 선택 / 전체 해제
+     * 선택 컬럼명 클릭 시 전체 선택 / 전체 해제
+     *
+     * 설명:
+     * - 헤더의 "선택" 텍스트를 클릭하면 현재 목록의 itemIdList 체크박스를 모두 선택하거나 해제한다.
+     * - 전체 체크 상태면 해제하고, 하나라도 미체크가 있으면 전체 선택한다.
+     * - 선택삭제 기능은 공용 JS에 없으므로 item.jsp에서 직접 처리한다.
+     */
+    function toggleAllCheckByTitle() {
+    	var checkboxList = document.querySelectorAll("#itemDeleteForm input[name='itemIdList']");
+
+    	if (checkboxList.length === 0) {
+    		return;
+    	}
+
+    	var allChecked = true;
+
+    	for (var i = 0; i < checkboxList.length; i++) {
+    		if (!checkboxList[i].checked) {
+    			allChecked = false;
+    			break;
+    		}
+    	}
+
+    	var nextChecked = !allChecked;
+
+    	for (var j = 0; j < checkboxList.length; j++) {
+    		checkboxList[j].checked = nextChecked;
+    	}
+    }
+
+
+    /**
+     * 호환용 함수
+     *
+     * 설명:
+     * - 혹시 기존 코드에 toggleAllCheck(this) 호출이 남아 있어도 동작하도록 둔다.
+     * - 신규 기준은 toggleAllCheckByTitle()이다.
+     */
+    function toggleAllCheck(checkAll) {
+    	var checkboxList = document.querySelectorAll("#itemDeleteForm input[name='itemIdList']");
+
+    	for (var i = 0; i < checkboxList.length; i++) {
+    		checkboxList[i].checked = checkAll.checked;
+    	}
+    }
+
+
+    /**
+     * 예전 함수명 호환용
      */
     function toggleAllItems(checkAll) {
-        var checkboxes = document.querySelectorAll("input[name='itemIdList']");
-
-        for (var i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].checked = checkAll.checked;
-        }
+    	toggleAllCheck(checkAll);
     }
 
 
@@ -1142,296 +1162,5 @@
     		itemUnit.value = "";
     	}
     }
-    
-    document.addEventListener("DOMContentLoaded", function() {
-    	// 예전에 저장된 컬럼폭이 있으면 제거
-    	localStorage.removeItem("saeroi_item_list_column_widths");
-
-    	initResizableItemTable();
-    });
-
-    window.addEventListener("resize", function() {
-    	var table = document.getElementById("itemListTable");
-
-    	if (table == null) {
-    		return;
-    	}
-
-    	var colList = table.querySelectorAll("colgroup col");
-
-    	if (colList.length > 0) {
-    		fitColumnWidthsToTable(table, colList);
-    	}
-    });
-
-
-    function initResizableItemTable() {
-    	var table = document.getElementById("itemListTable");
-
-    	if (table == null) {
-    		return;
-    	}
-
-    	createColgroupIfNotExists(table);
-
-    	var colList = table.querySelectorAll("colgroup col");
-    	var thList = table.querySelectorAll("thead th");
-
-    	if (colList.length === 0 || thList.length === 0) {
-    		return;
-    	}
-
-    	// 새로고침할 때마다 기본폭으로 시작
-    	resetDefaultColumnWidths(table, colList);
-
-    	// 마지막 컬럼은 오른쪽으로 더 늘릴 대상이 없으므로 제외
-    	for (var index = 0; index < thList.length - 1; index++) {
-    		addColumnResizeHandle(table, colList, thList[index], index);
-    	}
-    }
-
-
-    function createColgroupIfNotExists(table) {
-    	var existingColgroup = table.querySelector("colgroup");
-
-    	if (existingColgroup != null) {
-    		return;
-    	}
-
-    	var thList = table.querySelectorAll("thead th");
-
-    	if (thList.length === 0) {
-    		return;
-    	}
-
-    	var colgroup = document.createElement("colgroup");
-
-    	for (var i = 0; i < thList.length; i++) {
-    		var col = document.createElement("col");
-    		colgroup.appendChild(col);
-    	}
-
-    	table.insertBefore(colgroup, table.firstChild);
-    }
-
-
-    function addColumnResizeHandle(table, colList, th, index) {
-    	var resizer = document.createElement("span");
-    	resizer.className = "column-resizer";
-
-    	th.appendChild(resizer);
-
-    	var startX = 0;
-    	var leftStartWidth = 0;
-    	var rightStartWidth = 0;
-    	var rightIndex = index + 1;
-
-    	resizer.addEventListener("mousedown", function(event) {
-    		event.preventDefault();
-    		event.stopPropagation();
-
-    		startX = event.pageX;
-    		leftStartWidth = getColWidth(colList[index]);
-    		rightStartWidth = getColWidth(colList[rightIndex]);
-
-    		document.addEventListener("mousemove", resizeColumnPair);
-    		document.addEventListener("mouseup", stopResizeColumnPair);
-    	});
-
-
-    	function resizeColumnPair(event) {
-    		var diffX = event.pageX - startX;
-
-    		var leftMinWidth = getColumnMinWidth(index);
-    		var rightMinWidth = getColumnMinWidth(rightIndex);
-
-    		var newLeftWidth = leftStartWidth + diffX;
-    		var newRightWidth = rightStartWidth - diffX;
-
-    		if (newLeftWidth < leftMinWidth) {
-    			newLeftWidth = leftMinWidth;
-    			newRightWidth = leftStartWidth + rightStartWidth - newLeftWidth;
-    		}
-
-    		if (newRightWidth < rightMinWidth) {
-    			newRightWidth = rightMinWidth;
-    			newLeftWidth = leftStartWidth + rightStartWidth - newRightWidth;
-    		}
-
-    		colList[index].style.width = newLeftWidth + "px";
-    		colList[rightIndex].style.width = newRightWidth + "px";
-
-    		// 전체 테이블이 화면 밖으로 나가지 않게 보정
-    		fitColumnWidthsToTable(table, colList);
-    	}
-
-
-    	function stopResizeColumnPair() {
-    		document.removeEventListener("mousemove", resizeColumnPair);
-    		document.removeEventListener("mouseup", stopResizeColumnPair);
-    	}
-
-
-    	// 더블클릭하면 전체 컬럼 기본폭 복구
-    	resizer.addEventListener("dblclick", function(event) {
-    		event.preventDefault();
-    		event.stopPropagation();
-
-    		resetDefaultColumnWidths(table, colList);
-    	});
-    }
-
-
-    function resetDefaultColumnWidths(table, colList) {
-    	var defaultWidths = [48, 190, 230, 90, 150, 170, 90, 70];
-
-    	for (var i = 0; i < colList.length; i++) {
-    		if (i < defaultWidths.length) {
-    			colList[i].style.width = defaultWidths[i] + "px";
-    		} else {
-    			colList[i].style.width = "120px";
-    		}
-    	}
-
-    	fitColumnWidthsToTable(table, colList);
-    }
-
-
-    function fitColumnWidthsToTable(table, colList) {
-    	var tableWidth = getAvailableTableWidth(table);
-
-    	if (tableWidth <= 0) {
-    		return;
-    	}
-
-    	var totalWidth = 0;
-
-    	for (var i = 0; i < colList.length; i++) {
-    		totalWidth += getColWidth(colList[i]);
-    	}
-
-    	if (totalWidth <= 0) {
-    		return;
-    	}
-
-    	// 전체 컬럼 폭 합계가 테이블 영역보다 크면 비율로 줄인다.
-    	if (totalWidth > tableWidth) {
-    		var ratio = tableWidth / totalWidth;
-
-    		for (var j = 0; j < colList.length; j++) {
-    			var newWidth = getColWidth(colList[j]) * ratio;
-    			var minWidth = getColumnMinWidth(j);
-
-    			if (newWidth < minWidth) {
-    				newWidth = minWidth;
-    			}
-
-    			colList[j].style.width = newWidth + "px";
-    		}
-    	}
-
-    	// 최소폭 때문에 다시 초과하면 뒤쪽 컬럼부터 조금씩 줄인다.
-    	var adjustedTotal = 0;
-
-    	for (var k = 0; k < colList.length; k++) {
-    		adjustedTotal += getColWidth(colList[k]);
-    	}
-
-    	if (adjustedTotal > tableWidth) {
-    		var overWidth = adjustedTotal - tableWidth;
-
-    		for (var x = colList.length - 1; x >= 0; x--) {
-    			var currentWidth = getColWidth(colList[x]);
-    			var min = getColumnAbsoluteMinWidth(x);
-    			var reducible = currentWidth - min;
-
-    			if (reducible <= 0) {
-    				continue;
-    			}
-
-    			var reduce = Math.min(reducible, overWidth);
-
-    			colList[x].style.width = (currentWidth - reduce) + "px";
-    			overWidth -= reduce;
-
-    			if (overWidth <= 0) {
-    				break;
-    			}
-    		}
-    	}
-
-    	// 남는 폭은 품목코드/품목명에 배분
-    	var finalTotal = 0;
-
-    	for (var y = 0; y < colList.length; y++) {
-    		finalTotal += getColWidth(colList[y]);
-    	}
-
-    	var remainWidth = tableWidth - finalTotal;
-
-    	if (remainWidth > 2 && colList.length >= 3) {
-    		colList[1].style.width = (getColWidth(colList[1]) + remainWidth / 2) + "px";
-    		colList[2].style.width = (getColWidth(colList[2]) + remainWidth / 2) + "px";
-    	}
-    }
-
-
-    function getAvailableTableWidth(table) {
-    	var parent = table.parentElement;
-
-    	if (parent == null) {
-    		return Math.floor(table.getBoundingClientRect().width);
-    	}
-
-    	return Math.floor(parent.getBoundingClientRect().width);
-    }
-
-
-    function getColWidth(col) {
-    	var width = parseFloat(col.style.width);
-
-    	if (isNaN(width) || width <= 0) {
-    		width = col.getBoundingClientRect().width;
-    	}
-
-    	if (isNaN(width) || width <= 0) {
-    		width = 100;
-    	}
-
-    	return width;
-    }
-
-
-    function getColumnMinWidth(index) {
-    	if (index === 0) {
-    		return 42;
-    	}
-
-    	if (index === 3) {
-    		return 80;
-    	}
-
-    	if (index === 6) {
-    		return 80;
-    	}
-
-    	if (index === 7) {
-    		return 60;
-    	}
-
-    	return 90;
-    }
-
-
-    function getColumnAbsoluteMinWidth(index) {
-    	if (index === 0) {
-    		return 36;
-    	}
-
-    	if (index === 7) {
-    		return 54;
-    	}
-
-    	return 70;
-    }
+   
 </script>
