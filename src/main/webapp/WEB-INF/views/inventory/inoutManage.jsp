@@ -70,14 +70,11 @@
 
 				<div class="search-btn-wrap">
 
-					<%-- 검색 버튼 아이콘 추가 --%>
+					<%-- 검색 버튼 아이콘 --%>
 					<button type="submit"
 						class="search-btn search-btn-main">
 
-						<svg viewBox="0 0 24 24"
-							fill="none"
-							style="width:16px; height:16px; margin-right:4px;">
-
+						<svg viewBox="0 0 24 24" fill="none">
 							<circle cx="10.5"
 								cy="10.5"
 								r="7.5"
@@ -90,19 +87,32 @@
 								stroke-width="2"
 								stroke-linecap="round">
 							</path>
-
 						</svg>
 
 						검색
-
 					</button>
 
+					<%-- 초기화 버튼 아이콘 --%>
 					<button type="button"
 						class="search-btn search-btn-sub search-reset-btn"
 						onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
 
-						초기화
+						<svg viewBox="0 0 24 24" fill="none">
+							<path d="M20 12C20 16.4 16.4 20 12 20C7.6 20 4 16.4 4 12C4 7.6 7.6 4 12 4C14.4 4 16.5 5.1 18 6.8"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round">
+							</path>
 
+							<path d="M18 4V7H21"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round">
+							</path>
+						</svg>
+
+						초기화
 					</button>
 
 				</div>
@@ -129,17 +139,13 @@
 					<button type="button"
 						class="search-btn search-btn-main modal_open_btn"
 						data_modal_target="#modal_insert">
-
 						등록
-
 					</button>
 
 					<button type="button"
 						class="search-btn search-btn-sub"
 						onclick="deleteCheck()">
-
 						선택 삭제
-
 					</button>
 
 				</div>
@@ -153,27 +159,24 @@
 			<table class="coTable">
 
 				<thead>
-
 					<tr>
-
-						<th>
-							<label for="checkAll">선택</label>
+						<th class="mobile_show">
+							<%-- 선택 글씨 클릭 시 전체 선택 / 전체 해제 --%>
+							<label id="checkAllLabel">선택</label>
 
 							<input type="checkbox"
 								id="checkAll"
 								style="display:none;">
 						</th>
 
-						<th>입출고번호</th>
-						<th>입출고구분</th>
-						<th>품목명</th>
-						<th>입출고량</th>
-						<th>단위</th>
-						<th>일자</th>
-						<th>상세</th>
-
+						<th class="mobile_hidden">입출고번호</th>
+						<th class="mobile_hidden">입출고구분</th>
+						<th class="mobile_show">품목명</th>
+						<th class="mobile_hidden">입출고량</th>
+						<th class="mobile_hidden">단위</th>
+						<th class="mobile_hidden">일자</th>
+						<th class="mobile_show">상세</th>
 					</tr>
-
 				</thead>
 
 				<tbody>
@@ -181,21 +184,18 @@
 					<c:forEach var="inout" items="${list}">
 
 						<tr>
-
-							<td>
+							<td class="mobile_show">
 								<input type="checkbox"
 									name="inoutIds"
 									value="${inout.inoutId}">
 							</td>
 
-							<td title="${inout.docNo}">
+							<td class="mobile_hidden" title="${inout.docNo}">
 								${inout.docNo}
 							</td>
 
-							<td>
-
+							<td class="mobile_hidden">
 								<c:choose>
-
 									<c:when test="${inout.inoutType eq 'MI'}">
 										입고
 									</c:when>
@@ -207,39 +207,32 @@
 									<c:otherwise>
 										${inout.inoutType}
 									</c:otherwise>
-
 								</c:choose>
-
 							</td>
 
-							<td title="${inout.itemName}">
+							<td class="mobile_show" title="${inout.itemName}">
 								${inout.itemName}
 							</td>
 
-							<td>
+							<td class="mobile_hidden">
 								${inout.inoutQty}
 							</td>
 
-							<td>
+							<td class="mobile_hidden">
 								${inout.itemUnit}
 							</td>
 
-							<td>
+							<td class="mobile_hidden">
 								${inout.inoutDate}
 							</td>
 
-							<td>
-
+							<td class="mobile_show">
 								<button type="button"
 									class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
-
 									보기
-
 								</button>
-
 							</td>
-
 						</tr>
 
 					</c:forEach>
@@ -255,3 +248,71 @@
 	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 
 </div>
+
+<script>
+	// 선택 글씨를 누르면 전체 선택 / 전체 해제
+	document.getElementById("checkAllLabel").onclick = function() {
+
+		var checkAll =
+			document.getElementById("checkAll");
+
+		var checks =
+			document.getElementsByName("inoutIds");
+
+		checkAll.checked =
+			!checkAll.checked;
+
+		for (var i = 0; i < checks.length; i++) {
+			checks[i].checked = checkAll.checked;
+		}
+	};
+
+	// 개별 체크박스를 직접 누르면 전체선택 상태도 같이 맞춘다.
+	var checks =
+		document.getElementsByName("inoutIds");
+
+	for (var i = 0; i < checks.length; i++) {
+
+		checks[i].onclick = function() {
+
+			var allChecked =
+				true;
+
+			for (var j = 0; j < checks.length; j++) {
+
+				if (!checks[j].checked) {
+					allChecked = false;
+					break;
+				}
+			}
+
+			document.getElementById("checkAll").checked =
+				allChecked;
+		};
+	}
+
+	// 선택 삭제
+	function deleteCheck() {
+
+		var checks =
+			document.getElementsByName("inoutIds");
+
+		var checked = false;
+
+		for (var i = 0; i < checks.length; i++) {
+
+			if (checks[i].checked) {
+				checked = true;
+			}
+		}
+
+		if (!checked) {
+			alert("삭제할 항목을 선택해주세요.");
+			return;
+		}
+
+		if (confirm("선택한 항목을 삭제하시겠습니까?")) {
+			document.getElementById("deleteForm").submit();
+		}
+	}
+</script>

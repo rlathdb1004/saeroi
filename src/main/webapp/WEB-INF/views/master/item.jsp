@@ -157,7 +157,7 @@
 		action="${contextPath}/master/item/delete">
 
 		<div class="coTableWrap">
-			<table class="coTable item-table">
+			<table class="coTable item-table" id="itemListTable">
 
 				<thead>
 					<tr>
@@ -594,6 +594,38 @@
 	color: #6B7280;
 	font-size: 12px;
 	line-height: 1.2;
+}
+
+#itemListTable {
+	table-layout: fixed;
+	width: 100% !important;
+	max-width: 100% !important;
+	min-width: 0 !important;
+}
+
+#itemListTable th, #itemListTable td {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+#itemListTable th {
+	position: relative;
+	user-select: none;
+}
+
+.column-resizer {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 7px;
+	height: 100%;
+	cursor: col-resize;
+	z-index: 5;
+}
+
+.column-resizer:hover {
+	background-color: rgba(47, 125, 96, 0.18);
 }
 
 @media ( max-width : 760px) {
@@ -1109,5 +1141,297 @@
     		itemUnitDirect.value = "";
     		itemUnit.value = "";
     	}
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+    	// 예전에 저장된 컬럼폭이 있으면 제거
+    	localStorage.removeItem("saeroi_item_list_column_widths");
+
+    	initResizableItemTable();
+    });
+
+    window.addEventListener("resize", function() {
+    	var table = document.getElementById("itemListTable");
+
+    	if (table == null) {
+    		return;
+    	}
+
+    	var colList = table.querySelectorAll("colgroup col");
+
+    	if (colList.length > 0) {
+    		fitColumnWidthsToTable(table, colList);
+    	}
+    });
+
+
+    function initResizableItemTable() {
+    	var table = document.getElementById("itemListTable");
+
+    	if (table == null) {
+    		return;
+    	}
+
+    	createColgroupIfNotExists(table);
+
+    	var colList = table.querySelectorAll("colgroup col");
+    	var thList = table.querySelectorAll("thead th");
+
+    	if (colList.length === 0 || thList.length === 0) {
+    		return;
+    	}
+
+    	// 새로고침할 때마다 기본폭으로 시작
+    	resetDefaultColumnWidths(table, colList);
+
+    	// 마지막 컬럼은 오른쪽으로 더 늘릴 대상이 없으므로 제외
+    	for (var index = 0; index < thList.length - 1; index++) {
+    		addColumnResizeHandle(table, colList, thList[index], index);
+    	}
+    }
+
+
+    function createColgroupIfNotExists(table) {
+    	var existingColgroup = table.querySelector("colgroup");
+
+    	if (existingColgroup != null) {
+    		return;
+    	}
+
+    	var thList = table.querySelectorAll("thead th");
+
+    	if (thList.length === 0) {
+    		return;
+    	}
+
+    	var colgroup = document.createElement("colgroup");
+
+    	for (var i = 0; i < thList.length; i++) {
+    		var col = document.createElement("col");
+    		colgroup.appendChild(col);
+    	}
+
+    	table.insertBefore(colgroup, table.firstChild);
+    }
+
+
+    function addColumnResizeHandle(table, colList, th, index) {
+    	var resizer = document.createElement("span");
+    	resizer.className = "column-resizer";
+
+    	th.appendChild(resizer);
+
+    	var startX = 0;
+    	var leftStartWidth = 0;
+    	var rightStartWidth = 0;
+    	var rightIndex = index + 1;
+
+    	resizer.addEventListener("mousedown", function(event) {
+    		event.preventDefault();
+    		event.stopPropagation();
+
+    		startX = event.pageX;
+    		leftStartWidth = getColWidth(colList[index]);
+    		rightStartWidth = getColWidth(colList[rightIndex]);
+
+    		document.addEventListener("mousemove", resizeColumnPair);
+    		document.addEventListener("mouseup", stopResizeColumnPair);
+    	});
+
+
+    	function resizeColumnPair(event) {
+    		var diffX = event.pageX - startX;
+
+    		var leftMinWidth = getColumnMinWidth(index);
+    		var rightMinWidth = getColumnMinWidth(rightIndex);
+
+    		var newLeftWidth = leftStartWidth + diffX;
+    		var newRightWidth = rightStartWidth - diffX;
+
+    		if (newLeftWidth < leftMinWidth) {
+    			newLeftWidth = leftMinWidth;
+    			newRightWidth = leftStartWidth + rightStartWidth - newLeftWidth;
+    		}
+
+    		if (newRightWidth < rightMinWidth) {
+    			newRightWidth = rightMinWidth;
+    			newLeftWidth = leftStartWidth + rightStartWidth - newRightWidth;
+    		}
+
+    		colList[index].style.width = newLeftWidth + "px";
+    		colList[rightIndex].style.width = newRightWidth + "px";
+
+    		// 전체 테이블이 화면 밖으로 나가지 않게 보정
+    		fitColumnWidthsToTable(table, colList);
+    	}
+
+
+    	function stopResizeColumnPair() {
+    		document.removeEventListener("mousemove", resizeColumnPair);
+    		document.removeEventListener("mouseup", stopResizeColumnPair);
+    	}
+
+
+    	// 더블클릭하면 전체 컬럼 기본폭 복구
+    	resizer.addEventListener("dblclick", function(event) {
+    		event.preventDefault();
+    		event.stopPropagation();
+
+    		resetDefaultColumnWidths(table, colList);
+    	});
+    }
+
+
+    function resetDefaultColumnWidths(table, colList) {
+    	var defaultWidths = [48, 190, 230, 90, 150, 170, 90, 70];
+
+    	for (var i = 0; i < colList.length; i++) {
+    		if (i < defaultWidths.length) {
+    			colList[i].style.width = defaultWidths[i] + "px";
+    		} else {
+    			colList[i].style.width = "120px";
+    		}
+    	}
+
+    	fitColumnWidthsToTable(table, colList);
+    }
+
+
+    function fitColumnWidthsToTable(table, colList) {
+    	var tableWidth = getAvailableTableWidth(table);
+
+    	if (tableWidth <= 0) {
+    		return;
+    	}
+
+    	var totalWidth = 0;
+
+    	for (var i = 0; i < colList.length; i++) {
+    		totalWidth += getColWidth(colList[i]);
+    	}
+
+    	if (totalWidth <= 0) {
+    		return;
+    	}
+
+    	// 전체 컬럼 폭 합계가 테이블 영역보다 크면 비율로 줄인다.
+    	if (totalWidth > tableWidth) {
+    		var ratio = tableWidth / totalWidth;
+
+    		for (var j = 0; j < colList.length; j++) {
+    			var newWidth = getColWidth(colList[j]) * ratio;
+    			var minWidth = getColumnMinWidth(j);
+
+    			if (newWidth < minWidth) {
+    				newWidth = minWidth;
+    			}
+
+    			colList[j].style.width = newWidth + "px";
+    		}
+    	}
+
+    	// 최소폭 때문에 다시 초과하면 뒤쪽 컬럼부터 조금씩 줄인다.
+    	var adjustedTotal = 0;
+
+    	for (var k = 0; k < colList.length; k++) {
+    		adjustedTotal += getColWidth(colList[k]);
+    	}
+
+    	if (adjustedTotal > tableWidth) {
+    		var overWidth = adjustedTotal - tableWidth;
+
+    		for (var x = colList.length - 1; x >= 0; x--) {
+    			var currentWidth = getColWidth(colList[x]);
+    			var min = getColumnAbsoluteMinWidth(x);
+    			var reducible = currentWidth - min;
+
+    			if (reducible <= 0) {
+    				continue;
+    			}
+
+    			var reduce = Math.min(reducible, overWidth);
+
+    			colList[x].style.width = (currentWidth - reduce) + "px";
+    			overWidth -= reduce;
+
+    			if (overWidth <= 0) {
+    				break;
+    			}
+    		}
+    	}
+
+    	// 남는 폭은 품목코드/품목명에 배분
+    	var finalTotal = 0;
+
+    	for (var y = 0; y < colList.length; y++) {
+    		finalTotal += getColWidth(colList[y]);
+    	}
+
+    	var remainWidth = tableWidth - finalTotal;
+
+    	if (remainWidth > 2 && colList.length >= 3) {
+    		colList[1].style.width = (getColWidth(colList[1]) + remainWidth / 2) + "px";
+    		colList[2].style.width = (getColWidth(colList[2]) + remainWidth / 2) + "px";
+    	}
+    }
+
+
+    function getAvailableTableWidth(table) {
+    	var parent = table.parentElement;
+
+    	if (parent == null) {
+    		return Math.floor(table.getBoundingClientRect().width);
+    	}
+
+    	return Math.floor(parent.getBoundingClientRect().width);
+    }
+
+
+    function getColWidth(col) {
+    	var width = parseFloat(col.style.width);
+
+    	if (isNaN(width) || width <= 0) {
+    		width = col.getBoundingClientRect().width;
+    	}
+
+    	if (isNaN(width) || width <= 0) {
+    		width = 100;
+    	}
+
+    	return width;
+    }
+
+
+    function getColumnMinWidth(index) {
+    	if (index === 0) {
+    		return 42;
+    	}
+
+    	if (index === 3) {
+    		return 80;
+    	}
+
+    	if (index === 6) {
+    		return 80;
+    	}
+
+    	if (index === 7) {
+    		return 60;
+    	}
+
+    	return 90;
+    }
+
+
+    function getColumnAbsoluteMinWidth(index) {
+    	if (index === 0) {
+    		return 36;
+    	}
+
+    	if (index === 7) {
+    		return 54;
+    	}
+
+    	return 70;
     }
 </script>
