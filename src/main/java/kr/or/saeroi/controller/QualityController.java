@@ -79,7 +79,7 @@ public class QualityController {
 
 		return option_list;
 	}
-	
+
 	@RequestMapping("/inspection_detail")
 	public String inspection_detail(Model model) {
 
@@ -112,20 +112,20 @@ public class QualityController {
 
 		return "redirect:/quality/inspection";
 	}
-	
-	//삭제 메서드
+
+	// 삭제 메서드
+	//삭제 시 검사 번호만
 	@RequestMapping(value = "/inspection/delete", method = RequestMethod.POST)
-	public String inspection_delete(Model model, @RequestParam(required = false) String insp_date,
-			@RequestParam(required = false) String prod_id, @RequestParam(required = false) String emp_id,
-			@RequestParam(required = false) String insp_type, @RequestParam(required = false) String result,
-			@RequestParam(required = false) String inspection_qty, @RequestParam(required = false) String good_qty,
-			@RequestParam(required = false) String remark) {
+	//검사번호를 여러 개(선택 시) 받을 수 있으므로 String[] 로 받음
+	public String inspection_delete(Model model, @RequestParam(value = "insp_id", required = false) String[] insp_id) {
+
+		if (insp_id != null) {
+			//어떤 행을 지울지만 필요함
+			int delete_result = qualityService._ser_delete_Inspection(insp_id);
 			
-		int delete_result = qualityService._ser_delete_Inspection(insp_date, prod_id, emp_id, insp_type, result,
-				inspection_qty, good_qty, remark);
-		
-		System.out.println("delete_result 결과: "+delete_result);
-		
-		return remark;
+			System.out.println("delete_result 결과: " + delete_result);
+		}
+
+		return "redirect:/quality/inspection";
 	}
 }

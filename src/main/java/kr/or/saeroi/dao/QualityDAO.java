@@ -16,8 +16,8 @@ public interface QualityDAO {
 			String result, String inspection_qty, String good_qty, String remark);
 
 	//삭제에 필요한 구성
-	int _dao_delete_Inspection(String insp_date, String prod_id, String emp_id, String insp_type,
-			String result, String inspection_qty, String good_qty, String remark);
+	//검사 번호만 필요
+	int _dao_delete_Inspection(String[] insp_id);
     
     
 }
