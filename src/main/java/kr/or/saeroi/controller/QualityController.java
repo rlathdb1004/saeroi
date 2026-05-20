@@ -59,6 +59,24 @@ public class QualityController {
 		model.addAttribute("searchType", searchType);
 		model.addAttribute("keyword", keyword);
 
+		// 페이징 바뀔 때도 검색 조건 유지(페이징 jsp에 보내는 값)
+		String searchParam = "";
+
+		if (startDate != null && !startDate.equals("")) {
+			searchParam += "&startDate=" + startDate;
+		}
+		if (endDate != null && !endDate.equals("")) {
+			searchParam += "&endDate=" + endDate;
+		}
+		if (searchType != null && !searchType.equals("")) {
+			searchParam += "&searchType=" + searchType;
+		}
+		if (keyword != null && !keyword.equals("")) {
+			searchParam += "&keyword=" + keyword;
+		}
+
+		model.addAttribute("searchParam", searchParam);
+
 		// JSP 지정
 //		model.addAttribute("contentPage", "/WEB-INF/views/inspection.jsp");
 
@@ -78,14 +96,6 @@ public class QualityController {
 				optionPage, optionSize);
 
 		return option_list;
-	}
-	
-	@RequestMapping("/inspection_detail")
-	public String inspection_detail(Model model) {
-
-//		model.addAttribute("contentPage", "/WEB-INF/views/quality/defect.jsp");
-
-		return "quality/inspection_detail.tiles";
 	}
 
 	@RequestMapping("/defect")
@@ -108,11 +118,51 @@ public class QualityController {
 		int insert_result = qualityService._ser_insert_Inspection(insp_date, prod_id, emp_id, insp_type, result,
 				inspection_qty, good_qty, remark);
 
-		System.out.println("insert_result: " + insert_result);
+		System.out.println("insert_result 결과: " + insert_result);
 
 		return "redirect:/quality/inspection";
 	}
-	
-	//삭제 메서드
-	
+
+	// 삭제 메서드
+	// 삭제 시 검사 번호만
+	@RequestMapping(value = "/inspection/delete", method = RequestMethod.POST)
+	// 검사번호를 여러 개(선택 시) 받을 수 있으므로 String[] 로 받음
+	public String inspection_delete(Model model, @RequestParam(value = "insp_id", required = false) String[] insp_id) {
+
+		if (insp_id != null) {
+			// 어떤 행을 지울지만 필요함
+			int delete_result = qualityService._ser_delete_Inspection(insp_id);
+
+			System.out.println("delete_result 결과: " + delete_result);
+		}
+
+		return "redirect:/quality/inspection";
+	}
+
+	// 검사 상세 목록
+	@RequestMapping("/inspection_detail")
+	public String inspection(Model model, @RequestParam(required = false) String insp_id,
+			@RequestParam(required = false) String insp_date, @RequestParam(required = false) String prod_id,
+			@RequestParam(required = false) String emp_id, @RequestParam(required = false) String insp_type,
+			@RequestParam(required = false) String result, @RequestParam(required = false) String inspection_qty,
+			@RequestParam(required = false) String good_qty, @RequestParam(required = false) String remark) {
+		//1건씩만 read이므로 List 아님
+		InspectionDTO inspection = qualityService._ser_select_Inspection_detail(insp_id, insp_date, prod_id, emp_id,
+				insp_type, result, inspection_qty, good_qty, remark);
+		System.out.println("검사 상세 목록 list 실행 됨");
+
+		// jsp에 값 보내기
+		model.addAttribute("inspection", inspection);
+		model.addAttribute("insp_id", insp_id);
+		model.addAttribute("insp_date", insp_date);
+		model.addAttribute("prod_id", prod_id);
+		model.addAttribute("emp_id", emp_id);
+		model.addAttribute("insp_type", insp_type);
+		model.addAttribute("inspection_qty", inspection_qty);
+		model.addAttribute("good_qty", good_qty);
+		model.addAttribute("remark", remark);
+
+		return "quality/inspection_detail.tiles";
+	}
+
 }

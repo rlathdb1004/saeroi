@@ -34,7 +34,7 @@
 
 					<label class="search-label">구분</label> <select name="searchType"
 						class="search-select">
-						<option value="">선택</option>
+						<option value="">전체</option>
 						<option value="insp_id"
 							<c:if test="${searchType == 'insp_id'}">selected</c:if>>검사번호</option>
 						<option value="itemName"
@@ -104,8 +104,11 @@
 			<button type="button"
 				class="search-btn search-btn-main modal_open_btn"
 				data_modal_target="#modal_insert">등록</button>
-			<button type="button" class="search-btn search-btn-sub">선택
-				삭제</button>
+			<!-- 			//삭제 수정 부분 -->
+			<form method="post" accept-charset="UTF-8"
+				action="${pageContext.request.contextPath}/quality/inspection/delete">
+				<button type="submit" class="search-btn search-btn-sub">선택
+					삭제</button>
 		</div>
 
 	</div>
@@ -120,14 +123,14 @@
 
 			<thead>
 				<tr>
-					<th style="width: 80px;">선택</th>
-					<th style="width: 130px;">검사번호</th>
-					<th style="width: 130px;">검사일시</th>
-					<th style="width: 180px;">품목명</th>
-					<th style="width: 130px;">LOT번호</th>
-					<th style="width: 130px;">검사자</th>
-					<th style="width: 130px;">검사결과</th>
-					<th style="width: 130px;">상세</th>
+					<th class="mobile_show">선택</th>
+					<th class="mobile_show">검사번호</th>
+					<th class="mobile_hidden">검사일시</th>
+					<th class="mobile_show">품목명</th>
+					<th class="mobile_hidden">LOT번호</th>
+					<th class="mobile_hidden">검사자</th>
+					<th class="mobile_show">검사결과</th>
+					<th class="mobile_show">상세</th>
 				</tr>
 			</thead>
 
@@ -136,16 +139,16 @@
 					<%-- Controller에서 보낸 검사 목록을 한 줄씩 반복 --%>
 
 					<tr>
-						<td><input type="checkbox" name="insp_id"
+						<td class="mobile_show"><input type="checkbox" name="insp_id"
 							value="${inspection.insp_id}"></td>
-						<td>${inspection.doc_no}</td>
-						<td>${inspection.insp_date}</td>
-						<td class="coTextLeft">${inspection.item_name}</td>
-						<td>${inspection.product_lot}</td>
-						<td>${inspection.ename}</td>
-						<td><span class="coStatus coStatusUse">${inspection.result}</span>
+						<td class="mobile_show">${inspection.doc_no}</td>
+						<td class="mobile_hidden">${inspection.insp_date}</td>
+						<td class="coTextLeft mobile_show">${inspection.item_name}</td>
+						<td class="mobile_hidden">${inspection.product_lot}</td>
+						<td class="mobile_hidden">${inspection.ename}</td>
+						<td class="mobile_show"><span class="coStatus coStatusUse">${inspection.result}</span>
 						</td>
-						<td>
+						<td class="mobile_show">
 							<button type="button" class="coDetailBtn"
 								onclick="location.href='${pageContext.request.contextPath}/quality/inspection_detail?insp_id=${inspection.insp_id}'">
 								보기</button>
@@ -163,7 +166,10 @@
 				</c:if>
 			</tbody>
 
+
 		</table>
+		</form>
+		<!-- 		//삭제 수정 부분 -->
 		<%-- 공통 테이블을 끝낸다. --%>
 
 	</div>

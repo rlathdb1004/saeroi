@@ -101,6 +101,18 @@ a {
     /* 메뉴가 많아지면 사이드바 안에서 세로 스크롤이 생기게 한다. */
 }
 
+/* 사이드바 스크롤 기능은 유지하고 스크롤바만 숨긴다. */
+.siSidebar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* 크롬, 엣지, 사파리에서 사이드바 스크롤바를 숨긴다. */
+.siSidebar::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+}
+
 .siLogoBox {
     /* 로고를 감싸는 영역이다. */
     width: 100%;
@@ -573,11 +585,30 @@ a {
 .main-content {
     /* layout.jsp 안의 실제 본문 영역이다. */
     margin-left: 240px;
-    /* 사이드바 너비만큼 본문을 오른쪽으로 밀어준다. */
-    padding: 30px;
+
     /* 본문 안쪽 여백을 설정한다. */
-    min-height: 100vh;
-    /* 본문 최소 높이를 화면 전체 높이로 설정한다. */
-    background-color: #F7F9F8;
+    padding: 30px;
+
+    /* 헤더 높이 110px을 제외한 나머지 높이만 사용한다. */
+    min-height: calc(100vh - 110px);
+
     /* 본문 배경색을 우리 컬러가이드 배경색으로 설정한다. */
+    background-color: #F7F9F8;
+
+    /* padding을 높이 계산에 포함한다. */
+    box-sizing: border-box;
+}
+
+/* 메인 화면 스크롤 기능은 유지하고 스크롤바만 숨긴다. */
+html,
+body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* 크롬, 엣지, 사파리에서 메인 스크롤바를 숨긴다. */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+    width: 0;
+    height: 0;
 }

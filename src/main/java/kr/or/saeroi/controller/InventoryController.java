@@ -29,7 +29,7 @@ public class InventoryController {
 	@RequestMapping("/inventory/materialIn")
 	public String materialIn(
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "size", defaultValue = "5") int size,
 			@RequestParam(value = "searchType", defaultValue = "all") String searchType,
 			@RequestParam(value = "inoutType", defaultValue = "") String inoutType,
 			@RequestParam(value = "keyword", defaultValue = "") String keyword,
@@ -72,7 +72,8 @@ public class InventoryController {
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
 
-		return "inoutManage.tiles";
+		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		return "inventory/inoutManage.tiles";
 	}
 
 	// 입출고 등록
@@ -122,7 +123,8 @@ public class InventoryController {
 		model.addAttribute("inout", inout);
 		model.addAttribute("mode", mode);
 
-		return "inoutDetail.tiles";
+		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		return "inventory/inoutDetail.tiles";
 	}
 
 	// 입출고 수정
@@ -161,14 +163,13 @@ public class InventoryController {
 	})
 	public String inventoryList(
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "size", defaultValue = "5") int size,
 			@RequestParam(value = "searchType", defaultValue = "") String searchType,
 			@RequestParam(value = "keyword", defaultValue = "") String keyword,
 			@RequestParam(value = "startDate", defaultValue = "") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "") String endDate,
 			Model model) {
 
-		// 재고 목록 조회
 		List<InventoryDTO> list =
 				inventoryService.getInventoryList(
 						searchType,
@@ -176,7 +177,6 @@ public class InventoryController {
 						startDate,
 						endDate);
 
-		// 페이징 기능
 		int totalCount = list.size();
 		int startIndex = (page - 1) * size;
 		int endIndex = startIndex + size;
@@ -185,34 +185,28 @@ public class InventoryController {
 			endIndex = totalCount;
 		}
 
-		// 현재 페이지 목록
 		List<InventoryDTO> page_list =
 				list.subList(startIndex, endIndex);
 
-		// 공통 페이징 정보
 		PageDTO pageInfo =
 				new PageDTO(page, size, totalCount);
 
-		// 등록 모달 품목 목록
 		List<InventoryDTO> itemList =
 				inventoryService.getItemList();
 
-		// JSP로 보낼 값
 		model.addAttribute("list", page_list);
 		model.addAttribute("itemList", itemList);
 		model.addAttribute("pageInfo", pageInfo);
 
-		// 공통 페이징 URL
 		model.addAttribute("pageUrl", "/inventory/inventoryStatus");
 
-		// 검색값 유지
 		model.addAttribute("searchType", searchType);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
 
-		// 재고조회 Tiles 주소
-		return "inventoryManage.tiles";
+		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		return "inventory/inventoryManage.tiles";
 	}
 
 	// 재고 등록
@@ -260,7 +254,8 @@ public class InventoryController {
 		model.addAttribute("inventory", inventory);
 		model.addAttribute("mode", mode);
 
-		return "inventoryDetail.tiles";
+		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		return "inventory/inventoryDetail.tiles";
 	}
 
 	// 재고 수정
