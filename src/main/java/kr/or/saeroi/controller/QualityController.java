@@ -80,14 +80,6 @@ public class QualityController {
 		return option_list;
 	}
 
-	@RequestMapping("/inspection_detail")
-	public String inspection_detail(Model model) {
-
-//		model.addAttribute("contentPage", "/WEB-INF/views/quality/defect.jsp");
-
-		return "quality/inspection_detail.tiles";
-	}
-
 	@RequestMapping("/defect")
 	public String defect(Model model) {
 
@@ -128,4 +120,15 @@ public class QualityController {
 
 		return "redirect:/quality/inspection";
 	}
+	
+	//검사 상세
+	@RequestMapping("/inspection_detail")
+	public String inspection_detail(Model model) {
+
+//		model.addAttribute("contentPage", "/WEB-INF/views/quality/defect.jsp");
+
+		return "quality/inspection_detail.tiles";
+	}
+	
+	
 }
