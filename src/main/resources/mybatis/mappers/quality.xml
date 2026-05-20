@@ -23,9 +23,11 @@
 		item it,
 		emp e
 		WHERE i.prod_id = p.prod_id
-		AND p.order_id = w.order_id
+		AND
+		p.order_id = w.order_id
 		AND w.prod_plan_id = pr.prod_plan_id
-		AND pr.item_id = it.item_id
+		AND
+		pr.item_id = it.item_id
 		AND i.emp_id = e.emp_id
 
 		<if test="startDate != null and startDate != ''">
@@ -35,9 +37,17 @@
 			AND i.insp_date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
 		</if>
 
-		<if
-			test="searchType != null and searchType != '' and keyword != null and keyword != ''">
+		<if test="keyword != null and keyword != ''">
 			<choose>
+				<when test="searchType == null or searchType == ''">
+					AND (
+					i.doc_no LIKE '%' || #{keyword} || '%'
+					OR it.item_name LIKE '%' || #{keyword} || '%'
+					OR w.product_lot LIKE '%' || #{keyword} || '%'
+					OR e.ename LIKE '%' || #{keyword} || '%'
+					OR i.result LIKE '%' || #{keyword} || '%'
+					)
+				</when>
 				<when test="searchType == 'insp_id'">
 					AND i.doc_no LIKE '%' || #{keyword} || '%'
 				</when>
@@ -56,6 +66,7 @@
 			</choose>
 		</if>
 
+
 		ORDER BY i.insp_id DESC
 	</select>
 
@@ -72,33 +83,39 @@
 		FROM (
 		SELECT
 		option_data.*,
-		ROW_NUMBER() OVER (ORDER BY option_data.option_name) AS rn
+		ROW_NUMBER() OVER (ORDER BY option_data.option_name) AS
+		rn
 		FROM (
 		<choose>
 			<when test="searchType == 'itemName'">
 				SELECT
 				MIN(p.prod_id) AS prod_id,
-				it.item_name AS item_name,
+				it.item_name AS
+				item_name,
 				NULL AS product_lot,
 				NULL AS emp_id,
 				NULL AS ename,
-				NULL AS result,
+				NULL AS
+				result,
 				it.item_name AS option_name
 				FROM production p,
 				work_order w,
 				production_plan pr,
 				item it
 				WHERE p.order_id = w.order_id
-				AND w.prod_plan_id = pr.prod_plan_id
+				AND
+				w.prod_plan_id = pr.prod_plan_id
 				AND pr.item_id = it.item_id
-				GROUP BY it.item_name
+				GROUP BY
+				it.item_name
 			</when>
 
 			<when test="searchType == 'ename'">
 				SELECT
 				NULL AS prod_id,
 				NULL AS item_name,
-				NULL AS product_lot,
+				NULL AS
+				product_lot,
 				e.emp_id AS emp_id,
 				e.ename AS ename,
 				NULL AS result,
@@ -112,7 +129,8 @@
 				SELECT
 				NULL AS prod_id,
 				NULL AS item_name,
-				NULL AS product_lot,
+				NULL AS
+				product_lot,
 				NULL AS emp_id,
 				NULL AS ename,
 				i.result AS result,
@@ -126,20 +144,24 @@
 				SELECT
 				NULL AS prod_id,
 				NULL AS item_name,
-				NULL AS product_lot,
+				NULL AS
+				product_lot,
 				NULL AS emp_id,
 				NULL AS ename,
 				NULL AS result,
-				NULL AS option_name
+				NULL AS
+				option_name
 				FROM dual
 			</otherwise>
 		</choose>
 		) option_data
 		WHERE option_data.option_name IS NOT NULL
 		)
-		WHERE rn BETWEEN ((#{optionPage}
+		WHERE rn
+		BETWEEN ((#{optionPage}
 		- 1) * #{optionSize} + 1)
-		AND (#{optionPage} * #{optionSize})
+		AND (#{optionPage} *
+		#{optionSize})
 	</select>
 
 	<!-- 등록 쿼리 -->
@@ -162,12 +184,16 @@
 		updated_date
 		)
 		SELECT
-		(SELECT NVL(MAX(insp_id), 0) + 1 FROM inspection),
-		'INSP-' || TO_CHAR(TO_DATE(#{insp_date}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
+		(SELECT NVL(MAX(insp_id), 0) + 1 FROM
+		inspection),
+		'INSP-' || TO_CHAR(TO_DATE(#{insp_date}, 'YYYY-MM-DD'),
+		'YYYYMMDD') || '-' ||
 		LPAD(
 		(SELECT NVL(MAX(doc_seq), 0) + 1
-		FROM inspection
-		WHERE TRUNC(insp_date) = TRUNC(TO_DATE(#{insp_date}, 'YYYY-MM-DD'))),
+		FROM
+		inspection
+		WHERE TRUNC(insp_date) = TRUNC(TO_DATE(#{insp_date},
+		'YYYY-MM-DD'))),
 		4,
 		'0'
 		),
@@ -198,4 +224,35 @@
 		</foreach>
 	</delete>
 
+<!-- 검사 상세 목록 -->
+<select id="_select_Inspection_detail"
+	resultType="kr.or.saeroi.dto.InspectionDTO">
+	SELECT
+	i.insp_id,
+	i.doc_no,
+	i.insp_date,
+	it.item_name,
+	w.product_lot,
+	e.ename,
+	i.result,
+	i.prod_id,
+	i.emp_id,
+	i.insp_type,
+	i.insp_status,
+	i.inspection_qty,
+	i.good_qty,
+	i.remark
+	FROM inspection i,
+	production p,
+	work_order w,
+	production_plan pr,
+	item it,
+	emp e
+	WHERE i.prod_id = p.prod_id
+	AND p.order_id = w.order_id
+	AND w.prod_plan_id = pr.prod_plan_id
+	AND pr.item_id = it.item_id
+	AND i.emp_id = e.emp_id
+	AND i.insp_id = TO_NUMBER(#{insp_id})
+</select>
 </mapper>

@@ -76,7 +76,7 @@ public class QualityDAOImpl implements QualityDAO {
 
 	// 삭제에 필요한 구성
 	@Override
-	//검사번호만  필요
+	// 검사번호만 필요
 	public int _dao_delete_Inspection(String[] insp_id) {
 
 		Map<String, Object> param = new HashMap<String, Object>();
@@ -85,6 +85,27 @@ public class QualityDAOImpl implements QualityDAO {
 		int delete_list = sqlSession.delete("mapper.quality._delete_Inspection", param);
 
 		return delete_list;
+	}
+
+	// 검사 상세 목록
+	@Override
+	public InspectionDTO _dao_Insepection_detail(String insp_id, String insp_date, String prod_id, String emp_id,
+			String insp_type, String result, String inspection_qty, String good_qty, String remark) {
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("insp_id", insp_id);
+		param.put("insp_date", insp_date);
+		param.put("prod_id", prod_id);
+		param.put("emp_id", emp_id);
+		param.put("insp_type", insp_type);
+		param.put("result", result);
+		param.put("inspection_qty", inspection_qty);
+		param.put("good_qty", good_qty);
+		param.put("remark", remark);
+		//1건씩만 read이므로 List 아님
+		InspectionDTO inspection_detail = sqlSession.selectOne("mapper.quality._select_Inspection_detail", param);
+
+		return inspection_detail;
 	}
 
 }
