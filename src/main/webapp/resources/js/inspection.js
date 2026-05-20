@@ -109,3 +109,24 @@ if (detailEditBtn) {
         detailEditBtn.style.display = 'none';
     });
 }
+
+function changeEditMode(isEdit) {
+		var detailTexts = document.querySelectorAll('.detailText');
+		var detailInputs = document.querySelectorAll('.detailInput');
+
+		var editBtn = document.querySelector('#editBtn');
+		var saveBtn = document.querySelector('#saveBtn');
+		var cancelBtn = document.querySelector('#cancelBtn');
+
+		detailTexts.forEach(function(text) {
+			text.style.display = isEdit ? 'none' : '';
+		});
+
+		detailInputs.forEach(function(input) {
+			input.style.display = isEdit ? 'inline-block' : 'none';
+		});
+
+		editBtn.style.display = isEdit ? 'none' : 'inline-block';
+		saveBtn.style.display = isEdit ? 'inline-block' : 'none';
+		cancelBtn.style.display = isEdit ? 'inline-block' : 'none';
+	}
