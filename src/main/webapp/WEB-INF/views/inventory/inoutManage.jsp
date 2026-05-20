@@ -174,7 +174,7 @@
 						<th class="mobile_hidden">입출고번호</th>
 						<th class="mobile_hidden">입출고구분</th>
 						<th class="mobile_show">품목명</th>
-						<th class="mobile_hidden">입출고량</th>
+						<th class="mobile_show">입출고량</th>
 						<th class="mobile_hidden">단위</th>
 						<th class="mobile_show">일자</th>
 						<th class="mobile_show">상세</th>
@@ -204,7 +204,7 @@
 							</td>
 
 							<td class="mobile_show">${inout.itemName}</td>
-							<td class="mobile_hidden">${inout.inoutQty}</td>
+							<td class="mobile_show">${inout.inoutQty}</td>
 							<td class="mobile_hidden">${inout.itemUnit}</td>
 							<td class="mobile_show">${inout.inoutDate}</td>
 

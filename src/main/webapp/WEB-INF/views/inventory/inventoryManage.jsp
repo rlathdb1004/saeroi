@@ -15,24 +15,6 @@
 			<div class="search-row">
 
 				<div class="search-item">
-					<label class="search-label">시작일</label>
-
-					<input type="date"
-						name="startDate"
-						class="search-date"
-						value="${startDate}">
-				</div>
-
-				<div class="search-item">
-					<label class="search-label">종료일</label>
-
-					<input type="date"
-						name="endDate"
-						class="search-date"
-						value="${endDate}">
-				</div>
-
-				<div class="search-item">
 					<label class="search-label">구분</label>
 
 					<select name="searchType"
@@ -51,6 +33,24 @@
 						</option>
 
 					</select>
+				</div>
+
+				<div class="search-item">
+					<label class="search-label">시작일</label>
+
+					<input type="date"
+						name="startDate"
+						class="search-date"
+						value="${startDate}">
+				</div>
+
+				<div class="search-item">
+					<label class="search-label">종료일</label>
+
+					<input type="date"
+						name="endDate"
+						class="search-date"
+						value="${endDate}">
 				</div>
 
 				<div class="search-item">
@@ -170,7 +170,7 @@
 						<th class="mobile_show">품목명</th>
 						<th class="mobile_show">현재재고</th>
 						<th class="mobile_hidden">단위</th>
-						<th class="mobile_hidden">창고위치</th>
+						<th class="mobile_show">창고위치</th>
 						<th class="mobile_show">상세</th>
 					</tr>
 				</thead>
@@ -214,7 +214,7 @@
 								${inventory.itemUnit}
 							</td>
 
-							<td class="mobile_hidden">
+							<td class="mobile_show">
 								${inventory.stockLocation}
 							</td>
 
@@ -265,7 +265,6 @@
 						<select name="itemId"
 							id="insertInventoryItemId"
 							class="modal_select"
-							onchange="changeStockLocation();"
 							required>
 
 							<option value="">선택</option>
@@ -273,8 +272,7 @@
 							<c:forEach var="item"
 								items="${itemList}">
 
-								<option value="${item.itemId}"
-									data-location="${item.stockLocation}">
+								<option value="${item.itemId}">
 									${item.itemName}
 								</option>
 
@@ -343,26 +341,6 @@
 </div>
 
 <script>
-	// 품목명 선택 시 창고위치 자동 입력
-	function changeStockLocation() {
-
-		var select =
-			document.getElementById("insertInventoryItemId");
-
-		var option =
-			select.options[select.selectedIndex];
-
-		var location =
-			option.getAttribute("data-location");
-
-		if (location == null) {
-			location = "";
-		}
-
-		document.getElementById("insertStockLocation").value =
-			location;
-	}
-
 	// 선택 글씨 클릭 시 전체 선택 / 전체 해제
 	document.getElementById("checkAllLabel").onclick = function() {
 
