@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="mapper.chart">
+	<!-- 일별 합계 -->
+	<select id="sleect_day_data" resultType="map">
+		WITH plandata AS (
+		SELECT
+		prod_plan_date,
+		sum(prod_plan_qty)
+		total_plan_qty
+		from production_plan pp
+		GROUP BY prod_plan_date
+		),
+		workdata AS (
+		SELECT
+		pp.prod_plan_date,
+		sum(wo.order_qty) total_order_qty
+		FROM production_plan pp
+		JOIN WORK_ORDER wo
+		on(pp.prod_plan_id=
+		wo.prod_plan_id)
+		group BY pp.prod_plan_date
+		),
+		defectdate AS (
+		SELECT
+		pp.prod_plan_date,
+		sum(dl.defect_qty) total_defect_qty
+		FROM
+		production_plan pp
+		JOIN work_order wo
+		on(pp.prod_plan_id =
+		wo.prod_plan_id)
+		JOIN production p
+		on(wo.order_id = p.order_id)
+		JOIN
+		inspection i
+		on(p.prod_id = i.prod_id)
+		JOIN DEFECT_LIST dl
+		on(i.insp_id =
+		dl.insp_id)
+		GROUP BY pp.prod_plan_date
+		)
+
+		<choose>
+			<when test="_parameter == 'week'">
+				SELECT
+					to_char(p.prod_plan_date,'YYYY-IW') 계획일자,
+					round(avg(total_plan_qty),1) 생산계획량,
+					round(avg(nvl(w.total_order_qty,0)),1) 작업량,
+					round(avg(nvl(d.total_defect_qty,0)),1) 불량수량
+				FROM plandata p
+				LEFT OUTER JOIN workdata w
+				ON p.prod_plan_date = w.PROD_PLAN_DATE
+				LEFT OUTER JOIN defectdate d
+				ON p.prod_plan_date = d.prod_plan_date
+				GROUP BY to_char(p.prod_plan_date, 'YYYY-IW')
+				ORDER BY 계획일자
+			</when>
+			<when test="_parameter == 'day'">
+				SELECT
+					to_char(p.prod_plan_date,'YYYY-MM-DD') 계획일자,
+					total_plan_qty 생산계획량,
+					nvl(w.total_order_qty,0) 작업량,
+					nvl(d.total_defect_qty,0) 불량수량
+				FROM plandata p
+				LEFT OUTER JOIN workdata w
+				ON p.prod_plan_date = w.PROD_PLAN_DATE
+				LEFT OUTER JOIN defectdate d
+				ON p.prod_plan_date = d.prod_plan_date
+				ORDER BY p.prod_plan_date
+			</when>
+			<when test="_parameter == 'year_sum'">
+				SELECT
+					to_char(p.prod_plan_date,'YYYY') 계획일자,
+					sum(total_plan_qty) 생산계획량,
+					sum(nvl(w.total_order_qty,0)) 작업량,
+					sum(nvl(d.total_defect_qty,0)) 불량수량
+				FROM plandata p
+				LEFT OUTER JOIN workdata w
+				ON p.prod_plan_date = w.PROD_PLAN_DATE
+				LEFT OUTER JOIN defectdate d
+				ON p.prod_plan_date = d.prod_plan_date
+				GROUP BY to_char(p.prod_plan_date, 'YYYY')
+				ORDER BY 계획일자
+			</when>
+			<when test="_parameter == 'year_avg'">
+				SELECT
+					to_char(p.prod_plan_date,'YYYY') 계획일자,
+					round(avg(total_plan_qty),1) 생산계획량,
+					round(avg(nvl(w.total_order_qty,0)),1) 작업량,
+					round(avg(nvl(d.total_defect_qty,0)),1) 불량수량
+				FROM plandata p
+				LEFT OUTER JOIN workdata w
+				ON p.prod_plan_date = w.PROD_PLAN_DATE
+				LEFT OUTER JOIN defectdate d
+				ON p.prod_plan_date = d.prod_plan_date
+				GROUP BY to_char(p.prod_plan_date, 'YYYY')
+				ORDER BY 계획일자
+			</when>
+			<otherwise>
+				SELECT
+					to_char(p.prod_plan_date,'YYYY-MM') 계획일자,
+					round(avg(total_plan_qty),1) 생산계획량,
+					round(avg(nvl(w.total_order_qty,0)),1) 작업량,
+					round(avg(nvl(d.total_defect_qty,0)),1) 불량수량
+				FROM plandata p
+				LEFT OUTER JOIN workdata w
+				ON p.prod_plan_date = w.PROD_PLAN_DATE
+				LEFT OUTER JOIN defectdate d
+				ON p.prod_plan_date = d.prod_plan_date
+				GROUP BY to_char(p.prod_plan_date, 'YYYY-MM')
+				ORDER BY 계획일자
+			</otherwise>
+		</choose>
+	</select>
+
+
+
+</mapper>

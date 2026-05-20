@@ -7,7 +7,6 @@
 }
 
 @media screen and (max-width: 768px) {
-
 	/* 모바일에서는 화면이 기기 너비보다 넓어지지 않도록 기본값을 잡는다. */
 	body {
 		min-width: 0;
@@ -217,8 +216,7 @@
 	}
 
 	/* 모바일에서는 공통 검색 박스의 안쪽 여백을 줄이고 가로 스크롤을 만들지 않는다. */
-	.coSearchBox,
-	.search-box {
+	.coSearchBox, .search-box {
 		padding: 16px;
 		margin-bottom: 18px;
 		overflow-x: visible;
@@ -226,8 +224,7 @@
 	}
 
 	/* 모바일에서는 검색 조건을 한 줄에 두 개씩 보이도록 한다. */
-	.coSearchRow,
-	.search-row {
+	.coSearchRow, .search-row {
 		display: flex;
 		flex-direction: row;
 		align-items: flex-start;
@@ -236,10 +233,7 @@
 	}
 
 	/* 모바일에서는 일반 검색 조건을 한 줄에 두 개씩 배치한다. */
-	.coSearchItem,
-	.coSearchItemMiddle,
-	.coSearchItemSmall,
-	.search-item {
+	.coSearchItem, .coSearchItemMiddle, .coSearchItemSmall, .search-item {
 		width: calc(50% - 5px);
 		min-width: 0;
 		flex: 0 0 calc(50% - 5px);
@@ -255,11 +249,7 @@
 	}
 
 	/* 모바일에서는 input, select, date가 화면 밖으로 나가지 않도록 한다. */
-	.coInput,
-	.coSelect,
-	.search-input,
-	.search-select,
-	.search-date {
+	.coInput, .coSelect, .search-input, .search-select, .search-date {
 		width: 100%;
 		max-width: 100%;
 		box-sizing: border-box;
@@ -285,8 +275,7 @@
 	}
 
 	/* 모바일에서는 content.css 검색/초기화 버튼의 PC 최소 너비를 해제한다. */
-	.coSearchBtnBox .coBtnSearch,
-	.coSearchBtnBox .coBtnReset {
+	.coSearchBtnBox .coBtnSearch, .coSearchBtnBox .coBtnReset {
 		min-width: 0;
 	}
 
@@ -309,46 +298,37 @@
 	}
 
 	/* 모바일에서는 searchtable.css 검색/초기화 버튼의 PC 최소 너비를 해제한다. */
-	.search-btn-wrap .search-btn-main,
-	.search-btn-wrap .search-btn-sub {
+	.search-btn-wrap .search-btn-main, .search-btn-wrap .search-btn-sub {
 		min-width: 0;
 	}
 
 	/* 모바일에서는 테이블이 화면 폭 안에서 줄어들 수 있도록 한다. */
-	.coTable,
-	.list-table {
+	.coTable, .list-table {
 		width: 100%;
 		min-width: 0;
 		table-layout: fixed;
 	}
 
 	/* PC에서 colgroup으로 컬럼 폭이 고정되어 있으면 모바일에서는 해제한다. */
-	.coTable colgroup,
-	.list-table colgroup {
+	.coTable colgroup, .list-table colgroup {
 		display: none;
 	}
 
 	/* 모바일에서 숨길 테이블 컬럼이다. */
-	.coTable th.mobile_hidden,
-	.coTable td.mobile_hidden,
-	.list-table th.mobile_hidden,
-	.list-table td.mobile_hidden {
+	.coTable th.mobile_hidden, .coTable td.mobile_hidden, .list-table th.mobile_hidden,
+		.list-table td.mobile_hidden {
 		display: none;
 	}
 
 	/* 모바일에서 보여줄 테이블 컬럼이다. */
-	.coTable th.mobile_show,
-	.coTable td.mobile_show,
-	.list-table th.mobile_show,
-	.list-table td.mobile_show {
+	.coTable th.mobile_show, .coTable td.mobile_show, .list-table th.mobile_show,
+		.list-table td.mobile_show {
 		display: table-cell;
 	}
 
 	/* 모바일에서 보이는 컬럼은 기존 테이블 스타일을 유지하면서 칸 안에서 말줄임 처리한다. */
-	.coTable th.mobile_show,
-	.coTable td.mobile_show,
-	.list-table th.mobile_show,
-	.list-table td.mobile_show {
+	.coTable th.mobile_show, .coTable td.mobile_show, .list-table th.mobile_show,
+		.list-table td.mobile_show {
 		min-width: 0;
 		white-space: nowrap;
 		overflow: hidden;
@@ -357,8 +337,7 @@
 	}
 
 	/* 모바일 테이블 안의 링크만 칸 밖으로 나가지 않도록 한다. */
-	.coTable td.mobile_show a,
-	.list-table td.mobile_show a {
+	.coTable td.mobile_show a, .list-table td.mobile_show a {
 		display: inline-block;
 		max-width: 100%;
 		overflow: hidden;
@@ -446,7 +425,7 @@
 		height: 16px;
 	}
 
-		/* 모바일에서는 상세 페이지 회색 배경 영역을 위로 올린다. */
+	/* 모바일에서는 상세 페이지 회색 배경 영역을 위로 올린다. */
 	.detail_page {
 		width: calc(100% + 32px);
 		margin: -16px -16px 0;
@@ -481,9 +460,7 @@
 	}
 
 	/* 모바일에서는 상세 경로 문구 간격을 줄인다. */
-	.detail_path,
-	.detail_breadcrumb,
-	.breadcrumb {
+	.detail_path, .detail_breadcrumb, .breadcrumb {
 		margin-top: 4px;
 		margin-bottom: 8px;
 		font-size: 12px;
@@ -499,11 +476,9 @@
 	}
 
 	/* 모바일에서는 상세 버튼 크기를 맞춘다. */
-	.detail_btn_area .detail_btn_line,
-	.detail_btn_area .detail_btn_green,
-	.detail_btn_area .btn_list,
-	.detail_btn_area .btn_update,
-	.detail_btn_area .coBtn {
+	.detail_btn_area .detail_btn_line, .detail_btn_area .detail_btn_green,
+		.detail_btn_area .btn_list, .detail_btn_area .btn_update,
+		.detail_btn_area .coBtn {
 		min-width: 92px;
 		height: 36px;
 		padding: 0 14px;
@@ -524,32 +499,28 @@
 		box-sizing: border-box;
 	}
 
-	/* 모바일 상세 기본정보 테이블은 항목명과 값을 2열로 보여준다. */
+	/* 모바일 상세 기본정보 테이블 */
 	.detail_info_table {
 		width: 100%;
-		display: block;
+		display: grid;
+		grid-template-columns: 86px minmax(0, 1fr);
 		border-collapse: collapse;
 		box-sizing: border-box;
 	}
 
-	/* 모바일에서는 tbody도 화면 폭 전체를 사용한다. */
+	/* 모바일에서는 PC colgroup 폭을 사용하지 않는다. */
+	.detail_info_table colgroup {
+		display: none;
+	}
+
+	/* 모바일에서는 tbody가 배치에 영향을 주지 않게 한다. */
 	.detail_info_table tbody {
-		display: block;
-		width: 100%;
+		display: contents;
 	}
 
-	/* 모바일에서는 한 행 안의 th, td를 2열 그리드로 배치한다. */
+	/* 모바일에서는 tr이 배치에 영향을 주지 않게 한다. */
 	.detail_info_table tr {
-		display: grid;
-		grid-template-columns: 86px minmax(0, 1fr);
-		width: 100%;
-		border-bottom: 1px solid #DDE5E1;
-		box-sizing: border-box;
-	}
-
-	/* 모바일에서는 마지막 행의 아래 선을 제거한다. */
-	.detail_info_table tr:last-child {
-		border-bottom: none;
+		display: contents;
 	}
 
 	/* 모바일 상세 기본정보의 항목명 칸이다. */
@@ -559,8 +530,9 @@
 		width: auto;
 		min-width: 0;
 		padding: 12px 10px;
-		background-color: #F1F4F3;
+		background-color: #ffffff;
 		border: none;
+		border-bottom: 1px solid #DDE5E1;
 		color: #1F2933;
 		font-size: 13px;
 		font-weight: 700;
@@ -578,7 +550,9 @@
 		width: auto;
 		min-width: 0;
 		padding: 12px 10px;
+		background-color: #ffffff;
 		border: none;
+		border-bottom: 1px solid #DDE5E1;
 		color: #1F2933;
 		font-size: 14px;
 		font-weight: 500;
@@ -590,15 +564,13 @@
 		box-sizing: border-box;
 	}
 
-	/* colspan이 있는 값은 내용 영역 전체를 사용한다. */
+	/* colspan이 있는 값은 모바일에서도 값 영역에만 배치한다. */
 	.detail_info_table td[colspan] {
-		grid-column: 2 / -1;
+		grid-column: 2/-1;
 	}
 
 	/* 모바일에서는 상세 하단 영역도 화면 폭 안에 맞춘다. */
-	.detail_content_box,
-	.detail_extra_box,
-	.detail_content_area {
+	.detail_content_box, .detail_extra_box, .detail_content_area {
 		width: 100%;
 		padding: 16px;
 		box-sizing: border-box;
@@ -606,7 +578,6 @@
 }
 
 @media screen and (max-width: 480px) {
-
 	/* 작은 모바일에서도 대메뉴가 제목처럼 보이도록 크기를 유지한다. */
 	.hePageTitle {
 		font-size: 24px;
@@ -619,10 +590,7 @@
 	}
 
 	/* 작은 모바일에서도 검색 조건을 한 줄에 두 개씩 보여준다. */
-	.coSearchItem,
-	.coSearchItemMiddle,
-	.coSearchItemSmall,
-	.search-item {
+	.coSearchItem, .coSearchItemMiddle, .coSearchItemSmall, .search-item {
 		width: calc(50% - 5px);
 		flex: 0 0 calc(50% - 5px);
 		min-width: 0;
