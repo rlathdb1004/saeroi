@@ -161,15 +161,22 @@
 
 				<thead>
 					<tr>
-						<th class="col-check"><input type="checkbox" id="checkAll"
-							onclick="toggleAllItems(this);" /></th>
-						<th class="col-code">품목코드</th>
-						<th class="col-name">품목명</th>
-						<th class="col-type">품목구분</th>
-						<th class="col-supplier">공급처</th>
-						<th class="col-client">납품처</th>
-						<th class="col-use">사용여부</th>
-						<th class="col-detail">상세</th>
+						<th class="mobile_show"><input type="checkbox" id="checkAll"
+							onclick="toggleAllCheck(this);"></th>
+
+						<th class="mobile_show">품목코드</th>
+
+						<th class="mobile_show">품목명</th>
+
+						<th class="mobile_show">품목구분</th>
+
+						<th class="mobile_hidden">공급처</th>
+
+						<th class="mobile_hidden">납품처</th>
+
+						<th class="mobile_hidden">사용여부</th>
+
+						<th class="mobile_show">상세</th>
 					</tr>
 				</thead>
 
@@ -179,42 +186,78 @@
 						<c:when test="${not empty itemList}">
 							<c:forEach var="item" items="${itemList}">
 								<tr>
-									<%-- PC 전용 체크박스 --%>
-									<td class="col-check"><input type="checkbox"
-										name="itemIdList" value="${item.itemId}" /></td>
+									<%--
+										모바일 표시 컬럼 1: 체크박스
+										- 선택삭제 기능을 위해 모바일에서도 표시한다.
+									--%>
+									<td class="mobile_show"><input type="checkbox"
+										name="itemIdList" value="${item.itemId}"></td>
 
-									<%-- 모바일에서도 표시 --%>
-									<td class="col-code" title="${item.itemCode}">
+									<%--
+										모바일 표시 컬럼 2: 품목코드
+										- 긴 값은 공용 CSS에서 말줄임 처리된다.
+										- title 속성으로 마우스 오버 시 전체 값을 확인할 수 있다.
+									--%>
+									<td class="mobile_show" title="${item.itemCode}">
 										${item.itemCode}</td>
 
-									<%-- 모바일에서도 표시 --%>
-									<td class="col-name" title="${item.itemName}">
+									<%--
+										모바일 표시 컬럼 3: 품목명
+										- 품목 식별에 가장 중요한 표시값이다.
+									--%>
+									<td class="mobile_show" title="${item.itemName}">
 										${item.itemName}</td>
 
-									<%-- 모바일에서도 표시 --%>
-									<td class="col-type"><span class="coStatus coStatusUse">
-											${item.itemTypeName} </span></td>
+									<%--
+										모바일 표시 컬럼 4: 품목구분
+										- 사용여부 대신 모바일 목록에 표시한다.
+									--%>
+									<td class="mobile_show"><c:choose>
+											<c:when test="${item.itemType == 'FG'}">
+												<span class="coStatus coStatusUse">완제품</span>
+											</c:when>
+											<c:when test="${item.itemType == 'RM'}">
+												<span class="coStatus coStatusUse">원자재</span>
+											</c:when>
+											<c:when test="${item.itemType == 'SM'}">
+												<span class="coStatus coStatusUse">부자재</span>
+											</c:when>
+											<c:otherwise>
+												<span class="coStatus">${item.itemType}</span>
+											</c:otherwise>
+										</c:choose></td>
 
-									<%-- PC 전용 --%>
-									<td class="col-supplier" title="${item.supplierName}"><c:choose>
+									<%--
+										모바일 숨김 컬럼: 공급처
+										- PC 목록에서는 표시
+										- 모바일에서는 상세 화면에서 확인
+									--%>
+									<td class="mobile_hidden" title="${item.supplierName}"><c:choose>
 											<c:when test="${not empty item.supplierName}">
-                                                ${item.supplierName}
-                                            </c:when>
+												${item.supplierName}
+											</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose></td>
 
-									<%-- PC 전용 --%>
-									<td class="col-client" title="${item.deliveryClientName}">
+									<%--
+										모바일 숨김 컬럼: 납품처
+										- 원자재/부자재는 납품처가 없을 수 있으므로 모바일 우선순위에서 제외한다.
+									--%>
+									<td class="mobile_hidden" title="${item.deliveryClientName}">
 										<c:choose>
 											<c:when test="${not empty item.deliveryClientName}">
-                                                ${item.deliveryClientName}
-                                            </c:when>
+											${item.deliveryClientName}
+										</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose>
 									</td>
 
-									<%-- PC 전용 --%>
-									<td class="col-use"><c:choose>
+									<%--
+										모바일 숨김 컬럼: 사용여부
+										- PC에서는 표시
+										- 모바일에서는 5컬럼 기준 때문에 숨김 처리한다.
+									--%>
+									<td class="mobile_hidden"><c:choose>
 											<c:when test="${item.useYn == 'Y'}">
 												<span class="coStatus coStatusUse">사용</span>
 											</c:when>
@@ -223,8 +266,11 @@
 											</c:otherwise>
 										</c:choose></td>
 
-									<%-- 모바일에서도 표시 --%>
-									<td class="col-detail"><a
+									<%--
+										모바일 표시 컬럼 5: 상세
+										- 상세 컬럼은 모바일에서도 반드시 표시한다.
+									--%>
+									<td class="mobile_show"><a
 										href="${contextPath}/master/item/detail?itemId=${item.itemId}"
 										class="coDetailBtn"> 보기 </a></td>
 								</tr>
@@ -522,98 +568,93 @@
      - 공용 CSS 수정 없이 현재 화면에만 적용
      ============================================================= --%>
 <style>
-/* 긴 텍스트 말줄임 처리 */
-.item-table td {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
+/* =========================================================
+   item.jsp 전용 CSS
+   공용 CSS에 없는 기능만 작성한다.
+   - 품목코드 구성 select 영역
+   - 거래처 자동완성 박스
+   - 목록 테이블 컬럼폭 드래그 핸들
+   ========================================================= */
 
-/* 품목코드 자동생성 input + 버튼 배치 */
-.item-code-generate-box {
-	display: flex;
-	gap: 8px;
-	width: 100%;
-}
-
-.item-code-generate-box .modal_input {
-	flex: 1;
-}
-
-.item-code-btn {
-	height: 42px;
-	min-width: 96px;
-}
-
-/* 자동완성 영역 기준점 */
-.autocomplete-wrap {
-	position: relative;
-}
-
-/* 자동완성 후보 목록 */
-.autocomplete-list {
+/* 품목코드 구성 선택 영역 */
+.item-code-option-group {
 	display: none;
-	position: absolute;
-	top: 72px;
-	left: 0;
-	right: 0;
-	z-index: 1100;
-	max-height: 180px;
-	overflow-y: auto;
-	background-color: #FFFFFF;
-	border: 1px solid #D6DEE0;
-	border-radius: 8px;
-	box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+	margin-top: 6px;
 }
 
-.autocomplete-item {
-	padding: 10px 12px;
-	font-size: 14px;
-	color: #1F2933;
-	cursor: pointer;
+.item-code-select-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 8px;
 }
 
-.autocomplete-item:hover {
-	background-color: #E6F2ED;
-	color: #2F7D62;
-}
-
-.autocomplete-name {
+.code-sub-label {
+	display: block;
+	margin: 0 0 4px 2px;
+	color: #4B5563;
+	font-size: 12px;
 	font-weight: 600;
 }
 
-.autocomplete-code {
-	margin-left: 6px;
-	color: #6B7280;
-	font-size: 12px;
-}
-
-/* 선택된 ID 표시 */
+/* 자동완성 선택 후 ID 안내 문구 */
 .autocomplete-id-text {
 	margin: 4px 0 0 2px;
 	color: #6B7280;
 	font-size: 12px;
-	line-height: 1.2;
+	line-height: 1.4;
 }
 
-#itemListTable {
-	table-layout: fixed;
-	width: 100% !important;
-	max-width: 100% !important;
-	min-width: 0 !important;
+/* 공급처/납품처 자동완성 박스 */
+#supplierAutoCompleteBox, #deliveryClientAutoCompleteBox {
+	display: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 100%;
+	z-index: 20;
+	max-height: 180px;
+	overflow-y: auto;
+	margin-top: 4px;
+	border: 1px solid #D6DEE0;
+	border-radius: 8px;
+	background-color: #FFFFFF;
+	box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+	box-sizing: border-box;
 }
 
-#itemListTable th, #itemListTable td {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+/* 자동완성 input 감싸는 영역 */
+.autocomplete-wrap {
+	position: relative;
 }
 
+/* 자동완성 목록 한 줄 */
+.autocomplete-item {
+	padding: 9px 12px;
+	color: #1F2933;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.4;
+	cursor: pointer;
+	border-bottom: 1px solid #EEF2F0;
+	box-sizing: border-box;
+}
+
+.autocomplete-item:last-child {
+	border-bottom: none;
+}
+
+.autocomplete-item:hover {
+	background-color: #F7F9F8;
+	color: #2F7D62;
+}
+
+/* 목록 테이블 컬럼폭 드래그 */
 #itemListTable th {
 	position: relative;
 	user-select: none;
 }
 
+/* 컬럼 경계 드래그 핸들 */
 .column-resizer {
 	position: absolute;
 	top: 0;
@@ -628,56 +669,16 @@
 	background-color: rgba(47, 125, 96, 0.18);
 }
 
-@media ( max-width : 760px) {
-	/*
-            모바일 목록 기준:
-            - 체크박스 제외
-            - 상세 포함 최대 4개 컬럼
-            - 품목코드, 품목명, 품목구분, 상세 표시
-        */
-	.item-table .col-check, .item-table .col-supplier, .item-table .col-client,
-		.item-table .col-use {
-		display: none;
-	}
-
-	/* 모바일에서는 선택삭제 기능 제외 */
-	.pc-only-delete-btn {
-		display: none;
-	}
-	.item-table .col-name {
-		max-width: 150px;
-	}
-	.item-code-generate-box {
-		flex-direction: column;
-	}
-	.item-code-btn {
-		width: 100%;
-	}
+/* 상세 컬럼은 '보기.'처럼 말줄임 점이 생기지 않도록 제외 */
+#itemListTable th:last-child, #itemListTable td:last-child {
+	text-overflow: clip !important;
 }
 
-.item-code-option-group {
-	display: none;
-	margin-top: 6px;
-}
-
-.item-code-select-grid {
-	display: grid;
-	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 8px;
-}
-
-.code-sub-label {
-	display: block;
-	margin: 0 0 4px 2px;
-	color: #4B5563;
-	font-size: 12px;
-	font-weight: 600;
-}
-
-@media ( max-width : 760px) {
-	.item-code-select-grid {
-		grid-template-columns: 1fr;
-	}
+#itemListTable td:last-child .coDetailBtn {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: clip !important;
+	white-space: nowrap;
 }
 </style>
 
