@@ -70,15 +70,39 @@
 				<!-- 검색 / 초기화 버튼 -->
 				<div class="search-btn-wrap">
 
+					<!-- 검색 버튼 -->
 					<button type="submit"
 						class="search-btn search-btn-main">
+
+						<!-- 돋보기 아이콘 -->
+						<svg viewBox="0 0 24 24" fill="none">
+
+							<circle cx="10.5"
+								cy="10.5"
+								r="7.5"
+								stroke="currentColor"
+								stroke-width="2">
+							</circle>
+
+							<path d="M16 16L21 21"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round">
+							</path>
+
+						</svg>
+
 						검색
+
 					</button>
 
+					<!-- 초기화 버튼 -->
 					<button type="button"
 						class="search-btn search-btn-sub search-reset-btn"
 						onclick="location.href='${pageContext.request.contextPath}/inventory/stockList'">
+
 						초기화
+
 					</button>
 
 				</div>
@@ -99,22 +123,28 @@
 				총 ${pageInfo.totalCount}건
 			</p>
 
-			<!-- 관리자/매니저만 등록/삭제 버튼 보임 -->
+			<!-- 관리자 / 매니저만 등록, 삭제 버튼 보임 -->
 			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
 				or sessionScope.loginUser.role eq 'MANAGER'}">
 
 				<div class="search-btn-right">
 
+					<!-- 등록 버튼 -->
 					<button type="button"
 						class="search-btn search-btn-main modal_open_btn"
 						data_modal_target="#modal_insert">
+
 						등록
+
 					</button>
 
+					<!-- 선택 삭제 버튼 -->
 					<button type="button"
 						class="search-btn search-btn-sub"
 						onclick="deleteCheck()">
+
 						선택 삭제
+
 					</button>
 
 				</div>
@@ -129,13 +159,22 @@
 			<table class="coTable">
 
 				<thead>
+
 					<tr>
+
+						<!-- 전체 선택 -->
 						<th>
-							<label for="checkAll">선택</label>
+
+							<label for="checkAll">
+								선택
+							</label>
+
 							<input type="checkbox"
 								id="checkAll"
 								style="display:none;">
+
 						</th>
+
 						<th>품목코드</th>
 						<th>품목유형</th>
 						<th>품목명</th>
@@ -143,7 +182,9 @@
 						<th>단위</th>
 						<th>창고위치</th>
 						<th>상세</th>
+
 					</tr>
+
 				</thead>
 
 				<tbody>
@@ -152,10 +193,13 @@
 						items="${list}">
 
 						<tr>
+
 							<td>
+
 								<input type="checkbox"
 									name="inventoryIds"
 									value="${inventory.inventoryId}">
+
 							</td>
 
 							<td title="${inventory.itemCode}">
@@ -163,29 +207,57 @@
 							</td>
 
 							<td>
+
 								<c:choose>
-									<c:when test="${inventory.itemType eq 'FG'}">완제품</c:when>
-									<c:when test="${inventory.itemType eq 'RM'}">원자재</c:when>
-									<c:when test="${inventory.itemType eq 'SM'}">부자재</c:when>
-									<c:otherwise>${inventory.itemType}</c:otherwise>
+
+									<c:when test="${inventory.itemType eq 'FG'}">
+										완제품
+									</c:when>
+
+									<c:when test="${inventory.itemType eq 'RM'}">
+										원자재
+									</c:when>
+
+									<c:when test="${inventory.itemType eq 'SM'}">
+										부자재
+									</c:when>
+
+									<c:otherwise>
+										${inventory.itemType}
+									</c:otherwise>
+
 								</c:choose>
+
 							</td>
 
 							<td title="${inventory.itemName}">
 								${inventory.itemName}
 							</td>
 
-							<td>${inventory.inventoryStock}</td>
-							<td>${inventory.itemUnit}</td>
-							<td>${inventory.stockLocation}</td>
+							<td>
+								${inventory.inventoryStock}
+							</td>
 
 							<td>
+								${inventory.itemUnit}
+							</td>
+
+							<td>
+								${inventory.stockLocation}
+							</td>
+
+							<td>
+
 								<button type="button"
 									class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/stockList/detail?inventoryId=${inventory.inventoryId}'">
+
 									보기
+
 								</button>
+
 							</td>
+
 						</tr>
 
 					</c:forEach>
@@ -203,128 +275,16 @@
 
 </div>
 
-<!-- 등록 모달 -->
-<div id="modal_insert"
-	class="modal_wrap"
-	aria-hidden="true">
-
-	<div class="modal_box"
-		role="dialog"
-		aria-modal="true">
-
-		<div class="modal_header">
-			<h3 class="modal_title">재고 등록</h3>
-		</div>
-
-		<form class="modal_form"
-			method="post"
-			action="${pageContext.request.contextPath}/inventory/stockList/insert">
-
-			<div class="modal_body modal_body_2col">
-
-				<!-- 품목 선택 -->
-				<div class="modal_item">
-
-					<label class="modal_label">
-						품목명<span class="modal_required">*</span>
-					</label>
-
-					<select name="itemId"
-						id="itemSelect"
-						class="modal_select"
-						onchange="changeStockLocation()"
-						required>
-
-						<option value="">선택</option>
-
-						<c:forEach var="item"
-							items="${itemList}">
-
-							<option value="${item.itemId}"
-								data-location="${item.stockLocation}">
-								${item.itemName}
-							</option>
-
-						</c:forEach>
-
-					</select>
-
-				</div>
-
-				<!-- 현재 재고 -->
-				<div class="modal_item">
-
-					<label class="modal_label">
-						현재재고<span class="modal_required">*</span>
-					</label>
-
-					<input type="number"
-						name="inventoryStock"
-						class="modal_input"
-						min="0"
-						required>
-
-				</div>
-
-				<!-- 창고 위치 -->
-				<div class="modal_item">
-
-					<label class="modal_label">
-						창고위치<span class="modal_required">*</span>
-					</label>
-
-					<input type="text"
-						name="stockLocation"
-						id="stockLocation"
-						class="modal_input"
-						required>
-
-				</div>
-
-				<!-- 비고 -->
-				<div class="modal_item">
-
-					<label class="modal_label">
-						비고
-					</label>
-
-					<input type="text"
-						name="remark"
-						class="modal_input">
-
-				</div>
-
-			</div>
-
-			<div class="modal_footer">
-
-				<button type="button"
-					class="modal_btn modal_btn_cancel modal_close_btn">
-					취소
-				</button>
-
-				<button type="submit"
-					class="modal_btn modal_btn_submit">
-					등록
-				</button>
-
-			</div>
-
-		</form>
-
-	</div>
-
-</div>
-
 <script>
 
-	// 선택 글씨를 누르면 전체 선택 / 해제
+	// 전체 선택 체크박스
 	document.getElementById("checkAll").onclick = function() {
 
 		var checks =
 			document.getElementsByName("inventoryIds");
 
 		for (var i = 0; i < checks.length; i++) {
+
 			checks[i].checked = this.checked;
 		}
 	};
@@ -340,6 +300,7 @@
 		for (var i = 0; i < checks.length; i++) {
 
 			if (checks[i].checked) {
+
 				checked = true;
 			}
 		}
@@ -354,26 +315,6 @@
 
 			document.getElementById("deleteForm").submit();
 		}
-	}
-
-	// 품목명을 선택하면 창고위치 자동 입력
-	function changeStockLocation() {
-
-		var select =
-			document.getElementById("itemSelect");
-
-		var option =
-			select.options[select.selectedIndex];
-
-		var location =
-			option.getAttribute("data-location");
-
-		if (location == null) {
-			location = "";
-		}
-
-		document.getElementById("stockLocation").value =
-			location;
 	}
 
 </script>

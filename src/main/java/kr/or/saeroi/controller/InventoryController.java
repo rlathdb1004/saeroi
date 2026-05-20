@@ -72,8 +72,8 @@ public class InventoryController {
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
 
-		// tiles 공통 레이아웃 사용
-		return "inoutManage.tiles";
+		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		return "inventory/inoutManage.tiles";
 	}
 
 	// 입출고 등록
@@ -123,8 +123,8 @@ public class InventoryController {
 		model.addAttribute("inout", inout);
 		model.addAttribute("mode", mode);
 
-		// tiles 공통 레이아웃 사용
-		return "inoutDetail.tiles";
+		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		return "inventory/inoutDetail.tiles";
 	}
 
 	// 입출고 수정
@@ -205,8 +205,8 @@ public class InventoryController {
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
 
-		// tiles 공통 레이아웃 사용
-		return "inventoryManage.tiles";
+		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		return "inventory/inventoryManage.tiles";
 	}
 
 	// 재고 등록
@@ -254,8 +254,8 @@ public class InventoryController {
 		model.addAttribute("inventory", inventory);
 		model.addAttribute("mode", mode);
 
-		// tiles 공통 레이아웃 사용
-		return "inventoryDetail.tiles";
+		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		return "inventory/inventoryDetail.tiles";
 	}
 
 	// 재고 수정
