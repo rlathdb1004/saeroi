@@ -88,3 +88,24 @@ if (result) {
 // 페이지가 열리면 품목명, 검사자 옵션 미리 불러오기
 loadProdOptions();
 loadEmpOptions();
+
+//수정 클릭 하면 인풋창으로 변경 됨(수정은 검사 일시, 품목명, 검사자, 검사결과, 검사 구분, ~수량, 비고까지 가능하게 할 것임)
+//수정 할 칸이 여러 개이므로 All로 해야 함
+const detailEditBtn = document.querySelector('#detailEditBtn');//수정 버튼
+const detailText = document.querySelectorAll('.detailText');//span 부분 공통 클래스
+const detailInput = document.querySelectorAll('.detailInput');//숨어 있는 인풋
+
+if (detailEditBtn) {
+    detailEditBtn.addEventListener('click', function () {
+
+        detailText.forEach(function (text) {
+            text.style.display = 'none';
+        });
+
+        detailInput.forEach(function (input) {
+            input.style.display = 'inline-block';
+        });
+
+        detailEditBtn.style.display = 'none';
+    });
+}

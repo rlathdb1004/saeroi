@@ -253,6 +253,10 @@ function siLoadMenuByCurrentUrl() {
             matchedMenu = menuLinks[i];
         }
     }
+    // 검사 상세 페이지는 사이드바에 직접 있는 메뉴가 아니므로 검사관리 메뉴로 처리한다.
+	if (matchedMenu == null && currentPath == contextPath + "/quality/inspection_detail") {
+    	matchedMenu = document.querySelector(".siSubMenuLink[data-main-menu='품질관리'][data-sub-menu='검사관리']");
+	}
 
     // 사용자가 /saeroi 또는 /saeroi/ 기본 주소로 들어온 경우를 처리한다.
     if (matchedMenu == null && (currentPath == contextPath || currentPath == contextPath + "/")) {
