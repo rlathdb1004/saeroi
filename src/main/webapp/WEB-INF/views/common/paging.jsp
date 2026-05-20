@@ -7,6 +7,55 @@
 <c:if test="${not empty pageInfo}">
 	<%-- pageInfo가 있을 때만 페이징을 보여준다. --%>
 
+	<%
+		// 현재 주소의 queryString을 가져온다.
+		// 예: page=1&size=10&searchType=itemName&keyword=가스켓
+		String currentQueryString = request.getQueryString();
+
+		// 페이징 이동 시 유지할 검색 조건을 담는 변수이다.
+		StringBuilder keepQueryBuilder = new StringBuilder();
+
+		// queryString이 있을 때만 처리한다.
+		if (currentQueryString != null && currentQueryString.length() > 0) {
+
+			// & 기준으로 파라미터를 나눈다.
+			String[] queryArray = currentQueryString.split("&");
+
+			for (int i = 0; i < queryArray.length; i++) {
+
+				// 현재 파라미터 하나를 꺼낸다.
+				String queryParam = queryArray[i];
+
+				// 빈 값이면 건너뛴다.
+				if (queryParam == null || queryParam.trim().length() == 0) {
+					continue;
+				}
+
+				// 파라미터 이름만 꺼내기 위한 변수이다.
+				String queryName = queryParam;
+
+				// = 위치를 찾는다.
+				int equalIndex = queryParam.indexOf("=");
+
+				// = 이 있으면 앞부분만 파라미터 이름으로 사용한다.
+				if (equalIndex > -1) {
+					queryName = queryParam.substring(0, equalIndex);
+				}
+
+				// page와 size는 페이징에서 새로 넣을 값이므로 제외한다.
+				if ("page".equals(queryName) || "size".equals(queryName)) {
+					continue;
+				}
+
+				// 검색 조건은 다시 붙일 수 있도록 &와 함께 저장한다.
+				keepQueryBuilder.append("&").append(queryParam);
+			}
+		}
+
+		// JSP EL에서 사용할 수 있도록 request에 저장한다.
+		request.setAttribute("pagingKeepQuery", keepQueryBuilder.toString());
+	%>
+
 	<div class="coTableBottom">
 		<%-- 페이징과 몇 개씩 보기가 들어가는 하단 영역이다. --%>
 
@@ -19,46 +68,39 @@
 				<c:when test="${pageInfo.hasPrev}">
 					<%-- 현재 페이지가 1보다 크면 첫 페이지로 이동할 수 있다. --%>
 
-					<a
-						href="${pageContext.request.contextPath}${pageUrl}?page=1&size=${pageInfo.size}"
-						class="coPageMoveBtn"> <%-- 첫 페이지로 이동하는 버튼이다. --%> <svg
-							class="coPageIcon" viewBox="0 0 24 24" fill="none"
-							stroke-width="2">
-                        <%-- SVG 아이콘을 그리기 위한 태그이다. --%>
+					<a href="${pageContext.request.contextPath}${pageUrl}?page=1&size=${pageInfo.size}${pagingKeepQuery}"
+						class="coPageMoveBtn">
+						<%-- 첫 페이지로 이동하는 버튼이다. --%>
 
-                            <path d="M11 18L5 12L11 6"></path>
-                            <%-- 첫 번째 왼쪽 화살표 선이다. --%>
+						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+							<%-- SVG 아이콘을 그리기 위한 태그이다. --%>
 
-                            <path d="M19 18L13 12L19 6"></path>
-                            <%-- 두 번째 왼쪽 화살표 선이다. --%>
+							<path d="M11 18L5 12L11 6"></path>
+							<%-- 첫 번째 왼쪽 화살표 선이다. --%>
 
-                        </svg> <%-- SVG 아이콘을 끝낸다. --%>
-
+							<path d="M19 18L13 12L19 6"></path>
+							<%-- 두 번째 왼쪽 화살표 선이다. --%>
+						</svg>
+						<%-- SVG 아이콘을 끝낸다. --%>
 					</a>
 					<%-- 첫 페이지 이동 버튼을 끝낸다. --%>
-
 				</c:when>
-				<%-- 첫 페이지로 이동할 수 있는 경우를 끝낸다. --%>
 
 				<c:otherwise>
 					<%-- 현재 페이지가 1페이지면 첫 페이지로 이동할 필요가 없다. --%>
 
-					<span class="coPageMoveBtn disabled"> <%-- 비활성화된 첫 페이지 버튼이다. --%>
+					<span class="coPageMoveBtn disabled">
+						<%-- 비활성화된 첫 페이지 버튼이다. --%>
 
-						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none"
-							stroke-width="2">
-                            <path d="M11 18L5 12L11 6"></path>
-                            <path d="M19 18L13 12L19 6"></path>
-                        </svg> <%-- 비활성화된 첫 페이지 SVG 아이콘이다. --%>
-
+						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+							<path d="M11 18L5 12L11 6"></path>
+							<path d="M19 18L13 12L19 6"></path>
+						</svg>
+						<%-- 비활성화된 첫 페이지 SVG 아이콘이다. --%>
 					</span>
 					<%-- 비활성화된 첫 페이지 버튼을 끝낸다. --%>
-
 				</c:otherwise>
-				<%-- 첫 페이지로 이동할 수 없는 경우를 끝낸다. --%>
-
 			</c:choose>
-			<%-- 첫 페이지 버튼 조건을 끝낸다. --%>
 
 
 			<c:choose>
@@ -67,46 +109,38 @@
 				<c:when test="${pageInfo.hasPrev}">
 					<%-- 현재 페이지가 1보다 크면 이전 페이지로 이동할 수 있다. --%>
 
-					<a
-						href="${pageContext.request.contextPath}${pageUrl}?page=${pageInfo.prevPage}&size=${pageInfo.size}"
-						class="coPageMoveBtn"> <%-- 이전 페이지로 이동하는 버튼이다. --%> <svg
-							class="coPageIcon" viewBox="0 0 24 24" fill="none"
-							stroke-width="2">
-                        <%-- SVG 아이콘을 그리기 위한 태그이다. --%>
+					<a href="${pageContext.request.contextPath}${pageUrl}?page=${pageInfo.prevPage}&size=${pageInfo.size}${pagingKeepQuery}"
+						class="coPageMoveBtn">
+						<%-- 이전 페이지로 이동하는 버튼이다. --%>
 
-                            <path d="M15 18L9 12L15 6"></path>
-                            <%-- 왼쪽 화살표 선이다. --%>
+						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+							<%-- SVG 아이콘을 그리기 위한 태그이다. --%>
 
-                        </svg> <%-- SVG 아이콘을 끝낸다. --%>
-
+							<path d="M15 18L9 12L15 6"></path>
+							<%-- 왼쪽 화살표 선이다. --%>
+						</svg>
+						<%-- SVG 아이콘을 끝낸다. --%>
 					</a>
 					<%-- 이전 페이지 이동 버튼을 끝낸다. --%>
-
 				</c:when>
-				<%-- 이전 페이지로 이동할 수 있는 경우를 끝낸다. --%>
 
 				<c:otherwise>
 					<%-- 현재 페이지가 1페이지면 이전 페이지로 이동할 수 없다. --%>
 
-					<span class="coPageMoveBtn disabled"> <%-- 비활성화된 이전 페이지 버튼이다. --%>
+					<span class="coPageMoveBtn disabled">
+						<%-- 비활성화된 이전 페이지 버튼이다. --%>
 
-						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none"
-							stroke-width="2">
-                            <path d="M15 18L9 12L15 6"></path>
-                        </svg> <%-- 비활성화된 이전 페이지 SVG 아이콘이다. --%>
-
+						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+							<path d="M15 18L9 12L15 6"></path>
+						</svg>
+						<%-- 비활성화된 이전 페이지 SVG 아이콘이다. --%>
 					</span>
 					<%-- 비활성화된 이전 페이지 버튼을 끝낸다. --%>
-
 				</c:otherwise>
-				<%-- 이전 페이지로 이동할 수 없는 경우를 끝낸다. --%>
-
 			</c:choose>
-			<%-- 이전 페이지 버튼 조건을 끝낸다. --%>
 
 
-			<c:forEach var="num" begin="${pageInfo.startPage}"
-				end="${pageInfo.endPage}">
+			<c:forEach var="num" begin="${pageInfo.startPage}" end="${pageInfo.endPage}">
 				<%-- 시작 페이지부터 끝 페이지까지 페이지 번호를 반복해서 만든다. --%>
 
 				<c:choose>
@@ -116,27 +150,18 @@
 						<%-- 현재 보고 있는 페이지 번호이다. --%>
 
 						<span class="coPageBtn active">${num}</span>
-						<%-- 현재 페이지라서 초록색 active 디자인을 적용한다. --%>
-
+						<%-- 현재 페이지라서 active 디자인을 적용한다. --%>
 					</c:when>
-					<%-- 현재 페이지인 경우를 끝낸다. --%>
 
 					<c:otherwise>
 						<%-- 현재 페이지가 아닌 번호이다. --%>
 
-						<a
-							href="${pageContext.request.contextPath}${pageUrl}?page=${num}&size=${pageInfo.size}"
+						<a href="${pageContext.request.contextPath}${pageUrl}?page=${num}&size=${pageInfo.size}${pagingKeepQuery}"
 							class="coPageBtn">${num}</a>
 						<%-- 해당 번호 페이지로 이동하는 버튼이다. --%>
-
 					</c:otherwise>
-					<%-- 현재 페이지가 아닌 경우를 끝낸다. --%>
-
 				</c:choose>
-				<%-- 현재 페이지 조건을 끝낸다. --%>
-
 			</c:forEach>
-			<%-- 페이지 번호 반복을 끝낸다. --%>
 
 
 			<c:choose>
@@ -145,42 +170,35 @@
 				<c:when test="${pageInfo.hasNext}">
 					<%-- 현재 페이지가 마지막 페이지보다 작으면 다음 페이지로 이동할 수 있다. --%>
 
-					<a
-						href="${pageContext.request.contextPath}${pageUrl}?page=${pageInfo.nextPage}&size=${pageInfo.size}"
-						class="coPageMoveBtn"> <%-- 다음 페이지로 이동하는 버튼이다. --%> <svg
-							class="coPageIcon" viewBox="0 0 24 24" fill="none"
-							stroke-width="2">
-                        <%-- SVG 아이콘을 그리기 위한 태그이다. --%>
+					<a href="${pageContext.request.contextPath}${pageUrl}?page=${pageInfo.nextPage}&size=${pageInfo.size}${pagingKeepQuery}"
+						class="coPageMoveBtn">
+						<%-- 다음 페이지로 이동하는 버튼이다. --%>
 
-                            <path d="M9 18L15 12L9 6"></path>
-                            <%-- 오른쪽 화살표 선이다. --%>
+						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+							<%-- SVG 아이콘을 그리기 위한 태그이다. --%>
 
-                        </svg> <%-- SVG 아이콘을 끝낸다. --%>
-
+							<path d="M9 18L15 12L9 6"></path>
+							<%-- 오른쪽 화살표 선이다. --%>
+						</svg>
+						<%-- SVG 아이콘을 끝낸다. --%>
 					</a>
 					<%-- 다음 페이지 이동 버튼을 끝낸다. --%>
-
 				</c:when>
-				<%-- 다음 페이지로 이동할 수 있는 경우를 끝낸다. --%>
 
 				<c:otherwise>
 					<%-- 현재 페이지가 마지막 페이지면 다음 페이지로 이동할 수 없다. --%>
 
-					<span class="coPageMoveBtn disabled"> <%-- 비활성화된 다음 페이지 버튼이다. --%>
+					<span class="coPageMoveBtn disabled">
+						<%-- 비활성화된 다음 페이지 버튼이다. --%>
 
-						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none"
-							stroke-width="2">
-                            <path d="M9 18L15 12L9 6"></path>
-                        </svg> <%-- 비활성화된 다음 페이지 SVG 아이콘이다. --%>
-
+						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+							<path d="M9 18L15 12L9 6"></path>
+						</svg>
+						<%-- 비활성화된 다음 페이지 SVG 아이콘이다. --%>
 					</span>
 					<%-- 비활성화된 다음 페이지 버튼을 끝낸다. --%>
-
 				</c:otherwise>
-				<%-- 다음 페이지로 이동할 수 없는 경우를 끝낸다. --%>
-
 			</c:choose>
-			<%-- 다음 페이지 버튼 조건을 끝낸다. --%>
 
 
 			<c:choose>
@@ -189,46 +207,39 @@
 				<c:when test="${pageInfo.hasNext}">
 					<%-- 현재 페이지가 마지막 페이지가 아니면 마지막 페이지로 이동할 수 있다. --%>
 
-					<a
-						href="${pageContext.request.contextPath}${pageUrl}?page=${pageInfo.totalPage}&size=${pageInfo.size}"
-						class="coPageMoveBtn"> <%-- 마지막 페이지로 이동하는 버튼이다. --%> <svg
-							class="coPageIcon" viewBox="0 0 24 24" fill="none"
-							stroke-width="2">
-                        <%-- SVG 아이콘을 그리기 위한 태그이다. --%>
+					<a href="${pageContext.request.contextPath}${pageUrl}?page=${pageInfo.totalPage}&size=${pageInfo.size}${pagingKeepQuery}"
+						class="coPageMoveBtn">
+						<%-- 마지막 페이지로 이동하는 버튼이다. --%>
 
-                            <path d="M5 18L11 12L5 6"></path>
-                            <%-- 첫 번째 오른쪽 화살표 선이다. --%>
+						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+							<%-- SVG 아이콘을 그리기 위한 태그이다. --%>
 
-                            <path d="M13 18L19 12L13 6"></path>
-                            <%-- 두 번째 오른쪽 화살표 선이다. --%>
+							<path d="M5 18L11 12L5 6"></path>
+							<%-- 첫 번째 오른쪽 화살표 선이다. --%>
 
-                        </svg> <%-- SVG 아이콘을 끝낸다. --%>
-
+							<path d="M13 18L19 12L13 6"></path>
+							<%-- 두 번째 오른쪽 화살표 선이다. --%>
+						</svg>
+						<%-- SVG 아이콘을 끝낸다. --%>
 					</a>
 					<%-- 마지막 페이지 이동 버튼을 끝낸다. --%>
-
 				</c:when>
-				<%-- 마지막 페이지로 이동할 수 있는 경우를 끝낸다. --%>
 
 				<c:otherwise>
 					<%-- 현재 페이지가 마지막 페이지면 마지막 페이지로 이동할 필요가 없다. --%>
 
-					<span class="coPageMoveBtn disabled"> <%-- 비활성화된 마지막 페이지 버튼이다. --%>
+					<span class="coPageMoveBtn disabled">
+						<%-- 비활성화된 마지막 페이지 버튼이다. --%>
 
-						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none"
-							stroke-width="2">
-                            <path d="M5 18L11 12L5 6"></path>
-                            <path d="M13 18L19 12L13 6"></path>
-                        </svg> <%-- 비활성화된 마지막 페이지 SVG 아이콘이다. --%>
-
+						<svg class="coPageIcon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+							<path d="M5 18L11 12L5 6"></path>
+							<path d="M13 18L19 12L13 6"></path>
+						</svg>
+						<%-- 비활성화된 마지막 페이지 SVG 아이콘이다. --%>
 					</span>
 					<%-- 비활성화된 마지막 페이지 버튼을 끝낸다. --%>
-
 				</c:otherwise>
-				<%-- 마지막 페이지로 이동할 수 없는 경우를 끝낸다. --%>
-
 			</c:choose>
-			<%-- 마지막 페이지 버튼 조건을 끝낸다. --%>
 
 		</div>
 		<%-- 페이지 버튼 영역을 끝낸다. --%>
@@ -238,28 +249,28 @@
 			<%-- 몇 개씩 볼지 선택하는 영역이다. --%>
 
 			<select class="coPageSizeSelect"
-				onchange="location.href='${pageContext.request.contextPath}${pageUrl}?page=1&size=' + this.value;">
+				onchange="location.href='${pageContext.request.contextPath}${pageUrl}?page=1&size=' + this.value + '${pagingKeepQuery}';">
 				<%-- 선택한 개수만큼 다시 조회하기 위해 page=1로 이동한다. --%>
 
-				<option value="5" <c:if test="${pageInfo.size == 5}">selected</c:if>>5개씩
-					보기</option>
+				<option value="5" <c:if test="${pageInfo.size == 5}">selected</c:if>>
+					5개씩 보기
+				</option>
 				<%-- 한 페이지에 5개씩 보는 옵션이다. --%>
 
-				<option value="10"
-					<c:if test="${pageInfo.size == 10}">selected</c:if>>10개씩
-					보기</option>
+				<option value="10" <c:if test="${pageInfo.size == 10}">selected</c:if>>
+					10개씩 보기
+				</option>
 				<%-- 한 페이지에 10개씩 보는 옵션이다. --%>
 
-				<option value="20"
-					<c:if test="${pageInfo.size == 20}">selected</c:if>>20개씩
-					보기</option>
+				<option value="20" <c:if test="${pageInfo.size == 20}">selected</c:if>>
+					20개씩 보기
+				</option>
 				<%-- 한 페이지에 20개씩 보는 옵션이다. --%>
 
-				<option value="30"
-					<c:if test="${pageInfo.size == 30}">selected</c:if>>30개씩
-					보기</option>
+				<option value="30" <c:if test="${pageInfo.size == 30}">selected</c:if>>
+					30개씩 보기
+				</option>
 				<%-- 한 페이지에 30개씩 보는 옵션이다. --%>
-
 			</select>
 			<%-- 보기 개수 선택박스를 끝낸다. --%>
 

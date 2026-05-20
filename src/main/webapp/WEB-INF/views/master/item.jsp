@@ -161,8 +161,14 @@
 
 				<thead>
 					<tr>
-						<th class="mobile_show"><input type="checkbox" id="checkAll"
-							onclick="toggleAllCheck(this);"></th>
+						<%--
+							모바일 표시 컬럼 1: 선택
+							- 선택삭제 기능을 위해 모바일에서도 표시한다.
+							- 컬럼명 "선택"을 클릭하면 현재 목록의 체크박스를 전체 선택/해제한다.
+							- 별도 버튼 태그를 만들지 않고 th 자체를 클릭하게 해서 공용 coTable th 스타일을 그대로 사용한다.
+						--%>
+						<th class="mobile_show" onclick="toggleAllCheckByTitle();"
+							title="전체 선택/해제">선택</th>
 
 						<th class="mobile_show">품목코드</th>
 
@@ -648,38 +654,6 @@
 	color: #2F7D62;
 }
 
-/* 목록 테이블 컬럼폭 드래그 */
-#itemListTable th {
-	position: relative;
-	user-select: none;
-}
-
-/* 컬럼 경계 드래그 핸들 */
-.column-resizer {
-	position: absolute;
-	top: 0;
-	right: 0;
-	width: 7px;
-	height: 100%;
-	cursor: col-resize;
-	z-index: 5;
-}
-
-.column-resizer:hover {
-	background-color: rgba(47, 125, 96, 0.18);
-}
-
-/* 상세 컬럼은 '보기.'처럼 말줄임 점이 생기지 않도록 제외 */
-#itemListTable th:last-child, #itemListTable td:last-child {
-	text-overflow: clip !important;
-}
-
-#itemListTable td:last-child .coDetailBtn {
-	max-width: 100%;
-	overflow: hidden;
-	text-overflow: clip !important;
-	white-space: nowrap;
-}
 </style>
 
 
@@ -727,14 +701,58 @@
 
 
     /**
-     * 전체 선택 / 전체 해제
+     * 선택 컬럼명 클릭 시 전체 선택 / 전체 해제
+     *
+     * 설명:
+     * - 헤더의 "선택" 텍스트를 클릭하면 현재 목록의 itemIdList 체크박스를 모두 선택하거나 해제한다.
+     * - 전체 체크 상태면 해제하고, 하나라도 미체크가 있으면 전체 선택한다.
+     * - 선택삭제 기능은 공용 JS에 없으므로 item.jsp에서 직접 처리한다.
+     */
+    function toggleAllCheckByTitle() {
+    	var checkboxList = document.querySelectorAll("#itemDeleteForm input[name='itemIdList']");
+
+    	if (checkboxList.length === 0) {
+    		return;
+    	}
+
+    	var allChecked = true;
+
+    	for (var i = 0; i < checkboxList.length; i++) {
+    		if (!checkboxList[i].checked) {
+    			allChecked = false;
+    			break;
+    		}
+    	}
+
+    	var nextChecked = !allChecked;
+
+    	for (var j = 0; j < checkboxList.length; j++) {
+    		checkboxList[j].checked = nextChecked;
+    	}
+    }
+
+
+    /**
+     * 호환용 함수
+     *
+     * 설명:
+     * - 혹시 기존 코드에 toggleAllCheck(this) 호출이 남아 있어도 동작하도록 둔다.
+     * - 신규 기준은 toggleAllCheckByTitle()이다.
+     */
+    function toggleAllCheck(checkAll) {
+    	var checkboxList = document.querySelectorAll("#itemDeleteForm input[name='itemIdList']");
+
+    	for (var i = 0; i < checkboxList.length; i++) {
+    		checkboxList[i].checked = checkAll.checked;
+    	}
+    }
+
+
+    /**
+     * 예전 함수명 호환용
      */
     function toggleAllItems(checkAll) {
-        var checkboxes = document.querySelectorAll("input[name='itemIdList']");
-
-        for (var i = 0; i < checkboxes.length; i++) {
-            checkboxes[i].checked = checkAll.checked;
-        }
+    	toggleAllCheck(checkAll);
     }
 
 
@@ -1144,296 +1162,5 @@
     		itemUnit.value = "";
     	}
     }
-    
-    document.addEventListener("DOMContentLoaded", function() {
-    	// 예전에 저장된 컬럼폭이 있으면 제거
-    	localStorage.removeItem("saeroi_item_list_column_widths");
-
-    	initResizableItemTable();
-    });
-
-    window.addEventListener("resize", function() {
-    	var table = document.getElementById("itemListTable");
-
-    	if (table == null) {
-    		return;
-    	}
-
-    	var colList = table.querySelectorAll("colgroup col");
-
-    	if (colList.length > 0) {
-    		fitColumnWidthsToTable(table, colList);
-    	}
-    });
-
-
-    function initResizableItemTable() {
-    	var table = document.getElementById("itemListTable");
-
-    	if (table == null) {
-    		return;
-    	}
-
-    	createColgroupIfNotExists(table);
-
-    	var colList = table.querySelectorAll("colgroup col");
-    	var thList = table.querySelectorAll("thead th");
-
-    	if (colList.length === 0 || thList.length === 0) {
-    		return;
-    	}
-
-    	// 새로고침할 때마다 기본폭으로 시작
-    	resetDefaultColumnWidths(table, colList);
-
-    	// 마지막 컬럼은 오른쪽으로 더 늘릴 대상이 없으므로 제외
-    	for (var index = 0; index < thList.length - 1; index++) {
-    		addColumnResizeHandle(table, colList, thList[index], index);
-    	}
-    }
-
-
-    function createColgroupIfNotExists(table) {
-    	var existingColgroup = table.querySelector("colgroup");
-
-    	if (existingColgroup != null) {
-    		return;
-    	}
-
-    	var thList = table.querySelectorAll("thead th");
-
-    	if (thList.length === 0) {
-    		return;
-    	}
-
-    	var colgroup = document.createElement("colgroup");
-
-    	for (var i = 0; i < thList.length; i++) {
-    		var col = document.createElement("col");
-    		colgroup.appendChild(col);
-    	}
-
-    	table.insertBefore(colgroup, table.firstChild);
-    }
-
-
-    function addColumnResizeHandle(table, colList, th, index) {
-    	var resizer = document.createElement("span");
-    	resizer.className = "column-resizer";
-
-    	th.appendChild(resizer);
-
-    	var startX = 0;
-    	var leftStartWidth = 0;
-    	var rightStartWidth = 0;
-    	var rightIndex = index + 1;
-
-    	resizer.addEventListener("mousedown", function(event) {
-    		event.preventDefault();
-    		event.stopPropagation();
-
-    		startX = event.pageX;
-    		leftStartWidth = getColWidth(colList[index]);
-    		rightStartWidth = getColWidth(colList[rightIndex]);
-
-    		document.addEventListener("mousemove", resizeColumnPair);
-    		document.addEventListener("mouseup", stopResizeColumnPair);
-    	});
-
-
-    	function resizeColumnPair(event) {
-    		var diffX = event.pageX - startX;
-
-    		var leftMinWidth = getColumnMinWidth(index);
-    		var rightMinWidth = getColumnMinWidth(rightIndex);
-
-    		var newLeftWidth = leftStartWidth + diffX;
-    		var newRightWidth = rightStartWidth - diffX;
-
-    		if (newLeftWidth < leftMinWidth) {
-    			newLeftWidth = leftMinWidth;
-    			newRightWidth = leftStartWidth + rightStartWidth - newLeftWidth;
-    		}
-
-    		if (newRightWidth < rightMinWidth) {
-    			newRightWidth = rightMinWidth;
-    			newLeftWidth = leftStartWidth + rightStartWidth - newRightWidth;
-    		}
-
-    		colList[index].style.width = newLeftWidth + "px";
-    		colList[rightIndex].style.width = newRightWidth + "px";
-
-    		// 전체 테이블이 화면 밖으로 나가지 않게 보정
-    		fitColumnWidthsToTable(table, colList);
-    	}
-
-
-    	function stopResizeColumnPair() {
-    		document.removeEventListener("mousemove", resizeColumnPair);
-    		document.removeEventListener("mouseup", stopResizeColumnPair);
-    	}
-
-
-    	// 더블클릭하면 전체 컬럼 기본폭 복구
-    	resizer.addEventListener("dblclick", function(event) {
-    		event.preventDefault();
-    		event.stopPropagation();
-
-    		resetDefaultColumnWidths(table, colList);
-    	});
-    }
-
-
-    function resetDefaultColumnWidths(table, colList) {
-    	var defaultWidths = [48, 190, 230, 90, 150, 170, 90, 70];
-
-    	for (var i = 0; i < colList.length; i++) {
-    		if (i < defaultWidths.length) {
-    			colList[i].style.width = defaultWidths[i] + "px";
-    		} else {
-    			colList[i].style.width = "120px";
-    		}
-    	}
-
-    	fitColumnWidthsToTable(table, colList);
-    }
-
-
-    function fitColumnWidthsToTable(table, colList) {
-    	var tableWidth = getAvailableTableWidth(table);
-
-    	if (tableWidth <= 0) {
-    		return;
-    	}
-
-    	var totalWidth = 0;
-
-    	for (var i = 0; i < colList.length; i++) {
-    		totalWidth += getColWidth(colList[i]);
-    	}
-
-    	if (totalWidth <= 0) {
-    		return;
-    	}
-
-    	// 전체 컬럼 폭 합계가 테이블 영역보다 크면 비율로 줄인다.
-    	if (totalWidth > tableWidth) {
-    		var ratio = tableWidth / totalWidth;
-
-    		for (var j = 0; j < colList.length; j++) {
-    			var newWidth = getColWidth(colList[j]) * ratio;
-    			var minWidth = getColumnMinWidth(j);
-
-    			if (newWidth < minWidth) {
-    				newWidth = minWidth;
-    			}
-
-    			colList[j].style.width = newWidth + "px";
-    		}
-    	}
-
-    	// 최소폭 때문에 다시 초과하면 뒤쪽 컬럼부터 조금씩 줄인다.
-    	var adjustedTotal = 0;
-
-    	for (var k = 0; k < colList.length; k++) {
-    		adjustedTotal += getColWidth(colList[k]);
-    	}
-
-    	if (adjustedTotal > tableWidth) {
-    		var overWidth = adjustedTotal - tableWidth;
-
-    		for (var x = colList.length - 1; x >= 0; x--) {
-    			var currentWidth = getColWidth(colList[x]);
-    			var min = getColumnAbsoluteMinWidth(x);
-    			var reducible = currentWidth - min;
-
-    			if (reducible <= 0) {
-    				continue;
-    			}
-
-    			var reduce = Math.min(reducible, overWidth);
-
-    			colList[x].style.width = (currentWidth - reduce) + "px";
-    			overWidth -= reduce;
-
-    			if (overWidth <= 0) {
-    				break;
-    			}
-    		}
-    	}
-
-    	// 남는 폭은 품목코드/품목명에 배분
-    	var finalTotal = 0;
-
-    	for (var y = 0; y < colList.length; y++) {
-    		finalTotal += getColWidth(colList[y]);
-    	}
-
-    	var remainWidth = tableWidth - finalTotal;
-
-    	if (remainWidth > 2 && colList.length >= 3) {
-    		colList[1].style.width = (getColWidth(colList[1]) + remainWidth / 2) + "px";
-    		colList[2].style.width = (getColWidth(colList[2]) + remainWidth / 2) + "px";
-    	}
-    }
-
-
-    function getAvailableTableWidth(table) {
-    	var parent = table.parentElement;
-
-    	if (parent == null) {
-    		return Math.floor(table.getBoundingClientRect().width);
-    	}
-
-    	return Math.floor(parent.getBoundingClientRect().width);
-    }
-
-
-    function getColWidth(col) {
-    	var width = parseFloat(col.style.width);
-
-    	if (isNaN(width) || width <= 0) {
-    		width = col.getBoundingClientRect().width;
-    	}
-
-    	if (isNaN(width) || width <= 0) {
-    		width = 100;
-    	}
-
-    	return width;
-    }
-
-
-    function getColumnMinWidth(index) {
-    	if (index === 0) {
-    		return 42;
-    	}
-
-    	if (index === 3) {
-    		return 80;
-    	}
-
-    	if (index === 6) {
-    		return 80;
-    	}
-
-    	if (index === 7) {
-    		return 60;
-    	}
-
-    	return 90;
-    }
-
-
-    function getColumnAbsoluteMinWidth(index) {
-    	if (index === 0) {
-    		return 36;
-    	}
-
-    	if (index === 7) {
-    		return 54;
-    	}
-
-    	return 70;
-    }
+   
 </script>

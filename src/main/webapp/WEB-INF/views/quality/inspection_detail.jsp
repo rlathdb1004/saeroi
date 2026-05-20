@@ -26,7 +26,8 @@
 				<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 					stroke="currentColor" stroke-width="2" stroke-linecap="round"
 					stroke-linejoin="round"
-					style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+					style="vertical-align: -3px; margin-right: 6px;"
+					aria-hidden="true">
 					<path d="M8 6h13"></path>
 					<path d="M8 12h13"></path>
 					<path d="M8 18h13"></path>
@@ -38,24 +39,57 @@
 				목록
 			</button>
 
-			<%-- 수정 버튼은 새 창이 아니라 현재 페이지에서 입력창으로 변경한다. --%>
-			<button type="button" class="detail_btn_green" id="detailEditBtn">
+			<%-- 수정 버튼은 현재 페이지에서 입력창으로 변경한다. --%>
+			<button type="button" id="editBtn" class="detail_btn_green"
+				onclick="changeEditMode(true);">
 
 				<%-- 수정 아이콘 SVG이다. --%>
 				<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 					stroke="currentColor" stroke-width="2" stroke-linecap="round"
 					stroke-linejoin="round"
-					style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+					style="vertical-align: -3px; margin-right: 6px;"
+					aria-hidden="true">
 					<path d="M12 20h9"></path>
-					<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+					<path
+						d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
 				</svg>
 
 				수정
 			</button>
 
-			<%-- 저장 버튼은 수정 버튼을 누른 뒤 JS에서 보여줄 예정이다. --%>
-			<button type="submit" class="detail_btn_green detailInput"
-				form="inspectionDetailForm" style="display: none;">저장</button>
+			<%-- 저장 버튼은 수정 버튼을 누른 뒤 보여준다. --%>
+			<button type="submit" id="saveBtn" class="detail_btn_green"
+				form="inspectionDetailForm" style="display: none;">
+
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round"
+					stroke-linejoin="round"
+					style="vertical-align: -3px; margin-right: 6px;"
+					aria-hidden="true">
+					<path
+						d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+					<path d="M17 21v-8H7v8"></path>
+					<path d="M7 3v5h8"></path>
+				</svg>
+
+				저장
+			</button>
+
+			<%-- 취소 버튼은 수정 모드를 닫고 보기 모드로 돌아간다. --%>
+			<button type="button" id="cancelBtn" class="detail_btn_line"
+				onclick="changeEditMode(false);" style="display: none;">
+
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round"
+					stroke-linejoin="round"
+					style="vertical-align: -3px; margin-right: 6px;"
+					aria-hidden="true">
+					<path d="M18 6L6 18"></path>
+					<path d="M6 6l12 12"></path>
+				</svg>
+
+				취소
+			</button>
 		</div>
 	</div>
 
@@ -84,14 +118,18 @@
 						<td>${inspection.doc_no}</td>
 
 						<th>검사일시</th>
-						<td><span class="detailText">${inspection.insp_date}</span> <input
-							type="date" name="insp_date" class="detailInput"
-							value="${inspection.insp_date}" style="display: none;"></td>
+						<td>
+							<span class="detailText">${inspection.insp_date}</span>
+							<input type="date" name="insp_date" class="detailInput"
+								value="${inspection.insp_date}" style="display: none;">
+						</td>
 
 						<th>품목명</th>
-						<td><span class="detailText">${inspection.item_name}</span> <input
-							type="text" name="item_name" class="detailInput"
-							value="${inspection.item_name}" style="display: none;"></td>
+						<td>
+							<span class="detailText">${inspection.item_name}</span>
+							<input type="text" name="item_name" class="detailInput"
+								value="${inspection.item_name}" style="display: none;">
+						</td>
 					</tr>
 
 					<tr>
@@ -99,26 +137,31 @@
 						<td>${inspection.product_lot}</td>
 
 						<th>검사자</th>
-						<td><span class="detailText">${inspection.ename}</span> <input
-							type="text" name="ename" class="detailInput"
-							value="${inspection.ename}" style="display: none;"></td>
+						<td>
+							<span class="detailText">${inspection.ename}</span>
+							<input type="text" name="ename" class="detailInput"
+								value="${inspection.ename}" style="display: none;">
+						</td>
 
 						<th>검사결과</th>
-						<td><span
-							class="detailText detail_status_badge detail_status_pass">
-								${inspection.result} </span> <select name="result" class="detailInput"
-							style="display: none;">
+						<td>
+							<span class="detailText detail_status_badge detail_status_pass">${inspection.result}</span>
+
+							<select name="result" class="detailInput" style="display: none;">
 								<option value="합격"
 									<c:if test="${inspection.result == '합격'}">selected</c:if>>합격</option>
 								<option value="조건부"
 									<c:if test="${inspection.result == '조건부'}">selected</c:if>>조건부</option>
-						</select></td>
+							</select>
+						</td>
 					</tr>
 
 					<tr>
 						<th>검사구분</th>
-						<td><span class="detailText">${inspection.insp_type}</span> <select
-							name="insp_type" class="detailInput" style="display: none;">
+						<td>
+							<span class="detailText">${inspection.insp_type}</span>
+
+							<select name="insp_type" class="detailInput" style="display: none;">
 								<option value="외관검사"
 									<c:if test="${inspection.insp_type == '외관검사'}">selected</c:if>>외관검사</option>
 								<option value="치수검사"
@@ -127,37 +170,58 @@
 									<c:if test="${inspection.insp_type == '품질판정'}">selected</c:if>>품질판정</option>
 								<option value="재검사"
 									<c:if test="${inspection.insp_type == '재검사'}">selected</c:if>>재검사</option>
-						</select></td>
+							</select>
+						</td>
 
 						<th>검사수량</th>
-						<td><span class="detailText">${inspection.inspection_qty}</span>
+						<td>
+							<span class="detailText">${inspection.inspection_qty}</span>
 							<input type="number" name="inspection_qty" class="detailInput"
-							value="${inspection.inspection_qty}" style="display: none;">
+								value="${inspection.inspection_qty}" style="display: none;">
 						</td>
 
 						<th>양품수량</th>
-						<td><span class="detailText">${inspection.good_qty}</span> <input
-							type="number" name="good_qty" class="detailInput"
-							value="${inspection.good_qty}" style="display: none;"></td>
+						<td>
+							<span class="detailText">${inspection.good_qty}</span>
+							<input type="number" name="good_qty" class="detailInput"
+								value="${inspection.good_qty}" style="display: none;">
+						</td>
 					</tr>
 
 					<tr>
 						<th>비고</th>
-						<td colspan="5"><span class="detailText">${inspection.remark}</span>
+						<td colspan="5">
+							<span class="detailText">${inspection.remark}</span>
 							<input type="text" name="remark" class="detailInput"
-							value="${inspection.remark}" style="display: none;"></td>
+								value="${inspection.remark}" style="display: none;">
+						</td>
 					</tr>
 				</tbody>
 			</table>
 		</form>
 	</div>
 
-	<%-- 팀원별로 추가 상세 정보가 필요할 때 사용하는 영역이다. --%>
-	<!-- 	<div class="detail_content_area"> -->
-	<!-- 		<div class="detail_empty_box">팀원별 상세 내용을 추가하는 영역입니다.</div> -->
-	<!-- 	</div> -->
-
 </div>
-<script
-	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script>
 
+<script>
+	function changeEditMode(isEdit) {
+		var detailTexts = document.querySelectorAll('.detailText');
+		var detailInputs = document.querySelectorAll('.detailInput');
+
+		var editBtn = document.querySelector('#editBtn');
+		var saveBtn = document.querySelector('#saveBtn');
+		var cancelBtn = document.querySelector('#cancelBtn');
+
+		detailTexts.forEach(function(text) {
+			text.style.display = isEdit ? 'none' : '';
+		});
+
+		detailInputs.forEach(function(input) {
+			input.style.display = isEdit ? 'inline-block' : 'none';
+		});
+
+		editBtn.style.display = isEdit ? 'none' : 'inline-block';
+		saveBtn.style.display = isEdit ? 'inline-block' : 'none';
+		cancelBtn.style.display = isEdit ? 'inline-block' : 'none';
+	}
+</script>
