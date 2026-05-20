@@ -162,10 +162,11 @@
 
 					<tr>
 
-						<!-- 전체 선택 -->
-						<th>
+						<!-- 모바일에서도 보여줄 컬럼 1 -->
+						<th class="mobile_show">
 
-							<label for="checkAll">
+							<!-- 선택 글씨를 누르면 전체 선택 / 전체 해제 -->
+							<label id="checkAllLabel">
 								선택
 							</label>
 
@@ -175,13 +176,26 @@
 
 						</th>
 
-						<th>품목코드</th>
-						<th>품목유형</th>
-						<th>품목명</th>
-						<th>현재재고</th>
-						<th>단위</th>
-						<th>창고위치</th>
-						<th>상세</th>
+						<!-- 모바일에서 숨길 컬럼 -->
+						<th class="mobile_hidden">품목코드</th>
+
+						<!-- 모바일에서 숨길 컬럼 -->
+						<th class="mobile_hidden">품목유형</th>
+
+						<!-- 모바일에서도 보여줄 컬럼 2 -->
+						<th class="mobile_show">품목명</th>
+
+						<!-- 모바일에서도 보여줄 컬럼 3 -->
+						<th class="mobile_show">현재재고</th>
+
+						<!-- 모바일에서 숨길 컬럼 -->
+						<th class="mobile_hidden">단위</th>
+
+						<!-- 모바일에서 숨길 컬럼 -->
+						<th class="mobile_hidden">창고위치</th>
+
+						<!-- 상세는 무조건 모바일 노출 -->
+						<th class="mobile_show">상세</th>
 
 					</tr>
 
@@ -194,7 +208,8 @@
 
 						<tr>
 
-							<td>
+							<!-- 모바일에서도 보여줄 컬럼 1 -->
+							<td class="mobile_show">
 
 								<input type="checkbox"
 									name="inventoryIds"
@@ -202,11 +217,14 @@
 
 							</td>
 
-							<td title="${inventory.itemCode}">
+							<!-- 모바일에서 숨길 컬럼 -->
+							<td class="mobile_hidden"
+								title="${inventory.itemCode}">
 								${inventory.itemCode}
 							</td>
 
-							<td>
+							<!-- 모바일에서 숨길 컬럼 -->
+							<td class="mobile_hidden">
 
 								<c:choose>
 
@@ -230,23 +248,29 @@
 
 							</td>
 
-							<td title="${inventory.itemName}">
+							<!-- 모바일에서도 보여줄 컬럼 2 -->
+							<td class="mobile_show"
+								title="${inventory.itemName}">
 								${inventory.itemName}
 							</td>
 
-							<td>
+							<!-- 모바일에서도 보여줄 컬럼 3 -->
+							<td class="mobile_show">
 								${inventory.inventoryStock}
 							</td>
 
-							<td>
+							<!-- 모바일에서 숨길 컬럼 -->
+							<td class="mobile_hidden">
 								${inventory.itemUnit}
 							</td>
 
-							<td>
+							<!-- 모바일에서 숨길 컬럼 -->
+							<td class="mobile_hidden">
 								${inventory.stockLocation}
 							</td>
 
-							<td>
+							<!-- 상세는 무조건 모바일 노출 -->
+							<td class="mobile_show">
 
 								<button type="button"
 									class="coDetailBtn"
@@ -277,17 +301,49 @@
 
 <script>
 
-	// 전체 선택 체크박스
-	document.getElementById("checkAll").onclick = function() {
+	// 선택 글씨를 누르면 전체 선택 / 전체 해제
+	document.getElementById("checkAllLabel").onclick = function() {
+
+		var checkAll =
+			document.getElementById("checkAll");
 
 		var checks =
 			document.getElementsByName("inventoryIds");
 
+		checkAll.checked =
+			!checkAll.checked;
+
 		for (var i = 0; i < checks.length; i++) {
 
-			checks[i].checked = this.checked;
+			checks[i].checked =
+				checkAll.checked;
 		}
 	};
+
+	// 개별 체크박스를 직접 누르면 전체선택 상태도 같이 맞춘다.
+	var checks =
+		document.getElementsByName("inventoryIds");
+
+	for (var i = 0; i < checks.length; i++) {
+
+		checks[i].onclick = function() {
+
+			var allChecked =
+				true;
+
+			for (var j = 0; j < checks.length; j++) {
+
+				if (!checks[j].checked) {
+
+					allChecked = false;
+					break;
+				}
+			}
+
+			document.getElementById("checkAll").checked =
+				allChecked;
+		};
+	}
 
 	// 선택 삭제
 	function deleteCheck() {

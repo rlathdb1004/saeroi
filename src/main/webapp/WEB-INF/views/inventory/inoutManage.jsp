@@ -160,8 +160,8 @@
 
 				<thead>
 					<tr>
+						<%-- 모바일 표시 1 --%>
 						<th class="mobile_show">
-							<%-- 선택 글씨 클릭 시 전체 선택 / 전체 해제 --%>
 							<label id="checkAllLabel">선택</label>
 
 							<input type="checkbox"
@@ -169,12 +169,25 @@
 								style="display:none;">
 						</th>
 
+						<%-- 모바일 숨김 --%>
 						<th class="mobile_hidden">입출고번호</th>
+
+						<%-- 모바일 숨김 --%>
 						<th class="mobile_hidden">입출고구분</th>
+
+						<%-- 모바일 표시 2 --%>
 						<th class="mobile_show">품목명</th>
+
+						<%-- 모바일 숨김 --%>
 						<th class="mobile_hidden">입출고량</th>
+
+						<%-- 모바일 숨김 --%>
 						<th class="mobile_hidden">단위</th>
-						<th class="mobile_hidden">일자</th>
+
+						<%-- 모바일 표시 3 --%>
+						<th class="mobile_show">일자</th>
+
+						<%-- 모바일 표시 4, 상세는 무조건 노출 --%>
 						<th class="mobile_show">상세</th>
 					</tr>
 				</thead>
@@ -184,16 +197,19 @@
 					<c:forEach var="inout" items="${list}">
 
 						<tr>
+							<%-- 모바일 표시 1 --%>
 							<td class="mobile_show">
 								<input type="checkbox"
 									name="inoutIds"
 									value="${inout.inoutId}">
 							</td>
 
+							<%-- 모바일 숨김 --%>
 							<td class="mobile_hidden" title="${inout.docNo}">
 								${inout.docNo}
 							</td>
 
+							<%-- 모바일 숨김 --%>
 							<td class="mobile_hidden">
 								<c:choose>
 									<c:when test="${inout.inoutType eq 'MI'}">
@@ -210,22 +226,27 @@
 								</c:choose>
 							</td>
 
+							<%-- 모바일 표시 2 --%>
 							<td class="mobile_show" title="${inout.itemName}">
 								${inout.itemName}
 							</td>
 
+							<%-- 모바일 숨김 --%>
 							<td class="mobile_hidden">
 								${inout.inoutQty}
 							</td>
 
+							<%-- 모바일 숨김 --%>
 							<td class="mobile_hidden">
 								${inout.itemUnit}
 							</td>
 
-							<td class="mobile_hidden">
+							<%-- 모바일 표시 3 --%>
+							<td class="mobile_show">
 								${inout.inoutDate}
 							</td>
 
+							<%-- 모바일 표시 4, 상세는 무조건 노출 --%>
 							<td class="mobile_show">
 								<button type="button"
 									class="coDetailBtn"
