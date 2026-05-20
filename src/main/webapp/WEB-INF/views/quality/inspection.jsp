@@ -123,14 +123,14 @@
 
 			<thead>
 				<tr>
-					<th class="mobile_hidden" style="width: 80px;">선택</th>
-					<th class="mobile_show" style="width: 130px;">검사번호</th>
-					<th class="mobile_hidden" style="width: 130px;">검사일시</th>
-					<th class="mobile_show" style="width: 180px;">품목명</th>
-					<th class="mobile_hidden" style="width: 130px;">LOT번호</th>
-					<th class="mobile_hidden" style="width: 130px;">검사자</th>
-					<th class="mobile_show" style="width: 130px;">검사결과</th>
-					<th class="mobile_show" style="width: 130px;">상세</th>
+					<th class="mobile_show">선택</th>
+					<th class="mobile_show">검사번호</th>
+					<th class="mobile_hidden">검사일시</th>
+					<th class="mobile_show">품목명</th>
+					<th class="mobile_hidden">LOT번호</th>
+					<th class="mobile_hidden">검사자</th>
+					<th class="mobile_show">검사결과</th>
+					<th class="mobile_show">상세</th>
 				</tr>
 			</thead>
 
@@ -139,8 +139,8 @@
 					<%-- Controller에서 보낸 검사 목록을 한 줄씩 반복 --%>
 
 					<tr>
-						<td class="mobile_hidden"><input type="checkbox"
-							name="insp_id" value="${inspection.insp_id}"></td>
+						<td class="mobile_show"><input type="checkbox" name="insp_id"
+							value="${inspection.insp_id}"></td>
 						<td class="mobile_show">${inspection.doc_no}</td>
 						<td class="mobile_hidden">${inspection.insp_date}</td>
 						<td class="coTextLeft mobile_show">${inspection.item_name}</td>
