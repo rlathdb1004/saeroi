@@ -29,7 +29,7 @@ public class InventoryController {
 	@RequestMapping("/inventory/materialIn")
 	public String materialIn(
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "size", defaultValue = "5") int size,
 			@RequestParam(value = "searchType", defaultValue = "all") String searchType,
 			@RequestParam(value = "inoutType", defaultValue = "") String inoutType,
 			@RequestParam(value = "keyword", defaultValue = "") String keyword,
@@ -163,7 +163,7 @@ public class InventoryController {
 	})
 	public String inventoryList(
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "size", defaultValue = "5") int size,
 			@RequestParam(value = "searchType", defaultValue = "") String searchType,
 			@RequestParam(value = "keyword", defaultValue = "") String keyword,
 			@RequestParam(value = "startDate", defaultValue = "") String startDate,
