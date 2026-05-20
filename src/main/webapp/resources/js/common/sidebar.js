@@ -231,58 +231,82 @@ for (var c = 0; c < siSubMenuLinks.length; c++) {
 
 function siLoadMenuByCurrentUrl() {
     // 현재 브라우저 주소를 가져온다.
-    // 예) /saeroi/ 또는 /saeroi/dashboard
+    // 예) /saeroi/inventory/materialIn/detail
     var currentPath = window.location.pathname;
 
     // 하위 메뉴 링크를 전부 찾는다.
-    // 예전에는 .siMenuSingle도 같이 찾았지만, 지금은 대시보드도 하위 메뉴 구조로 변경했기 때문에 .siSubMenuLink만 사용한다.
     var menuLinks = document.querySelectorAll(".siSubMenuLink");
 
     // 현재 주소와 일치하는 메뉴를 담을 변수이다.
     var matchedMenu = null;
 
-    // 모든 하위 메뉴 링크를 하나씩 확인한다.
+    // 대메뉴명과 하위 메뉴명으로 사이드바 메뉴를 찾는 함수이다.
+    function findSubMenu(mainMenu, subMenu) {
+        return document.querySelector(
+            ".siSubMenuLink[data-main-menu='" + mainMenu + "'][data-sub-menu='" + subMenu + "']"
+        );
+    }
+
+    // 사이드바에 직접 등록된 주소와 현재 주소가 같은지 먼저 확인한다.
     for (var i = 0; i < menuLinks.length; i++) {
         // 메뉴 링크의 실제 주소를 가져온다.
-        // 예) /saeroi/dashboard
         var menuPath = menuLinks[i].pathname;
 
-        // 현재 브라우저 주소와 메뉴 링크 주소가 같으면 현재 메뉴로 선택한다.
+        // 현재 주소와 메뉴 주소가 같으면 현재 메뉴로 선택한다.
         if (currentPath == menuPath) {
-            // 현재 주소와 같은 메뉴를 matchedMenu에 저장한다.
             matchedMenu = menuLinks[i];
         }
     }
-    // 검사 상세 페이지는 사이드바에 직접 있는 메뉴가 아니므로 검사관리 메뉴로 처리한다.
-	if (matchedMenu == null && currentPath == contextPath + "/quality/inspection_detail") {
-    	matchedMenu = document.querySelector(".siSubMenuLink[data-main-menu='품질관리'][data-sub-menu='검사관리']");
-	}
 
-    // 사용자가 /saeroi 또는 /saeroi/ 기본 주소로 들어온 경우를 처리한다.
-    if (matchedMenu == null && (currentPath == contextPath || currentPath == contextPath + "/")) {
-        // 기본 주소는 대시보드 > 메인 메뉴가 선택된 것으로 처리한다.
-        // 대시보드가 더 이상 .siMenuSingle이 아니기 때문에 data-main-menu와 data-sub-menu로 정확히 찾는다.
-        matchedMenu = document.querySelector(".siSubMenuLink[data-main-menu='대시보드'][data-sub-menu='메인']");
+    // 자재 입출고 상세 페이지는 사이드바에 직접 없기 때문에 자재(입)출고 관리 메뉴로 처리한다.
+    if (matchedMenu == null && currentPath == contextPath + "/inventory/materialIn/detail") {
+        matchedMenu = findSubMenu("자재/재고 관리", "자재(입)출고 관리");
     }
 
-    // 현재 주소와 맞는 메뉴를 찾지 못하면 더 이상 진행하지 않는다.
+    // 자재 입출고 수정 페이지로 이동했을 때도 자재(입)출고 관리 메뉴로 처리한다.
+    if (matchedMenu == null && currentPath == contextPath + "/inventory/materialIn/update") {
+        matchedMenu = findSubMenu("자재/재고 관리", "자재(입)출고 관리");
+    }
+
+    // 재고 상세 페이지는 사이드바에 직접 없기 때문에 재고조회 관리 메뉴로 처리한다.
+    if (matchedMenu == null && currentPath == contextPath + "/inventory/stockList/detail") {
+        matchedMenu = findSubMenu("자재/재고 관리", "재고조회 관리");
+    }
+
+    // 재고 수정 페이지로 이동했을 때도 재고조회 관리 메뉴로 처리한다.
+    if (matchedMenu == null && currentPath == contextPath + "/inventory/stockList/update") {
+        matchedMenu = findSubMenu("자재/재고 관리", "재고조회 관리");
+    }
+
+    // 검사 상세 페이지는 사이드바에 직접 없기 때문에 검사관리 메뉴로 처리한다.
+    if (matchedMenu == null && currentPath == contextPath + "/quality/inspection_detail") {
+        matchedMenu = findSubMenu("품질관리", "검사관리");
+    }
+
+    // 품목 상세 페이지는 사이드바에 직접 없기 때문에 품목관리 메뉴로 처리한다.
+    if (matchedMenu == null && currentPath == contextPath + "/master/item/detail") {
+        matchedMenu = findSubMenu("기준정보관리", "품목관리");
+    }
+
+    // 사용자가 /saeroi 또는 /saeroi/ 기본 주소로 들어온 경우 대시보드 메인으로 처리한다.
+    if (matchedMenu == null && (currentPath == contextPath || currentPath == contextPath + "/")) {
+        matchedMenu = findSubMenu("대시보드", "메인");
+    }
+
+    // 현재 주소와 맞는 메뉴를 찾지 못하면 헤더를 변경하지 않고 끝낸다.
     if (matchedMenu == null) {
-        // 메뉴를 찾지 못한 경우에는 active 처리나 헤더 변경을 하지 않고 함수를 끝낸다.
         return;
     }
 
     // 기존에 active 되어 있던 하위 메뉴 상태를 모두 지운다.
     for (var a = 0; a < menuLinks.length; a++) {
-        // 기존 active class를 제거해서 여러 메뉴가 동시에 선택되지 않게 한다.
         menuLinks[a].classList.remove("active");
     }
 
     // 기존에 열려 있던 큰 메뉴 상태를 모두 닫는다.
     var menuGroups = document.querySelectorAll(".siMenuGroup");
 
-    // 큰 메뉴 그룹 개수만큼 반복한다.
     for (var b = 0; b < menuGroups.length; b++) {
-        // 기존 open class를 제거해서 이전에 열려 있던 메뉴를 닫는다.
         menuGroups[b].classList.remove("open");
     }
 
@@ -298,10 +322,10 @@ function siLoadMenuByCurrentUrl() {
     // 헤더 제목을 현재 주소 기준으로 변경한다.
     siChangeHeader(mainMenu, subMenu);
 
-    // 현재 하위 메뉴를 감싸는 siSubMenu 영역이다.
+    // 현재 하위 메뉴를 감싸는 영역을 찾는다.
     var siSubMenu = matchedMenu.parentElement;
 
-    // siSubMenu를 감싸는 큰 메뉴 그룹이다.
+    // 현재 하위 메뉴를 감싸는 큰 메뉴 그룹을 찾는다.
     var siMenuGroup = siSubMenu.parentElement;
 
     // 현재 메뉴가 들어있는 큰 메뉴를 열린 상태로 만든다.
