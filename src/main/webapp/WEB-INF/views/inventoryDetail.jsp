@@ -1,8 +1,10 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
+<%-- 상세페이지 공통 CSS --%>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
 
@@ -12,19 +14,21 @@
 
 		<div>
 
+			<%-- 재고 상세 제목 --%>
 			<h2 class="detail_title">
-				자재 입출고 상세
+				재고 상세
 			</h2>
 
+			<%-- 현재 위치 --%>
 			<div class="detail_path">
-				자재/재고관리 &gt; 자재 입출고관리 &gt; 자재 입출고 상세
+				자재/재고관리 &gt; 재고조회 관리 &gt; 재고 상세
 			</div>
 
 		</div>
 
 		<div class="detail_btn_area">
 
-			<%-- 관리자 / 매니저만 수정 버튼 보임 --%>
+			<%-- 관리자 / 매니저만 수정 관련 버튼 보임 --%>
 			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
 				or sessionScope.loginUser.role eq 'MANAGER'}">
 
@@ -32,7 +36,7 @@
 
 					<button type="button"
 						class="detail_btn_green"
-						onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}&mode=edit'">
+						onclick="location.href='${pageContext.request.contextPath}/inventory/stockList/detail?inventoryId=${inventory.inventoryId}&mode=edit'">
 
 						<svg width="16"
 							height="16"
@@ -68,7 +72,7 @@
 
 					<button type="button"
 						class="detail_btn_line"
-						onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
+						onclick="location.href='${pageContext.request.contextPath}/inventory/stockList/detail?inventoryId=${inventory.inventoryId}'">
 
 						취소
 
@@ -78,9 +82,10 @@
 
 			</c:if>
 
+			<%-- 목록 버튼은 항상 보임 --%>
 			<button type="button"
 				class="detail_btn_line"
-				onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
+				onclick="location.href='${pageContext.request.contextPath}/inventory/inventoryStatus'">
 
 				<svg width="16"
 					height="16"
@@ -116,11 +121,11 @@
 
 			<form id="updateForm"
 				method="post"
-				action="${pageContext.request.contextPath}/inventory/materialIn/update">
+				action="${pageContext.request.contextPath}/inventory/stockList/update">
 
 				<input type="hidden"
-					name="inoutId"
-					value="${inout.inoutId}">
+					name="inventoryId"
+					value="${inventory.inventoryId}">
 
 				<div class="detail_card">
 
@@ -142,110 +147,63 @@
 						<tbody>
 
 							<tr>
-
-								<th>입출고번호</th>
-								<td>${inout.docNo}</td>
-
-								<th>입출고일자</th>
-
-								<td>
-									<input type="date"
-										name="inoutDate"
-										class="search-date"
-										value="${inout.inoutDate}">
-								</td>
-
-								<th>품목명</th>
-								<td>${inout.itemName}</td>
-
-							</tr>
-
-							<tr>
-
-								<th>LOT번호</th>
-								<td>${inout.materialLot}</td>
-
-								<th>입출고구분</th>
-
-								<td>
-
-									<select name="inoutType"
-										class="search-select">
-
-										<option value="MI"
-											<c:if test="${inout.inoutType eq 'MI'}">selected</c:if>>
-											입고
-										</option>
-
-										<option value="MO-PROD"
-											<c:if test="${inout.inoutType eq 'MO-PROD'}">selected</c:if>>
-											출고
-										</option>
-
-									</select>
-
-								</td>
+								<th>재고번호</th>
+								<td>${inventory.inventoryId}</td>
 
 								<th>품목코드</th>
-								<td>${inout.itemCode}</td>
+								<td>${inventory.itemCode}</td>
 
+								<th>품목명</th>
+								<td>${inventory.itemName}</td>
 							</tr>
 
 							<tr>
-
 								<th>품목유형</th>
-
 								<td>
-
 									<c:choose>
-
-										<c:when test="${inout.itemType eq 'FG'}">
-											완제품
-										</c:when>
-
-										<c:when test="${inout.itemType eq 'RM'}">
-											원자재
-										</c:when>
-
-										<c:when test="${inout.itemType eq 'SM'}">
-											부자재
-										</c:when>
-
-										<c:otherwise>
-											${inout.itemType}
-										</c:otherwise>
-
+										<c:when test="${inventory.itemType eq 'FG'}">완제품</c:when>
+										<c:when test="${inventory.itemType eq 'RM'}">원자재</c:when>
+										<c:when test="${inventory.itemType eq 'SM'}">부자재</c:when>
+										<c:otherwise>${inventory.itemType}</c:otherwise>
 									</c:choose>
-
 								</td>
 
-								<th>입출고수량</th>
-
+								<th>현재재고</th>
 								<td>
 									<input type="number"
-										name="inoutQty"
+										name="inventoryStock"
 										class="search-input"
-										value="${inout.inoutQty}">
+										value="${inventory.inventoryStock}">
 								</td>
 
 								<th>단위</th>
-								<td>${inout.itemUnit}</td>
-
+								<td>${inventory.itemUnit}</td>
 							</tr>
 
 							<tr>
+								<th>창고위치</th>
+								<td>
+									<input type="text"
+										name="stockLocation"
+										class="search-input"
+										value="${inventory.stockLocation}">
+								</td>
 
+								<th>생성일</th>
+								<td>${inventory.createdDate}</td>
+
+								<th>수정일</th>
+								<td>${inventory.updatedDate}</td>
+							</tr>
+
+							<tr>
 								<th>비고</th>
-
 								<td colspan="5">
-
 									<input type="text"
 										name="remark"
 										class="search-input"
-										value="${inout.remark}">
-
+										value="${inventory.remark}">
 								</td>
-
 							</tr>
 
 						</tbody>
@@ -280,104 +238,50 @@
 					<tbody>
 
 						<tr>
-
-							<th>입출고번호</th>
-							<td>${inout.docNo}</td>
-
-							<th>입출고일자</th>
-							<td>${inout.inoutDate}</td>
-
-							<th>품목명</th>
-							<td>${inout.itemName}</td>
-
-						</tr>
-
-						<tr>
-
-							<th>LOT번호</th>
-							<td>${inout.materialLot}</td>
-
-							<th>입출고구분</th>
-
-							<td>
-
-								<c:choose>
-
-									<c:when test="${inout.inoutType eq 'MI'}">
-
-										<span class="detail_status_badge detail_status_pass">
-											입고
-										</span>
-
-									</c:when>
-
-									<c:when test="${inout.inoutType eq 'MO-PROD'}">
-
-										<span class="detail_status_badge detail_status_wait">
-											출고
-										</span>
-
-									</c:when>
-
-									<c:otherwise>
-
-										${inout.inoutType}
-
-									</c:otherwise>
-
-								</c:choose>
-
-							</td>
+							<th>재고번호</th>
+							<td>${inventory.inventoryId}</td>
 
 							<th>품목코드</th>
-							<td>${inout.itemCode}</td>
+							<td>${inventory.itemCode}</td>
 
+							<th>품목명</th>
+							<td>${inventory.itemName}</td>
 						</tr>
 
 						<tr>
-
 							<th>품목유형</th>
-
 							<td>
-
 								<c:choose>
-
-									<c:when test="${inout.itemType eq 'FG'}">
-										완제품
-									</c:when>
-
-									<c:when test="${inout.itemType eq 'RM'}">
-										원자재
-									</c:when>
-
-									<c:when test="${inout.itemType eq 'SM'}">
-										부자재
-									</c:when>
-
-									<c:otherwise>
-										${inout.itemType}
-									</c:otherwise>
-
+									<c:when test="${inventory.itemType eq 'FG'}">완제품</c:when>
+									<c:when test="${inventory.itemType eq 'RM'}">원자재</c:when>
+									<c:when test="${inventory.itemType eq 'SM'}">부자재</c:when>
+									<c:otherwise>${inventory.itemType}</c:otherwise>
 								</c:choose>
-
 							</td>
 
-							<th>입출고수량</th>
-							<td>${inout.inoutQty}</td>
+							<th>현재재고</th>
+							<td>${inventory.inventoryStock}</td>
 
 							<th>단위</th>
-							<td>${inout.itemUnit}</td>
-
+							<td>${inventory.itemUnit}</td>
 						</tr>
 
 						<tr>
+							<th>창고위치</th>
+							<td>${inventory.stockLocation}</td>
 
+							<th>생성일</th>
+							<td>${inventory.createdDate}</td>
+
+							<th>수정일</th>
+							<td>${inventory.updatedDate}</td>
+						</tr>
+
+						<tr>
 							<th>비고</th>
-
 							<td colspan="5">
-								${inout.remark}
+								${inventory.remark}
 							</td>
-
 						</tr>
 
 					</tbody>
