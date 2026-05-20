@@ -23,7 +23,25 @@
 			<div class="search-row">
 
 				<div class="search-item">
-					<label class="search-label">입출고구분</label>
+					<label class="search-label">시작일</label>
+
+					<input type="date"
+						name="startDate"
+						class="search-date"
+						value="${startDate}">
+				</div>
+
+				<div class="search-item">
+					<label class="search-label">종료일</label>
+
+					<input type="date"
+						name="endDate"
+						class="search-date"
+						value="${endDate}">
+				</div>
+
+				<div class="search-item">
+					<label class="search-label">구분</label>
 
 					<select name="inoutType"
 						class="search-select">
@@ -41,24 +59,6 @@
 						</option>
 
 					</select>
-				</div>
-
-				<div class="search-item">
-					<label class="search-label">시작일</label>
-
-					<input type="date"
-						name="startDate"
-						class="search-date"
-						value="${startDate}">
-				</div>
-
-				<div class="search-item">
-					<label class="search-label">종료일</label>
-
-					<input type="date"
-						name="endDate"
-						class="search-date"
-						value="${endDate}">
 				</div>
 
 				<div class="search-item">
