@@ -32,13 +32,13 @@
 				</div>
 				<!-- 시작일 -->
 				<div class="search-item">
-					<label class="search-label">시작일</label> <input type="date"
-						name="startDate" class="search-date">
+					<label class="search-label">시작일</label> 
+					<input type="date" name="startDate" class="search-date" id="startDate">
 				</div>
 				<!-- 종료일 -->
 				<div class="search-item">
-					<label class="search-label">종료일</label> <input type="date"
-						name="endDate" class="search-date">
+					<label class="search-label">종료일</label> 
+					<input type="date" name="endDate" class="search-date" id="endDate">
 				</div>
 
 				<!-- 검색, 초기화 버튼 -->
@@ -73,9 +73,16 @@
 		
 		document.querySelector('#select_type').
 			addEventListener('change',function(){
-				let searchType = this.value;
-				
-				loadChartData(searchType);
+				loadChartData(this.value);
+			});
+		document.querySelector('#startDate').
+			addEventListener('change',function(){
+				let type = document.querySelector('#select_type').value || 'month';
+				loadChartData(type);
+			});
+		document.querySelector('#endDate').
+			addEventListener('change',function(){
+				loadChartData(this.value);
 			});
 		});
 	
@@ -172,6 +179,19 @@
       		opposite: true,
       		title: {text: '불량 수량 (EA)'}
       	}],
+      	legend:{
+      		show: true,
+      		position: 'top',
+      		horizontalAlign: 'left',
+      		floating: true,
+      		fontSize:'14px',
+      		offsetY: -40,
+      		offsetX: 10,
+      		itemMargin:{
+      			horizontal:12,
+      			vertical: 0
+      		}
+      	},
       	colors:['#008FFB', '#00E396', '#FF4560'],
       	markers: {
       		size: 5

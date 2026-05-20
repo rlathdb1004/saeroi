@@ -94,87 +94,97 @@
 	<%-- 검색 영역을 끝낸다. --%>
 
 
-	<div class="coTableTop">
-		<%-- 총 건수와 등록 버튼이 들어가는 영역이다. --%>
+	<form method="post" id="deleteForm" accept-charset="UTF-8"
+		action="${pageContext.request.contextPath}/quality/inspection/delete">
 
-		<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
-		<%-- DB에서 조회한 전체 데이터 개수를 보여줌 --%>
+		<div class="coTableTop">
+			<%-- 총 건수와 등록 버튼이 들어가는 영역이다. --%>
 
-		<div class="search-btn-right">
-			<button type="button"
-				class="search-btn search-btn-main modal_open_btn"
-				data_modal_target="#modal_insert">등록</button>
-			<!-- 			//삭제 수정 부분 -->
-			<form method="post" accept-charset="UTF-8"
-				action="${pageContext.request.contextPath}/quality/inspection/delete">
+			<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
+			<%-- DB에서 조회한 전체 데이터 개수를 보여줌 --%>
+
+			<div class="search-btn-right">
+				<button type="button"
+					class="search-btn search-btn-main modal_open_btn"
+					data_modal_target="#modal_insert">등록</button>
+				<!-- 			//삭제 수정 부분 -->
 				<button type="submit" class="search-btn search-btn-sub">선택
 					삭제</button>
+			</div>
+
 		</div>
-
-	</div>
-	<%-- 테이블 상단 영역을 끝낸다. --%>
+		<%-- 테이블 상단 영역을 끝낸다. --%>
 
 
-	<div class="coTableWrap">
-		<%-- 테이블을 감싸는 영역이다. --%>
+		<div class="coTableWrap">
+			<%-- 테이블을 감싸는 영역이다. --%>
 
-		<table class="coTable">
-			<%-- 공통 테이블 디자인을 사용하는 테이블이다. --%>
+			<table class="coTable">
+				<%-- 공통 테이블 디자인을 사용하는 테이블이다. --%>
 
-			<thead>
-				<tr>
-					<th class="mobile_show">선택</th>
-					<th class="mobile_show">검사번호</th>
-					<th class="mobile_hidden">검사일시</th>
-					<th class="mobile_show">품목명</th>
-					<th class="mobile_hidden">LOT번호</th>
-					<th class="mobile_hidden">검사자</th>
-					<th class="mobile_show">검사결과</th>
-					<th class="mobile_show">상세</th>
-				</tr>
-			</thead>
-
-			<tbody>
-				<c:forEach var="inspection" items="${list}">
-					<%-- Controller에서 보낸 검사 목록을 한 줄씩 반복 --%>
-
+				<thead>
 					<tr>
-						<td class="mobile_show"><input type="checkbox" name="insp_id"
-							value="${inspection.insp_id}"></td>
-						<td class="mobile_show">${inspection.doc_no}</td>
-						<td class="mobile_hidden">${inspection.insp_date}</td>
-						<td class="coTextLeft mobile_show">${inspection.item_name}</td>
-						<td class="mobile_hidden">${inspection.product_lot}</td>
-						<td class="mobile_hidden">${inspection.ename}</td>
-						<td class="mobile_show"><span class="coStatus coStatusUse">${inspection.result}</span>
-						</td>
-						<td class="mobile_show">
-							<button type="button" class="coDetailBtn"
-								onclick="location.href='${pageContext.request.contextPath}/quality/inspection_detail?insp_id=${inspection.insp_id}'">
-								보기</button>
-
-						</td>
+						<th class="mobile_show">선택</th>
+						<th class="mobile_show">검사번호</th>
+						<th class="mobile_hidden">검사일시</th>
+						<th class="mobile_show">품목명</th>
+						<th class="mobile_hidden">LOT번호</th>
+						<th class="mobile_hidden">검사자</th>
+						<th class="mobile_show">검사결과</th>
+						<th class="mobile_show">상세</th>
 					</tr>
-				</c:forEach>
+				</thead>
 
-				<c:if test="${empty list}">
-					<%-- 조회된 검사 목록이 없을 때 보여주는 줄 --%>
+				<tbody>
+					<c:forEach var="inspection" items="${list}">
+						<%-- Controller에서 보낸 검사 목록을 한 줄씩 반복 --%>
 
-					<tr>
-						<td colspan="8">조회된 검사 내역이 없습니다.</td>
-					</tr>
-				</c:if>
-			</tbody>
+						<tr>
+							<td class="mobile_show"><input type="checkbox"
+								name="insp_id" value="${inspection.insp_id}"></td>
+							<td class="mobile_show">${inspection.doc_no}</td>
+							<td class="mobile_hidden">${inspection.insp_date}</td>
+							<td class="coTextLeft mobile_show">${inspection.item_name}</td>
+							<td class="mobile_hidden">${inspection.product_lot}</td>
+							<td class="mobile_hidden">${inspection.ename}</td>
+							<td class="mobile_show">
+								<c:choose>
+									<c:when test="${inspection.result == '조건부'}">
+										<span class="coStatus coStatusStop">${inspection.result}</span>
+									</c:when>
+									<c:otherwise>
+										<span class="coStatus coStatusUse">${inspection.result}</span>
+									</c:otherwise>
+								</c:choose>
+							</td>
+							<td class="mobile_show">
+								<button type="button" class="coDetailBtn"
+									onclick="location.href='${pageContext.request.contextPath}/quality/inspection_detail?insp_id=${inspection.insp_id}'">
+									보기</button>
+
+							</td>
+						</tr>
+					</c:forEach>
+
+					<c:if test="${empty list}">
+						<%-- 조회된 검사 목록이 없을 때 보여주는 줄 --%>
+
+						<tr>
+							<td colspan="8">조회된 검사 내역이 없습니다.</td>
+						</tr>
+					</c:if>
+				</tbody>
 
 
-		</table>
-		</form>
-		<!-- 		//삭제 수정 부분 -->
-		<%-- 공통 테이블을 끝낸다. --%>
+			</table>
+			<!-- 		//삭제 수정 부분 -->
+			<%-- 공통 테이블을 끝낸다. --%>
 
-	</div>
-	<%-- 테이블 감싸는 영역을 끝낸다. --%>
+		</div>
+		<%-- 테이블 감싸는 영역을 끝낸다. --%>
 
+
+	</form>
 
 	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 	<%-- 공통 페이징 화면을 불러온다. --%>

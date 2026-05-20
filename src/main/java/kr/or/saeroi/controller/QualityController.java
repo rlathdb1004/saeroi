@@ -164,5 +164,14 @@ public class QualityController {
 
 		return "quality/inspection_detail.tiles";
 	}
+	
+	//(검사 상세에서)
+	//업데이트 메서드
+	@RequestMapping(value = "/inspection/update",method = RequestMethod.POST)
+	public String inspection_update() {
+		
+		
+		return null;
+	}
 
 }
