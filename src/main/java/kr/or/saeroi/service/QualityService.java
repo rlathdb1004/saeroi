@@ -14,4 +14,8 @@ public interface QualityService {
 	//insert 실행 결과는 int
 	int  _ser_insert_Inspection(String insp_date, String prod_id, String emp_id, String insp_type, String result, String inspection_qty, String good_qty, String remark);
 	
+	//삭제에 필요한 구성
+	int _ser_delete_Inspection(String insp_date, String prod_id, String emp_id, String insp_type, String result,
+			String inspection_qty, String good_qty, String remark);
+	
 }

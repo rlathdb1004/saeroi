@@ -108,11 +108,24 @@ public class QualityController {
 		int insert_result = qualityService._ser_insert_Inspection(insp_date, prod_id, emp_id, insp_type, result,
 				inspection_qty, good_qty, remark);
 
-		System.out.println("insert_result: " + insert_result);
+		System.out.println("insert_result 결과: " + insert_result);
 
 		return "redirect:/quality/inspection";
 	}
 	
 	//삭제 메서드
-	
+	@RequestMapping(value = "/inspection/delete", method = RequestMethod.POST)
+	public String inspection_delete(Model model, @RequestParam(required = false) String insp_date,
+			@RequestParam(required = false) String prod_id, @RequestParam(required = false) String emp_id,
+			@RequestParam(required = false) String insp_type, @RequestParam(required = false) String result,
+			@RequestParam(required = false) String inspection_qty, @RequestParam(required = false) String good_qty,
+			@RequestParam(required = false) String remark) {
+			
+		int delete_result = qualityService._ser_delete_Inspection(insp_date, prod_id, emp_id, insp_type, result,
+				inspection_qty, good_qty, remark);
+		
+		System.out.println("delete_result 결과: "+delete_result);
+		
+		return remark;
+	}
 }

@@ -11,8 +11,12 @@ public interface QualityDAO {
     // 구분 옵션
     List<InspectionDTO> _dao_option_Inspection(String startDate, String endDate, String searchType, int optionPage, int optionSize);
 
-    //등록에 필요한
+    //등록에 필요한 구성
 	int _dao_insert_Inspection(String insp_date, String prod_id, String emp_id, String insp_type,
+			String result, String inspection_qty, String good_qty, String remark);
+
+	//삭제에 필요한 구성
+	int _dao_delete_Inspection(String insp_date, String prod_id, String emp_id, String insp_type,
 			String result, String inspection_qty, String good_qty, String remark);
     
     

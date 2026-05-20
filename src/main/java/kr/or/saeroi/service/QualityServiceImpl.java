@@ -44,4 +44,14 @@ public class QualityServiceImpl implements QualityService {
 		
 		return insert_list;
 	}
+
+	//삭제에 필요한 구성
+	@Override
+	public int _ser_delete_Inspection(String insp_date, String prod_id, String emp_id, String insp_type, String result,
+			String inspection_qty, String good_qty, String remark) {
+
+		int delete_list = qualityDAO._dao_delete_Inspection(insp_date, prod_id, emp_id, insp_type, result, inspection_qty, good_qty, remark);
+		
+		return delete_list;
+	}
 }

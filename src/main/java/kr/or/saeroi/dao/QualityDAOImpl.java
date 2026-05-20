@@ -69,4 +69,24 @@ public class QualityDAOImpl implements QualityDAO{
 		return insert_list;
 	}
 	
+	//삭제에 필요한 구성
+	@Override
+	public int _dao_delete_Inspection(String insp_date, String prod_id, String emp_id, String insp_type, String result,
+			String inspection_qty, String good_qty, String remark) {
+		
+		//DB에서 가져옴
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("insp_date", insp_date);
+		param.put("prod_id", prod_id);
+		param.put("emp_id", emp_id);
+		param.put("insp_type", insp_type);
+		param.put("result", result);
+		param.put("inspection_qty", inspection_qty);
+		param.put("good_qty", good_qty);
+		param.put("remark", remark);
+		
+		int delete_list = sqlSession.delete("mapper.quality._delete_Inspection",param);
+		return delete_list;
+	}
+	
 }

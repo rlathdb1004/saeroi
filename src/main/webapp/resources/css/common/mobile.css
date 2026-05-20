@@ -168,6 +168,7 @@
 		min-width: 0;
 		font-size: 13px;
 		box-sizing: border-box;
+		margin-top: 10px;
 	}
 
 	/* 모바일에서는 날씨와 시간 간격을 줄인다. */
@@ -278,9 +279,26 @@
 		box-sizing: border-box;
 	}
 
-	/* 모바일에서도 테이블 구조가 무너지지 않도록 최소 너비를 유지한다. */
-	.coTable, .list-table, .detail_table {
+	/* 모바일에서는 목록 테이블이 4개 컬럼 기준으로 보이도록 최소 너비를 줄인다. */
+	.coTable, .list-table {
+		min-width: 520px;
+	}
+
+	/* 상세 테이블은 컬럼이 많을 수 있으므로 기존 너비를 유지한다. */
+	.detail_table {
 		min-width: 700px;
+	}
+
+	/* 모바일에서 숨길 테이블 컬럼이다. */
+	.coTable th.mobile_hidden, .coTable td.mobile_hidden, .list-table th.mobile_hidden,
+		.list-table td.mobile_hidden {
+		display: none;
+	}
+
+	/* 모바일에서 보여줄 테이블 컬럼이다. */
+	.coTable th.mobile_show, .coTable td.mobile_show, .list-table th.mobile_show,
+		.list-table td.mobile_show {
+		display: table-cell;
 	}
 
 	/* 모바일에서는 테이블 글씨와 여백을 조금 줄인다. */
@@ -293,7 +311,6 @@
 }
 
 @media screen and (max-width: 480px) {
-
 	/* 작은 모바일에서도 대메뉴가 제목처럼 보이도록 크기를 유지한다. */
 	.hePageTitle {
 		font-size: 24px;
@@ -306,10 +323,7 @@
 	}
 
 	/* 작은 모바일에서도 검색 조건을 한 줄에 두 개씩 보여준다. */
-	.coSearchItem,
-	.coSearchItemMiddle,
-	.coSearchItemSmall,
-	.search-item {
+	.coSearchItem, .coSearchItemMiddle, .coSearchItemSmall, .search-item {
 		width: calc(50% - 5px);
 		flex: 0 0 calc(50% - 5px);
 		min-width: 0;
