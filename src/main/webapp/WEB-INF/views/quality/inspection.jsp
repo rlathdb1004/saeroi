@@ -146,7 +146,10 @@
 						<td><span class="coStatus coStatusUse">${inspection.result}</span>
 						</td>
 						<td>
-							<button type="button" class="coDetailBtn">보기</button>
+							<button type="button" class="coDetailBtn"
+								onclick="location.href='${pageContext.request.contextPath}/quality/inspection_detail?insp_id=${inspection.insp_id}'">
+								보기</button>
+
 						</td>
 					</tr>
 				</c:forEach>
@@ -244,11 +247,8 @@
 				</div>
 
 				<div class="modal_item">
-					<label class="modal_label">비고</label> 
-					<input
-						name="remark" class="modal_select">
-						
-					</input>
+					<label class="modal_label">비고</label> <input name="remark"
+						class="modal_select"> </input>
 				</div>
 			</div>
 

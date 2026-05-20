@@ -62,7 +62,7 @@ public class QualityController {
 		// JSP 지정
 //		model.addAttribute("contentPage", "/WEB-INF/views/inspection.jsp");
 
-		return "inspection.tiles";
+		return "quality/inspection.tiles";
 	}
 
 //	구분 10개씩 기능 메서드
@@ -79,13 +79,21 @@ public class QualityController {
 
 		return option_list;
 	}
+	
+	@RequestMapping("/inspection_detail")
+	public String inspection_detail(Model model) {
+
+//		model.addAttribute("contentPage", "/WEB-INF/views/quality/defect.jsp");
+
+		return "quality/inspection_detail.tiles";
+	}
 
 	@RequestMapping("/defect")
 	public String defect(Model model) {
 
 		model.addAttribute("contentPage", "/WEB-INF/views/quality/defect.jsp");
 
-		return "defect.tiles";
+		return "quality/defect.tiles";
 	}
 
 	// 등록 메서드(등록 post 방식 추가)
@@ -104,4 +112,7 @@ public class QualityController {
 
 		return "redirect:/quality/inspection";
 	}
+	
+	//삭제 메서드
+	
 }
