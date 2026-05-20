@@ -6,15 +6,14 @@
 
 <div class="coPageWrap">
 
-	<!-- 검색 영역 -->
 	<form class="search-form"
 		method="get"
 		action="${pageContext.request.contextPath}/inventory/stockList">
 
 		<div class="search-box">
+
 			<div class="search-row">
 
-				<!-- 구분 -->
 				<div class="search-item">
 					<label class="search-label">구분</label>
 
@@ -36,7 +35,6 @@
 					</select>
 				</div>
 
-				<!-- 시작일 -->
 				<div class="search-item">
 					<label class="search-label">시작일</label>
 
@@ -46,7 +44,6 @@
 						value="${startDate}">
 				</div>
 
-				<!-- 종료일 -->
 				<div class="search-item">
 					<label class="search-label">종료일</label>
 
@@ -56,7 +53,6 @@
 						value="${endDate}">
 				</div>
 
-				<!-- 검색어 -->
 				<div class="search-item">
 					<label class="search-label">검색어</label>
 
@@ -67,16 +63,13 @@
 						value="${keyword}">
 				</div>
 
-				<!-- 검색 / 초기화 버튼 -->
 				<div class="search-btn-wrap">
 
-					<!-- 검색 버튼 -->
 					<button type="submit"
 						class="search-btn search-btn-main">
 
-						<!-- 돋보기 아이콘 -->
-						<svg viewBox="0 0 24 24" fill="none">
-
+						<svg viewBox="0 0 24 24"
+							fill="none">
 							<circle cx="10.5"
 								cy="10.5"
 								r="7.5"
@@ -89,30 +82,42 @@
 								stroke-width="2"
 								stroke-linecap="round">
 							</path>
-
 						</svg>
 
 						검색
-
 					</button>
 
-					<!-- 초기화 버튼 -->
 					<button type="button"
 						class="search-btn search-btn-sub search-reset-btn"
 						onclick="location.href='${pageContext.request.contextPath}/inventory/stockList'">
 
-						초기화
+						<svg viewBox="0 0 24 24"
+							fill="none">
+							<path d="M20 12C20 16.4 16.4 20 12 20C7.6 20 4 16.4 4 12C4 7.6 7.6 4 12 4C14.4 4 16.5 5.1 18 6.8"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round">
+							</path>
 
+							<path d="M18 4V7H21"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round">
+							</path>
+						</svg>
+
+						초기화
 					</button>
 
 				</div>
 
 			</div>
+
 		</div>
 
 	</form>
 
-	<!-- 삭제 form -->
 	<form method="post"
 		id="deleteForm"
 		action="${pageContext.request.contextPath}/inventory/stockList/delete">
@@ -123,28 +128,21 @@
 				총 ${pageInfo.totalCount}건
 			</p>
 
-			<!-- 관리자 / 매니저만 등록, 삭제 버튼 보임 -->
 			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
 				or sessionScope.loginUser.role eq 'MANAGER'}">
 
 				<div class="search-btn-right">
 
-					<!-- 등록 버튼 -->
 					<button type="button"
 						class="search-btn search-btn-main modal_open_btn"
 						data_modal_target="#modal_insert">
-
 						등록
-
 					</button>
 
-					<!-- 선택 삭제 버튼 -->
 					<button type="button"
 						class="search-btn search-btn-sub"
 						onclick="deleteCheck()">
-
 						선택 삭제
-
 					</button>
 
 				</div>
@@ -153,52 +151,28 @@
 
 		</div>
 
-		<!-- 목록 테이블 -->
 		<div class="coTableWrap">
 
 			<table class="coTable">
 
 				<thead>
-
 					<tr>
-
-						<!-- 모바일에서도 보여줄 컬럼 1 -->
 						<th class="mobile_show">
-
-							<!-- 선택 글씨를 누르면 전체 선택 / 전체 해제 -->
-							<label id="checkAllLabel">
-								선택
-							</label>
+							<label id="checkAllLabel">선택</label>
 
 							<input type="checkbox"
 								id="checkAll"
 								style="display:none;">
-
 						</th>
 
-						<!-- 모바일에서 숨길 컬럼 -->
 						<th class="mobile_hidden">품목코드</th>
-
-						<!-- 모바일에서 숨길 컬럼 -->
 						<th class="mobile_hidden">품목유형</th>
-
-						<!-- 모바일에서도 보여줄 컬럼 2 -->
 						<th class="mobile_show">품목명</th>
-
-						<!-- 모바일에서도 보여줄 컬럼 3 -->
 						<th class="mobile_show">현재재고</th>
-
-						<!-- 모바일에서 숨길 컬럼 -->
 						<th class="mobile_hidden">단위</th>
-
-						<!-- 모바일에서 숨길 컬럼 -->
 						<th class="mobile_hidden">창고위치</th>
-
-						<!-- 상세는 무조건 모바일 노출 -->
 						<th class="mobile_show">상세</th>
-
 					</tr>
-
 				</thead>
 
 				<tbody>
@@ -207,81 +181,50 @@
 						items="${list}">
 
 						<tr>
-
-							<!-- 모바일에서도 보여줄 컬럼 1 -->
 							<td class="mobile_show">
-
 								<input type="checkbox"
 									name="inventoryIds"
 									value="${inventory.inventoryId}">
-
 							</td>
 
-							<!-- 모바일에서 숨길 컬럼 -->
 							<td class="mobile_hidden"
 								title="${inventory.itemCode}">
 								${inventory.itemCode}
 							</td>
 
-							<!-- 모바일에서 숨길 컬럼 -->
 							<td class="mobile_hidden">
-
 								<c:choose>
-
-									<c:when test="${inventory.itemType eq 'FG'}">
-										완제품
-									</c:when>
-
-									<c:when test="${inventory.itemType eq 'RM'}">
-										원자재
-									</c:when>
-
-									<c:when test="${inventory.itemType eq 'SM'}">
-										부자재
-									</c:when>
-
-									<c:otherwise>
-										${inventory.itemType}
-									</c:otherwise>
-
+									<c:when test="${inventory.itemType eq 'FG'}">완제품</c:when>
+									<c:when test="${inventory.itemType eq 'RM'}">원자재</c:when>
+									<c:when test="${inventory.itemType eq 'SM'}">부자재</c:when>
+									<c:otherwise>${inventory.itemType}</c:otherwise>
 								</c:choose>
-
 							</td>
 
-							<!-- 모바일에서도 보여줄 컬럼 2 -->
 							<td class="mobile_show"
 								title="${inventory.itemName}">
 								${inventory.itemName}
 							</td>
 
-							<!-- 모바일에서도 보여줄 컬럼 3 -->
 							<td class="mobile_show">
 								${inventory.inventoryStock}
 							</td>
 
-							<!-- 모바일에서 숨길 컬럼 -->
 							<td class="mobile_hidden">
 								${inventory.itemUnit}
 							</td>
 
-							<!-- 모바일에서 숨길 컬럼 -->
 							<td class="mobile_hidden">
 								${inventory.stockLocation}
 							</td>
 
-							<!-- 상세는 무조건 모바일 노출 -->
 							<td class="mobile_show">
-
 								<button type="button"
 									class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/stockList/detail?inventoryId=${inventory.inventoryId}'">
-
 									보기
-
 								</button>
-
 							</td>
-
 						</tr>
 
 					</c:forEach>
@@ -294,14 +237,111 @@
 
 	</form>
 
-	<!-- 공통 페이징 -->
+	<%-- 공통 모달 구조 사용 --%>
+	<div id="modal_insert"
+		class="modal_wrap"
+		aria-hidden="true">
+
+		<div class="modal_box"
+			role="dialog"
+			aria-modal="true">
+
+			<div class="modal_header">
+				<h3 class="modal_title">재고 등록</h3>
+			</div>
+
+			<form class="modal_form"
+				method="post"
+				action="${pageContext.request.contextPath}/inventory/stockList/insert"
+				onsubmit="return checkInventoryInsert();">
+
+				<div class="modal_body modal_body_2col">
+
+					<div class="modal_item">
+						<label class="modal_label">
+							품목명<span class="modal_required">*</span>
+						</label>
+
+						<select name="itemId"
+							id="insertInventoryItemId"
+							class="modal_select"
+							required>
+
+							<option value="">선택</option>
+
+							<c:forEach var="item"
+								items="${itemList}">
+
+								<option value="${item.itemId}">
+									${item.itemName}
+								</option>
+
+							</c:forEach>
+
+						</select>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">
+							현재재고<span class="modal_required">*</span>
+						</label>
+
+						<input type="number"
+							name="inventoryStock"
+							id="insertInventoryStock"
+							class="modal_input"
+							min="0"
+							required>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">
+							창고위치<span class="modal_required">*</span>
+						</label>
+
+						<input type="text"
+							name="stockLocation"
+							id="insertStockLocation"
+							class="modal_input"
+							required>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">비고</label>
+
+						<input type="text"
+							name="remark"
+							class="modal_input">
+					</div>
+
+				</div>
+
+				<div class="modal_footer">
+
+					<button type="button"
+						class="modal_btn modal_btn_cancel modal_close_btn">
+						취소
+					</button>
+
+					<button type="submit"
+						class="modal_btn modal_btn_submit">
+						등록
+					</button>
+
+				</div>
+
+			</form>
+
+		</div>
+
+	</div>
+
 	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 
 </div>
 
 <script>
-
-	// 선택 글씨를 누르면 전체 선택 / 전체 해제
+	// 선택 글씨 클릭 시 전체 선택 / 전체 해제
 	document.getElementById("checkAllLabel").onclick = function() {
 
 		var checkAll =
@@ -314,13 +354,11 @@
 			!checkAll.checked;
 
 		for (var i = 0; i < checks.length; i++) {
-
 			checks[i].checked =
 				checkAll.checked;
 		}
 	};
 
-	// 개별 체크박스를 직접 누르면 전체선택 상태도 같이 맞춘다.
 	var checks =
 		document.getElementsByName("inventoryIds");
 
@@ -328,13 +366,11 @@
 
 		checks[i].onclick = function() {
 
-			var allChecked =
-				true;
+			var allChecked = true;
 
 			for (var j = 0; j < checks.length; j++) {
 
 				if (!checks[j].checked) {
-
 					allChecked = false;
 					break;
 				}
@@ -345,7 +381,7 @@
 		};
 	}
 
-	// 선택 삭제
+	// 선택 삭제 방어코딩
 	function deleteCheck() {
 
 		var checks =
@@ -356,21 +392,47 @@
 		for (var i = 0; i < checks.length; i++) {
 
 			if (checks[i].checked) {
-
 				checked = true;
 			}
 		}
 
 		if (!checked) {
-
 			alert("삭제할 항목을 선택해주세요.");
 			return;
 		}
 
 		if (confirm("선택한 항목을 삭제하시겠습니까?")) {
-
 			document.getElementById("deleteForm").submit();
 		}
 	}
 
+	// 등록 방어코딩
+	function checkInventoryInsert() {
+
+		var itemId =
+			document.getElementById("insertInventoryItemId").value;
+
+		var inventoryStock =
+			document.getElementById("insertInventoryStock").value;
+
+		var stockLocation =
+			document.getElementById("insertStockLocation").value;
+
+		if (itemId == "") {
+			alert("품목명을 선택해주세요.");
+			return false;
+		}
+
+		if (inventoryStock == "" || Number(inventoryStock) < 0) {
+			alert("현재재고는 0 이상 입력해주세요.");
+			return false;
+		}
+
+		if (stockLocation == "") {
+			alert("창고위치를 입력해주세요.");
+			return false;
+		}
+
+		return true;
+	}
 </script>
