@@ -170,7 +170,7 @@
 						<th class="mobile_show">품목명</th>
 						<th class="mobile_show">현재재고</th>
 						<th class="mobile_hidden">단위</th>
-						<th class="mobile_hidden">창고위치</th>
+						<th class="mobile_show">창고위치</th>
 						<th class="mobile_show">상세</th>
 					</tr>
 				</thead>
@@ -214,7 +214,7 @@
 								${inventory.itemUnit}
 							</td>
 
-							<td class="mobile_hidden">
+							<td class="mobile_show">
 								${inventory.stockLocation}
 							</td>
 

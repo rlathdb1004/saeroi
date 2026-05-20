@@ -23,7 +23,25 @@
 			<div class="search-row">
 
 				<div class="search-item">
-					<label class="search-label">입출고구분</label>
+					<label class="search-label">시작일</label>
+
+					<input type="date"
+						name="startDate"
+						class="search-date"
+						value="${startDate}">
+				</div>
+
+				<div class="search-item">
+					<label class="search-label">종료일</label>
+
+					<input type="date"
+						name="endDate"
+						class="search-date"
+						value="${endDate}">
+				</div>
+
+				<div class="search-item">
+					<label class="search-label">구분</label>
 
 					<select name="inoutType"
 						class="search-select">
@@ -41,24 +59,6 @@
 						</option>
 
 					</select>
-				</div>
-
-				<div class="search-item">
-					<label class="search-label">시작일</label>
-
-					<input type="date"
-						name="startDate"
-						class="search-date"
-						value="${startDate}">
-				</div>
-
-				<div class="search-item">
-					<label class="search-label">종료일</label>
-
-					<input type="date"
-						name="endDate"
-						class="search-date"
-						value="${endDate}">
 				</div>
 
 				<div class="search-item">
@@ -174,7 +174,7 @@
 						<th class="mobile_hidden">입출고번호</th>
 						<th class="mobile_hidden">입출고구분</th>
 						<th class="mobile_show">품목명</th>
-						<th class="mobile_hidden">입출고량</th>
+						<th class="mobile_show">입출고량</th>
 						<th class="mobile_hidden">단위</th>
 						<th class="mobile_show">일자</th>
 						<th class="mobile_show">상세</th>
@@ -204,7 +204,7 @@
 							</td>
 
 							<td class="mobile_show">${inout.itemName}</td>
-							<td class="mobile_hidden">${inout.inoutQty}</td>
+							<td class="mobile_show">${inout.inoutQty}</td>
 							<td class="mobile_hidden">${inout.itemUnit}</td>
 							<td class="mobile_show">${inout.inoutDate}</td>
 

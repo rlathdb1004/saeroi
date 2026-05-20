@@ -86,9 +86,14 @@ public class InventoryDAOImpl implements InventoryDAO {
 				// 전체 검색
 				} else {
 
+					// 상세페이지 값까지 전체 검색되게 수정
 					sql += " AND ( ";
 					sql += " I.ITEM_CODE LIKE ? ";
 					sql += " OR I.ITEM_NAME LIKE ? ";
+					sql += " OR I.ITEM_TYPE LIKE ? ";
+					sql += " OR I.ITEM_UNIT LIKE ? ";
+					sql += " OR IV.STOCK_LOCATION LIKE ? ";
+					sql += " OR IV.REMARK LIKE ? ";
 					sql += " ) ";
 				}
 			}
@@ -134,6 +139,22 @@ public class InventoryDAOImpl implements InventoryDAO {
 							"%" + keyword + "%");
 
 				} else {
+
+					pstmt.setString(
+							idx++,
+							"%" + keyword + "%");
+
+					pstmt.setString(
+							idx++,
+							"%" + keyword + "%");
+
+					pstmt.setString(
+							idx++,
+							"%" + keyword + "%");
+
+					pstmt.setString(
+							idx++,
+							"%" + keyword + "%");
 
 					pstmt.setString(
 							idx++,
@@ -275,7 +296,7 @@ public class InventoryDAOImpl implements InventoryDAO {
 				dto.setItemUnit(
 						rs.getString("ITEM_UNIT"));
 
-				// 품목 선택 시 창고위치를 자동으로 보여주기 위해 넣는다.
+				// 품목 선택 시 창고위치 자동 입력용
 				dto.setStockLocation(
 						rs.getString("STOCK_LOCATION"));
 

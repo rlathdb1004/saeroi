@@ -45,7 +45,7 @@
     flex-shrink: 0;
 }
 
-/* 목록 버튼 */
+/* 라인 버튼 */
 .detail_btn_line {
     width: 95px;
     height: 36px;
@@ -65,7 +65,7 @@
     gap: 6px;
 }
 
-/* 수정 버튼 */
+/* 초록 버튼 */
 .detail_btn_green {
     width: 95px;
     height: 36px;
@@ -159,13 +159,6 @@
     overflow-wrap: break-word;
 }
 
-/* 수정 모드 input, select가 칸 밖으로 삐져나가지 않게 한다. */
-.detail_info_table input,
-.detail_info_table select {
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
 /* 상세 상태 뱃지 */
 .detail_status_badge {
     display: inline-block;
@@ -214,4 +207,188 @@
     background-color: #fbfdfc;
     color: #6b7280;
     font-size: 14px;
+}
+
+/* 수정 모드 입력 영역 */
+.detail_page [data-edit-box],
+.detail_page .detail_edit_box {
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+}
+
+/* 수정 모드 input, select, textarea 공통 */
+.detail_page .detail_info_table input:not([type="hidden"]),
+.detail_page .detail_info_table select,
+.detail_page .detail_info_table textarea,
+.detail_page [data-edit-box] input:not([type="hidden"]),
+.detail_page [data-edit-box] select,
+.detail_page [data-edit-box] textarea,
+.detail_page .detail_input,
+.detail_page .detail_select,
+.detail_page .detail_textarea,
+.detail_page .detailInput,
+.detail_page .search-input,
+.detail_page .search-select,
+.detail_page .search-date {
+    width: 100% !important;
+    min-width: 0;
+    height: 34px;
+    padding: 0 10px;
+    border: 1.5px solid #2f7d62;
+    border-radius: 6px;
+    background-color: #eef8f3;
+    color: #111827;
+    font-size: 14px;
+    font-family: inherit;
+    box-sizing: border-box;
+    outline: none;
+}
+
+/* 수정 모드 input, select, textarea에 마우스를 올렸을 때 */
+.detail_page .detail_info_table input:not([type="hidden"]):hover,
+.detail_page .detail_info_table select:hover,
+.detail_page .detail_info_table textarea:hover,
+.detail_page [data-edit-box] input:not([type="hidden"]):hover,
+.detail_page [data-edit-box] select:hover,
+.detail_page [data-edit-box] textarea:hover,
+.detail_page .detail_input:hover,
+.detail_page .detail_select:hover,
+.detail_page .detail_textarea:hover,
+.detail_page .detailInput:hover,
+.detail_page .search-input:hover,
+.detail_page .search-select:hover,
+.detail_page .search-date:hover {
+    border-color: #1f6b50;
+    background-color: #e4f3eb;
+}
+
+/* 수정 모드 input, select, textarea를 클릭했을 때 */
+.detail_page .detail_info_table input:not([type="hidden"]):focus,
+.detail_page .detail_info_table select:focus,
+.detail_page .detail_info_table textarea:focus,
+.detail_page [data-edit-box] input:not([type="hidden"]):focus,
+.detail_page [data-edit-box] select:focus,
+.detail_page [data-edit-box] textarea:focus,
+.detail_page .detail_input:focus,
+.detail_page .detail_select:focus,
+.detail_page .detail_textarea:focus,
+.detail_page .detailInput:focus,
+.detail_page .search-input:focus,
+.detail_page .search-select:focus,
+.detail_page .search-date:focus {
+    border-color: #155f45;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(47, 125, 98, 0.2);
+}
+
+/* 수정 모드 textarea */
+.detail_page .detail_info_table textarea,
+.detail_page [data-edit-box] textarea,
+.detail_page .detail_textarea {
+    min-height: 80px;
+    height: 80px;
+    padding: 10px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+/* 수정 모드 select */
+.detail_page .detail_info_table select,
+.detail_page [data-edit-box] select,
+.detail_page .detail_select,
+.detail_page .search-select {
+    cursor: pointer;
+}
+
+/* 읽기 전용 input */
+.detail_page .detail_info_table input[readonly],
+.detail_page input[readonly] {
+    background-color: #f4f8f6;
+    border-color: #d6e5dd;
+    color: #6b7280;
+    cursor: default;
+}
+
+/* 비활성화된 input, select, textarea */
+.detail_page .detail_info_table input:disabled,
+.detail_page .detail_info_table select:disabled,
+.detail_page .detail_info_table textarea:disabled,
+.detail_page input:disabled,
+.detail_page select:disabled,
+.detail_page textarea:disabled {
+    background-color: #f9fafb;
+    border-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* input placeholder */
+.detail_page .detail_info_table input::placeholder,
+.detail_page .detail_info_table textarea::placeholder,
+.detail_page input::placeholder,
+.detail_page textarea::placeholder {
+    color: #9ca3af;
+}
+
+/* 품목코드처럼 긴 코드값 입력칸 */
+.detail_page input[name*="code"],
+.detail_page input[id*="code"],
+.detail_page input[name*="Code"],
+.detail_page input[id*="Code"] {
+    font-size: 13px;
+    letter-spacing: -0.5px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+/* 숫자 input 오른쪽 화살표 영역까지 높이 맞춤 */
+.detail_page input[type="number"],
+.detail_info_table input[type="number"] {
+    text-align: left;
+}
+
+/* 수정 모드 보조 설명 문구 */
+.detail_page .detail_help_text,
+.detail_page #supplierSelectedText,
+.detail_page #deliveryClientSelectedText {
+    margin-top: 6px !important;
+    color: #6b7280 !important;
+    font-size: 12px !important;
+    line-height: 1.4;
+}
+
+/* 자동완성 박스 */
+.detail_page .detail_auto_box,
+.detail_page #supplierAutoCompleteBox,
+.detail_page #deliveryClientAutoCompleteBox {
+    width: 100%;
+    max-height: 160px;
+    margin-top: 6px !important;
+    border: 1px solid #d1d5db !important;
+    border-radius: 6px;
+    background-color: #ffffff !important;
+    box-shadow: 0 6px 14px rgba(17, 24, 39, 0.08);
+    overflow-y: auto;
+    box-sizing: border-box;
+    z-index: 20;
+}
+
+/* 자동완성 항목 */
+.detail_page .detail_auto_item {
+    padding: 8px 10px;
+    border-bottom: 1px solid #e5e7eb;
+    color: #111827;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* 자동완성 마지막 항목 */
+.detail_page .detail_auto_item:last-child {
+    border-bottom: none;
+}
+
+/* 자동완성 항목에 마우스를 올렸을 때 */
+.detail_page .detail_auto_item:hover {
+    background-color: #f3f4f6;
 }
