@@ -111,8 +111,17 @@ public class InoutDAOImpl implements InoutDAO {
 					sql += " AND I.ITEM_NAME LIKE ? ";
 
 				} else {
-					sql += " AND (I.ITEM_CODE LIKE ? ";
-					sql += " OR I.ITEM_NAME LIKE ?) ";
+					// 상세페이지에 있는 값까지 검색되게 추가
+					sql += " AND ( ";
+					sql += " I.ITEM_CODE LIKE ? ";
+					sql += " OR I.ITEM_NAME LIKE ? ";
+					sql += " OR I.ITEM_TYPE LIKE ? ";
+					sql += " OR I.ITEM_UNIT LIKE ? ";
+					sql += " OR MI.DOC_NO LIKE ? ";
+					sql += " OR MI.MATERIAL_LOT LIKE ? ";
+					sql += " OR MI.REMARK LIKE ? ";
+					sql += " OR MI.INOUT_TYPE LIKE ? ";
+					sql += " ) ";
 				}
 			}
 
@@ -148,6 +157,12 @@ public class InoutDAOImpl implements InoutDAO {
 					pstmt.setString(idx++, "%" + keyword + "%");
 
 				} else {
+					pstmt.setString(idx++, "%" + keyword + "%");
+					pstmt.setString(idx++, "%" + keyword + "%");
+					pstmt.setString(idx++, "%" + keyword + "%");
+					pstmt.setString(idx++, "%" + keyword + "%");
+					pstmt.setString(idx++, "%" + keyword + "%");
+					pstmt.setString(idx++, "%" + keyword + "%");
 					pstmt.setString(idx++, "%" + keyword + "%");
 					pstmt.setString(idx++, "%" + keyword + "%");
 				}
@@ -237,8 +252,17 @@ public class InoutDAOImpl implements InoutDAO {
 					sql += " AND I.ITEM_NAME LIKE ? ";
 
 				} else {
-					sql += " AND (I.ITEM_CODE LIKE ? ";
-					sql += " OR I.ITEM_NAME LIKE ?) ";
+					// 상세페이지에 있는 값까지 검색되게 추가
+					sql += " AND ( ";
+					sql += " I.ITEM_CODE LIKE ? ";
+					sql += " OR I.ITEM_NAME LIKE ? ";
+					sql += " OR I.ITEM_TYPE LIKE ? ";
+					sql += " OR I.ITEM_UNIT LIKE ? ";
+					sql += " OR MI.DOC_NO LIKE ? ";
+					sql += " OR MI.MATERIAL_LOT LIKE ? ";
+					sql += " OR MI.REMARK LIKE ? ";
+					sql += " OR MI.INOUT_TYPE LIKE ? ";
+					sql += " ) ";
 				}
 			}
 
@@ -271,6 +295,12 @@ public class InoutDAOImpl implements InoutDAO {
 					pstmt.setString(idx++, "%" + keyword + "%");
 
 				} else {
+					pstmt.setString(idx++, "%" + keyword + "%");
+					pstmt.setString(idx++, "%" + keyword + "%");
+					pstmt.setString(idx++, "%" + keyword + "%");
+					pstmt.setString(idx++, "%" + keyword + "%");
+					pstmt.setString(idx++, "%" + keyword + "%");
+					pstmt.setString(idx++, "%" + keyword + "%");
 					pstmt.setString(idx++, "%" + keyword + "%");
 					pstmt.setString(idx++, "%" + keyword + "%");
 				}
