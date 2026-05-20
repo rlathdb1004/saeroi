@@ -34,7 +34,7 @@
 
 					<label class="search-label">구분</label> <select name="searchType"
 						class="search-select">
-						<option value="">선택</option>
+						<option value="">전체</option>
 						<option value="insp_id"
 							<c:if test="${searchType == 'insp_id'}">selected</c:if>>검사번호</option>
 						<option value="itemName"
