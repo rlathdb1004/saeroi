@@ -55,7 +55,7 @@
 			</choose>
 		</if>
 
-		ORDER BY i.insp_date DESC, i.insp_id DESC
+		ORDER BY i.insp_id DESC
 	</select>
 
 	<!-- 구분 옵션 -->
@@ -184,5 +184,5 @@
 			SYSDATE
 		FROM dual
 	</insert>
-
+	
 </mapper>
