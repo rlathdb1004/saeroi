@@ -59,7 +59,7 @@
 					<input type="text"
 						name="keyword"
 						class="search-input"
-						placeholder="작업지시번호 / LOT번호 / 품목명 / 라인 검색"
+						placeholder="검색키워드"
 						value="${keyword}">
 				</div>
 
@@ -214,8 +214,8 @@
 
 						<th class="mobile_hidden">작업지시번호</th>
 						<th class="mobile_show">LOT번호</th>
-						<th class="mobile_show">품목명</th>
-						<th class="mobile_show">지시/생산수량</th>
+						<th class="mobile_hidden">품목명</th>
+						<th class="mobile_hidden">지시/생산수량</th>
 						<th class="mobile_show">진행률</th>
 						<th class="mobile_show">진행상태</th>
 						<th class="mobile_show">상세</th>
@@ -244,12 +244,12 @@
 								${progress.productLot}
 							</td>
 
-							<td class="coTextLeft mobile_show"
+							<td class="coTextLeft mobile_hidden"
 								title="${progress.itemName}">
 								${progress.itemName}
 							</td>
 
-							<td class="mobile_show">
+							<td class="mobile_hidden">
 								${progress.orderQty} / ${progress.totalProdQty}
 							</td>
 
