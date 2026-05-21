@@ -4,22 +4,14 @@
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
-<%-- 관리자 / 매니저 권한 체크 --%>
-<c:set var="isAdmin"
-	value="${sessionScope.member.role eq 'ADMIN'
-		or sessionScope.member.role eq 'MANAGER'
-		or sessionScope.loginUser.role eq 'ADMIN'
-		or sessionScope.loginUser.role eq 'MANAGER'
-		or sessionScope.member.job eq '관리자'
-		or sessionScope.loginUser.job eq '관리자'}" />
-
 <div class="coPageWrap">
 
 	<form class="search-form"
 		method="get"
-		action="${pageContext.request.contextPath}/inventory/materialIn">
+		action="${pageContext.request.contextPath}/production/productionplan">
 
 		<div class="search-box">
+
 			<div class="search-row">
 
 				<div class="search-item">
@@ -43,20 +35,20 @@
 				<div class="search-item">
 					<label class="search-label">구분</label>
 
-					<select name="inoutType"
+					<select name="itemType"
 						class="search-select">
 
 						<option value="">전체</option>
 
-						<option value="MI"
-							<c:if test="${inoutType eq 'MI'}">selected</c:if>>
-							입고
-						</option>
+						<c:forEach var="type"
+							items="${itemTypeList}">
 
-						<option value="MO-PROD"
-							<c:if test="${inoutType eq 'MO-PROD'}">selected</c:if>>
-							출고
-						</option>
+							<option value="${type}"
+								<c:if test="${itemType eq type}">selected</c:if>>
+								${type}
+							</option>
+
+						</c:forEach>
 
 					</select>
 				</div>
@@ -97,7 +89,7 @@
 
 					<button type="button"
 						class="search-btn search-btn-sub search-reset-btn"
-						onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
+						onclick="location.href='${pageContext.request.contextPath}/production/productionplan'">
 
 						<svg viewBox="0 0 24 24"
 							fill="none">
@@ -121,13 +113,15 @@
 				</div>
 
 			</div>
+
 		</div>
 
 	</form>
 
+
 	<form method="post"
 		id="deleteForm"
-		action="${pageContext.request.contextPath}/inventory/materialIn/delete">
+		action="${pageContext.request.contextPath}/production/productionplan/delete">
 
 		<div class="coTableTop">
 
@@ -135,26 +129,67 @@
 				총 ${pageInfo.totalCount}건
 			</p>
 
-			<c:if test="${isAdmin}">
+			<div class="search-btn-right">
 
-				<div class="search-btn-right">
+				<button type="button"
+					class="search-btn search-btn-main modal_open_btn"
+					data_modal_target="#modal_insert">
+					<svg viewBox="0 0 24 24"
+                        fill="none">
+                        <path d="M12 5V19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
 
-					<button type="button"
-						class="search-btn search-btn-main modal_open_btn"
-						data_modal_target="#modal_insert">
-						등록
-					</button>
+                        <path d="M5 12H19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+                    </svg>
+					등록
+				</button>
 
-					<button type="button"
-						class="search-btn search-btn-sub"
-						onclick="deleteCheck()">
-						선택 삭제
-					</button>
-					
+				<button type="button"
+					class="search-btn search-btn-sub"
+					onclick="deleteCheck()">
+					<svg viewBox="0 0 24 24"
+                        fill="none">
+                        <path d="M4 7H20"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
 
-				</div>
+                        <path d="M10 11V17"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
 
-			</c:if>
+                        <path d="M14 11V17"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+
+                        <path d="M6 7L7 21H17L18 7"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linejoin="round">
+                        </path>
+
+                        <path d="M9 7V4H15V7"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linejoin="round">
+                        </path>
+                    </svg>
+					선택 삭제
+				</button>
+
+			</div>
 
 		</div>
 
@@ -172,53 +207,72 @@
 								style="display:none;">
 						</th>
 
-						<th class="mobile_hidden">입출고번호</th>
-						<th class="mobile_hidden">입출고구분</th>
+						<th class="mobile_hidden">생산계획번호</th>
 						<th class="mobile_show">품목명</th>
-						<th class="mobile_hidden">입출고량</th>
+						<th class="mobile_show">계획수량</th>
 						<th class="mobile_hidden">단위</th>
-						<th class="mobile_show">일자</th>
+						<th class="mobile_show">계획일자</th>
+						<th class="mobile_hidden">납기일</th>
 						<th class="mobile_show">상세</th>
 					</tr>
 				</thead>
 
 				<tbody>
 
-					<c:forEach var="inout"
+					<c:forEach var="production"
 						items="${list}">
 
 						<tr>
 							<td class="mobile_show">
 								<input type="checkbox"
-									name="inoutIds"
-									value="${inout.inoutId}">
+									name="prodPlanIds"
+									value="${production.prodPlanId}">
 							</td>
 
-							<td class="mobile_hidden">${inout.docNo}</td>
+							<td class="mobile_hidden"
+								title="${production.docNo}">
+								${production.docNo}
+							</td>
+
+							<td class="mobile_show"
+								title="${production.itemName}">
+								${production.itemName}
+							</td>
+
+							<td class="mobile_show">
+								${production.prodPlanQty}
+							</td>
 
 							<td class="mobile_hidden">
-								<c:choose>
-									<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
-									<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
-									<c:otherwise>${inout.inoutType}</c:otherwise>
-								</c:choose>
+								${production.itemUnit}
 							</td>
 
-							<td class="mobile_show">${inout.itemName}</td>
-							<td class="mobile_hidden">${inout.inoutQty}</td>
-							<td class="mobile_hidden">${inout.itemUnit}</td>
-							<td class="mobile_show">${inout.inoutDate}</td>
+							<td class="mobile_show">
+								${production.prodPlanDate}
+							</td>
+
+							<td class="mobile_hidden">
+								${production.dueDate}
+							</td>
 
 							<td class="mobile_show">
 								<button type="button"
 									class="coDetailBtn"
-									onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
+									onclick="location.href='${pageContext.request.contextPath}/production/productionplan/detail?prodPlanId=${production.prodPlanId}'">
 									보기
 								</button>
 							</td>
 						</tr>
 
 					</c:forEach>
+
+					<c:if test="${empty list}">
+						<tr>
+							<td colspan="8">
+								조회된 생산계획이 없습니다.
+							</td>
+						</tr>
+					</c:if>
 
 				</tbody>
 
@@ -227,6 +281,7 @@
 		</div>
 
 	</form>
+
 
 	<%-- 공통 모달 구조 사용 --%>
 	<div id="modal_insert"
@@ -238,32 +293,15 @@
 			aria-modal="true">
 
 			<div class="modal_header">
-				<h3 class="modal_title">자재 입출고 등록</h3>
+				<h3 class="modal_title">생산계획 등록</h3>
 			</div>
 
 			<form class="modal_form"
 				method="post"
-				action="${pageContext.request.contextPath}/inventory/materialIn/insert"
-				onsubmit="return checkInoutInsert();">
+				action="${pageContext.request.contextPath}/production/productionplan/insert"
+				onsubmit="return checkProductionPlanInsert();">
 
 				<div class="modal_body modal_body_2col">
-
-					<div class="modal_item">
-						<label class="modal_label">
-							입출고구분<span class="modal_required">*</span>
-						</label>
-
-						<select name="inoutType"
-							id="insertInoutType"
-							class="modal_select"
-							required>
-
-							<option value="">선택</option>
-							<option value="MI">입고</option>
-							<option value="MO-PROD">출고</option>
-
-						</select>
-					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">
@@ -291,12 +329,12 @@
 
 					<div class="modal_item">
 						<label class="modal_label">
-							입출고수량<span class="modal_required">*</span>
+							계획수량<span class="modal_required">*</span>
 						</label>
 
 						<input type="number"
-							name="inoutQty"
-							id="insertInoutQty"
+							name="prodPlanQty"
+							id="insertProdPlanQty"
 							class="modal_input"
 							min="1"
 							required>
@@ -304,13 +342,25 @@
 
 					<div class="modal_item">
 						<label class="modal_label">
-							입출고일자<span class="modal_required">*</span>
+							계획일자<span class="modal_required">*</span>
 						</label>
 
 						<input type="date"
-							name="inoutDate"
-							id="insertInoutDate"
-							class="modal_input modal_today"
+							name="prodPlanDate"
+							id="insertProdPlanDate"
+							class="modal_input"
+							required>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">
+							납기일<span class="modal_required">*</span>
+						</label>
+
+						<input type="date"
+							name="dueDate"
+							id="insertDueDate"
+							class="modal_input"
 							required>
 					</div>
 
@@ -344,6 +394,7 @@
 
 	</div>
 
+
 	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 
 </div>
@@ -356,7 +407,7 @@
 			document.getElementById("checkAll");
 
 		var checks =
-			document.getElementsByName("inoutIds");
+			document.getElementsByName("prodPlanIds");
 
 		checkAll.checked =
 			!checkAll.checked;
@@ -368,7 +419,7 @@
 	};
 
 	var checks =
-		document.getElementsByName("inoutIds");
+		document.getElementsByName("prodPlanIds");
 
 	for (var i = 0; i < checks.length; i++) {
 
@@ -393,7 +444,7 @@
 	function deleteCheck() {
 
 		var checks =
-			document.getElementsByName("inoutIds");
+			document.getElementsByName("prodPlanIds");
 
 		var checked = false;
 
@@ -414,38 +465,38 @@
 		}
 	}
 
-	// 등록 방어코딩
-	function checkInoutInsert() {
-
-		var inoutType =
-			document.getElementById("insertInoutType").value;
+	// 생산계획 등록 방어코딩
+	function checkProductionPlanInsert() {
 
 		var itemId =
 			document.getElementById("insertItemId").value;
 
-		var inoutQty =
-			document.getElementById("insertInoutQty").value;
+		var prodPlanQty =
+			document.getElementById("insertProdPlanQty").value;
 
-		var inoutDate =
-			document.getElementById("insertInoutDate").value;
+		var prodPlanDate =
+			document.getElementById("insertProdPlanDate").value;
 
-		if (inoutType == "") {
-			alert("입출고구분을 선택해주세요.");
-			return false;
-		}
+		var dueDate =
+			document.getElementById("insertDueDate").value;
 
 		if (itemId == "") {
 			alert("품목명을 선택해주세요.");
 			return false;
 		}
 
-		if (inoutQty == "" || Number(inoutQty) <= 0) {
-			alert("입출고수량은 1 이상 입력해주세요.");
+		if (prodPlanQty == "" || Number(prodPlanQty) <= 0) {
+			alert("계획수량은 1 이상 입력해주세요.");
 			return false;
 		}
 
-		if (inoutDate == "") {
-			alert("입출고일자를 선택해주세요.");
+		if (prodPlanDate == "") {
+			alert("계획일자를 선택해주세요.");
+			return false;
+		}
+
+		if (dueDate == "") {
+			alert("납기일을 선택해주세요.");
 			return false;
 		}
 

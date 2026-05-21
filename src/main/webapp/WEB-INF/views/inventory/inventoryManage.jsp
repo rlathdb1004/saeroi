@@ -14,13 +14,34 @@
 
 			<div class="search-row">
 
+				<%-- 시작일 --%>
+				<div class="search-item">
+					<label class="search-label">시작일</label>
+
+					<input type="date"
+						name="startDate"
+						class="search-date"
+						value="${startDate}">
+				</div>
+
+				<%-- 종료일 --%>
+				<div class="search-item">
+					<label class="search-label">종료일</label>
+
+					<input type="date"
+						name="endDate"
+						class="search-date"
+						value="${endDate}">
+				</div>
+
+				<%-- 구분 --%>
 				<div class="search-item">
 					<label class="search-label">구분</label>
 
 					<select name="searchType"
 						class="search-select">
 
-						<option value="">선택</option>
+						<option value="">전체</option>
 
 						<option value="itemCode"
 							<c:if test="${searchType eq 'itemCode'}">selected</c:if>>
@@ -35,24 +56,7 @@
 					</select>
 				</div>
 
-				<div class="search-item">
-					<label class="search-label">시작일</label>
-
-					<input type="date"
-						name="startDate"
-						class="search-date"
-						value="${startDate}">
-				</div>
-
-				<div class="search-item">
-					<label class="search-label">종료일</label>
-
-					<input type="date"
-						name="endDate"
-						class="search-date"
-						value="${endDate}">
-				</div>
-
+				<%-- 검색어는 구분 선택 안해도 전체 검색 --%>
 				<div class="search-item">
 					<label class="search-label">검색어</label>
 
@@ -194,10 +198,21 @@
 
 							<td class="mobile_hidden">
 								<c:choose>
-									<c:when test="${inventory.itemType eq 'FG'}">완제품</c:when>
-									<c:when test="${inventory.itemType eq 'RM'}">원자재</c:when>
-									<c:when test="${inventory.itemType eq 'SM'}">부자재</c:when>
-									<c:otherwise>${inventory.itemType}</c:otherwise>
+									<c:when test="${inventory.itemType eq 'FG'}">
+										완제품
+									</c:when>
+
+									<c:when test="${inventory.itemType eq 'RM'}">
+										원자재
+									</c:when>
+
+									<c:when test="${inventory.itemType eq 'SM'}">
+										부자재
+									</c:when>
+
+									<c:otherwise>
+										${inventory.itemType}
+									</c:otherwise>
 								</c:choose>
 							</td>
 
@@ -219,11 +234,15 @@
 							</td>
 
 							<td class="mobile_show">
+
 								<button type="button"
 									class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/stockList/detail?inventoryId=${inventory.inventoryId}'">
+
 									보기
+
 								</button>
+
 							</td>
 						</tr>
 
@@ -237,7 +256,10 @@
 
 	</form>
 
-	<%-- 공통 모달 구조 사용 --%>
+	<%-- =========================================================
+		재고 등록 모달
+	========================================================= --%>
+
 	<div id="modal_insert"
 		class="modal_wrap"
 		aria-hidden="true">
@@ -247,7 +269,11 @@
 			aria-modal="true">
 
 			<div class="modal_header">
-				<h3 class="modal_title">재고 등록</h3>
+
+				<h3 class="modal_title">
+					재고 등록
+				</h3>
+
 			</div>
 
 			<form class="modal_form"
@@ -257,9 +283,17 @@
 
 				<div class="modal_body modal_body_2col">
 
+					<%-- =====================================================
+						품목명
+					===================================================== --%>
+
 					<div class="modal_item">
+
 						<label class="modal_label">
-							품목명<span class="modal_required">*</span>
+
+							품목명
+							<span class="modal_required">*</span>
+
 						</label>
 
 						<select name="itemId"
@@ -267,23 +301,42 @@
 							class="modal_select"
 							required>
 
-							<option value="">선택</option>
+							<option value="">
+								선택
+							</option>
 
 							<c:forEach var="item"
 								items="${itemList}">
 
-								<option value="${item.itemId}">
+								<%-- =================================================
+									data-location 추가
+									품목 선택 시 창고위치 자동입력
+								================================================= --%>
+
+								<option value="${item.itemId}"
+									data-location="${item.stockLocation}">
+
 									${item.itemName}
+
 								</option>
 
 							</c:forEach>
 
 						</select>
+
 					</div>
 
+					<%-- =====================================================
+						현재재고
+					===================================================== --%>
+
 					<div class="modal_item">
+
 						<label class="modal_label">
-							현재재고<span class="modal_required">*</span>
+
+							현재재고
+							<span class="modal_required">*</span>
+
 						</label>
 
 						<input type="number"
@@ -292,26 +345,43 @@
 							class="modal_input"
 							min="0"
 							required>
+
 					</div>
 
+					<%-- =====================================================
+						창고위치
+					===================================================== --%>
+
 					<div class="modal_item">
+
 						<label class="modal_label">
-							창고위치<span class="modal_required">*</span>
+
+							창고위치
+							<span class="modal_required">*</span>
+
 						</label>
 
 						<input type="text"
 							name="stockLocation"
 							id="insertStockLocation"
-							class="modal_input"
-							required>
+							class="modal_input">
+
 					</div>
 
+					<%-- =====================================================
+						비고
+					===================================================== --%>
+
 					<div class="modal_item">
-						<label class="modal_label">비고</label>
+
+						<label class="modal_label">
+							비고
+						</label>
 
 						<input type="text"
 							name="remark"
 							class="modal_input">
+
 					</div>
 
 				</div>
@@ -320,12 +390,16 @@
 
 					<button type="button"
 						class="modal_btn modal_btn_cancel modal_close_btn">
+
 						취소
+
 					</button>
 
 					<button type="submit"
 						class="modal_btn modal_btn_submit">
+
 						등록
+
 					</button>
 
 				</div>
@@ -341,8 +415,13 @@
 </div>
 
 <script>
-	// 선택 글씨 클릭 시 전체 선택 / 전체 해제
-	document.getElementById("checkAllLabel").onclick = function() {
+
+	// =========================================================
+	// 전체 선택
+	// =========================================================
+
+	document.getElementById("checkAllLabel").onclick =
+		function() {
 
 		var checkAll =
 			document.getElementById("checkAll");
@@ -354,10 +433,15 @@
 			!checkAll.checked;
 
 		for (var i = 0; i < checks.length; i++) {
+
 			checks[i].checked =
 				checkAll.checked;
 		}
 	};
+
+	// =========================================================
+	// 체크박스 상태 동기화
+	// =========================================================
 
 	var checks =
 		document.getElementsByName("inventoryIds");
@@ -371,6 +455,7 @@
 			for (var j = 0; j < checks.length; j++) {
 
 				if (!checks[j].checked) {
+
 					allChecked = false;
 					break;
 				}
@@ -381,7 +466,10 @@
 		};
 	}
 
-	// 선택 삭제 방어코딩
+	// =========================================================
+	// 선택 삭제
+	// =========================================================
+
 	function deleteCheck() {
 
 		var checks =
@@ -397,42 +485,101 @@
 		}
 
 		if (!checked) {
+
 			alert("삭제할 항목을 선택해주세요.");
 			return;
 		}
 
 		if (confirm("선택한 항목을 삭제하시겠습니까?")) {
+
 			document.getElementById("deleteForm").submit();
 		}
 	}
 
+	// =========================================================
 	// 등록 방어코딩
+	// =========================================================
+
 	function checkInventoryInsert() {
 
 		var itemId =
-			document.getElementById("insertInventoryItemId").value;
+			document.getElementById(
+				"insertInventoryItemId").value;
 
 		var inventoryStock =
-			document.getElementById("insertInventoryStock").value;
-
-		var stockLocation =
-			document.getElementById("insertStockLocation").value;
+			document.getElementById(
+				"insertInventoryStock").value;
 
 		if (itemId == "") {
+
 			alert("품목명을 선택해주세요.");
 			return false;
 		}
 
-		if (inventoryStock == "" || Number(inventoryStock) < 0) {
+		if (inventoryStock == ""
+			|| Number(inventoryStock) < 0) {
+
 			alert("현재재고는 0 이상 입력해주세요.");
 			return false;
 		}
 
-		if (stockLocation == "") {
-			alert("창고위치를 입력해주세요.");
-			return false;
+		// =====================================================
+		// 창고위치 null 방어
+		// =====================================================
+
+		var stockLocation =
+			document.getElementById(
+				"insertStockLocation");
+
+		if (stockLocation.value == null
+			|| stockLocation.value == "null"
+			|| stockLocation.value == undefined) {
+
+			stockLocation.value = "";
 		}
 
 		return true;
 	}
+
+	// =========================================================
+	// 품목 선택 시 창고위치 자동입력
+	// =========================================================
+
+	document.getElementById(
+		"insertInventoryItemId")
+		.addEventListener(
+			"change",
+			function() {
+
+		var selectedOption =
+			this.options[this.selectedIndex];
+
+		// =====================================================
+		// data-location 가져오기
+		// =====================================================
+
+		var stockLocation =
+			selectedOption.getAttribute(
+				"data-location");
+
+		// =====================================================
+		// null 방어코딩
+		// =====================================================
+
+		if (stockLocation == null
+			|| stockLocation == "null"
+			|| stockLocation == undefined
+			|| stockLocation == "창고 미지정") {
+
+			stockLocation = "";
+		}
+
+		// =====================================================
+		// 창고위치 자동입력
+		// =====================================================
+
+		document.getElementById(
+			"insertStockLocation").value =
+				stockLocation;
+	});
 </script>

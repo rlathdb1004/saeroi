@@ -7,6 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.or.saeroi.common.PageDTO;
 import kr.or.saeroi.dto.InoutDTO;
@@ -20,12 +21,21 @@ import kr.or.saeroi.service.InventoryServiceImpl;
 @Controller
 public class InventoryController {
 
-	private InoutService service = new InoutServiceImpl();
+	// =========================================================================
+	// 입출고 Service
+	// =========================================================================
+	private InoutService service =
+		new InoutServiceImpl();
 
+	// =========================================================================
 	// 재고조회 Service
-	private InventoryService inventoryService = new InventoryServiceImpl();
+	// =========================================================================
+	private InventoryService inventoryService =
+		new InventoryServiceImpl();
 
+	// =========================================================================
 	// 자재입고관리 클릭 시 입출고관리 화면
+	// =========================================================================
 	@RequestMapping("/inventory/materialIn")
 	public String materialIn(
 			@RequestParam(value = "page", defaultValue = "1") int page,
@@ -37,7 +47,8 @@ public class InventoryController {
 			@RequestParam(value = "endDate", defaultValue = "") String endDate,
 			Model model) {
 
-		List<InoutDTO> list = service.getInoutList(
+		List<InoutDTO> list =
+			service.getInoutList(
 				searchType,
 				inoutType,
 				keyword,
@@ -45,38 +56,62 @@ public class InventoryController {
 				endDate);
 
 		int totalCount = list.size();
-		int startIndex = (page - 1) * size;
-		int endIndex = startIndex + size;
+
+		int startIndex =
+			(page - 1) * size;
+
+		int endIndex =
+			startIndex + size;
 
 		if (endIndex > totalCount) {
 			endIndex = totalCount;
 		}
 
 		List<InoutDTO> page_list =
-				list.subList(startIndex, endIndex);
+			list.subList(startIndex, endIndex);
 
 		PageDTO pageInfo =
-				new PageDTO(page, size, totalCount);
+			new PageDTO(page, size, totalCount);
 
 		List<InoutDTO> itemList =
-				service.getItemList();
+			service.getItemList();
 
 		model.addAttribute("list", page_list);
+
 		model.addAttribute("itemList", itemList);
+
 		model.addAttribute("pageInfo", pageInfo);
-		model.addAttribute("pageUrl", "/inventory/materialIn");
 
-		model.addAttribute("searchType", searchType);
-		model.addAttribute("inoutType", inoutType);
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("startDate", startDate);
-		model.addAttribute("endDate", endDate);
+		model.addAttribute(
+			"pageUrl",
+			"/inventory/materialIn");
 
-		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		model.addAttribute(
+			"searchType",
+			searchType);
+
+		model.addAttribute(
+			"inoutType",
+			inoutType);
+
+		model.addAttribute(
+			"keyword",
+			keyword);
+
+		model.addAttribute(
+			"startDate",
+			startDate);
+
+		model.addAttribute(
+			"endDate",
+			endDate);
+
 		return "inventory/inoutManage.tiles";
 	}
 
+	// =========================================================================
 	// 입출고 등록
+	// =========================================================================
 	@RequestMapping("/inventory/materialIn/insert")
 	public String insertInout(
 			@RequestParam("itemId") int itemId,
@@ -85,12 +120,18 @@ public class InventoryController {
 			@RequestParam("inoutDate") String inoutDate,
 			@RequestParam(value = "remark", defaultValue = "") String remark) {
 
-		InoutDTO dto = new InoutDTO();
+		InoutDTO dto =
+			new InoutDTO();
 
 		dto.setItemId(itemId);
+
 		dto.setInoutType(inoutType);
+
 		dto.setInoutQty(inoutQty);
-		dto.setInoutDate(Date.valueOf(inoutDate));
+
+		dto.setInoutDate(
+			Date.valueOf(inoutDate));
+
 		dto.setRemark(remark);
 
 		service.addInout(dto);
@@ -98,62 +139,93 @@ public class InventoryController {
 		return "redirect:/inventory/materialIn";
 	}
 
+	// =========================================================================
 	// 선택 삭제
+	// =========================================================================
 	@RequestMapping("/inventory/materialIn/delete")
 	public String deleteInout(
-			@RequestParam(value = "inoutIds", required = false) String[] inoutIds) {
+			@RequestParam(
+				value = "inoutIds",
+				required = false)
+			String[] inoutIds) {
 
 		if (inoutIds != null) {
-			service.removeInout(inoutIds);
+
+			service.removeInout(
+				inoutIds);
 		}
 
 		return "redirect:/inventory/materialIn";
 	}
 
+	// =========================================================================
 	// 상세보기 페이지
+	// =========================================================================
 	@RequestMapping("/inventory/materialIn/detail")
 	public String inoutDetail(
 			@RequestParam("inoutId") int inoutId,
-			@RequestParam(value = "mode", defaultValue = "view") String mode,
+			@RequestParam(
+				value = "mode",
+				defaultValue = "view")
+			String mode,
 			Model model) {
 
 		InoutDTO inout =
-				service.getInoutDetail(inoutId);
+			service.getInoutDetail(
+				inoutId);
 
-		model.addAttribute("inout", inout);
-		model.addAttribute("mode", mode);
+		model.addAttribute(
+			"inout",
+			inout);
 
-		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		model.addAttribute(
+			"mode",
+			mode);
+
 		return "inventory/inoutDetail.tiles";
 	}
 
+	// =========================================================================
 	// 입출고 수정
+	// =========================================================================
 	@RequestMapping("/inventory/materialIn/update")
 	public String updateInout(
 			@RequestParam("inoutId") int inoutId,
 			@RequestParam("inoutType") String inoutType,
 			@RequestParam("inoutQty") int inoutQty,
 			@RequestParam("inoutDate") String inoutDate,
-			@RequestParam(value = "remark", defaultValue = "") String remark) {
+			@RequestParam(
+				value = "remark",
+				defaultValue = "")
+			String remark) {
 
-		InoutDTO dto = new InoutDTO();
+		InoutDTO dto =
+			new InoutDTO();
 
 		dto.setInoutId(inoutId);
+
 		dto.setInoutType(inoutType);
+
 		dto.setInoutQty(inoutQty);
-		dto.setInoutDate(Date.valueOf(inoutDate));
+
+		dto.setInoutDate(
+			Date.valueOf(inoutDate));
+
 		dto.setRemark(remark);
 
 		service.modifyInout(dto);
 
-		return "redirect:/inventory/materialIn/detail?inoutId=" + inoutId;
+		return "redirect:/inventory/materialIn/detail?inoutId="
+				+ inoutId;
 	}
 
-	// ==================================================
+	// =========================================================================
 	// 여기부터 재고조회 코드
-	// ==================================================
+	// =========================================================================
 
+	// =========================================================================
 	// 재고조회 목록
+	// =========================================================================
 	@RequestMapping({
 		"/inventory/inventoryStatus",
 		"/inventory/stockList",
@@ -171,110 +243,224 @@ public class InventoryController {
 			Model model) {
 
 		List<InventoryDTO> list =
-				inventoryService.getInventoryList(
-						searchType,
-						keyword,
-						startDate,
-						endDate);
+			inventoryService.getInventoryList(
+				searchType,
+				keyword,
+				startDate,
+				endDate);
 
-		int totalCount = list.size();
-		int startIndex = (page - 1) * size;
-		int endIndex = startIndex + size;
+		int totalCount =
+			list.size();
+
+		int startIndex =
+			(page - 1) * size;
+
+		int endIndex =
+			startIndex + size;
 
 		if (endIndex > totalCount) {
 			endIndex = totalCount;
 		}
 
 		List<InventoryDTO> page_list =
-				list.subList(startIndex, endIndex);
+			list.subList(startIndex, endIndex);
 
 		PageDTO pageInfo =
-				new PageDTO(page, size, totalCount);
+			new PageDTO(page, size, totalCount);
+
+		// =============================================================
+		// 등록 모달용 품목 리스트 조회
+		// =============================================================
 
 		List<InventoryDTO> itemList =
-				inventoryService.getItemList();
+			inventoryService.getItemList();
 
-		model.addAttribute("list", page_list);
-		model.addAttribute("itemList", itemList);
-		model.addAttribute("pageInfo", pageInfo);
+		model.addAttribute(
+			"list",
+			page_list);
 
-		model.addAttribute("pageUrl", "/inventory/inventoryStatus");
+		model.addAttribute(
+			"itemList",
+			itemList);
 
-		model.addAttribute("searchType", searchType);
-		model.addAttribute("keyword", keyword);
-		model.addAttribute("startDate", startDate);
-		model.addAttribute("endDate", endDate);
+		model.addAttribute(
+			"pageInfo",
+			pageInfo);
 
-		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		// =============================================================
+		// 검색 후에도 재고조회 페이지 유지
+		// 헤더 / 사이드바 안깨지게 수정
+		// =============================================================
+
+		model.addAttribute(
+			"pageUrl",
+			"/inventory/stockList");
+
+		model.addAttribute(
+			"searchType",
+			searchType);
+
+		model.addAttribute(
+			"keyword",
+			keyword);
+
+		model.addAttribute(
+			"startDate",
+			startDate);
+
+		model.addAttribute(
+			"endDate",
+			endDate);
+
 		return "inventory/inventoryManage.tiles";
 	}
 
+	// =========================================================================
 	// 재고 등록
+	// =========================================================================
 	@RequestMapping("/inventory/stockList/insert")
 	public String insertInventory(
 			@RequestParam("itemId") int itemId,
 			@RequestParam("inventoryStock") int inventoryStock,
 			@RequestParam("stockLocation") String stockLocation,
-			@RequestParam(value = "remark", defaultValue = "") String remark) {
+			@RequestParam(
+				value = "remark",
+				defaultValue = "")
+			String remark) {
 
-		InventoryDTO dto = new InventoryDTO();
+		InventoryDTO dto =
+			new InventoryDTO();
 
 		dto.setItemId(itemId);
-		dto.setInventoryStock(inventoryStock);
-		dto.setStockLocation(stockLocation);
+
+		dto.setInventoryStock(
+			inventoryStock);
+
+		// =============================================================
+		// null 방어코딩
+		// =============================================================
+
+		if (stockLocation == null) {
+			stockLocation = "";
+		}
+
+		dto.setStockLocation(
+			stockLocation);
+
 		dto.setRemark(remark);
 
 		inventoryService.addInventory(dto);
 
-		return "redirect:/inventory/inventoryStatus";
+		// =============================================================
+		// 등록 후 재고조회 페이지 유지
+		// =============================================================
+
+		return "redirect:/inventory/stockList";
 	}
 
+	// =========================================================================
 	// 재고 선택 삭제
+	// =========================================================================
 	@RequestMapping("/inventory/stockList/delete")
 	public String deleteInventory(
-			@RequestParam(value = "inventoryIds", required = false) String[] inventoryIds) {
+			@RequestParam(
+				value = "inventoryIds",
+				required = false)
+			String[] inventoryIds) {
 
 		if (inventoryIds != null) {
-			inventoryService.removeInventory(inventoryIds);
+
+			inventoryService.removeInventory(
+				inventoryIds);
 		}
 
-		return "redirect:/inventory/inventoryStatus";
+		// =============================================================
+		// 삭제 후 재고조회 페이지 유지
+		// =============================================================
+
+		return "redirect:/inventory/stockList";
 	}
 
+	// =========================================================================
 	// 재고 상세
+	// =========================================================================
 	@RequestMapping("/inventory/stockList/detail")
 	public String inventoryDetail(
 			@RequestParam("inventoryId") int inventoryId,
-			@RequestParam(value = "mode", defaultValue = "view") String mode,
+			@RequestParam(
+				value = "mode",
+				defaultValue = "view")
+			String mode,
 			Model model) {
 
 		InventoryDTO inventory =
-				inventoryService.getInventoryDetail(inventoryId);
+			inventoryService.getInventoryDetail(
+				inventoryId);
 
-		model.addAttribute("inventory", inventory);
-		model.addAttribute("mode", mode);
+		model.addAttribute(
+			"inventory",
+			inventory);
 
-		// inventory 폴더로 옮겼기 때문에 폴더명 추가
+		model.addAttribute(
+			"mode",
+			mode);
+
 		return "inventory/inventoryDetail.tiles";
 	}
 
+	// =========================================================================
 	// 재고 수정
+	// =========================================================================
 	@RequestMapping("/inventory/stockList/update")
 	public String updateInventory(
 			@RequestParam("inventoryId") int inventoryId,
 			@RequestParam("inventoryStock") int inventoryStock,
 			@RequestParam("stockLocation") String stockLocation,
-			@RequestParam(value = "remark", defaultValue = "") String remark) {
+			@RequestParam(
+				value = "remark",
+				defaultValue = "")
+			String remark) {
 
-		InventoryDTO dto = new InventoryDTO();
+		InventoryDTO dto =
+			new InventoryDTO();
 
-		dto.setInventoryId(inventoryId);
-		dto.setInventoryStock(inventoryStock);
-		dto.setStockLocation(stockLocation);
+		dto.setInventoryId(
+			inventoryId);
+
+		dto.setInventoryStock(
+			inventoryStock);
+
+		dto.setStockLocation(
+			stockLocation);
+
 		dto.setRemark(remark);
 
 		inventoryService.modifyInventory(dto);
 
-		return "redirect:/inventory/stockList/detail?inventoryId=" + inventoryId;
+		return "redirect:/inventory/stockList/detail?inventoryId="
+				+ inventoryId;
+	}
+
+	// =========================================================================
+	// 품목 선택 시 창고위치 자동 조회
+	// =========================================================================
+	@ResponseBody
+	@RequestMapping("/inventory/getStockLocation")
+	public String getStockLocation(
+			@RequestParam("itemId") int itemId) {
+
+		String stockLocation =
+			inventoryService.getStockLocationByItemId(
+				itemId);
+
+		// =============================================================
+		// null 방어코딩
+		// =============================================================
+
+		if (stockLocation == null) {
+			stockLocation = "";
+		}
+
+		return stockLocation;
 	}
 }

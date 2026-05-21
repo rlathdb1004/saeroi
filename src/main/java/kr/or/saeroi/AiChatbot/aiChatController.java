@@ -20,7 +20,7 @@ public class aiChatController {
 	@RequestMapping("/chat")
 	public String chat() {
 		
-		return "chat";
+		return "chat.tiles";
 	}
 
 	@RequestMapping(value = "/gemini", method = RequestMethod.POST, produces = "text/plain;charset=UTF-8")

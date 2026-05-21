@@ -12,14 +12,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
+@RequestMapping("/report")
 public class ChartController {
 	@Autowired
 	ChartService chartService;
 	
-	@RequestMapping("/chart")
+	@RequestMapping("/productionreport")
 	public String Chart() {
 		
-		return "chart.tiles";
+		return "report/productionreport.tiles";
 	}
 	
 	@RequestMapping("/chart_bar")

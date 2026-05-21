@@ -89,6 +89,8 @@
 
 	<%-- 공통 모달 열기, 닫기, 오늘 날짜 세팅을 담당하는 JS 파일이다. --%>
 	<script src="${pageContext.request.contextPath}/resources/js/common/modal.js"></script>
+	<%-- 챗봇. --%>
+	<tiles:insertAttribute name="chatbot" />
 
 </body>
 </html>
