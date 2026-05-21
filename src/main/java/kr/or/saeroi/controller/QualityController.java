@@ -24,7 +24,7 @@ public class QualityController {
 
 	@RequestMapping("/inspection")
 	public String inspection(Model model, @RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String startDate,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String startDate,
 			@RequestParam(required = false) String endDate, @RequestParam(required = false) String searchType,
 			@RequestParam(required = false) String keyword) {
 //		검사 목록 
@@ -146,7 +146,7 @@ public class QualityController {
 			@RequestParam(required = false) String emp_id, @RequestParam(required = false) String insp_type,
 			@RequestParam(required = false) String result, @RequestParam(required = false) String inspection_qty,
 			@RequestParam(required = false) String good_qty, @RequestParam(required = false) String remark) {
-		//1건씩만 read이므로 List 아님
+		// 1건씩만 read이므로 List 아님
 		InspectionDTO inspection = qualityService._ser_select_Inspection_detail(insp_id, insp_date, prod_id, emp_id,
 				insp_type, result, inspection_qty, good_qty, remark);
 		System.out.println("검사 상세 목록 list 실행 됨");
@@ -164,14 +164,22 @@ public class QualityController {
 
 		return "quality/inspection_detail.tiles";
 	}
-	
-	//(검사 상세에서)
-	//업데이트 메서드
-	@RequestMapping(value = "/inspection/update",method = RequestMethod.POST)
-	public String inspection_update() {
-		
-		
-		return null;
+
+	// (검사 상세에서)
+	// 업데이트 메서드
+	// 검사 수정
+	@RequestMapping(value = "/inspection/update", method = RequestMethod.POST)
+	public String inspection_update(Model model, @RequestParam(required = false) String insp_id,
+			@RequestParam(required = false) String insp_date, @RequestParam(required = false) String insp_type,
+			@RequestParam(required = false) String result, @RequestParam(required = false) String inspection_qty,
+			@RequestParam(required = false) String good_qty, @RequestParam(required = false) String remark) {
+
+		int update_result = qualityService._ser_update_Inspection(insp_id, insp_date, insp_type, result, inspection_qty,
+				good_qty, remark);
+
+		System.out.println("update_result: " + update_result);
+
+		return "redirect:/quality/inspection_detail?insp_id=" + insp_id;
 	}
 
 }
