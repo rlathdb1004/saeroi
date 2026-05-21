@@ -65,12 +65,12 @@
 				</div>
 
 				<div class="search-item">
-					<label class="search-label">검색키워드</label>
+					<label class="search-label">검색</label>
 
 					<input type="text"
 						name="keyword"
 						class="search-input"
-						placeholder="LOT번호 / 품목명 / 작업지시번호"
+						placeholder="검색키워드"
 						value="${keyword}">
 				</div>
 
