@@ -4,6 +4,33 @@
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
+<%-- =========================================================
+	에러 스타일 추가
+========================================================= --%>
+<style>
+
+	/* =====================================================
+		에러 메시지
+	===================================================== */
+	.input_error_text {
+
+		margin-top: 6px;
+		font-size: 12px;
+		color: #e53935;
+		font-weight: 500;
+		display: none;
+	}
+
+	/* =====================================================
+		빨간 테두리
+	===================================================== */
+	.input_error {
+
+		border: 1px solid #e53935 !important;
+	}
+
+</style>
+
 <div class="coPageWrap">
 
 	<form class="search-form"
@@ -328,9 +355,6 @@
 										원자재
 									</c:when>
 
-									<%-- =================================================
-										SM 도 원자재로 통일
-									================================================= --%>
 									<c:when test="${inventory.itemType eq 'SM'}">
 										원자재
 									</c:when>
@@ -370,10 +394,6 @@
 
 							<td class="mobile_show">
 
-								<%-- =================================================
-									공통 버튼 스타일 유지
-									coDetailBtn 그대로 사용
-								================================================= --%>
 								<button type="button"
 									class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/stockList/detail?inventoryId=${inventory.inventoryId}'">
@@ -436,8 +456,7 @@
 
 						<select name="itemId"
 							id="insertInventoryItemId"
-							class="modal_select"
-							required>
+							class="modal_select">
 
 							<option value="">
 								선택
@@ -457,6 +476,16 @@
 
 						</select>
 
+						<%-- =================================================
+							품목명 에러 메시지
+						================================================= --%>
+						<div id="inventoryItemError"
+							class="input_error_text">
+
+							품목명을 선택해주세요.
+
+						</div>
+
 					</div>
 
 					<%-- =================================================
@@ -475,8 +504,17 @@
 							name="inventoryStock"
 							id="insertInventoryStock"
 							class="modal_input"
-							min="0"
-							required>
+							min="0">
+
+						<%-- =================================================
+							현재재고 에러 메시지
+						================================================= --%>
+						<div id="inventoryStockError"
+							class="input_error_text">
+
+							현재재고는 0 이상 입력해주세요.
+
+						</div>
 
 					</div>
 
@@ -496,6 +534,16 @@
 							name="stockLocation"
 							id="insertStockLocation"
 							class="modal_input">
+
+						<%-- =================================================
+							창고위치 에러 메시지
+						================================================= --%>
+						<div id="stockLocationError"
+							class="input_error_text">
+
+							창고위치를 입력해주세요.
+
+						</div>
 
 					</div>
 
@@ -630,37 +678,84 @@
 
 		var itemId =
 			document.getElementById(
-				"insertInventoryItemId").value;
+				"insertInventoryItemId");
 
 		var inventoryStock =
 			document.getElementById(
-				"insertInventoryStock").value;
-
-		if (itemId == "") {
-
-			alert("품목명을 선택해주세요.");
-			return false;
-		}
-
-		if (inventoryStock == ""
-			|| Number(inventoryStock) < 0) {
-
-			alert("현재재고는 0 이상 입력해주세요.");
-			return false;
-		}
+				"insertInventoryStock");
 
 		var stockLocation =
 			document.getElementById(
 				"insertStockLocation");
 
-		if (stockLocation.value == null
-			|| stockLocation.value == "null"
-			|| stockLocation.value == undefined) {
+		var inventoryItemError =
+			document.getElementById(
+				"inventoryItemError");
 
-			stockLocation.value = "";
+		var inventoryStockError =
+			document.getElementById(
+				"inventoryStockError");
+
+		var stockLocationError =
+			document.getElementById(
+				"stockLocationError");
+
+		// =====================================================
+		// 초기화
+		// =====================================================
+		itemId.classList.remove("input_error");
+		inventoryStock.classList.remove("input_error");
+		stockLocation.classList.remove("input_error");
+
+		inventoryItemError.style.display = "none";
+		inventoryStockError.style.display = "none";
+		stockLocationError.style.display = "none";
+
+		var isValid = true;
+
+		// =====================================================
+		// 품목명 체크
+		// =====================================================
+		if (itemId.value == "") {
+
+			itemId.classList.add("input_error");
+
+			inventoryItemError.style.display =
+				"block";
+
+			isValid = false;
 		}
 
-		return true;
+		// =====================================================
+		// 현재재고 체크
+		// =====================================================
+		if (inventoryStock.value == ""
+			|| Number(inventoryStock.value) < 0) {
+
+			inventoryStock.classList.add(
+				"input_error");
+
+			inventoryStockError.style.display =
+				"block";
+
+			isValid = false;
+		}
+
+		// =====================================================
+		// 창고위치 체크
+		// =====================================================
+		if (stockLocation.value.trim() == "") {
+
+			stockLocation.classList.add(
+				"input_error");
+
+			stockLocationError.style.display =
+				"block";
+
+			isValid = false;
+		}
+
+		return isValid;
 	}
 
 	// =========================================================
