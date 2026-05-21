@@ -15,6 +15,34 @@
 		or sessionScope.member.job eq '관리자'
 		or sessionScope.loginUser.job eq '관리자'}" />
 
+<%-- =========================================================
+	추가
+	등록 모달 방어코딩 CSS
+========================================================= --%>
+<style>
+
+	/* =====================================================
+		에러 메시지
+	===================================================== */
+	.input_error_text {
+
+		margin-top: 6px;
+		font-size: 12px;
+		color: #e53935;
+		font-weight: 500;
+		display: none;
+	}
+
+	/* =====================================================
+		에러 input 빨간 테두리
+	===================================================== */
+	.input_error {
+
+		border: 1px solid #e53935 !important;
+	}
+
+</style>
+
 <div class="coPageWrap">
 
 	<%-- =========================================================
@@ -106,9 +134,6 @@
 				<%-- 검색 버튼 영역 --%>
 				<div class="search-btn-wrap">
 
-					<%-- =====================================================
-						검색 버튼
-					===================================================== --%>
 					<button type="submit"
 						class="search-btn search-btn-main">
 
@@ -134,9 +159,6 @@
 
 					</button>
 
-					<%-- =====================================================
-						초기화 버튼
-					===================================================== --%>
 					<button type="button"
 						class="search-btn search-btn-sub search-reset-btn"
 						onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
@@ -171,32 +193,22 @@
 
 	</form>
 
-	<%-- =========================================================
-		삭제 form
-	========================================================= --%>
 	<form method="post"
 		id="deleteForm"
 		action="${pageContext.request.contextPath}/inventory/materialIn/delete">
 
 		<div class="coTableTop">
 
-			<%-- 총 건수 --%>
 			<p class="coTotalCount">
 
 				총 ${pageInfo.totalCount}건
 
 			</p>
 
-			<%-- 관리자 / 매니저만 출력 --%>
 			<c:if test="${isAdmin}">
 
 				<div class="search-btn-right">
 
-					<%-- =====================================================
-						등록 버튼
-						플러스 SVG 추가
-						기존 공통 클래스 유지
-					===================================================== --%>
 					<button type="button"
 						class="search-btn search-btn-main modal_open_btn"
 						data_modal_target="#modal_insert">
@@ -222,11 +234,6 @@
 
 					</button>
 
-					<%-- =====================================================
-						선택 삭제 버튼
-						휴지통 SVG 추가
-						기존 공통 클래스 유지
-					===================================================== --%>
 					<button type="button"
 						class="search-btn search-btn-sub"
 						onclick="deleteCheck()">
@@ -276,9 +283,6 @@
 
 		</div>
 
-		<%-- =========================================================
-			입출고 목록 테이블
-		========================================================= --%>
 		<div class="coTableWrap">
 
 			<table class="coTable">
@@ -338,7 +342,6 @@
 
 						<tr>
 
-							<%-- 체크박스 --%>
 							<td class="mobile_show">
 
 								<input type="checkbox"
@@ -347,12 +350,10 @@
 
 							</td>
 
-							<%-- 입출고번호 --%>
 							<td class="mobile_hidden">
 								${inout.docNo}
 							</td>
 
-							<%-- 입출고구분 --%>
 							<td class="mobile_hidden">
 
 								<c:choose>
@@ -373,30 +374,22 @@
 
 							</td>
 
-							<%-- 품목명 --%>
 							<td class="mobile_show">
 								${inout.itemName}
 							</td>
 
-							<%-- 입출고량 --%>
 							<td class="mobile_hidden">
 								${inout.inoutQty}
 							</td>
 
-							<%-- 단위 --%>
 							<td class="mobile_hidden">
 								${inout.itemUnit}
 							</td>
 
-							<%-- 일자 --%>
 							<td class="mobile_show">
 								${inout.inoutDate}
 							</td>
 
-							<%-- =================================================
-								상세 버튼
-								공통 클래스 유지
-							================================================= --%>
 							<td class="mobile_show">
 
 								<button type="button"
@@ -447,6 +440,9 @@
 
 				<div class="modal_body modal_body_2col">
 
+					<%-- =====================================================
+						입출고구분
+					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -456,8 +452,7 @@
 
 						<select name="inoutType"
 							id="insertInoutType"
-							class="modal_select"
-							required>
+							class="modal_select">
 
 							<option value="">선택</option>
 							<option value="MI">입고</option>
@@ -465,8 +460,19 @@
 
 						</select>
 
+						<%-- 에러메시지 추가 --%>
+						<div id="inoutTypeError"
+							class="input_error_text">
+
+							입출고구분을 선택해주세요.
+
+						</div>
+
 					</div>
 
+					<%-- =====================================================
+						품목명
+					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -476,8 +482,7 @@
 
 						<select name="itemId"
 							id="insertItemId"
-							class="modal_select"
-							required>
+							class="modal_select">
 
 							<option value="">선택</option>
 
@@ -492,8 +497,19 @@
 
 						</select>
 
+						<%-- 에러메시지 추가 --%>
+						<div id="itemError"
+							class="input_error_text">
+
+							품목명을 선택해주세요.
+
+						</div>
+
 					</div>
 
+					<%-- =====================================================
+						입출고수량
+					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -505,11 +521,21 @@
 							name="inoutQty"
 							id="insertInoutQty"
 							class="modal_input"
-							min="1"
-							required>
+							min="1">
+
+						<%-- 에러메시지 추가 --%>
+						<div id="qtyError"
+							class="input_error_text">
+
+							입출고수량을 입력해주세요.
+
+						</div>
 
 					</div>
 
+					<%-- =====================================================
+						입출고일자
+					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -520,8 +546,15 @@
 						<input type="date"
 							name="inoutDate"
 							id="insertInoutDate"
-							class="modal_input modal_today"
-							required>
+							class="modal_input modal_today">
+
+						<%-- 에러메시지 추가 --%>
+						<div id="dateError"
+							class="input_error_text">
+
+							입출고일자를 선택해주세요.
+
+						</div>
 
 					</div>
 
@@ -566,3 +599,111 @@
 	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 
 </div>
+
+<script>
+
+	// =========================================================
+	// 등록 방어코딩
+	// 회원가입처럼 빨간글씨 출력
+	// =========================================================
+	function checkInoutInsert() {
+
+		var inoutType =
+			document.getElementById("insertInoutType");
+
+		var itemId =
+			document.getElementById("insertItemId");
+
+		var inoutQty =
+			document.getElementById("insertInoutQty");
+
+		var inoutDate =
+			document.getElementById("insertInoutDate");
+
+		// =====================================================
+		// 에러메시지 영역
+		// =====================================================
+		var inoutTypeError =
+			document.getElementById("inoutTypeError");
+
+		var itemError =
+			document.getElementById("itemError");
+
+		var qtyError =
+			document.getElementById("qtyError");
+
+		var dateError =
+			document.getElementById("dateError");
+
+		// =====================================================
+		// 초기화
+		// =====================================================
+		inoutType.classList.remove("input_error");
+		itemId.classList.remove("input_error");
+		inoutQty.classList.remove("input_error");
+		inoutDate.classList.remove("input_error");
+
+		inoutTypeError.style.display = "none";
+		itemError.style.display = "none";
+		qtyError.style.display = "none";
+		dateError.style.display = "none";
+
+		var isValid = true;
+
+		// =====================================================
+		// 입출고구분 체크
+		// =====================================================
+		if (inoutType.value == "") {
+
+			inoutType.classList.add("input_error");
+
+			inoutTypeError.style.display =
+				"block";
+
+			isValid = false;
+		}
+
+		// =====================================================
+		// 품목명 체크
+		// =====================================================
+		if (itemId.value == "") {
+
+			itemId.classList.add("input_error");
+
+			itemError.style.display =
+				"block";
+
+			isValid = false;
+		}
+
+		// =====================================================
+		// 수량 체크
+		// =====================================================
+		if (inoutQty.value == ""
+			|| Number(inoutQty.value) <= 0) {
+
+			inoutQty.classList.add("input_error");
+
+			qtyError.style.display =
+				"block";
+
+			isValid = false;
+		}
+
+		// =====================================================
+		// 날짜 체크
+		// =====================================================
+		if (inoutDate.value == "") {
+
+			inoutDate.classList.add("input_error");
+
+			dateError.style.display =
+				"block";
+
+			isValid = false;
+		}
+
+		return isValid;
+	}
+
+</script>
