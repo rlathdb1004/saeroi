@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+	
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,14 +18,16 @@
 </style>
 </head>
 <body>
+	<!-- 라이브러리 -->
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	
 	<form class="search-form" method="get">
 		<div class="search-box">
 			<div class="search-row">
 				<!-- 구분 -->
 				<div class="search-item">
-					<label class="search-label">구분</label> <select name="searchType"
-						class="search-select" id="select_type">
+					<label class="search-label">차트구분</label> 
+					<select name="searchType" class="search-select" id="select_type">
 						<option value="day">일별</option>
 						<option value="week">주별</option>
 						<option value="month" selected>월별</option>
@@ -30,6 +35,7 @@
 						<option value="year_avg">년별(평균)</option>
 					</select>
 				</div>
+				
 				<!-- 시작일 -->
 				<div class="search-item">
 					<label class="search-label">시작일</label> <input type="date"
@@ -40,8 +46,15 @@
 					<label class="search-label">종료일</label> <input type="date"
 						name="endDate" class="search-date" id="endDate">
 				</div>
-
-
+				<div class="search-item">
+					<label class="search-label">품목구분</label> 
+					<select name="searchItem" class="search-select" id="select_item">
+						<option value="all">전체</option>
+						<c:forEach var="i" items="${item }">
+							<option value="${i.ITEM_NAME}">${i.ITEM_NAME}</option>
+						</c:forEach>
+					</select>
+				</div>
 			</div>
 		</div>
 	</form>
@@ -51,26 +64,32 @@
 	<script>
 	let chart = null;
 	document.addEventListener('DOMContentLoaded', function(){
-		loadChartData('month');
+		loadChartData('month','all');
 		
 		document.querySelector('#startDate').addEventListener('change', function(){
 		    let type = document.querySelector('#select_type').value || 'month';
-		    loadChartData(type);
+		    let item = document.querySelector('#select_item').value || 'all';
+		    loadChartData(type,item);
 		});
 		
 		document.querySelector('#endDate').addEventListener('change', function(){
 		    let type = document.querySelector('#select_type').value || 'month';
-		    loadChartData(type);
+		    let item = document.querySelector('#select_item').value || 'all';
+		    loadChartData(type,item);
 		});
-		document.querySelector('#select_type').
-			addEventListener('change',function(){
-				loadChartData(this.value);
+		document.querySelector('#select_type').addEventListener('change', function(){
+		    let item = document.querySelector('#select_item').value || 'all';
+		    loadChartData(this.value,item);
+		});
+		document.querySelector('#select_item').addEventListener('change', function(){
+		    let type = document.querySelector('#select_type').value || 'month';
+		    loadChartData(type,this.value);
 		});
 		
 	});
 	
-	async function loadChartData(searchType){
-		let url = "chart_bar?searchType="+searchType
+	async function loadChartData(searchType,searchItem){
+		let url = "chart_bar?searchType="+searchType+"&searchItem="+searchItem
 
 		try{
 			
@@ -155,12 +174,17 @@
       		toolbar: {show:true},
       	events: {
       		zoomed:function(chartContext,{xaxis,yaxis}){
+      			
+    		if (chartContext.updateTimer) {
+      	        clearTimeout(chartContext.updateTimer);
+      	    }
+      		chartContext.updateTimer = setTimeout(function() {
       			if(xaxis.min ===undefined && xaxis.max === undefined){
       				chartContext.updateOptions({
       					dataLabels:{
       						enabled:false
       					}
-      				},false, false);
+      				},false, true);
       				return;
       			} 
       			let min_index = Math.max(0,Math.floor(xaxis.min));
@@ -174,14 +198,15 @@
       						enabled: true,
       						enabledOnSeries: [0,1]
       					}
-      				},false, false);
+      				},false, true);
       			} else{
       				chartContext.updateOptions({
       					dataLabels:{
       						enabled: false,
       					}
-      				},false, false);
+      				},false, true);
       			}
+      		},50);
       		}
       	}
       },
@@ -199,22 +224,29 @@
       		categories: dates
       	},
       	yaxis:[{
-      		title: {text:'생산 / 작업 수량 (EA)'}
-      	},
-      	{
-      		opposite: true,
-      		title: {text: '불량 수량 (EA)'}
-      	}],
+      	    seriesName: '생산계획량',
+      	    title: { text: '생산 / 작업 수량 (EA)' }
+      	  },
+      	  {
+      	    seriesName: '생산계획량', 
+      	    show: false
+      	  },
+      	  {
+      	    seriesName: '불량수량',
+      	    opposite: true,
+      	    title: { text: '불량 수량 (EA)' },
+      	    min: 0
+      	  }],
       	legend:{
       		show: true,
       		position: 'top',
       		horizontalAlign: 'left',
       		floating: true,
       		fontSize:'14px',
-      		offsetY: -40,
+      		offsetY: -30,
       		offsetX: 10,
       		itemMargin:{
-      			horizontal:12,
+      			horizontal:8,
       			vertical: 0
       		}
       	},

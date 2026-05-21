@@ -5,13 +5,20 @@
 
 <mapper namespace="mapper.chart">
 	<!-- 일별 합계 -->
-	<select id="sleect_day_data" resultType="map">
+	<select id="sleect_day_data" resultType="map" parameterType="map">
 		WITH plandata AS (
 		SELECT
 		prod_plan_date,
 		sum(prod_plan_qty)
 		total_plan_qty
 		from production_plan pp
+		join item i
+		on (pp.item_id = i.item_id)
+		<where>
+			<if test="searchItem != null and searchItem != '' and searchItem != 'all'">
+				i.item_name = #{searchItem}
+			</if>
+		</where>
 		GROUP BY prod_plan_date
 		),
 		workdata AS (
@@ -20,8 +27,14 @@
 		sum(wo.order_qty) total_order_qty
 		FROM production_plan pp
 		JOIN WORK_ORDER wo
-		on(pp.prod_plan_id=
-		wo.prod_plan_id)
+		on(pp.prod_plan_id=wo.prod_plan_id)
+		join item i
+		on(pp.item_id = i.item_id)
+		<where>
+			<if test="searchItem != null and searchItem != '' and searchItem != 'all'">
+				i.item_name = #{searchItem}
+			</if>
+		</where>
 		group BY pp.prod_plan_date
 		),
 		defectdate AS (
@@ -31,21 +44,24 @@
 		FROM
 		production_plan pp
 		JOIN work_order wo
-		on(pp.prod_plan_id =
-		wo.prod_plan_id)
+		on(pp.prod_plan_id = wo.prod_plan_id)
 		JOIN production p
 		on(wo.order_id = p.order_id)
-		JOIN
-		inspection i
+		JOIN inspection i
 		on(p.prod_id = i.prod_id)
 		JOIN DEFECT_LIST dl
-		on(i.insp_id =
-		dl.insp_id)
+		on(i.insp_id = dl.insp_id)
+		join item it
+		on(pp.item_id = it.item_id)
+		<where>
+            <if test="searchItem != null and searchItem != '' and searchItem != 'all'">
+                it.item_name = #{searchItem}
+            </if>
+        </where>
 		GROUP BY pp.prod_plan_date
 		)
-
 		<choose>
-			<when test="_parameter == 'week'">
+			<when test="searchType == 'week'">
 				SELECT
 					to_char(p.prod_plan_date,'YYYY-IW') 계획일자,
 					round(avg(total_plan_qty),1) 생산계획량,
@@ -59,7 +75,7 @@
 				GROUP BY to_char(p.prod_plan_date, 'YYYY-IW')
 				ORDER BY 계획일자
 			</when>
-			<when test="_parameter == 'day'">
+			<when test="searchType == 'day'">
 				SELECT
 					to_char(p.prod_plan_date,'YYYY-MM-DD') 계획일자,
 					total_plan_qty 생산계획량,
@@ -72,7 +88,7 @@
 				ON p.prod_plan_date = d.prod_plan_date
 				ORDER BY p.prod_plan_date
 			</when>
-			<when test="_parameter == 'year_sum'">
+			<when test="searchType == 'year_sum'">
 				SELECT
 					to_char(p.prod_plan_date,'YYYY') 계획일자,
 					sum(total_plan_qty) 생산계획량,
@@ -86,7 +102,7 @@
 				GROUP BY to_char(p.prod_plan_date, 'YYYY')
 				ORDER BY 계획일자
 			</when>
-			<when test="_parameter == 'year_avg'">
+			<when test="searchType == 'year_avg'">
 				SELECT
 					to_char(p.prod_plan_date,'YYYY') 계획일자,
 					round(avg(total_plan_qty),1) 생산계획량,
@@ -116,7 +132,10 @@
 			</otherwise>
 		</choose>
 	</select>
-
+	
+	<select id="sleect_item" resultType="map">
+		select * from item
+	</select>
 
 
 </mapper>
