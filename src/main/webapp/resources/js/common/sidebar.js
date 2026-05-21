@@ -233,8 +233,8 @@ function siLoadMenuByCurrentUrl() {
     // 현재 브라우저 주소를 가져온다.
     var currentPath = window.location.pathname;
 
-    // 하위 메뉴 링크를 전부 찾는다.
-    var menuLinks = document.querySelectorAll(".siSubMenuLink");
+    // 하위 메뉴와 단독 메뉴를 전부 찾는다.
+    var menuLinks = document.querySelectorAll(".siSubMenuLink, .siMenuSingle");
 
     // 현재 주소와 일치하는 메뉴를 담을 변수이다.
     var matchedMenu = null;
@@ -264,7 +264,7 @@ function siLoadMenuByCurrentUrl() {
             // 메뉴 링크의 실제 주소를 가져온다.
             var subMenuPath = menuLinks[j].pathname;
 
-            // 예) /production/workorder/detail 은 /production/workorder 메뉴로 처리한다.
+            // 예) /lot/lothistory/detail 은 /lot/lothistory 메뉴로 처리한다.
             if (currentPath.indexOf(subMenuPath + "/") == 0) {
                 matchedMenu = menuLinks[j];
                 break;
@@ -310,7 +310,7 @@ function siLoadMenuByCurrentUrl() {
         return;
     }
 
-    // 기존에 active 되어 있던 하위 메뉴 상태를 모두 지운다.
+    // 기존에 active 되어 있던 메뉴 상태를 모두 지운다.
     for (var a = 0; a < menuLinks.length; a++) {
         menuLinks[a].classList.remove("active");
     }
@@ -334,16 +334,17 @@ function siLoadMenuByCurrentUrl() {
     // 헤더 제목을 현재 주소 기준으로 변경한다.
     siChangeHeader(mainMenu, subMenu);
 
-    // 현재 하위 메뉴를 감싸는 영역을 찾는다.
-    var siSubMenu = matchedMenu.parentElement;
+    // 현재 메뉴가 하위 메뉴인 경우에만 큰 메뉴를 열린 상태로 만든다.
+    if (matchedMenu.classList.contains("siSubMenuLink")) {
+        // 현재 하위 메뉴를 감싸는 영역을 찾는다.
+        var siSubMenu = matchedMenu.parentElement;
 
-    // 현재 하위 메뉴를 감싸는 큰 메뉴 그룹을 찾는다.
-    var siMenuGroup = siSubMenu.parentElement;
+        // 현재 하위 메뉴를 감싸는 큰 메뉴 그룹을 찾는다.
+        var siMenuGroup = siSubMenu.parentElement;
 
-    // 현재 메뉴가 들어있는 큰 메뉴를 열린 상태로 만든다.
-    siMenuGroup.classList.add("open");
+        // 현재 메뉴가 들어있는 큰 메뉴를 열린 상태로 만든다.
+        siMenuGroup.classList.add("open");
+    }
 }
-
-siLoadMenuByCurrentUrl();
 
 siLoadMenuByCurrentUrl();

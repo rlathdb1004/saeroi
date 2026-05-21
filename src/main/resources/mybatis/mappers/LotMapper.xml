@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- LOT 이력추적 Mapper이다. -->
+<mapper namespace="kr.or.saeroi.mapper.LotMapper">
+
+	<!-- LOT 이력 조회 결과를 LotDTO에 매핑한다. -->
+	<resultMap id="lotHistoryResultMap"
+		type="kr.or.saeroi.dto.LotDTO">
+
+		<result property="orderId" column="ORDER_ID" />
+		<result property="prodPlanId" column="PROD_PLAN_ID" />
+		<result property="itemId" column="ITEM_ID" />
+		<result property="prodId" column="PROD_ID" />
+		<result property="inspId" column="INSP_ID" />
+
+		<result property="productLot" column="PRODUCT_LOT" />
+		<result property="prodPlanDocNo" column="PROD_PLAN_DOC_NO" />
+		<result property="workOrderDocNo" column="WORK_ORDER_DOC_NO" />
+		<result property="prodDocNo" column="PROD_DOC_NO" />
+		<result property="inspDocNo" column="INSP_DOC_NO" />
+
+		<result property="itemCode" column="ITEM_CODE" />
+		<result property="itemName" column="ITEM_NAME" />
+		<result property="currentProcess" column="CURRENT_PROCESS" />
+
+		<result property="orderQty" column="ORDER_QTY" />
+		<result property="prodQty" column="PROD_QTY" />
+		<result property="lossQty" column="LOSS_QTY" />
+		<result property="goodQty" column="GOOD_QTY" />
+		<result property="inspectionQty" column="INSPECTION_QTY" />
+		<result property="progressRate" column="PROGRESS_RATE" />
+
+		<result property="progressStatus" column="PROGRESS_STATUS" />
+		<result property="inspResult" column="INSP_RESULT" />
+
+		<result property="orderDate" column="ORDER_DATE" />
+		<result property="prodDate" column="PROD_DATE" />
+		<result property="inspDate" column="INSP_DATE" />
+
+		<result property="ename" column="ENAME" />
+		<result property="dept" column="DEPT" />
+		<result property="remark" column="REMARK" />
+
+	</resultMap>
+
+
+	<!-- LOT 이력 검색 조건이다. -->
+	<sql id="lotHistorySearchCondition">
+
+		<where>
+
+			<!-- 시작일 검색 조건이다. 작업지시일 기준이다. -->
+			<if test="startDate != null and startDate != ''">
+				AND WO.ORDER_DATE <![CDATA[>=]]> TO_DATE(#{startDate}, 'YYYY-MM-DD')
+			</if>
+
+			<!-- 종료일 검색 조건이다. 종료일 당일까지 포함한다. -->
+			<if test="endDate != null and endDate != ''">
+				AND WO.ORDER_DATE <![CDATA[<]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+			</if>
+
+			<!-- 진행상태 검색 조건이다. -->
+			<if test="progressStatus != null and progressStatus != ''">
+				AND NVL(LP.PROD_STATUS, '대기') = #{progressStatus}
+			</if>
+
+			<!-- 검색키워드 조건이다. -->
+			<if test="keyword != null and keyword != ''">
+				AND (
+					WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
+					OR WO.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+					OR PP.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+					OR I.ITEM_CODE LIKE '%' || TRIM(#{keyword}) || '%'
+					OR I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+					OR L.LINE_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+					OR NVL(LP.PROD_STATUS, '대기') LIKE '%' || TRIM(#{keyword}) || '%'
+					OR LI.RESULT LIKE '%' || TRIM(#{keyword}) || '%'
+				)
+			</if>
+
+		</where>
+
+	</sql>
+
+
+	<!-- LOT 이력 목록 총 건수를 조회한다. -->
+	<select id="selectLotHistoryCount"
+		parameterType="kr.or.saeroi.dto.LotDTO"
+		resultType="int">
+
+		SELECT COUNT(*)
+		FROM WORK_ORDER WO
+
+		JOIN PRODUCTION_PLAN PP
+		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+		JOIN ITEM I
+		  ON PP.ITEM_ID = I.ITEM_ID
+
+		LEFT JOIN LINE L
+		  ON WO.LINE_ID = L.LINE_ID
+
+		LEFT JOIN (
+			SELECT
+				P1.ORDER_ID,
+				P1.PROD_STATUS
+			FROM PRODUCTION P1
+			JOIN (
+				SELECT
+					ORDER_ID,
+					MAX(PROD_ID) AS PROD_ID
+				FROM PRODUCTION
+				GROUP BY ORDER_ID
+			) PM
+			  ON P1.ORDER_ID = PM.ORDER_ID
+			 AND P1.PROD_ID = PM.PROD_ID
+		) LP
+		  ON WO.ORDER_ID = LP.ORDER_ID
+
+		LEFT JOIN (
+			SELECT
+				P2.ORDER_ID,
+				I2.RESULT
+			FROM INSPECTION I2
+			JOIN PRODUCTION P2
+			  ON I2.PROD_ID = P2.PROD_ID
+			JOIN (
+				SELECT
+					P3.ORDER_ID,
+					MAX(I3.INSP_ID) AS INSP_ID
+				FROM INSPECTION I3
+				JOIN PRODUCTION P3
+				  ON I3.PROD_ID = P3.PROD_ID
+				GROUP BY P3.ORDER_ID
+			) IM
+			  ON P2.ORDER_ID = IM.ORDER_ID
+			 AND I2.INSP_ID = IM.INSP_ID
+		) LI
+		  ON WO.ORDER_ID = LI.ORDER_ID
+
+		<include refid="lotHistorySearchCondition" />
+
+	</select>
+
+
+	<!-- LOT 이력 목록을 조회한다. -->
+	<select id="selectLotHistoryList"
+		parameterType="kr.or.saeroi.dto.LotDTO"
+		resultMap="lotHistoryResultMap">
+
+		SELECT *
+		FROM (
+			SELECT LOT_LIST.*,
+				   ROWNUM AS RN
+			FROM (
+				SELECT
+					WO.ORDER_ID,
+					WO.PROD_PLAN_ID,
+					PP.ITEM_ID,
+
+					WO.PRODUCT_LOT,
+					PP.DOC_NO AS PROD_PLAN_DOC_NO,
+					WO.DOC_NO AS WORK_ORDER_DOC_NO,
+
+					I.ITEM_CODE,
+					I.ITEM_NAME,
+
+					NVL(L.LINE_NAME, '-') AS CURRENT_PROCESS,
+
+					WO.ORDER_QTY,
+					NVL(PA.TOTAL_PROD_QTY, 0) AS PROD_QTY,
+					NVL(PA.TOTAL_LOSS_QTY, 0) AS LOSS_QTY,
+					GREATEST(NVL(PA.TOTAL_PROD_QTY, 0) - NVL(PA.TOTAL_LOSS_QTY, 0), 0) AS GOOD_QTY,
+
+					CASE
+						WHEN NVL(WO.ORDER_QTY, 0) = 0 THEN 0
+						ELSE LEAST(
+							100,
+							ROUND((NVL(PA.TOTAL_PROD_QTY, 0) / WO.ORDER_QTY) * 100)
+						)
+					END AS PROGRESS_RATE,
+
+					NVL(LP.PROD_STATUS, '대기') AS PROGRESS_STATUS,
+					NVL(LI.RESULT, '-') AS INSP_RESULT,
+
+					TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+					TO_CHAR(LP.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
+					TO_CHAR(LI.INSP_DATE, 'YYYY-MM-DD') AS INSP_DATE
+
+				FROM WORK_ORDER WO
+
+				JOIN PRODUCTION_PLAN PP
+				  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+				JOIN ITEM I
+				  ON PP.ITEM_ID = I.ITEM_ID
+
+				LEFT JOIN LINE L
+				  ON WO.LINE_ID = L.LINE_ID
+
+				LEFT JOIN (
+					SELECT
+						ORDER_ID,
+						SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
+						SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
+					FROM PRODUCTION
+					GROUP BY ORDER_ID
+				) PA
+				  ON WO.ORDER_ID = PA.ORDER_ID
+
+				LEFT JOIN (
+					SELECT
+						P1.ORDER_ID,
+						P1.PROD_ID,
+						P1.PROD_STATUS,
+						P1.PROD_DATE,
+						P1.DOC_NO
+					FROM PRODUCTION P1
+					JOIN (
+						SELECT
+							ORDER_ID,
+							MAX(PROD_ID) AS PROD_ID
+						FROM PRODUCTION
+						GROUP BY ORDER_ID
+					) PM
+					  ON P1.ORDER_ID = PM.ORDER_ID
+					 AND P1.PROD_ID = PM.PROD_ID
+				) LP
+				  ON WO.ORDER_ID = LP.ORDER_ID
+
+				LEFT JOIN (
+					SELECT
+						P2.ORDER_ID,
+						I2.INSP_ID,
+						I2.RESULT,
+						I2.INSP_DATE,
+						I2.DOC_NO
+					FROM INSPECTION I2
+					JOIN PRODUCTION P2
+					  ON I2.PROD_ID = P2.PROD_ID
+					JOIN (
+						SELECT
+							P3.ORDER_ID,
+							MAX(I3.INSP_ID) AS INSP_ID
+						FROM INSPECTION I3
+						JOIN PRODUCTION P3
+						  ON I3.PROD_ID = P3.PROD_ID
+						GROUP BY P3.ORDER_ID
+					) IM
+					  ON P2.ORDER_ID = IM.ORDER_ID
+					 AND I2.INSP_ID = IM.INSP_ID
+				) LI
+				  ON WO.ORDER_ID = LI.ORDER_ID
+
+				<include refid="lotHistorySearchCondition" />
+
+				ORDER BY WO.ORDER_DATE DESC,
+						 WO.ORDER_ID DESC
+			) LOT_LIST
+			WHERE ROWNUM <![CDATA[<=]]> #{endRow}
+		)
+		WHERE RN <![CDATA[>=]]> #{startRow}
+
+	</select>
+
+
+	<!-- LOT 이력 상세 정보를 조회한다. -->
+	<select id="selectLotHistoryDetail"
+		parameterType="int"
+		resultMap="lotHistoryResultMap">
+
+		SELECT
+			WO.ORDER_ID,
+			WO.PROD_PLAN_ID,
+			PP.ITEM_ID,
+
+			LP.PROD_ID,
+			LI.INSP_ID,
+
+			WO.PRODUCT_LOT,
+			PP.DOC_NO AS PROD_PLAN_DOC_NO,
+			WO.DOC_NO AS WORK_ORDER_DOC_NO,
+			LP.DOC_NO AS PROD_DOC_NO,
+			LI.DOC_NO AS INSP_DOC_NO,
+
+			I.ITEM_CODE,
+			I.ITEM_NAME,
+
+			NVL(L.LINE_NAME, '-') AS CURRENT_PROCESS,
+
+			WO.ORDER_QTY,
+			NVL(PA.TOTAL_PROD_QTY, 0) AS PROD_QTY,
+			NVL(PA.TOTAL_LOSS_QTY, 0) AS LOSS_QTY,
+			GREATEST(NVL(PA.TOTAL_PROD_QTY, 0) - NVL(PA.TOTAL_LOSS_QTY, 0), 0) AS GOOD_QTY,
+			NVL(LI.INSPECTION_QTY, 0) AS INSPECTION_QTY,
+
+			CASE
+				WHEN NVL(WO.ORDER_QTY, 0) = 0 THEN 0
+				ELSE LEAST(
+					100,
+					ROUND((NVL(PA.TOTAL_PROD_QTY, 0) / WO.ORDER_QTY) * 100)
+				)
+			END AS PROGRESS_RATE,
+
+			NVL(LP.PROD_STATUS, '대기') AS PROGRESS_STATUS,
+			NVL(LI.RESULT, '-') AS INSP_RESULT,
+
+			TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+			TO_CHAR(LP.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
+			TO_CHAR(LI.INSP_DATE, 'YYYY-MM-DD') AS INSP_DATE,
+
+			E.ENAME,
+			E.DEPT,
+			WO.REMARK
+
+		FROM WORK_ORDER WO
+
+		JOIN PRODUCTION_PLAN PP
+		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+		JOIN ITEM I
+		  ON PP.ITEM_ID = I.ITEM_ID
+
+		LEFT JOIN LINE L
+		  ON WO.LINE_ID = L.LINE_ID
+
+		LEFT JOIN (
+			SELECT
+				ORDER_ID,
+				SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
+				SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
+			FROM PRODUCTION
+			GROUP BY ORDER_ID
+		) PA
+		  ON WO.ORDER_ID = PA.ORDER_ID
+
+		LEFT JOIN (
+			SELECT
+				P1.ORDER_ID,
+				P1.PROD_ID,
+				P1.EMP_ID,
+				P1.PROD_STATUS,
+				P1.PROD_DATE,
+				P1.DOC_NO
+			FROM PRODUCTION P1
+			JOIN (
+				SELECT
+					ORDER_ID,
+					MAX(PROD_ID) AS PROD_ID
+				FROM PRODUCTION
+				GROUP BY ORDER_ID
+			) PM
+			  ON P1.ORDER_ID = PM.ORDER_ID
+			 AND P1.PROD_ID = PM.PROD_ID
+		) LP
+		  ON WO.ORDER_ID = LP.ORDER_ID
+
+		LEFT JOIN EMP E
+		  ON LP.EMP_ID = E.EMP_ID
+
+		LEFT JOIN (
+			SELECT
+				P2.ORDER_ID,
+				I2.INSP_ID,
+				I2.RESULT,
+				I2.INSP_DATE,
+				I2.DOC_NO,
+				I2.INSPECTION_QTY
+			FROM INSPECTION I2
+			JOIN PRODUCTION P2
+			  ON I2.PROD_ID = P2.PROD_ID
+			JOIN (
+				SELECT
+					P3.ORDER_ID,
+					MAX(I3.INSP_ID) AS INSP_ID
+				FROM INSPECTION I3
+				JOIN PRODUCTION P3
+				  ON I3.PROD_ID = P3.PROD_ID
+				GROUP BY P3.ORDER_ID
+			) IM
+			  ON P2.ORDER_ID = IM.ORDER_ID
+			 AND I2.INSP_ID = IM.INSP_ID
+		) LI
+		  ON WO.ORDER_ID = LI.ORDER_ID
+
+		WHERE WO.ORDER_ID = #{orderId}
+
+	</select>
+
+</mapper>
