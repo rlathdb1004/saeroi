@@ -41,7 +41,7 @@
 				<div class="search-item">
 					<label class="search-label">검색어</label>
 					<input type="text" name="keyword" class="search-input"
-						placeholder="내용을 입력하세요." value="${keyword}">
+						placeholder="검색키워드" value="${keyword}">
 				</div>
 
 				<div class="search-btn-wrap">

@@ -53,7 +53,7 @@
 					<%-- 검색어 입력 영역이다. --%>
 
 					<label class="search-label">검색어</label> <input type="text"
-						name="keyword" class="search-input" placeholder="검색 키워드"
+						name="keyword" class="search-input" placeholder="검색키워드"
 						value="${keyword}">
 
 				</div>
@@ -249,10 +249,12 @@
 				</div>
 
 				<div class="modal_item">
-					<label class="modal_label"> 검사자<span class="modal_required">*</span>
-					</label> <select name="emp_id" class="modal_select" required>
-						<option value="">선택</option>
-					</select>
+					<label class="modal_label">검사자<span class="modal_required">*</span></label>
+
+					<input type="text" class="modal_input"
+						value="${sessionScope.loginUser.ename}" readonly> <input
+						type="hidden" name="emp_id"
+						value="${sessionScope.loginUser.empno}">
 				</div>
 				<div class="modal_item">
 					<label class="modal_label"> 검사구분<span
