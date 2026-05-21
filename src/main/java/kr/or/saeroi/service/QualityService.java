@@ -25,4 +25,7 @@ public interface QualityService {
 	InspectionDTO _ser_select_Inspection_detail(String insp_id, String insp_date, String prod_id, String emp_id,
 			String insp_type, String result, String inspection_qty, String good_qty, String remark);
 
+	// 검사 수정
+	int _ser_update_Inspection(String insp_id, String insp_date, String insp_type, String result,
+	        String inspection_qty, String good_qty, String remark);
 }

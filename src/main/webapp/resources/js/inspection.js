@@ -11,8 +11,8 @@ if (coBtnReset) {
 // 모달 안에 있는 select 태그들 가져오기
 const prodId = document.getElementsByName('prod_id')[0];
 const empId = document.getElementsByName('emp_id')[0];
-const inspectionType = document.getElementsByName('insp_type')[0];
-const result = document.getElementsByName('result')[0];
+const inspectionType = document.querySelector('.modal_form [name="insp_type"]');
+const result = document.querySelector('.modal_form [name="result"]');
 // 옵션을 이미 불러왔는지 확인하는 변수
 let prodLoaded = false;
 let empLoaded = false;
@@ -86,8 +86,8 @@ if (result) {
     result.innerHTML += '<option value="\uC870\uAC74\uBD80">\uC870\uAC74\uBD80</option>';
 }
 // 페이지가 열리면 품목명, 검사자 옵션 미리 불러오기
-loadProdOptions();
-loadEmpOptions();
+//loadProdOptions();
+//loadEmpOptions();
 
 //수정 클릭 하면 인풋창으로 변경 됨(수정은 검사 일시, 품목명, 검사자, 검사결과, 검사 구분, ~수량, 비고까지 가능하게 할 것임)
 //수정 할 칸이 여러 개이므로 All로 해야 함

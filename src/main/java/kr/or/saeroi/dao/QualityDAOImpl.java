@@ -29,7 +29,7 @@ public class QualityDAOImpl implements QualityDAO {
 
 		// mybatis 도구 sqlSession, 여러줄 실행
 		List<InspectionDTO> inspection_List = sqlSession.selectList("mapper.quality._select_Inspection", param);
-		System.out.println("inspection_List 실행" + inspection_List);
+		System.out.println("inspection_List 실행 건수: " + inspection_List.size());
 
 		return inspection_List;
 	}
@@ -102,10 +102,28 @@ public class QualityDAOImpl implements QualityDAO {
 		param.put("inspection_qty", inspection_qty);
 		param.put("good_qty", good_qty);
 		param.put("remark", remark);
-		//1건씩만 read이므로 List 아님
+		// 1건씩만 read이므로 List 아님
 		InspectionDTO inspection_detail = sqlSession.selectOne("mapper.quality._select_Inspection_detail", param);
 
 		return inspection_detail;
 	}
 
+	// 검사 수정
+	@Override
+	public int _dao_update_Inspection(String insp_id, String insp_date, String insp_type, String result,
+			String inspection_qty, String good_qty, String remark) {
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("insp_id", insp_id);
+		param.put("insp_date", insp_date);
+		param.put("insp_type", insp_type);
+		param.put("result", result);
+		param.put("inspection_qty", inspection_qty);
+		param.put("good_qty", good_qty);
+		param.put("remark", remark);
+
+		int update_result = sqlSession.update("mapper.quality._update_Inspection", param);
+
+		return update_result;
+	}
 }

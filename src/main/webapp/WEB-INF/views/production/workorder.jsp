@@ -171,7 +171,7 @@
 
 						<th class="mobile_hidden">작업지시번호</th>
 						<th class="mobile_show">LOT번호</th>
-						<th class="mobile_show">품목명</th>
+						<th class="mobile_hidden">품목명</th>
 						<th class="mobile_show">지시수량</th>
 						<th class="mobile_hidden">작업지시일</th>
 						<th class="mobile_show">작업상태</th>
@@ -193,7 +193,7 @@
 							<td class="mobile_show" title="${workOrder.productLot}">
 								${workOrder.productLot}</td>
 
-							<td class="coTextLeft mobile_show" title="${workOrder.itemName}">
+							<td class="coTextLeft mobile_hidden" title="${workOrder.itemName}">
 								${workOrder.itemName}</td>
 
 							<td class="mobile_show">${workOrder.orderQty}</td>

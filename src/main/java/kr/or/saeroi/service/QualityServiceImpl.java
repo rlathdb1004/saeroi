@@ -65,4 +65,15 @@ public class QualityServiceImpl implements QualityService {
 				result, inspection_qty, good_qty, remark);
 		return detail_result;
 	}
+
+	// 검사 수정
+	@Override
+	public int _ser_update_Inspection(String insp_id, String insp_date, String insp_type, String result,
+			String inspection_qty, String good_qty, String remark) {
+
+		int update_result = qualityDAO._dao_update_Inspection(insp_id, insp_date, insp_type, result, inspection_qty,
+				good_qty, remark);
+
+		return update_result;
+	}
 }
