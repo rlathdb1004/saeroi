@@ -14,66 +14,100 @@
 
 			<div class="search-row">
 
-				<%-- 시작일 --%>
+				<%-- =====================================================
+					시작일
+				===================================================== --%>
 				<div class="search-item">
-					<label class="search-label">시작일</label>
+
+					<label class="search-label">
+						시작일
+					</label>
 
 					<input type="date"
 						name="startDate"
 						class="search-date"
 						value="${startDate}">
+
 				</div>
 
-				<%-- 종료일 --%>
+				<%-- =====================================================
+					종료일
+				===================================================== --%>
 				<div class="search-item">
-					<label class="search-label">종료일</label>
+
+					<label class="search-label">
+						종료일
+					</label>
 
 					<input type="date"
 						name="endDate"
 						class="search-date"
 						value="${endDate}">
+
 				</div>
 
-				<%-- 구분 --%>
+				<%-- =====================================================
+					구분
+				===================================================== --%>
 				<div class="search-item">
-					<label class="search-label">구분</label>
+
+					<label class="search-label">
+						구분
+					</label>
 
 					<select name="searchType"
 						class="search-select">
 
-						<option value="">전체</option>
+						<option value="">
+							전체
+						</option>
 
 						<option value="itemCode"
 							<c:if test="${searchType eq 'itemCode'}">selected</c:if>>
+
 							품목코드
+
 						</option>
 
 						<option value="itemName"
 							<c:if test="${searchType eq 'itemName'}">selected</c:if>>
+
 							품목명
+
 						</option>
 
 					</select>
+
 				</div>
 
-				<%-- 검색어는 구분 선택 안해도 전체 검색 --%>
+				<%-- =====================================================
+					검색어
+				===================================================== --%>
 				<div class="search-item">
-					<label class="search-label">검색어</label>
+
+					<label class="search-label">
+						검색어
+					</label>
 
 					<input type="text"
 						name="keyword"
 						class="search-input"
 						placeholder="검색키워드"
 						value="${keyword}">
+
 				</div>
 
 				<div class="search-btn-wrap">
 
+					<%-- =================================================
+						검색 버튼
+					================================================= --%>
 					<button type="submit"
 						class="search-btn search-btn-main">
 
 						<svg viewBox="0 0 24 24"
 							fill="none">
+
 							<circle cx="10.5"
 								cy="10.5"
 								r="7.5"
@@ -86,17 +120,23 @@
 								stroke-width="2"
 								stroke-linecap="round">
 							</path>
+
 						</svg>
 
 						검색
+
 					</button>
 
+					<%-- =================================================
+						초기화 버튼
+					================================================= --%>
 					<button type="button"
 						class="search-btn search-btn-sub search-reset-btn"
 						onclick="location.href='${pageContext.request.contextPath}/inventory/stockList'">
 
 						<svg viewBox="0 0 24 24"
 							fill="none">
+
 							<path d="M20 12C20 16.4 16.4 20 12 20C7.6 20 4 16.4 4 12C4 7.6 7.6 4 12 4C14.4 4 16.5 5.1 18 6.8"
 								stroke="currentColor"
 								stroke-width="2"
@@ -109,9 +149,11 @@
 								stroke-linecap="round"
 								stroke-linejoin="round">
 							</path>
+
 						</svg>
 
 						초기화
+
 					</button>
 
 				</div>
@@ -132,21 +174,86 @@
 				총 ${pageInfo.totalCount}건
 			</p>
 
+			<%-- =====================================================
+				관리자 / 매니저만 등록 삭제 가능
+			===================================================== --%>
 			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
 				or sessionScope.loginUser.role eq 'MANAGER'}">
 
 				<div class="search-btn-right">
 
+					<%-- =================================================
+						등록 버튼 + SVG 추가
+					================================================= --%>
 					<button type="button"
 						class="search-btn search-btn-main modal_open_btn"
 						data_modal_target="#modal_insert">
+
+						<svg viewBox="0 0 24 24"
+							fill="none">
+
+							<path d="M12 5V19"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round">
+							</path>
+
+							<path d="M5 12H19"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round">
+							</path>
+
+						</svg>
+
 						등록
+
 					</button>
 
+					<%-- =================================================
+						선택 삭제 버튼 + SVG 추가
+					================================================= --%>
 					<button type="button"
 						class="search-btn search-btn-sub"
 						onclick="deleteCheck()">
+
+						<svg viewBox="0 0 24 24"
+							fill="none">
+
+							<path d="M4 7H20"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round">
+							</path>
+
+							<path d="M10 11V17"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round">
+							</path>
+
+							<path d="M14 11V17"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round">
+							</path>
+
+							<path d="M6 7L7 21H17L18 7"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linejoin="round">
+							</path>
+
+							<path d="M9 7V4H15V7"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linejoin="round">
+							</path>
+
+						</svg>
+
 						선택 삭제
+
 					</button>
 
 				</div>
@@ -160,13 +267,19 @@
 			<table class="coTable">
 
 				<thead>
+
 					<tr>
+
 						<th class="mobile_show">
-							<label id="checkAllLabel">선택</label>
+
+							<label id="checkAllLabel">
+								선택
+							</label>
 
 							<input type="checkbox"
 								id="checkAll"
 								style="display:none;">
+
 						</th>
 
 						<th class="mobile_hidden">품목코드</th>
@@ -176,7 +289,9 @@
 						<th class="mobile_hidden">단위</th>
 						<th class="mobile_show">창고위치</th>
 						<th class="mobile_show">상세</th>
+
 					</tr>
+
 				</thead>
 
 				<tbody>
@@ -185,19 +300,26 @@
 						items="${list}">
 
 						<tr>
+
 							<td class="mobile_show">
+
 								<input type="checkbox"
 									name="inventoryIds"
 									value="${inventory.inventoryId}">
+
 							</td>
 
 							<td class="mobile_hidden"
 								title="${inventory.itemCode}">
+
 								${inventory.itemCode}
+
 							</td>
 
 							<td class="mobile_hidden">
+
 								<c:choose>
+
 									<c:when test="${inventory.itemType eq 'FG'}">
 										완제품
 									</c:when>
@@ -206,35 +328,52 @@
 										원자재
 									</c:when>
 
+									<%-- =================================================
+										SM 도 원자재로 통일
+									================================================= --%>
 									<c:when test="${inventory.itemType eq 'SM'}">
-										부자재
+										원자재
 									</c:when>
 
 									<c:otherwise>
 										${inventory.itemType}
 									</c:otherwise>
+
 								</c:choose>
+
 							</td>
 
 							<td class="mobile_show"
 								title="${inventory.itemName}">
+
 								${inventory.itemName}
+
 							</td>
 
 							<td class="mobile_show">
+
 								${inventory.inventoryStock}
+
 							</td>
 
 							<td class="mobile_hidden">
+
 								${inventory.itemUnit}
+
 							</td>
 
 							<td class="mobile_show">
+
 								${inventory.stockLocation}
+
 							</td>
 
 							<td class="mobile_show">
 
+								<%-- =================================================
+									공통 버튼 스타일 유지
+									coDetailBtn 그대로 사용
+								================================================= --%>
 								<button type="button"
 									class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/stockList/detail?inventoryId=${inventory.inventoryId}'">
@@ -244,6 +383,7 @@
 								</button>
 
 							</td>
+
 						</tr>
 
 					</c:forEach>
@@ -259,7 +399,6 @@
 	<%-- =========================================================
 		재고 등록 모달
 	========================================================= --%>
-
 	<div id="modal_insert"
 		class="modal_wrap"
 		aria-hidden="true">
@@ -283,10 +422,9 @@
 
 				<div class="modal_body modal_body_2col">
 
-					<%-- =====================================================
+					<%-- =================================================
 						품목명
-					===================================================== --%>
-
+					================================================= --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -308,11 +446,6 @@
 							<c:forEach var="item"
 								items="${itemList}">
 
-								<%-- =================================================
-									data-location 추가
-									품목 선택 시 창고위치 자동입력
-								================================================= --%>
-
 								<option value="${item.itemId}"
 									data-location="${item.stockLocation}">
 
@@ -326,10 +459,9 @@
 
 					</div>
 
-					<%-- =====================================================
+					<%-- =================================================
 						현재재고
-					===================================================== --%>
-
+					================================================= --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -348,10 +480,9 @@
 
 					</div>
 
-					<%-- =====================================================
+					<%-- =================================================
 						창고위치
-					===================================================== --%>
-
+					================================================= --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -368,10 +499,9 @@
 
 					</div>
 
-					<%-- =====================================================
+					<%-- =================================================
 						비고
-					===================================================== --%>
-
+					================================================= --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -419,7 +549,6 @@
 	// =========================================================
 	// 전체 선택
 	// =========================================================
-
 	document.getElementById("checkAllLabel").onclick =
 		function() {
 
@@ -442,7 +571,6 @@
 	// =========================================================
 	// 체크박스 상태 동기화
 	// =========================================================
-
 	var checks =
 		document.getElementsByName("inventoryIds");
 
@@ -469,7 +597,6 @@
 	// =========================================================
 	// 선택 삭제
 	// =========================================================
-
 	function deleteCheck() {
 
 		var checks =
@@ -499,7 +626,6 @@
 	// =========================================================
 	// 등록 방어코딩
 	// =========================================================
-
 	function checkInventoryInsert() {
 
 		var itemId =
@@ -523,10 +649,6 @@
 			return false;
 		}
 
-		// =====================================================
-		// 창고위치 null 방어
-		// =====================================================
-
 		var stockLocation =
 			document.getElementById(
 				"insertStockLocation");
@@ -544,7 +666,6 @@
 	// =========================================================
 	// 품목 선택 시 창고위치 자동입력
 	// =========================================================
-
 	document.getElementById(
 		"insertInventoryItemId")
 		.addEventListener(
@@ -554,17 +675,9 @@
 		var selectedOption =
 			this.options[this.selectedIndex];
 
-		// =====================================================
-		// data-location 가져오기
-		// =====================================================
-
 		var stockLocation =
 			selectedOption.getAttribute(
 				"data-location");
-
-		// =====================================================
-		// null 방어코딩
-		// =====================================================
 
 		if (stockLocation == null
 			|| stockLocation == "null"
@@ -573,10 +686,6 @@
 
 			stockLocation = "";
 		}
-
-		// =====================================================
-		// 창고위치 자동입력
-		// =====================================================
 
 		document.getElementById(
 			"insertStockLocation").value =
