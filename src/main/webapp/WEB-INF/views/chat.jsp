@@ -215,10 +215,12 @@
 				let promptValue = prompt.value.trim();
 				if (!promptValue) return
 				console.log(promptValue)
+				
 				chat.innerHTML +="<div class='message-bubble user'>" + promptValue + "</div>";
 				chat.scrollTop = chat.scrollHeight;
 				
-				param.push({ role:"user",text:promptValue });
+				
+				param.push({ role:"user",text:promptValue});
 				prompt.value='';
 				
 				let option = {

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kr.or.saeroi.dao.QualityDAO;
+import kr.or.saeroi.dto.DefectDTO;
 import kr.or.saeroi.dto.InspectionDTO;
 
 @Service
@@ -64,5 +65,27 @@ public class QualityServiceImpl implements QualityService {
 		InspectionDTO detail_result = qualityDAO._dao_Insepection_detail(insp_id, insp_date, prod_id, emp_id, insp_type,
 				result, inspection_qty, good_qty, remark);
 		return detail_result;
+	}
+
+	// 검사 수정
+	@Override
+	public int _ser_update_Inspection(String insp_id, String insp_date, String insp_type, String result,
+			String inspection_qty, String good_qty, String remark) {
+
+		int update_result = qualityDAO._dao_update_Inspection(insp_id, insp_date, insp_type, result, inspection_qty,
+				good_qty, remark);
+
+		return update_result;
+	}
+
+	// 불량 목록
+	@Override
+	public List<DefectDTO> _ser_select_Defect(String startDate, String endDate, String searchType, String keyword) {
+
+		System.out.println("defect_list 실행 됨");
+
+		List<DefectDTO> defect_list = qualityDAO._dao_select_Defect(startDate, endDate, searchType, keyword);
+
+		return defect_list;
 	}
 }

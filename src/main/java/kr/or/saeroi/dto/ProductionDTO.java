@@ -121,4 +121,16 @@ public class ProductionDTO {
 	// 작업지시 문서번호를 따로 보여주기 위한 값이다.
 	private String workOrderDocNo;
 	
+	// 공정진행 현황에서 사용할 누적 생산수량이다.
+	private Integer totalProdQty;
+
+	// 공정진행 현황에서 사용할 누적 불량수량이다.
+	private Integer totalLossQty;
+
+	// 공정진행 현황에서 사용할 진행률이다.
+	private Integer progressRate;
+
+	// 공정진행 현황에서 사용할 진행상태이다.
+	private String progressStatus;
+	
 }

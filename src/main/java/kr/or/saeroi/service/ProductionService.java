@@ -154,4 +154,27 @@ public class ProductionService {
 
 		return productionDAO.updateProductionResult(productionDTO);
 	}
+	
+	// 공정진행 현황 목록 총 건수를 조회한다.
+	public int selectProcessProgressCount(ProductionDTO productionDTO) {
+
+		return productionDAO.selectProcessProgressCount(productionDTO);
+	}
+
+	// 공정진행 현황 목록을 조회한다.
+	public List<ProductionDTO> selectProcessProgressList(ProductionDTO productionDTO) {
+
+		return productionDAO.selectProcessProgressList(productionDTO);
+	}
+
+	// 공정진행 현황 검색 select box에 사용할 진행상태 목록을 조회한다.
+	public List<String> selectProcessProgressStatusList() {
+
+		return productionDAO.selectProcessProgressStatusList();
+	}
+	// 공정진행 상세 정보를 조회한다.
+	public ProductionDTO selectProcessProgressDetail(Integer orderId) {
+
+		return productionDAO.selectProcessProgressDetail(orderId);
+	}
 }

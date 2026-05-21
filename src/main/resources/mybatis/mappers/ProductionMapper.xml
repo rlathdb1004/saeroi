@@ -1059,4 +1059,353 @@
 
 	</update>
 
+	<!-- 공정진행 현황 조회 결과를 ProductionDTO에 매핑한다. -->
+	<resultMap id="processProgressResultMap"
+		type="kr.or.saeroi.dto.ProductionDTO">
+
+		<!-- work_order 테이블 컬럼이다. -->
+		<result property="orderId" column="ORDER_ID" />
+		<result property="docNo" column="DOC_NO" />
+		<result property="productLot" column="PRODUCT_LOT" />
+		<result property="orderQty" column="ORDER_QTY" />
+		<result property="orderDate" column="ORDER_DATE" />
+
+		<!-- item 테이블 조인 컬럼이다. -->
+		<result property="itemId" column="ITEM_ID" />
+		<result property="itemCode" column="ITEM_CODE" />
+		<result property="itemName" column="ITEM_NAME" />
+		<result property="itemType" column="ITEM_TYPE" />
+		<result property="itemUnit" column="ITEM_UNIT" />
+
+		<!-- line 테이블 조인 컬럼이다. -->
+		<result property="lineId" column="LINE_ID" />
+		<result property="lineCode" column="LINE_CODE" />
+		<result property="lineName" column="LINE_NAME" />
+
+		<!-- 공정진행 계산 컬럼이다. -->
+		<result property="totalProdQty" column="TOTAL_PROD_QTY" />
+		<result property="totalLossQty" column="TOTAL_LOSS_QTY" />
+		<result property="progressRate" column="PROGRESS_RATE" />
+		<result property="progressStatus" column="PROGRESS_STATUS" />
+		
+		<!-- 최신 생산실적 수정용 컬럼이다. -->
+		<result property="prodId" column="PROD_ID" />
+		<result property="empId" column="EMP_ID" />
+		<result property="prodDate" column="PROD_DATE" />
+		<result property="prodQty" column="PROD_QTY" />
+		<result property="lossQty" column="LOSS_QTY" />
+		<result property="remark" column="REMARK" />
+
+		<!-- 담당자 표시용 컬럼이다. -->
+		<result property="ename" column="ENAME" />
+		<result property="dept" column="DEPT" />
+
+	</resultMap>
+
+
+	<!-- 공정진행 현황 검색 조건이다. -->
+	<sql id="processProgressSearchCondition">
+
+		<where>
+
+			<!-- 시작일 검색 조건이다. 작업지시일 기준이다. -->
+			<if test="startDate != null and startDate != ''">
+				AND WO.ORDER_DATE <![CDATA[>=]]> TO_DATE(#{startDate}, 'YYYY-MM-DD')
+			</if>
+
+			<!-- 종료일 검색 조건이다. 종료일 당일까지 포함한다. -->
+			<if test="endDate != null and endDate != ''">
+				AND WO.ORDER_DATE <![CDATA[<]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+			</if>
+
+			<!-- 진행상태 검색 조건이다. -->
+			<if test="progressStatus != null and progressStatus != ''">
+				AND NVL(LPS.PROD_STATUS, '대기') = #{progressStatus}
+			</if>
+
+			<!-- 검색어 조건이다. -->
+			<if test="keyword != null and keyword != ''">
+				AND (
+					WO.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+					OR WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
+					OR I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+					OR I.ITEM_CODE LIKE '%' || TRIM(#{keyword}) || '%'
+					OR L.LINE_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+					OR TO_CHAR(WO.ORDER_QTY, 'FM9999999999999990') LIKE '%' || REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
+					OR TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') LIKE '%' || TRIM(#{keyword}) || '%'
+					OR NVL(LPS.PROD_STATUS, '대기') LIKE '%' || TRIM(#{keyword}) || '%'
+				)
+			</if>
+
+		</where>
+
+	</sql>
+
+
+	<!-- 공정진행 현황 목록 총 건수를 조회한다. -->
+	<select id="selectProcessProgressCount"
+		parameterType="kr.or.saeroi.dto.ProductionDTO"
+		resultType="int">
+
+		SELECT COUNT(*)
+		FROM WORK_ORDER WO
+
+		JOIN PRODUCTION_PLAN PP
+		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+		JOIN ITEM I
+		  ON PP.ITEM_ID = I.ITEM_ID
+
+		LEFT JOIN LINE L
+		  ON WO.LINE_ID = L.LINE_ID
+
+		LEFT JOIN (
+			SELECT
+				P1.ORDER_ID,
+				P1.PROD_STATUS
+			FROM PRODUCTION P1
+			JOIN (
+				SELECT
+					ORDER_ID,
+					MAX(PROD_ID) AS PROD_ID
+				FROM PRODUCTION
+				GROUP BY ORDER_ID
+			) PM
+			  ON P1.ORDER_ID = PM.ORDER_ID
+			 AND P1.PROD_ID = PM.PROD_ID
+		) LPS
+		  ON WO.ORDER_ID = LPS.ORDER_ID
+
+		<include refid="processProgressSearchCondition" />
+
+	</select>
+
+
+	<!-- 공정진행 현황 목록을 조회한다. -->
+	<select id="selectProcessProgressList"
+		parameterType="kr.or.saeroi.dto.ProductionDTO"
+		resultMap="processProgressResultMap">
+
+		SELECT *
+		FROM (
+			SELECT PROCESS_PROGRESS_LIST.*,
+				   ROWNUM AS RN
+			FROM (
+				SELECT
+					WO.ORDER_ID,
+					WO.DOC_NO,
+					WO.PRODUCT_LOT,
+					WO.ORDER_QTY,
+					TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+
+					I.ITEM_ID,
+					I.ITEM_CODE,
+					I.ITEM_NAME,
+					I.ITEM_TYPE,
+					I.ITEM_UNIT,
+
+					L.LINE_ID,
+					L.LINE_CODE,
+					L.LINE_NAME,
+
+					NVL(PA.TOTAL_PROD_QTY, 0) AS TOTAL_PROD_QTY,
+					NVL(PA.TOTAL_LOSS_QTY, 0) AS TOTAL_LOSS_QTY,
+
+					CASE
+						WHEN NVL(WO.ORDER_QTY, 0) = 0 THEN 0
+						ELSE LEAST(
+							100,
+							ROUND((NVL(PA.TOTAL_PROD_QTY, 0) / WO.ORDER_QTY) * 100)
+						)
+					END AS PROGRESS_RATE,
+
+					NVL(LPS.PROD_STATUS, '대기') AS PROGRESS_STATUS
+
+				FROM WORK_ORDER WO
+
+				JOIN PRODUCTION_PLAN PP
+				  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+				JOIN ITEM I
+				  ON PP.ITEM_ID = I.ITEM_ID
+
+				LEFT JOIN LINE L
+				  ON WO.LINE_ID = L.LINE_ID
+
+				LEFT JOIN (
+					SELECT
+						ORDER_ID,
+						SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
+						SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
+					FROM PRODUCTION
+					GROUP BY ORDER_ID
+				) PA
+				  ON WO.ORDER_ID = PA.ORDER_ID
+
+				LEFT JOIN (
+					SELECT
+						P1.ORDER_ID,
+						P1.PROD_STATUS
+					FROM PRODUCTION P1
+					JOIN (
+						SELECT
+							ORDER_ID,
+							MAX(PROD_ID) AS PROD_ID
+						FROM PRODUCTION
+						GROUP BY ORDER_ID
+					) PM
+					  ON P1.ORDER_ID = PM.ORDER_ID
+					 AND P1.PROD_ID = PM.PROD_ID
+				) LPS
+				  ON WO.ORDER_ID = LPS.ORDER_ID
+
+				<include refid="processProgressSearchCondition" />
+
+				ORDER BY WO.ORDER_DATE DESC,
+						 WO.ORDER_ID DESC
+			) PROCESS_PROGRESS_LIST
+			WHERE ROWNUM <![CDATA[<=]]> #{endRow}
+		)
+		WHERE RN <![CDATA[>=]]> #{startRow}
+
+	</select>
+
+
+	<!-- 공정진행 현황 검색 select box에 사용할 진행상태 목록을 조회한다. -->
+	<select id="selectProcessProgressStatusList"
+		resultType="string">
+
+		SELECT STATUS_NAME
+		FROM (
+			SELECT '대기' AS STATUS_NAME
+			FROM DUAL
+
+			UNION
+
+			SELECT '진행중' AS STATUS_NAME
+			FROM DUAL
+
+			UNION
+
+			SELECT '완료' AS STATUS_NAME
+			FROM DUAL
+
+			UNION
+
+			SELECT '보류' AS STATUS_NAME
+			FROM DUAL
+
+			UNION
+
+			SELECT DISTINCT PROD_STATUS AS STATUS_NAME
+			FROM PRODUCTION
+			WHERE PROD_STATUS IS NOT NULL
+		)
+		ORDER BY
+			CASE STATUS_NAME
+				WHEN '대기' THEN 1
+				WHEN '진행중' THEN 2
+				WHEN '완료' THEN 3
+				WHEN '보류' THEN 4
+				ELSE 5
+			END,
+			STATUS_NAME ASC
+
+	</select>
+	
+			<!-- 공정진행 상세 정보를 조회한다. -->
+	<select id="selectProcessProgressDetail"
+		parameterType="int"
+		resultMap="processProgressResultMap">
+
+		SELECT
+			WO.ORDER_ID,
+			WO.DOC_NO,
+			WO.PRODUCT_LOT,
+			WO.ORDER_QTY,
+			TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+
+			I.ITEM_ID,
+			I.ITEM_CODE,
+			I.ITEM_NAME,
+			I.ITEM_TYPE,
+			I.ITEM_UNIT,
+
+			L.LINE_ID,
+			L.LINE_CODE,
+			L.LINE_NAME,
+
+			NVL(PA.TOTAL_PROD_QTY, 0) AS TOTAL_PROD_QTY,
+			NVL(PA.TOTAL_LOSS_QTY, 0) AS TOTAL_LOSS_QTY,
+
+			CASE
+				WHEN NVL(WO.ORDER_QTY, 0) = 0 THEN 0
+				ELSE LEAST(
+					100,
+					ROUND((NVL(PA.TOTAL_PROD_QTY, 0) / WO.ORDER_QTY) * 100)
+				)
+			END AS PROGRESS_RATE,
+
+			NVL(LPD.PROD_STATUS, '대기') AS PROGRESS_STATUS,
+
+			LPD.PROD_ID,
+			LPD.EMP_ID,
+			TO_CHAR(LPD.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
+			LPD.PROD_QTY,
+			LPD.LOSS_QTY,
+			LPD.REMARK,
+
+			E.ENAME,
+			E.DEPT
+
+		FROM WORK_ORDER WO
+
+		JOIN PRODUCTION_PLAN PP
+		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+		JOIN ITEM I
+		  ON PP.ITEM_ID = I.ITEM_ID
+
+		LEFT JOIN LINE L
+		  ON WO.LINE_ID = L.LINE_ID
+
+		LEFT JOIN (
+			SELECT
+				ORDER_ID,
+				SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
+				SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
+			FROM PRODUCTION
+			GROUP BY ORDER_ID
+		) PA
+		  ON WO.ORDER_ID = PA.ORDER_ID
+
+		LEFT JOIN (
+			SELECT
+				P1.PROD_ID,
+				P1.ORDER_ID,
+				P1.EMP_ID,
+				P1.PROD_DATE,
+				P1.PROD_QTY,
+				P1.LOSS_QTY,
+				P1.PROD_STATUS,
+				P1.REMARK
+			FROM PRODUCTION P1
+			JOIN (
+				SELECT
+					ORDER_ID,
+					MAX(PROD_ID) AS PROD_ID
+				FROM PRODUCTION
+				GROUP BY ORDER_ID
+			) PM
+			  ON P1.ORDER_ID = PM.ORDER_ID
+			 AND P1.PROD_ID = PM.PROD_ID
+		) LPD
+		  ON WO.ORDER_ID = LPD.ORDER_ID
+
+		LEFT JOIN EMP E
+		  ON LPD.EMP_ID = E.EMP_ID
+
+		WHERE WO.ORDER_ID = #{orderId}
+
+	</select>
 </mapper>

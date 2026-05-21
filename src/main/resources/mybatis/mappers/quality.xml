@@ -42,10 +42,13 @@
 				<when test="searchType == null or searchType == ''">
 					AND (
 					i.doc_no LIKE '%' || #{keyword} || '%'
-					OR it.item_name LIKE '%' || #{keyword} || '%'
-					OR w.product_lot LIKE '%' || #{keyword} || '%'
+					OR
+					it.item_name LIKE '%' || #{keyword} || '%'
+					OR w.product_lot LIKE '%'
+					|| #{keyword} || '%'
 					OR e.ename LIKE '%' || #{keyword} || '%'
-					OR i.result LIKE '%' || #{keyword} || '%'
+					OR
+					i.result LIKE '%' || #{keyword} || '%'
 					)
 				</when>
 				<when test="searchType == 'insp_id'">
@@ -224,35 +227,132 @@
 		</foreach>
 	</delete>
 
-<!-- 검사 상세 목록 -->
-<select id="_select_Inspection_detail"
-	resultType="kr.or.saeroi.dto.InspectionDTO">
-	SELECT
-	i.insp_id,
-	i.doc_no,
-	i.insp_date,
-	it.item_name,
-	w.product_lot,
-	e.ename,
-	i.result,
-	i.prod_id,
-	i.emp_id,
-	i.insp_type,
-	i.insp_status,
-	i.inspection_qty,
-	i.good_qty,
-	i.remark
-	FROM inspection i,
-	production p,
-	work_order w,
-	production_plan pr,
-	item it,
-	emp e
-	WHERE i.prod_id = p.prod_id
-	AND p.order_id = w.order_id
-	AND w.prod_plan_id = pr.prod_plan_id
-	AND pr.item_id = it.item_id
-	AND i.emp_id = e.emp_id
-	AND i.insp_id = TO_NUMBER(#{insp_id})
-</select>
+	<!-- 검사 상세 목록 -->
+	<select id="_select_Inspection_detail"
+		resultType="kr.or.saeroi.dto.InspectionDTO">
+		SELECT
+		i.insp_id,
+		i.doc_no,
+		i.insp_date,
+		it.item_name,
+		w.product_lot,
+		e.ename,
+		i.result,
+		i.prod_id,
+		i.emp_id,
+		i.insp_type,
+		i.insp_status,
+		i.inspection_qty,
+		i.good_qty,
+		i.remark
+		FROM inspection i,
+		production p,
+		work_order w,
+		production_plan pr,
+		item it,
+		emp e
+		WHERE
+		i.prod_id = p.prod_id
+		AND p.order_id = w.order_id
+		AND w.prod_plan_id =
+		pr.prod_plan_id
+		AND pr.item_id = it.item_id
+		AND i.emp_id = e.emp_id
+		AND
+		i.insp_id = TO_NUMBER(#{insp_id})
+	</select>
+
+	<!-- 검사 수정 -->
+	<update id="_update_Inspection" parameterType="map">
+		UPDATE inspection
+		SET
+		insp_date = TO_DATE(#{insp_date}, 'YYYY-MM-DD'),
+		insp_type =
+		#{insp_type},
+		result = #{result},
+		inspection_qty =
+		TO_NUMBER(#{inspection_qty}),
+		good_qty = TO_NUMBER(#{good_qty}),
+		remark
+		= #{remark},
+		updated_date = SYSDATE
+		WHERE insp_id =
+		TO_NUMBER(#{insp_id})
+	</update>
+
+	<!-- 불량 목록 -->
+	<select id="_select_Defect"
+		resultType="kr.or.saeroi.dto.DefectDTO">
+		SELECT
+		dl.defect_list_id,
+		d.defect_id,
+		dl.insp_id,
+		d.defect_code,
+		dl.defect_date,
+		it.item_name,
+		w.product_lot,
+		d.defect_name,
+		e.ename,
+		dl.defect_qty,
+		dl.remark
+		FROM defect_list dl,
+		defect d,
+		inspection i,
+		production p,
+		work_order w,
+		production_plan pr,
+		item it,
+		emp e
+		WHERE dl.defect_id = d.defect_id
+		AND dl.insp_id = i.insp_id
+		AND i.prod_id = p.prod_id
+		AND p.order_id = w.order_id
+		AND w.prod_plan_id = pr.prod_plan_id
+		AND pr.item_id = it.item_id
+		AND i.emp_id = e.emp_id
+
+		<if test="startDate != null and startDate != ''">
+			AND dl.defect_date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+		</if>
+
+		<if test="endDate != null and endDate != ''">
+			AND dl.defect_date &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+		</if>
+
+		<if test="keyword != null and keyword != ''">
+			<choose>
+				<when test="searchType == 'defectCode'">
+					AND d.defect_code LIKE '%' || #{keyword} || '%'
+				</when>
+
+				<when test="searchType == 'itemName'">
+					AND it.item_name LIKE '%' || #{keyword} || '%'
+				</when>
+
+				<when test="searchType == 'productLot'">
+					AND w.product_lot LIKE '%' || #{keyword} || '%'
+				</when>
+
+				<when test="searchType == 'defectName'">
+					AND d.defect_name LIKE '%' || #{keyword} || '%'
+				</when>
+
+				<when test="searchType == 'ename'">
+					AND e.ename LIKE '%' || #{keyword} || '%'
+				</when>
+
+				<otherwise>
+					AND (
+					d.defect_code LIKE '%' || #{keyword} || '%'
+					OR it.item_name LIKE '%' || #{keyword} || '%'
+					OR w.product_lot LIKE '%' || #{keyword} || '%'
+					OR d.defect_name LIKE '%' || #{keyword} || '%'
+					OR e.ename LIKE '%' || #{keyword} || '%'
+					)
+				</otherwise>
+			</choose>
+		</if>
+
+		ORDER BY dl.defect_list_id DESC
+	</select>
 </mapper>

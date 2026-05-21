@@ -134,12 +134,58 @@
 				<button type="button"
 					class="search-btn search-btn-main modal_open_btn"
 					data_modal_target="#modal_insert">
+					<svg viewBox="0 0 24 24"
+                        fill="none">
+                        <path d="M12 5V19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+
+                        <path d="M5 12H19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+                    </svg>
 					등록
 				</button>
 
 				<button type="button"
 					class="search-btn search-btn-sub"
 					onclick="deleteCheck()">
+					<svg viewBox="0 0 24 24"
+                        fill="none">
+                        <path d="M4 7H20"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+
+                        <path d="M10 11V17"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+
+                        <path d="M14 11V17"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+
+                        <path d="M6 7L7 21H17L18 7"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linejoin="round">
+                        </path>
+
+                        <path d="M9 7V4H15V7"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linejoin="round">
+                        </path>
+                    </svg>
 					선택 삭제
 				</button>
 

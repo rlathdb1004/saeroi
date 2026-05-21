@@ -53,7 +53,7 @@
 					<%-- 검색어 입력 영역이다. --%>
 
 					<label class="search-label">검색어</label> <input type="text"
-						name="keyword" class="search-input" placeholder="내용을 입력하세요."
+						name="keyword" class="search-input" placeholder="검색 키워드"
 						value="${keyword}">
 
 				</div>
@@ -106,10 +106,34 @@
 			<div class="search-btn-right">
 				<button type="button"
 					class="search-btn search-btn-main modal_open_btn"
-					data_modal_target="#modal_insert">등록</button>
+					data_modal_target="#modal_insert">
+					<svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 5V19" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round">
+        </path>
+
+        <path d="M5 12H19" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round">
+        </path>
+    </svg>
+					등록
+				</button>
 				<!-- 			//삭제 수정 부분 -->
-				<button type="submit" class="search-btn search-btn-sub">선택
-					삭제</button>
+				<button type="submit" class="search-btn search-btn-sub">
+					<svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 7H20" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round"></path>
+        <path d="M10 11V17" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round"></path>
+        <path d="M14 11V17" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round"></path>
+        <path d="M6 7L7 21H17L18 7" stroke="currentColor"
+							stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
+							stroke-linejoin="round"></path>
+    </svg>
+					선택 삭제
+				</button>
 			</div>
 
 		</div>
@@ -147,16 +171,14 @@
 							<td class="coTextLeft mobile_show">${inspection.item_name}</td>
 							<td class="mobile_hidden">${inspection.product_lot}</td>
 							<td class="mobile_hidden">${inspection.ename}</td>
-							<td class="mobile_show">
-								<c:choose>
+							<td class="mobile_show"><c:choose>
 									<c:when test="${inspection.result == '조건부'}">
 										<span class="coStatus coStatusStop">${inspection.result}</span>
 									</c:when>
 									<c:otherwise>
 										<span class="coStatus coStatusUse">${inspection.result}</span>
 									</c:otherwise>
-								</c:choose>
-							</td>
+								</c:choose></td>
 							<td class="mobile_show">
 								<button type="button" class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/quality/inspection_detail?insp_id=${inspection.insp_id}'">

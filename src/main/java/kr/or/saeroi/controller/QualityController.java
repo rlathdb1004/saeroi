@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.or.saeroi.common.PageDTO;
+import kr.or.saeroi.dto.DefectDTO;
 import kr.or.saeroi.dto.InspectionDTO;
 import kr.or.saeroi.service.QualityService;
 
@@ -24,7 +25,7 @@ public class QualityController {
 
 	@RequestMapping("/inspection")
 	public String inspection(Model model, @RequestParam(defaultValue = "1") int page,
-			@RequestParam(defaultValue = "10") int size, @RequestParam(required = false) String startDate,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String startDate,
 			@RequestParam(required = false) String endDate, @RequestParam(required = false) String searchType,
 			@RequestParam(required = false) String keyword) {
 //		검사 목록 
@@ -38,6 +39,7 @@ public class QualityController {
 		System.out.println("keyword: " + keyword);
 
 		// 페이징 기능
+		//DB에서 전체목록을 가져온 다음 컨트롤러에서 보여줄 것만 잘라서 JSP로 보냄
 		int totalCount = list.size();
 		int startIndex = (page - 1) * size;
 		int endIndex = startIndex + size;
@@ -98,14 +100,6 @@ public class QualityController {
 		return option_list;
 	}
 
-	@RequestMapping("/defect")
-	public String defect(Model model) {
-
-		model.addAttribute("contentPage", "/WEB-INF/views/quality/defect.jsp");
-
-		return "quality/defect.tiles";
-	}
-
 	// 등록 메서드(등록 post 방식 추가)
 	// redirect: DB에 저장하고 다시 목록 페이지로 이동시키기 위해서
 	@RequestMapping(value = "/inspection/add", method = RequestMethod.POST)
@@ -131,6 +125,7 @@ public class QualityController {
 
 		if (insp_id != null) {
 			// 어떤 행을 지울지만 필요함
+//			sqlSession.CRUD 자체가 반환 타입이 int
 			int delete_result = qualityService._ser_delete_Inspection(insp_id);
 
 			System.out.println("delete_result 결과: " + delete_result);
@@ -146,7 +141,7 @@ public class QualityController {
 			@RequestParam(required = false) String emp_id, @RequestParam(required = false) String insp_type,
 			@RequestParam(required = false) String result, @RequestParam(required = false) String inspection_qty,
 			@RequestParam(required = false) String good_qty, @RequestParam(required = false) String remark) {
-		//1건씩만 read이므로 List 아님
+		// 1건씩만 read이므로 List 아님
 		InspectionDTO inspection = qualityService._ser_select_Inspection_detail(insp_id, insp_date, prod_id, emp_id,
 				insp_type, result, inspection_qty, good_qty, remark);
 		System.out.println("검사 상세 목록 list 실행 됨");
@@ -164,14 +159,82 @@ public class QualityController {
 
 		return "quality/inspection_detail.tiles";
 	}
-	
-	//(검사 상세에서)
-	//업데이트 메서드
-	@RequestMapping(value = "/inspection/update",method = RequestMethod.POST)
-	public String inspection_update() {
-		
-		
-		return null;
+
+	// (검사 상세에서)
+	// 업데이트 메서드
+	// 검사 수정
+	@RequestMapping(value = "/inspection/update", method = RequestMethod.POST)
+	public String inspection_update(Model model, @RequestParam(required = false) String insp_id,
+			@RequestParam(required = false) String insp_date, @RequestParam(required = false) String insp_type,
+			@RequestParam(required = false) String result, @RequestParam(required = false) String inspection_qty,
+			@RequestParam(required = false) String good_qty, @RequestParam(required = false) String remark) {
+
+		int update_result = qualityService._ser_update_Inspection(insp_id, insp_date, insp_type, result, inspection_qty,
+				good_qty, remark);
+
+		System.out.println("update_result: " + update_result);
+
+		return "redirect:/quality/inspection_detail?insp_id=" + insp_id;
 	}
 
+	// 불량 목록
+	@RequestMapping("/defect")
+	public String defect(Model model, @RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "5") int size, @RequestParam(required = false) String startDate,
+			@RequestParam(required = false) String endDate, @RequestParam(required = false) String searchType,
+			@RequestParam(required = false) String keyword) {
+
+		List<DefectDTO> list = qualityService._ser_select_Defect(startDate, endDate, searchType, keyword);
+
+		System.out.println("불량 목록 list 실행 됨");
+		System.out.println("startDate: " + startDate);
+		System.out.println("endDate: " + endDate);
+		System.out.println("searchType: " + searchType);
+		System.out.println("keyword: " + keyword);
+
+		int totalCount = list.size();
+
+		int startIndex = (page - 1) * size;
+		int endIndex = startIndex + size;
+
+		if (startIndex > totalCount) {
+			startIndex = totalCount;
+		}
+
+		if (endIndex > totalCount) {
+			endIndex = totalCount;
+		}
+
+		List<DefectDTO> page_list = list.subList(startIndex, endIndex);
+
+		PageDTO pageInfo = new PageDTO(page, size, totalCount);
+
+		model.addAttribute("list", page_list);
+		model.addAttribute("pageInfo", pageInfo);
+		model.addAttribute("pageUrl", "/quality/defect");
+
+		model.addAttribute("startDate", startDate);
+		model.addAttribute("endDate", endDate);
+		model.addAttribute("searchType", searchType);
+		model.addAttribute("keyword", keyword);
+
+		String searchParam = "";
+
+		if (startDate != null && !startDate.equals("")) {
+			searchParam += "&startDate=" + startDate;
+		}
+		if (endDate != null && !endDate.equals("")) {
+			searchParam += "&endDate=" + endDate;
+		}
+		if (searchType != null && !searchType.equals("")) {
+			searchParam += "&searchType=" + searchType;
+		}
+		if (keyword != null && !keyword.equals("")) {
+			searchParam += "&keyword=" + keyword;
+		}
+
+		model.addAttribute("searchParam", searchParam);
+
+		return "quality/defect.tiles";
+	}
 }
