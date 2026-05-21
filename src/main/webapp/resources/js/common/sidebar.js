@@ -231,7 +231,6 @@ for (var c = 0; c < siSubMenuLinks.length; c++) {
 
 function siLoadMenuByCurrentUrl() {
     // 현재 브라우저 주소를 가져온다.
-    // 예) /saeroi/inventory/materialIn/detail
     var currentPath = window.location.pathname;
 
     // 하위 메뉴 링크를 전부 찾는다.
@@ -252,46 +251,54 @@ function siLoadMenuByCurrentUrl() {
         // 메뉴 링크의 실제 주소를 가져온다.
         var menuPath = menuLinks[i].pathname;
 
-        // 현재 주소와 메뉴 주소가 같으면 현재 메뉴로 선택한다.
+        // 현재 주소와 메뉴 주소가 완전히 같으면 현재 메뉴로 선택한다.
         if (currentPath == menuPath) {
             matchedMenu = menuLinks[i];
+            break;
         }
     }
 
-    // 자재 입출고 상세 페이지는 사이드바에 직접 없기 때문에 자재(입)출고 관리 메뉴로 처리한다.
-    if (matchedMenu == null && currentPath == contextPath + "/inventory/materialIn/detail") {
-        matchedMenu = findSubMenu("자재/재고 관리", "자재(입)출고 관리");
+    // 상세, 수정, 하위 기능 주소처럼 메뉴 주소 뒤에 경로가 더 붙은 경우도 같은 메뉴로 처리한다.
+    if (matchedMenu == null) {
+        for (var j = 0; j < menuLinks.length; j++) {
+            // 메뉴 링크의 실제 주소를 가져온다.
+            var subMenuPath = menuLinks[j].pathname;
+
+            // 예) /production/workorder/detail 은 /production/workorder 메뉴로 처리한다.
+            if (currentPath.indexOf(subMenuPath + "/") == 0) {
+                matchedMenu = menuLinks[j];
+                break;
+            }
+        }
     }
 
-    // 자재 입출고 수정 페이지로 이동했을 때도 자재(입)출고 관리 메뉴로 처리한다.
-    if (matchedMenu == null && currentPath == contextPath + "/inventory/materialIn/update") {
-        matchedMenu = findSubMenu("자재/재고 관리", "자재(입)출고 관리");
-    }
-
-    // 재고 상세 페이지는 사이드바에 직접 없기 때문에 재고조회 관리 메뉴로 처리한다.
-    if (matchedMenu == null && currentPath == contextPath + "/inventory/stockList/detail") {
+    // 재고조회는 목록 메뉴 주소와 실제 상세 주소가 달라서 별도로 재고조회 관리 메뉴로 처리한다.
+    if (
+        matchedMenu == null &&
+        (
+            currentPath == contextPath + "/inventory/stockList" ||
+            currentPath.indexOf(contextPath + "/inventory/stockList/") == 0 ||
+            currentPath == contextPath + "/inventory/inventoryList" ||
+            currentPath.indexOf(contextPath + "/inventory/inventoryList/") == 0 ||
+            currentPath == contextPath + "/inventory/stock" ||
+            currentPath.indexOf(contextPath + "/inventory/stock/") == 0 ||
+            currentPath == contextPath + "/inventory/inventory" ||
+            currentPath.indexOf(contextPath + "/inventory/inventory/") == 0
+        )
+    ) {
         matchedMenu = findSubMenu("자재/재고 관리", "재고조회 관리");
     }
 
-    // 재고 수정 페이지로 이동했을 때도 재고조회 관리 메뉴로 처리한다.
-    if (matchedMenu == null && currentPath == contextPath + "/inventory/stockList/update") {
-        matchedMenu = findSubMenu("자재/재고 관리", "재고조회 관리");
-    }
-
-    // 검사 상세 페이지는 사이드바에 직접 없기 때문에 검사관리 메뉴로 처리한다.
+    // 검사 상세 페이지는 주소가 /quality/inspection_detail 이라서 검사관리 메뉴로 별도 처리한다.
     if (matchedMenu == null && currentPath == contextPath + "/quality/inspection_detail") {
         matchedMenu = findSubMenu("품질관리", "검사관리");
     }
 
-    // 품목 상세 페이지는 사이드바에 직접 없기 때문에 품목관리 메뉴로 처리한다.
-    if (matchedMenu == null && currentPath == contextPath + "/master/item/detail") {
-        matchedMenu = findSubMenu("기준정보관리", "품목관리");
+    // 마이페이지는 사이드바 메뉴가 아니기 때문에 헤더만 별도로 표시한다.
+    if (matchedMenu == null && currentPath == contextPath + "/mypage") {
+        siChangeHeader("마이페이지", "내 정보");
+        return;
     }
-    
-    // 생산계획 상세 페이지는 사이드바에 직접 없기 때문에 생산계획 관리 메뉴로 처리한다.
-	if (matchedMenu == null && currentPath == contextPath + "/production/productionplan/detail") {
-    matchedMenu = findSubMenu("생산관리", "생산계획 관리");
-	}
 
     // 사용자가 /saeroi 또는 /saeroi/ 기본 주소로 들어온 경우 대시보드 메인으로 처리한다.
     if (matchedMenu == null && (currentPath == contextPath || currentPath == contextPath + "/")) {
@@ -336,5 +343,7 @@ function siLoadMenuByCurrentUrl() {
     // 현재 메뉴가 들어있는 큰 메뉴를 열린 상태로 만든다.
     siMenuGroup.classList.add("open");
 }
+
+siLoadMenuByCurrentUrl();
 
 siLoadMenuByCurrentUrl();

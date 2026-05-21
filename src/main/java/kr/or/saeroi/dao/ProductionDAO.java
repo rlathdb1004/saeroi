@@ -196,5 +196,36 @@ public class ProductionDAO {
 				NAMESPACE + "updateProductionResult",
 				productionDTO);
 	}
+	
+	// 공정진행 현황 목록 총 건수를 조회한다.
+	public int selectProcessProgressCount(ProductionDTO productionDTO) {
+
+		return sqlSession.selectOne(
+				NAMESPACE + "selectProcessProgressCount",
+				productionDTO);
+	}
+
+	// 공정진행 현황 목록을 조회한다.
+	public List<ProductionDTO> selectProcessProgressList(ProductionDTO productionDTO) {
+
+		return sqlSession.selectList(
+				NAMESPACE + "selectProcessProgressList",
+				productionDTO);
+	}
+
+	// 공정진행 현황 검색 select box에 사용할 진행상태 목록을 조회한다.
+	public List<String> selectProcessProgressStatusList() {
+
+		return sqlSession.selectList(
+				NAMESPACE + "selectProcessProgressStatusList");
+	}
+	
+	// 공정진행 상세 정보를 조회한다.
+	public ProductionDTO selectProcessProgressDetail(Integer orderId) {
+
+			return sqlSession.selectOne(
+					NAMESPACE + "selectProcessProgressDetail",
+					orderId);
+	}
 }
 
