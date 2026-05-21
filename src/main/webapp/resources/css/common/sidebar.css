@@ -276,33 +276,83 @@ a {
 }
 
 .siMenuSingle {
-    /* 하위 메뉴가 없는 단일 메뉴이다. */
+    /* 하위 메뉴가 없는 단독 메뉴이다. */
     display: block;
+
     /* a 태그를 한 줄 전체를 차지하는 박스처럼 만든다. */
     width: 100%;
-    /* 메뉴 버튼의 가로 길이를 전체로 설정한다. */
-    padding: 11px 12px;
-    /* 메뉴 안쪽 여백을 설정한다. */
-    margin-bottom: 6px;
+
+    /* 선택 표시 막대가 들어갈 수 있도록 왼쪽 여백을 조금 더 준다. */
+    padding: 11px 12px 11px 22px;
+
     /* 메뉴 사이에 간격을 준다. */
-    border-radius: 10px;
+    margin-bottom: 6px;
+
     /* 메뉴 박스의 모서리를 둥글게 만든다. */
-    color: #1F2933;
+    border-radius: 10px;
+
     /* 메뉴 글자색을 진한 회색으로 설정한다. */
-    font-size: 16px;
+    color: #1F2933;
+
     /* 메뉴 글씨 크기를 설정한다. */
-    font-weight: 600;
+    font-size: 16px;
+
     /* 메뉴 글씨를 조금 굵게 설정한다. */
-    text-decoration: none;
+    font-weight: 600;
+
     /* a 태그의 밑줄을 제거한다. */
+    text-decoration: none;
+
+    /* active 상태에서 왼쪽 막대를 넣기 위한 기준 위치이다. */
+    position: relative;
 }
 
 .siMenuSingle:hover {
-    /* 단일 메뉴에 마우스를 올렸을 때의 디자인이다. */
+    /* 단독 메뉴에 마우스를 올렸을 때의 디자인이다. */
     background-color: #E6F2ED;
-    /* 마우스를 올리면 연한 민트 배경이 보이게 한다. */
-    color: #2F7D62;
+
     /* 마우스를 올리면 글씨색을 메인 컬러로 바꾼다. */
+    color: #2F7D62;
+}
+
+.siMenuSingle.active {
+    /* 현재 선택된 단독 메뉴 디자인이다. */
+    background-color: #E6F2ED;
+
+    /* 현재 선택된 메뉴 글자색을 메인 컬러로 설정한다. */
+    color: #2F7D62;
+
+    /* 현재 선택된 메뉴 글씨를 두껍게 만든다. */
+    font-weight: 700;
+}
+
+.siMenuSingle.active::before {
+    /* 현재 선택된 단독 메뉴 왼쪽에 표시되는 초록색 막대이다. */
+    content: "";
+
+    /* 메뉴 안에서 원하는 위치에 고정하기 위해 absolute를 사용한다. */
+    position: absolute;
+
+    /* 왼쪽 안쪽에 막대를 배치한다. */
+    left: 12px;
+
+    /* 세로 가운데에 맞춘다. */
+    top: 50%;
+
+    /* 막대의 가로 두께이다. */
+    width: 3px;
+
+    /* 막대의 세로 길이이다. */
+    height: 18px;
+
+    /* 우리 프로젝트 메인 초록색이다. */
+    background-color: #2F7D62;
+
+    /* 막대 끝부분을 둥글게 만든다. */
+    border-radius: 10px;
+
+    /* top 50% 기준에서 정확히 가운데로 보정한다. */
+    transform: translateY(-50%);
 }
 
 .siMenuGroup {
