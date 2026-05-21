@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	생산관리 Mapper이다.
+	ProductionDAO.java의 NAMESPACE와 반드시 동일해야 한다.
+
+	DAO 기준:
+	private static final String NAMESPACE =
+		"kr.or.saeroi.mapper.ProductionMapper.";
+-->
+<mapper namespace="kr.or.saeroi.mapper.ProductionMapper">
+
+	<!--
+		생산계획 조회 결과를 ProductionDTO에 매핑한다.
+		DB 컬럼명은 대문자 스네이크 케이스이고,
+		DTO 필드명은 카멜 케이스라서 resultMap으로 명확하게 연결한다.
+	-->
+	<resultMap id="productionPlanResultMap"
+		type="kr.or.saeroi.dto.ProductionDTO">
+
+		<!-- production_plan 테이블 컬럼이다. -->
+		<result property="prodPlanId" column="PROD_PLAN_ID" />
+		<result property="prodPlanQty" column="PROD_PLAN_QTY" />
+		<result property="prodPlanDate" column="PROD_PLAN_DATE" />
+		<result property="createdDate" column="CREATED_DATE" />
+		<result property="updatedDate" column="UPDATED_DATE" />
+		<result property="remark" column="REMARK" />
+		<result property="itemId" column="ITEM_ID" />
+		<result property="dueDate" column="DUE_DATE" />
+		<result property="docNo" column="DOC_NO" />
+		<result property="docSeq" column="DOC_SEQ" />
+
+		<!-- item 테이블 조인 컬럼이다. -->
+		<result property="itemCode" column="ITEM_CODE" />
+		<result property="itemName" column="ITEM_NAME" />
+		<result property="itemType" column="ITEM_TYPE" />
+		<result property="itemUnit" column="ITEM_UNIT" />
+
+	</resultMap>
+
+
+	<!--
+		생산계획 검색 조건이다.
+		count 쿼리와 list 쿼리에서 공통으로 사용한다.
+
+		검색어 keyword는 화면에 보이는 주요 컬럼 전체를 검색한다.
+		- 생산계획번호
+		- 생산계획 ID
+		- 계획수량
+		- 계획일자
+		- 납기일
+		- 문서순번
+		- 품목코드
+		- 품목명
+		- 품목구분
+		- 단위
+	-->
+	<sql id="productionPlanSearchCondition">
+
+		<where>
+
+			<!-- 시작일 검색 조건이다. -->
+			<if test="startDate != null and startDate != ''">
+				AND PP.PROD_PLAN_DATE <![CDATA[>=]]> TO_DATE(#{startDate}, 'YYYY-MM-DD')
+			</if>
+
+			<!-- 종료일 검색 조건이다. 종료일 당일까지 포함한다. -->
+			<if test="endDate != null and endDate != ''">
+				AND PP.PROD_PLAN_DATE <![CDATA[<]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+			</if>
+
+			<!-- 품목 구분 검색 조건이다. -->
+			<if test="itemType != null and itemType != ''">
+				AND I.ITEM_TYPE = #{itemType}
+			</if>
+
+			<!-- 검색어 조건이다. -->
+			<if test="keyword != null and keyword != ''">
+				AND (
+					<!-- 생산계획번호 검색이다. -->
+					PP.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+
+					<!-- 생산계획 ID 검색이다. -->
+					OR TO_CHAR(PP.PROD_PLAN_ID) LIKE '%' || REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
+
+					<!-- 계획수량 검색이다. 숫자 컬럼이라 TO_CHAR로 문자 변환 후 검색한다. -->
+					OR TO_CHAR(PP.PROD_PLAN_QTY, 'FM9999999999999990') LIKE '%' || REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
+
+					<!-- 계획일자 검색이다. -->
+					OR TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') LIKE '%' || TRIM(#{keyword}) || '%'
+
+					<!-- 납기일 검색이다. -->
+					OR TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') LIKE '%' || TRIM(#{keyword}) || '%'
+
+					<!-- 문서순번 검색이다. -->
+					OR TO_CHAR(PP.DOC_SEQ) LIKE '%' || REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
+
+					<!-- 품목코드 검색이다. -->
+					OR I.ITEM_CODE LIKE '%' || TRIM(#{keyword}) || '%'
+
+					<!-- 품목명 검색이다. -->
+					OR I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+
+					<!-- 품목구분 검색이다. -->
+					OR I.ITEM_TYPE LIKE '%' || TRIM(#{keyword}) || '%'
+
+					<!-- 단위 검색이다. -->
+					OR I.ITEM_UNIT LIKE '%' || TRIM(#{keyword}) || '%'
+				)
+			</if>
+
+		</where>
+
+	</sql>
+
+
+	<!--
+		생산계획 목록 총 건수를 조회한다.
+		검색 조건이 들어오면 count에도 동일하게 반영해야
+		페이징 총 건수와 실제 목록이 일치한다.
+	-->
+	<select id="selectProductionPlanCount"
+		parameterType="kr.or.saeroi.dto.ProductionDTO"
+		resultType="int">
+
+		SELECT COUNT(*)
+		FROM PRODUCTION_PLAN PP
+		JOIN ITEM I
+		  ON PP.ITEM_ID = I.ITEM_ID
+
+		<include refid="productionPlanSearchCondition" />
+
+	</select>
+
+
+	<!--
+		생산계획 목록을 조회한다.
+		Oracle ROWNUM 방식으로 현재 페이지에 필요한 데이터만 가져온다.
+	-->
+	<select id="selectProductionPlanList"
+		parameterType="kr.or.saeroi.dto.ProductionDTO"
+		resultMap="productionPlanResultMap">
+
+		SELECT *
+		FROM (
+			SELECT PLAN_LIST.*,
+				   ROWNUM AS RN
+			FROM (
+				SELECT
+					PP.PROD_PLAN_ID,
+					PP.PROD_PLAN_QTY,
+					TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS PROD_PLAN_DATE,
+					TO_CHAR(PP.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
+					TO_CHAR(PP.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
+					PP.REMARK,
+					PP.ITEM_ID,
+					TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
+					PP.DOC_NO,
+					PP.DOC_SEQ,
+					I.ITEM_CODE,
+					I.ITEM_NAME,
+					I.ITEM_TYPE,
+					I.ITEM_UNIT
+				FROM PRODUCTION_PLAN PP
+				JOIN ITEM I
+				  ON PP.ITEM_ID = I.ITEM_ID
+
+				<include refid="productionPlanSearchCondition" />
+
+				ORDER BY PP.PROD_PLAN_DATE DESC,
+						 PP.PROD_PLAN_ID DESC
+			) PLAN_LIST
+			WHERE ROWNUM <![CDATA[<=]]> #{endRow}
+		)
+		WHERE RN <![CDATA[>=]]> #{startRow}
+
+	</select>
+
+
+	<!--
+		검색 조건 select box에 사용할 품목 구분 목록을 조회한다.
+		하드코딩하지 않고 item 테이블에 있는 값 기준으로 출력한다.
+	-->
+	<select id="selectItemTypeList"
+		resultType="string">
+
+		SELECT DISTINCT ITEM_TYPE
+		FROM ITEM
+		WHERE ITEM_TYPE IS NOT NULL
+		ORDER BY ITEM_TYPE ASC
+
+	</select>
+	
+	<!-- 생산계획 상세 정보를 조회한다. -->
+<select id="selectProductionPlanDetail"
+	parameterType="int"
+	resultMap="productionPlanResultMap">
+
+	SELECT
+		PP.PROD_PLAN_ID,
+		PP.PROD_PLAN_QTY,
+		TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS PROD_PLAN_DATE,
+		TO_CHAR(PP.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
+		TO_CHAR(PP.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
+		PP.REMARK,
+		PP.ITEM_ID,
+		TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
+		PP.DOC_NO,
+		PP.DOC_SEQ,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT
+	FROM PRODUCTION_PLAN PP
+	JOIN ITEM I
+	  ON PP.ITEM_ID = I.ITEM_ID
+	WHERE PP.PROD_PLAN_ID = #{prodPlanId}
+
+</select>
+
+
+<!-- 생산계획 정보를 수정한다. -->
+<update id="updateProductionPlan"
+	parameterType="kr.or.saeroi.dto.ProductionDTO">
+
+	UPDATE PRODUCTION_PLAN
+	SET
+		PROD_PLAN_QTY = #{prodPlanQty},
+		PROD_PLAN_DATE = TO_DATE(#{prodPlanDate}, 'YYYY-MM-DD'),
+		DUE_DATE = TO_DATE(#{dueDate}, 'YYYY-MM-DD'),
+		REMARK = #{remark},
+		UPDATED_DATE = SYSDATE
+	WHERE PROD_PLAN_ID = #{prodPlanId}
+
+</update>
+
+
+</mapper>
