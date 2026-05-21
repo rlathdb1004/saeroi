@@ -53,7 +53,7 @@
 					<%-- 검색어 입력 영역이다. --%>
 
 					<label class="search-label">검색어</label> <input type="text"
-						name="keyword" class="search-input" placeholder="내용을 입력하세요."
+						name="keyword" class="search-input" placeholder="검색 키워드"
 						value="${keyword}">
 
 				</div>

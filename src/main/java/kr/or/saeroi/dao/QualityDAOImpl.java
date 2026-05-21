@@ -8,6 +8,7 @@ import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import kr.or.saeroi.dto.DefectDTO;
 import kr.or.saeroi.dto.InspectionDTO;
 
 //DAO 인터페이스 기능들을 mybatis와 연결
@@ -125,5 +126,23 @@ public class QualityDAOImpl implements QualityDAO {
 		int update_result = sqlSession.update("mapper.quality._update_Inspection", param);
 
 		return update_result;
+	}
+
+	// 불량 목록
+	@Override
+	public List<DefectDTO> _dao_select_Defect(String startDate, String endDate, String searchType, String keyword) {
+
+		Map<String, Object> map = new HashMap<String, Object>();
+
+		map.put("startDate", startDate);
+		map.put("endDate", endDate);
+		map.put("searchType", searchType);
+		map.put("keyword", keyword);
+
+		List<DefectDTO> defect_list = sqlSession.selectList("mapper.quality._select_Defect", map);
+
+		System.out.println("defect_list 실행 건수: " + defect_list.size());
+
+		return defect_list;
 	}
 }

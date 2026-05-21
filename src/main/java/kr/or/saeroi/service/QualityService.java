@@ -2,10 +2,13 @@ package kr.or.saeroi.service;
 
 import java.util.List;
 
+import kr.or.saeroi.dto.DefectDTO;
 import kr.or.saeroi.dto.InspectionDTO;
 
 public interface QualityService {
-	// 전체 목록
+	// 검사 목록
+	//검색조건에 맞는 전체목록을 가져옴 -> 가져온 값들을 컨트롤러에서 페이지 자름
+	//그러므로 여기엔 페이징 관련 전달인자가 없음
 	List<InspectionDTO> _ser_select_Inspection(String startDate, String endDate, String searchType, String keyword);
 
 	// 구분 옵션에 따른 목록
@@ -28,4 +31,7 @@ public interface QualityService {
 	// 검사 수정
 	int _ser_update_Inspection(String insp_id, String insp_date, String insp_type, String result,
 	        String inspection_qty, String good_qty, String remark);
+
+	//불량 목록
+	List<DefectDTO> _ser_select_Defect(String startDate, String endDate, String searchType, String keyword);
 }
