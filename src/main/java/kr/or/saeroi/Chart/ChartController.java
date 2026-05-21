@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -18,19 +19,24 @@ public class ChartController {
 	ChartService chartService;
 	
 	@RequestMapping("/productionreport")
-	public String Chart() {
+	public String Chart(Model model) {
 		
+		List<Map<String,Object>> item = chartService.itemList();
+		model.addAttribute("item", item);
 		return "report/productionreport.tiles";
 	}
 	
 	@RequestMapping("/chart_bar")
 	@ResponseBody
 	public Map<String, Object> chartday(
-			@RequestParam(value="searchType", defaultValue="month")String searchType) {
+			@RequestParam(value="searchType", defaultValue="month")String searchType,
+			@RequestParam(value="searchItem", defaultValue="all")String searchItem
+			) {
 		Map<String, Object> chartData = new HashMap<>();
-		
-		List<Map<String, Object>> list = chartService.chartday(searchType);
+		System.out.println("컨트롤"+searchItem);
+		List<Map<String, Object>> list = chartService.chartday(searchType,searchItem);
 		chartData.put("chartList", list);
+		System.out.println("list"+list);
 		return chartData;
 	}
 	
