@@ -34,6 +34,9 @@ public class ProductionDTO {
 	// production_plan 테이블의 생산계획 문서번호이다.
 	private String docNo;
 
+	// 작업지시 상세에서 보여줄 생산계획 문서번호이다.
+	private String prodPlanDocNo;
+		
 	// production_plan 테이블의 문서 순번이다.
 	private Integer docSeq;
 
@@ -63,4 +66,59 @@ public class ProductionDTO {
 
 	// Oracle ROWNUM 페이징 마지막 행 번호이다.
 	private Integer endRow;
+
+	// work_order 테이블의 작업지시 ID이다.
+	private Integer orderId;
+
+	// work_order 테이블의 생산라인 ID이다.
+	private Integer lineId;
+
+	// work_order 테이블의 담당자 ID이다.
+	private Integer empId;
+
+	// work_order 테이블의 완제품 LOT 번호이다.
+	private String productLot;
+
+	// work_order 테이블의 작업지시 수량이다.
+	private Integer orderQty;
+
+	// work_order 테이블의 작업지시 일자이다.
+	private String orderDate;
+
+	// production 테이블의 생산 상태이다.
+	private String prodStatus;
+
+	// line 테이블의 라인 코드이다.
+	private String lineCode;
+
+	// line 테이블의 라인명이다.
+	private String lineName;
+
+	// emp 테이블의 사원번호이다.
+	private String empno;
+
+	// emp 테이블의 사원명이다.
+	private String ename;
+
+	// emp 테이블의 부서명이다.
+	private String dept;
+
+	// emp 테이블의 직무명이다.
+	private String job;
+	
+	// production 테이블의 생산실적 ID이다.
+	private Integer prodId;
+
+	// production 테이블의 생산일자이다.
+	private String prodDate;
+
+	// production 테이블의 생산수량이다.
+	private Integer prodQty;
+
+	// production 테이블의 불량수량이다.
+	private Integer lossQty;
+
+	// 작업지시 문서번호를 따로 보여주기 위한 값이다.
+	private String workOrderDocNo;
+	
 }
