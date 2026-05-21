@@ -101,25 +101,74 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 					sql += " AND ( ";
 
+					// =====================================================
+					// 기본 검색
+					// =====================================================
+
 					sql += "     I.ITEM_CODE LIKE ? ";
 					sql += "     OR I.ITEM_NAME LIKE ? ";
 					sql += "     OR INV.STOCK_LOCATION LIKE ? ";
 					sql += "     OR INV.REMARK LIKE ? ";
+					sql += "     OR I.ITEM_UNIT LIKE ? ";
 
-					sql += "     OR ( ";
-					sql += "         I.ITEM_TYPE = 'FG' ";
-					sql += "         AND ? LIKE '%완제품%' ";
-					sql += "     ) ";
+					// =====================================================
+					// 숫자 검색
+					// 재고수량 정확검색
+					// =====================================================
 
-					sql += "     OR ( ";
-					sql += "         (I.ITEM_TYPE = 'RM' ";
-					sql += "          OR I.ITEM_TYPE = 'SM') ";
-					sql += "         AND ? LIKE '%원자재%' ";
-					sql += "     ) ";
+					boolean isNumber = false;
+
+					try {
+
+						Integer.parseInt(keyword);
+
+						isNumber = true;
+
+					} catch (Exception e) {
+
+						isNumber = false;
+					}
+
+					if (isNumber) {
+
+						sql += " OR INV.INVENTORY_STOCK = ? ";
+					}
+
+					// =====================================================
+					// 완제품 검색
+					// =====================================================
+
+					sql += " OR ( ";
+					sql += "     I.ITEM_TYPE = 'FG' ";
+					sql += "     AND ? LIKE '%완제품%' ";
+					sql += " ) ";
+
+					// =====================================================
+					// 원자재 검색
+					// RM만 원자재 처리
+					// =====================================================
+
+					sql += " OR ( ";
+					sql += "     I.ITEM_TYPE = 'RM' ";
+					sql += "     AND ? LIKE '%원자재%' ";
+					sql += " ) ";
+
+					// =====================================================
+					// 부자재 검색
+					// =====================================================
+
+					sql += " OR ( ";
+					sql += "     I.ITEM_TYPE = 'SM' ";
+					sql += "     AND ? LIKE '%부자재%' ";
+					sql += " ) ";
 
 					sql += " ) ";
 				}
 			}
+
+			// =============================================================
+			// 최신순 정렬
+			// =============================================================
 
 			sql += " ORDER BY INV.INVENTORY_ID DESC ";
 
@@ -154,11 +203,19 @@ public class InventoryDAOImpl implements InventoryDAO {
 				String likeKey =
 					"%" + keyword.trim() + "%";
 
+				// =========================================================
+				// 단일 검색
+				// =========================================================
+
 				if ("itemCode".equals(searchType)
 					|| "itemName".equals(searchType)) {
 
 					pstmt.setString(idx++, likeKey);
 				}
+
+				// =========================================================
+				// 전체 검색
+				// =========================================================
 
 				else {
 
@@ -166,7 +223,28 @@ public class InventoryDAOImpl implements InventoryDAO {
 					pstmt.setString(idx++, likeKey);
 					pstmt.setString(idx++, likeKey);
 					pstmt.setString(idx++, likeKey);
+					pstmt.setString(idx++, likeKey);
 
+					// =====================================================
+					// 숫자 검색 바인딩
+					// =====================================================
+
+					try {
+
+						pstmt.setInt(
+							idx++,
+							Integer.parseInt(keyword.trim()));
+
+					} catch (Exception e) {
+
+						// 숫자 아닐 경우 무시
+					}
+
+					// =====================================================
+					// 품목유형 검색
+					// =====================================================
+
+					pstmt.setString(idx++, keyword);
 					pstmt.setString(idx++, keyword);
 					pstmt.setString(idx++, keyword);
 				}
@@ -224,8 +302,6 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 	// =========================================================================
 	// 등록 모달 품목 리스트 조회
-	// - 품목 선택 시 창고위치 자동입력
-	// - 등록 오류 안나게 수정 완료
 	// =========================================================================
 	@Override
 	public List<InventoryDTO> selectItemList() {
@@ -240,21 +316,12 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 			String sql = "";
 
-			// =============================================================
-			// ITEM + INVENTORY LEFT JOIN
-			// =============================================================
-
 			sql += " SELECT ";
 			sql += "     I.ITEM_ID, ";
 			sql += "     I.ITEM_CODE, ";
 			sql += "     I.ITEM_NAME, ";
 			sql += "     I.ITEM_TYPE, ";
 			sql += "     I.ITEM_UNIT, ";
-
-			// =============================================================
-			// INVENTORY 테이블에서 창고위치 가져오기
-			// 값 없으면 공백 처리
-			// =============================================================
 
 			sql += "     NVL(MAX(INV.STOCK_LOCATION), '') ";
 			sql += "         AS STOCK_LOCATION ";
@@ -263,10 +330,6 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 			sql += " LEFT JOIN INVENTORY INV ";
 			sql += "     ON I.ITEM_ID = INV.ITEM_ID ";
-
-			// =============================================================
-			// GROUP BY
-			// =============================================================
 
 			sql += " GROUP BY ";
 			sql += "     I.ITEM_ID, ";
@@ -302,10 +365,6 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 				dto.setItemUnit(
 					rs.getString("ITEM_UNIT"));
-
-				// =========================================================
-				// 창고위치 추가
-				// =========================================================
 
 				dto.setStockLocation(
 					rs.getString("STOCK_LOCATION"));
@@ -404,11 +463,8 @@ public class InventoryDAOImpl implements InventoryDAO {
 				conn.prepareStatement(sql);
 
 			pstmt.setInt(1, dto.getItemId());
-
 			pstmt.setInt(2, dto.getInventoryStock());
-
 			pstmt.setString(3, dto.getStockLocation());
-
 			pstmt.setString(4, dto.getRemark());
 
 			result =
