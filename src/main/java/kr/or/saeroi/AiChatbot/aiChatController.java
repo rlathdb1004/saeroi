@@ -31,6 +31,7 @@ public class aiChatController {
 		for(Map<String, Object> msg : params) {
 			String role = (String) msg.get("role");
 			String text = (String) msg.get("text");
+			
 			history.add(new aiChatContents(role,text));
 		}
 		return aiChatservice.getChatResponse(history);
