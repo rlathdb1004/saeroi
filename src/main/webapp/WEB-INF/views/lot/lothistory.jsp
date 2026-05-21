@@ -34,7 +34,7 @@
 				</div>
 
 				<div class="search-item">
-					<label class="search-label">진행상태</label>
+					<label class="search-label">구분</label>
 
 					<select name="progressStatus"
 						class="search-select">
