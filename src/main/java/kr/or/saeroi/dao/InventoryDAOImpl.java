@@ -63,6 +63,13 @@ public class InventoryDAOImpl implements InventoryDAO {
 			sql += " WHERE 1=1 ";
 
 			// =============================================================
+			// 원자재(RM), 완제품(FG)만 조회
+			// 부자재(SM) 제외
+			// =============================================================
+
+			sql += " AND I.ITEM_TYPE IN ('RM', 'FG') ";
+
+			// =============================================================
 			// 날짜 검색
 			// =============================================================
 
@@ -82,27 +89,40 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 			// =============================================================
 			// 검색 기능
+			// 구분 선택 안해도 전체 컬럼 검색 가능
 			// =============================================================
 
 			if (keyword != null
 				&& !"".equals(keyword.trim())) {
+
+				// =========================================================
+				// 품목코드 검색
+				// =========================================================
 
 				if ("itemCode".equals(searchType)) {
 
 					sql += " AND I.ITEM_CODE LIKE ? ";
 				}
 
+				// =========================================================
+				// 품목명 검색
+				// =========================================================
+
 				else if ("itemName".equals(searchType)) {
 
 					sql += " AND I.ITEM_NAME LIKE ? ";
 				}
+
+				// =========================================================
+				// 전체 검색
+				// =========================================================
 
 				else {
 
 					sql += " AND ( ";
 
 					// =====================================================
-					// 기본 검색
+					// 기본 문자열 검색
 					// =====================================================
 
 					sql += "     I.ITEM_CODE LIKE ? ";
@@ -112,15 +132,26 @@ public class InventoryDAOImpl implements InventoryDAO {
 					sql += "     OR I.ITEM_UNIT LIKE ? ";
 
 					// =====================================================
+					// 품목유형 한글 검색
+					// 원자재 / 완제품 검색 가능
+					// =====================================================
+
+					sql += "     OR CASE ";
+					sql += "         WHEN I.ITEM_TYPE = 'RM' THEN '원자재' ";
+					sql += "         WHEN I.ITEM_TYPE = 'FG' THEN '완제품' ";
+					sql += "         ELSE I.ITEM_TYPE ";
+					sql += "     END LIKE ? ";
+
+					// =====================================================
 					// 숫자 검색
-					// 재고수량 정확검색
+					// 현재재고 정확검색
 					// =====================================================
 
 					boolean isNumber = false;
 
 					try {
 
-						Integer.parseInt(keyword);
+						Integer.parseInt(keyword.trim());
 
 						isNumber = true;
 
@@ -133,34 +164,6 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 						sql += " OR INV.INVENTORY_STOCK = ? ";
 					}
-
-					// =====================================================
-					// 완제품 검색
-					// =====================================================
-
-					sql += " OR ( ";
-					sql += "     I.ITEM_TYPE = 'FG' ";
-					sql += "     AND ? LIKE '%완제품%' ";
-					sql += " ) ";
-
-					// =====================================================
-					// 원자재 검색
-					// RM만 원자재 처리
-					// =====================================================
-
-					sql += " OR ( ";
-					sql += "     I.ITEM_TYPE = 'RM' ";
-					sql += "     AND ? LIKE '%원자재%' ";
-					sql += " ) ";
-
-					// =====================================================
-					// 부자재 검색
-					// =====================================================
-
-					sql += " OR ( ";
-					sql += "     I.ITEM_TYPE = 'SM' ";
-					sql += "     AND ? LIKE '%부자재%' ";
-					sql += " ) ";
 
 					sql += " ) ";
 				}
@@ -219,11 +222,12 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 				else {
 
-					pstmt.setString(idx++, likeKey);
-					pstmt.setString(idx++, likeKey);
-					pstmt.setString(idx++, likeKey);
-					pstmt.setString(idx++, likeKey);
-					pstmt.setString(idx++, likeKey);
+					pstmt.setString(idx++, likeKey); // 품목코드
+					pstmt.setString(idx++, likeKey); // 품목명
+					pstmt.setString(idx++, likeKey); // 창고위치
+					pstmt.setString(idx++, likeKey); // 비고
+					pstmt.setString(idx++, likeKey); // 단위
+					pstmt.setString(idx++, likeKey); // 품목유형
 
 					// =====================================================
 					// 숫자 검색 바인딩
@@ -239,14 +243,6 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 						// 숫자 아닐 경우 무시
 					}
-
-					// =====================================================
-					// 품목유형 검색
-					// =====================================================
-
-					pstmt.setString(idx++, keyword);
-					pstmt.setString(idx++, keyword);
-					pstmt.setString(idx++, keyword);
 				}
 			}
 
