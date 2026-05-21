@@ -8,7 +8,7 @@
 #chatbot-launcher {
 	position: fixed;
 	bottom: 30px;
-	right: 30px;
+	left: 30px;
 	width: 60px;
 	height: 60px;
 	background-color: #2f7d62;
@@ -161,10 +161,6 @@
 </style>
 
 
-<div style="padding: 20px;">
-	<h2>공장 MES 시스템 메인 화면</h2>
-	<p>챗봇은 우측 하단의 아이콘을 누르면 동작합니다.</p>
-</div>
 
 <div id="chatbot-launcher" id="open-chatbot">
 	<i class="fa-solid fa-comments"></i>
@@ -214,7 +210,7 @@
 		
 		 async function message(){
 				let prompt = document.querySelector('#prompt');
-				let url = "gemini";
+				let url = contextPath + "/gemini";
 				
 				let promptValue = prompt.value.trim();
 				if (!promptValue) return
