@@ -13,21 +13,34 @@ import org.springframework.stereotype.Repository;
 
 import kr.or.saeroi.dto.InoutDTO;
 
+// =============================================================
 // 입출고 DAO 구현 클래스
+// =============================================================
 @Repository
 public class InoutDAOImpl implements InoutDAO {
 
+	// =============================================================
+	// DB 연결
+	// =============================================================
 	private Connection getConnection() throws Exception {
 
 		Class.forName("oracle.jdbc.driver.OracleDriver");
 
-		String url = "jdbc:oracle:thin:@//125.181.132.133:51521/xe";
+		String url =
+				"jdbc:oracle:thin:@//125.181.132.133:51521/xe";
+
 		String id = "tofhdl";
 		String pw = "rlatofhdl";
 
-		return DriverManager.getConnection(url, id, pw);
+		return DriverManager.getConnection(
+				url,
+				id,
+				pw);
 	}
 
+	// =============================================================
+	// 입출고 목록 조회 오버로딩
+	// =============================================================
 	@Override
 	public List<InoutDTO> selectInoutList(
 			String searchType,
@@ -36,6 +49,10 @@ public class InoutDAOImpl implements InoutDAO {
 			String endDate) {
 
 		String inoutType = "";
+
+		// =========================================================
+		// 검색어에 입고 / 출고 직접 입력 시 처리
+		// =========================================================
 
 		if ("입고".equals(keyword)) {
 
@@ -56,6 +73,9 @@ public class InoutDAOImpl implements InoutDAO {
 				endDate);
 	}
 
+	// =============================================================
+	// 입출고 목록 조회
+	// =============================================================
 	@Override
 	public List<InoutDTO> selectInoutList(
 			String searchType,
@@ -67,9 +87,9 @@ public class InoutDAOImpl implements InoutDAO {
 		List<InoutDTO> list =
 				new ArrayList<InoutDTO>();
 
-		// =============================================================
+		// =========================================================
 		// 검색어에 입고 / 출고 직접 입력 시 처리
-		// =============================================================
+		// =========================================================
 
 		if ((inoutType == null || inoutType.equals(""))
 				&& keyword != null) {
@@ -115,9 +135,9 @@ public class InoutDAOImpl implements InoutDAO {
 
 			sql += " WHERE 1 = 1 ";
 
-			// =============================================================
-			// 입고 / 출고 타입 검색
-			// =============================================================
+			// =========================================================
+			// 입출고 타입 검색
+			// =========================================================
 
 			if (inoutType != null
 					&& !inoutType.equals("")) {
@@ -125,18 +145,14 @@ public class InoutDAOImpl implements InoutDAO {
 				sql += " AND MI.INOUT_TYPE = ? ";
 			}
 
-			// =============================================================
+			// =========================================================
 			// 검색 기능
-			// =============================================================
+			// =========================================================
 
 			if (keyword != null
 					&& !keyword.trim().equals("")) {
 
 				keyword = keyword.trim();
-
-				// =========================================================
-				// 숫자 여부 확인
-				// =========================================================
 
 				boolean isNumber = false;
 
@@ -151,36 +167,36 @@ public class InoutDAOImpl implements InoutDAO {
 					isNumber = false;
 				}
 
-				// =========================================================
+				// =====================================================
 				// 품목코드 검색
-				// =========================================================
+				// =====================================================
 
 				if ("itemCode".equals(searchType)) {
 
 					sql += " AND I.ITEM_CODE LIKE ? ";
 				}
 
-				// =========================================================
+				// =====================================================
 				// 품목명 검색
-				// =========================================================
+				// =====================================================
 
 				else if ("itemName".equals(searchType)) {
 
 					sql += " AND I.ITEM_NAME LIKE ? ";
 				}
 
-				// =========================================================
-				// 숫자 검색 시 입출고량만 정확검색
-				// =========================================================
+				// =====================================================
+				// 숫자 검색 시 입출고량 정확검색
+				// =====================================================
 
 				else if (isNumber) {
 
 					sql += " AND MI.INOUT_QTY = ? ";
 				}
 
-				// =========================================================
-				// 일반 문자열 검색
-				// =========================================================
+				// =====================================================
+				// 전체 검색
+				// =====================================================
 
 				else {
 
@@ -222,9 +238,9 @@ public class InoutDAOImpl implements InoutDAO {
 				}
 			}
 
-			// =============================================================
+			// =========================================================
 			// 날짜 검색
-			// =============================================================
+			// =========================================================
 
 			if (startDate != null
 					&& !startDate.equals("")) {
@@ -240,9 +256,9 @@ public class InoutDAOImpl implements InoutDAO {
 				sql += " TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			// =============================================================
+			// =========================================================
 			// 최신순 정렬
-			// =============================================================
+			// =========================================================
 
 			sql += " ORDER BY MI.INOUT_ID DESC ";
 
@@ -251,9 +267,9 @@ public class InoutDAOImpl implements InoutDAO {
 
 			int idx = 1;
 
-			// =============================================================
+			// =========================================================
 			// 입출고 타입 바인딩
-			// =============================================================
+			// =========================================================
 
 			if (inoutType != null
 					&& !inoutType.equals("")) {
@@ -261,9 +277,9 @@ public class InoutDAOImpl implements InoutDAO {
 				pstmt.setString(idx++, inoutType);
 			}
 
-			// =============================================================
+			// =========================================================
 			// 검색어 바인딩
-			// =============================================================
+			// =========================================================
 
 			if (keyword != null
 					&& !keyword.trim().equals("")) {
@@ -299,10 +315,7 @@ public class InoutDAOImpl implements InoutDAO {
 							"%" + keyword + "%");
 				}
 
-				// =========================================================
-				// 숫자 검색 시 입출고량만 정확검색
-				// =========================================================
-
+				// 숫자 검색
 				else if (isNumber) {
 
 					pstmt.setInt(
@@ -310,10 +323,7 @@ public class InoutDAOImpl implements InoutDAO {
 							Integer.parseInt(keyword));
 				}
 
-				// =========================================================
-				// 일반 문자열 검색
-				// =========================================================
-
+				// 전체 검색
 				else {
 
 					pstmt.setString(idx++, "%" + keyword + "%");
@@ -328,9 +338,9 @@ public class InoutDAOImpl implements InoutDAO {
 				}
 			}
 
-			// =============================================================
+			// =========================================================
 			// 날짜 바인딩
-			// =============================================================
+			// =========================================================
 
 			if (startDate != null
 					&& !startDate.equals("")) {
@@ -344,28 +354,59 @@ public class InoutDAOImpl implements InoutDAO {
 				pstmt.setString(idx++, endDate);
 			}
 
-			ResultSet rs = pstmt.executeQuery();
+			ResultSet rs =
+					pstmt.executeQuery();
+
+			// =========================================================
+			// 결과 DTO 저장
+			// =========================================================
 
 			while (rs.next()) {
 
-				InoutDTO dto = new InoutDTO();
+				InoutDTO dto =
+						new InoutDTO();
 
-				dto.setInoutId(rs.getInt("INOUT_ID"));
-				dto.setInoutType(rs.getString("INOUT_TYPE"));
-				dto.setMaterialLot(rs.getString("MATERIAL_LOT"));
-				dto.setInoutQty(rs.getInt("INOUT_QTY"));
-				dto.setInoutDate(rs.getDate("INOUT_DATE"));
-				dto.setRemark(rs.getString("REMARK"));
-				dto.setStatus(rs.getString("STATUS"));
-				dto.setItemId(rs.getInt("ITEM_ID"));
+				dto.setInoutId(
+						rs.getInt("INOUT_ID"));
 
-				dto.setDocNo(rs.getString("DOC_NO"));
-				dto.setDocSeq(rs.getInt("DOC_SEQ"));
+				dto.setInoutType(
+						rs.getString("INOUT_TYPE"));
 
-				dto.setItemCode(rs.getString("ITEM_CODE"));
-				dto.setItemName(rs.getString("ITEM_NAME"));
-				dto.setItemType(rs.getString("ITEM_TYPE"));
-				dto.setItemUnit(rs.getString("ITEM_UNIT"));
+				dto.setMaterialLot(
+						rs.getString("MATERIAL_LOT"));
+
+				dto.setInoutQty(
+						rs.getInt("INOUT_QTY"));
+
+				dto.setInoutDate(
+						rs.getDate("INOUT_DATE"));
+
+				dto.setRemark(
+						rs.getString("REMARK"));
+
+				dto.setStatus(
+						rs.getString("STATUS"));
+
+				dto.setItemId(
+						rs.getInt("ITEM_ID"));
+
+				dto.setDocNo(
+						rs.getString("DOC_NO"));
+
+				dto.setDocSeq(
+						rs.getInt("DOC_SEQ"));
+
+				dto.setItemCode(
+						rs.getString("ITEM_CODE"));
+
+				dto.setItemName(
+						rs.getString("ITEM_NAME"));
+
+				dto.setItemType(
+						rs.getString("ITEM_TYPE"));
+
+				dto.setItemUnit(
+						rs.getString("ITEM_UNIT"));
 
 				list.add(dto);
 			}
@@ -382,6 +423,197 @@ public class InoutDAOImpl implements InoutDAO {
 		return list;
 	}
 
+	// =============================================================
+	// 입출고 상세조회
+	// =============================================================
+	@Override
+	public InoutDTO selectInoutDetail(int inoutId) {
+
+		InoutDTO dto = null;
+
+		try {
+
+			Connection conn = getConnection();
+
+			String sql = "";
+
+			sql += " SELECT ";
+			sql += "     MI.INOUT_ID, ";
+			sql += "     MI.INOUT_TYPE, ";
+			sql += "     MI.MATERIAL_LOT, ";
+			sql += "     MI.INOUT_QTY, ";
+			sql += "     MI.INOUT_DATE, ";
+			sql += "     MI.REMARK, ";
+			sql += "     MI.STATUS, ";
+			sql += "     MI.ITEM_ID, ";
+			sql += "     MI.DOC_NO, ";
+			sql += "     MI.DOC_SEQ, ";
+
+			sql += "     I.ITEM_CODE, ";
+			sql += "     I.ITEM_NAME, ";
+			sql += "     I.ITEM_TYPE, ";
+			sql += "     I.ITEM_UNIT ";
+
+			sql += " FROM MATERIAL_INOUT MI ";
+
+			sql += " JOIN ITEM I ";
+			sql += " ON MI.ITEM_ID = I.ITEM_ID ";
+
+			sql += " WHERE MI.INOUT_ID = ? ";
+
+			PreparedStatement pstmt =
+					conn.prepareStatement(sql);
+
+			pstmt.setInt(1, inoutId);
+
+			ResultSet rs =
+					pstmt.executeQuery();
+
+			// =========================================================
+			// 상세 데이터 저장
+			// =========================================================
+
+			if (rs.next()) {
+
+				dto = new InoutDTO();
+
+				dto.setInoutId(
+						rs.getInt("INOUT_ID"));
+
+				dto.setInoutType(
+						rs.getString("INOUT_TYPE"));
+
+				dto.setMaterialLot(
+						rs.getString("MATERIAL_LOT"));
+
+				dto.setInoutQty(
+						rs.getInt("INOUT_QTY"));
+
+				dto.setInoutDate(
+						rs.getDate("INOUT_DATE"));
+
+				dto.setRemark(
+						rs.getString("REMARK"));
+
+				dto.setStatus(
+						rs.getString("STATUS"));
+
+				dto.setItemId(
+						rs.getInt("ITEM_ID"));
+
+				dto.setDocNo(
+						rs.getString("DOC_NO"));
+
+				dto.setDocSeq(
+						rs.getInt("DOC_SEQ"));
+
+				dto.setItemCode(
+						rs.getString("ITEM_CODE"));
+
+				dto.setItemName(
+						rs.getString("ITEM_NAME"));
+
+				dto.setItemType(
+						rs.getString("ITEM_TYPE"));
+
+				dto.setItemUnit(
+						rs.getString("ITEM_UNIT"));
+			}
+
+			rs.close();
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return dto;
+	}
+
+	// =============================================================
+	// 입출고 수정
+	// =============================================================
+	@Override
+	public int updateInout(InoutDTO dto) {
+
+		int result = 0;
+
+		try {
+
+			Connection conn =
+					getConnection();
+
+			// =====================================================
+			// 입출고 수정 SQL
+			// =====================================================
+
+			String sql = "";
+
+			sql += " UPDATE MATERIAL_INOUT ";
+			sql += " SET ";
+			sql += "     INOUT_TYPE = ?, ";
+			sql += "     INOUT_QTY = ?, ";
+			sql += "     INOUT_DATE = ?, ";
+			sql += "     REMARK = ? ";
+			sql += " WHERE INOUT_ID = ? ";
+
+			PreparedStatement pstmt =
+					conn.prepareStatement(sql);
+
+			int idx = 1;
+
+			// =====================================================
+			// 수정 데이터 바인딩
+			// =====================================================
+
+			pstmt.setString(
+					idx++,
+					dto.getInoutType());
+
+			pstmt.setInt(
+					idx++,
+					dto.getInoutQty());
+
+			pstmt.setDate(
+					idx++,
+					dto.getInoutDate());
+
+			pstmt.setString(
+					idx++,
+					dto.getRemark());
+
+			// =====================================================
+			// 수정할 입출고번호
+			// =====================================================
+
+			pstmt.setInt(
+					idx++,
+					dto.getInoutId());
+
+			// =====================================================
+			// 수정 실행
+			// =====================================================
+
+			result =
+					pstmt.executeUpdate();
+
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	// =============================================================
+	// 이하 기존 코드 그대로 유지
+	// =============================================================
+
 	@Override
 	public int selectInoutCount(
 			String searchType,
@@ -390,42 +622,24 @@ public class InoutDAOImpl implements InoutDAO {
 			String startDate,
 			String endDate) {
 
-		// 기존 코드 그대로 유지
 		return 0;
 	}
 
 	@Override
 	public List<InoutDTO> selectItemList() {
 
-		// 기존 코드 그대로 유지
 		return null;
 	}
 
 	@Override
 	public int insertInout(InoutDTO dto) {
 
-		// 기존 코드 그대로 유지
 		return 0;
-	}
-
-	@Override
-	public InoutDTO selectInoutDetail(int inoutId) {
-
-		// 기존 코드 그대로 유지
-		return null;
 	}
 
 	@Override
 	public int deleteInout(String[] inoutIds) {
 
-		// 기존 코드 그대로 유지
-		return 0;
-	}
-
-	@Override
-	public int updateInout(InoutDTO dto) {
-
-		// 기존 코드 그대로 유지
 		return 0;
 	}
 }
