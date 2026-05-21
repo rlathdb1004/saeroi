@@ -58,6 +58,11 @@ public class aiChatService {
 //			HttpEntity<aiChatText> entity = new HttpEntity<aiChatText>(requestBody,headers);
 			//langchain4j방식으로 전환해서 주석 궁금하면 LangChain4j파일로
 //			ResponseEntity<String> response = restTemplate.postForEntity(url, entity, String.class);
+		
+			if (history == null || history.isEmpty()) {
+		        return "보낸 메시지가 없습니다.";
+		    }
+			
 			String lastUserMsg = history.get(history.size()-1).getParts().get(0).getText();
 			return assistant.chat(lastUserMsg);
 		} catch (org.springframework.web.client.HttpClientErrorException e) {

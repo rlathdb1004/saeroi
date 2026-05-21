@@ -2,11 +2,13 @@ package kr.or.saeroi.AiChatbot;
 
 import java.sql.Connection;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import dev.langchain4j.agent.tool.Tool;
+import kr.or.saeroi.Chart.ChartDAO;
 import kr.or.saeroi.dao.InoutDAO;
 import kr.or.saeroi.dao.LoginDAO;
 import kr.or.saeroi.dao.QualityDAO;
@@ -28,6 +30,10 @@ public class DbTool {
 	
 	@Autowired
 	private InoutDAO inoutDAO;
+	
+	@Autowired
+	private ChartDAO chartDAO;
+	
 	
 	@Tool("사원 번호로 상세 정보를 조회합니다")
 	public String getemp(String empNo) {
@@ -71,5 +77,17 @@ public class DbTool {
 		
 		List<InoutDTO> list = inoutDAO.selectInoutList(type, key,startDate,endDate);
 		return list.isEmpty() ? "해당 조건으로 조회된 입출고 기록이 없습니다." :list.toString();
+	}
+	
+	@Tool("일일 주일 월별 년간 계획일자에 따른 생산계획수량 불량수량 작업량을 조회합니다 "+
+			"일수까지 물어본다면 구분(sarchType)을 day로 넣어주고"+
+			"년도만 물어보면 구분(sarchType)을 year로 넣어주는데" +
+			"이용자가 합을 물어본다면  year_sum 평균을 물어본다면 uear_avg를 넣고 기본은 year_sum이야")
+	public String getChart(String searchType) {
+		
+		String type = (searchType != null && !searchType.isEmpty()) ? searchType : null; 
+		
+		List<Map<String, Object>> list = chartDAO.chartday(searchType);
+		return list.isEmpty() ? "해당 조건으로 조회된 리포트기록이 없습니다." :list.toString();
 	}
 }
