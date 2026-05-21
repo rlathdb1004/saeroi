@@ -17,7 +17,9 @@
 
 		<!-- 브라우저 탭에 표시할 기본 제목을 지정한다. -->
 		<put-attribute name="title" value="SAEROI MES" />
-
+	
+		<!-- 챗봇 -->
+		<put-attribute name="chatbot" value="/WEB-INF/views/chat.jsp" />
 	</definition>
 
 	<!--

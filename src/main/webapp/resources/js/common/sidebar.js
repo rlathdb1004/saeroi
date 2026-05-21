@@ -287,6 +287,11 @@ function siLoadMenuByCurrentUrl() {
     if (matchedMenu == null && currentPath == contextPath + "/master/item/detail") {
         matchedMenu = findSubMenu("기준정보관리", "품목관리");
     }
+    
+    // 생산계획 상세 페이지는 사이드바에 직접 없기 때문에 생산계획 관리 메뉴로 처리한다.
+	if (matchedMenu == null && currentPath == contextPath + "/production/productionplan/detail") {
+    matchedMenu = findSubMenu("생산관리", "생산계획 관리");
+	}
 
     // 사용자가 /saeroi 또는 /saeroi/ 기본 주소로 들어온 경우 대시보드 메인으로 처리한다.
     if (matchedMenu == null && (currentPath == contextPath || currentPath == contextPath + "/")) {
