@@ -7,8 +7,7 @@
     <meta charset="UTF-8">
     <title>SAEROI - 로그인</title>
 
-    <style>
-        /* 대시보드 기반 폰트 및 스타일 초기화 */
+    <style>       
         * {
             box-sizing: border-box;
             margin: 0;
@@ -16,8 +15,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
-        body {
-            /* 대시보드 배경과 유사한 은은한 연회색/민트 톤 배경 */
+        body {          
             background: #f4f7f6;
             min-height: 100vh;
             display: flex;
@@ -44,8 +42,7 @@
         form {
             width: 100%;
             background: #ffffff;
-            padding: 40px 30px;
-            /* 대시보드 카드의 둥글기 반영 */
+            padding: 40px 30px;           
             border-radius: 12px;
             border: 1px solid #e2e8f0;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
@@ -75,8 +72,7 @@
             color: #1e293b;
             transition: all 0.2s ease;
         }
-
-        /* 대시보드 포인트 컬러(그린)로 포커스 효과 변경 */
+        
         .field input:focus,
         .pw-box input:focus {
             outline: none;
@@ -127,12 +123,11 @@
         .auto-login input[type="checkbox"] {
             cursor: pointer;
             width: 16px;
-            height: 16px;
-            /* 체크박스 기본 포인트를 브랜드 그린으로 변경 */
+            height: 16px;           
             accent-color: #1e6e53;
         }
 
-        /* 대시보드 '로그아웃' 버튼의 묵직한 그린 컬러 수용 */
+       
         .btn {
             width: 100%;
             height: 44px;
@@ -154,7 +149,7 @@
             border-color: #94a3b8;
         }
 
-        /* 메인 로그인 버튼 스타일 (#1e6e53) */
+       
         .btn.primary-btn {
             background: #1e6e53;
             color: #ffffff;
@@ -165,8 +160,7 @@
         .btn.primary-btn:hover {
             background: #16533f;
         }
-
-        /* 에러 메시지 스타일 부드럽게 조정 */
+        
         .error {
             color: #df473c;
             background: #fff5f5;
@@ -178,8 +172,7 @@
             display: flex;
             align-items: center;
         }
-
-        /* 모달 스타일 메인 톤 일치화 */
+      
         .modal-overlay {
             display: none;
             position: fixed;

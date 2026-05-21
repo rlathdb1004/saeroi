@@ -47,9 +47,24 @@
 							수정</button>
 
 						<button type="submit" form="myPageForm" class="detail_btn_green" id="saveBtn"
-							style="display: none;">저장</button>
+							style="display: none;">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+								style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+								<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+								<path d="M17 21v-8H7v8"></path>
+								<path d="M7 3v5h8"></path>
+							</svg>
+							저장</button>
 
-						<button type="button" class="detail_btn_line" id="cancelBtn" style="display: none;">취소</button>
+						<button type="button" class="detail_btn_line" id="cancelBtn" style="display: none;">
+							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+								stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+								style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+								<path d="M18 6L6 18"></path>
+								<path d="M6 6l12 12"></path>
+							</svg>
+							취소</button>
 
 					</div>
 
