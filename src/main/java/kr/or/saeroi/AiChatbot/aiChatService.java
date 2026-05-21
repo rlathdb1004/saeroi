@@ -1,5 +1,6 @@
 package kr.or.saeroi.AiChatbot;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +65,12 @@ public class aiChatService {
 		    }
 			
 			String lastUserMsg = history.get(history.size()-1).getParts().get(0).getText();
-			return assistant.chat(lastUserMsg);
+			
+			String today = LocalDate.now().toString();
+			
+			String prompt ="[시스템 알림: 오늘의 실제 날짜는 " + today + "입니다. 이 날짜를 기준으로 '오늘', '어제', '내일' 등을 계산하세요.]\n" + lastUserMsg;
+			
+			return assistant.chat(prompt);
 		} catch (org.springframework.web.client.HttpClientErrorException e) {
 			System.out.println("구글 에러 응답: " + e.getResponseBodyAsString());
 		    return "에러 발생: " + e.getResponseBodyAsString();

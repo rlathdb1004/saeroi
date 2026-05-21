@@ -351,21 +351,6 @@
 	/* 총 건수/버튼 영역과 테이블 사이 간격을 줄인다. */
 }
 
-/* 테이블 상단 */
-.coTableTop {
-	display: flex;
-	/* 총 건수와 등록 버튼을 가로로 배치한다. */
-
-	align-items: flex-end;
-	/* 총 건수를 버튼 아래쪽 기준에 맞춰 테이블 쪽으로 내려준다. */
-
-	justify-content: space-between;
-	/* 총 건수는 왼쪽, 등록/선택삭제 버튼은 오른쪽에 배치한다. */
-
-	margin: 0 0 8px 0;
-	/* 총 건수/버튼 영역과 테이블 사이 간격을 줄인다. */
-}
-
 /* 총 건수 */
 .coTotalCount {
 	margin: 0;
@@ -604,8 +589,8 @@ body.is-column-resizing {
 }
 
 .coTable tbody tr:hover {
-	background-color: #F7F9F8;
-	/* 테이블 행에 마우스를 올렸을 때 배경색을 연하게 변경한다. */
+	background-color: #F4FAF7;
+	/* 테이블 행에 마우스를 올렸을 때 연한 초록색으로 표시한다. */
 }
 
 .coTable input[type="checkbox"] {
@@ -618,12 +603,6 @@ body.is-column-resizing {
 	cursor: pointer;
 	/* 체크박스에 마우스를 올렸을 때 손가락 모양으로 보이게 한다. */
 }
-
-.coTable td[title] {
-	cursor: help;
-	/* title이 있는 셀은 마우스를 올렸을 때 전체 내용을 볼 수 있다는 표시를 준다. */
-}
-
 
 /* 컬럼 너비 조절용 클래스 */
 .coColXs {
@@ -1025,3 +1004,88 @@ body.is-column-resizing {
 	outline: none;
 	/* 클릭했을 때 기본 파란 테두리를 제거한다. */
 }
+
+/* 상세 이동이 가능한 목록 행 */
+.coTable tbody tr.coRowClickable {
+	cursor: pointer;
+	/* 행 전체가 클릭 가능하다는 느낌을 준다. */
+}
+
+/* 툴팁이 있는 테이블 제목 칸과 내용 칸 */
+.coTable thead th.coTooltipCell,
+.coTable tbody td.coTooltipCell {
+	cursor: pointer;
+	/* 툴팁이 있는 칸은 마우스를 올렸을 때 확인 가능한 느낌을 준다. */
+}
+
+/* 화면 전체 위에 뜨는 공통 툴팁 박스 */
+.coCommonTooltip {
+	position: fixed;
+	left: 0;
+	top: 0;
+	z-index: 99999;
+
+	max-width: 220px;
+	padding: 6px 9px;
+
+	border: 1px solid #2F7D62;
+	border-radius: 5px;
+	background-color: #FFFFFF;
+
+	color: #1F2933;
+	font-size: 12px;
+	font-weight: 400;
+	line-height: 1.45;
+	text-align: left;
+
+	white-space: normal;
+	word-break: keep-all;
+	overflow-wrap: break-word;
+
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.10);
+
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+
+	transform: translateY(4px);
+	transition: opacity 0.12s ease, transform 0.12s ease;
+	/* 테이블 영역에 잘리지 않고 화면 최상단에 표시되는 공통 툴팁이다. */
+}
+
+/* 툴팁 표시 상태 */
+.coCommonTooltip.is_show {
+	opacity: 1;
+	visibility: visible;
+	transform: translateY(0);
+}
+
+/* 툴팁 꼬리 */
+.coCommonTooltip::before {
+	content: "";
+	position: absolute;
+	left: var(--tooltip-arrow-left, 50%);
+	bottom: -5px;
+
+	width: 8px;
+	height: 8px;
+
+	border-right: 1px solid #2F7D62;
+	border-bottom: 1px solid #2F7D62;
+	background-color: #FFFFFF;
+
+	transform: translateX(-50%) rotate(45deg);
+	/* 툴팁 박스와 연결되는 작은 꼬리이다. */
+}
+
+/* 툴팁이 아래쪽에 뜰 때 꼬리 방향 */
+.coCommonTooltip.is_bottom::before {
+	top: -5px;
+	bottom: auto;
+
+	border-right: 0;
+	border-bottom: 0;
+	border-left: 1px solid #2F7D62;
+	border-top: 1px solid #2F7D62;
+}
+
