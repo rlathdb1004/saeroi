@@ -150,6 +150,7 @@
 						onclick="deleteCheck()">
 						선택 삭제
 					</button>
+					
 
 				</div>
 

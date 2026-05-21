@@ -287,9 +287,14 @@ public class InventoryController {
 			"pageInfo",
 			pageInfo);
 
+		// =============================================================
+		// 검색 후에도 재고조회 페이지 유지
+		// 헤더 / 사이드바 안깨지게 수정
+		// =============================================================
+
 		model.addAttribute(
 			"pageUrl",
-			"/inventory/inventoryStatus");
+			"/inventory/stockList");
 
 		model.addAttribute(
 			"searchType",
@@ -346,7 +351,11 @@ public class InventoryController {
 
 		inventoryService.addInventory(dto);
 
-		return "redirect:/inventory/inventoryStatus";
+		// =============================================================
+		// 등록 후 재고조회 페이지 유지
+		// =============================================================
+
+		return "redirect:/inventory/stockList";
 	}
 
 	// =========================================================================
@@ -365,7 +374,11 @@ public class InventoryController {
 				inventoryIds);
 		}
 
-		return "redirect:/inventory/inventoryStatus";
+		// =============================================================
+		// 삭제 후 재고조회 페이지 유지
+		// =============================================================
+
+		return "redirect:/inventory/stockList";
 	}
 
 	// =========================================================================
