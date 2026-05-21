@@ -15,26 +15,25 @@ import kr.or.saeroi.dto.InventoryDTO;
 @Repository
 public class InventoryDAOImpl implements InventoryDAO {
 
+	// =========================================================================
 	// DB 연결
+	// =========================================================================
 	private Connection getConnection() throws Exception {
 
 		Class.forName("oracle.jdbc.driver.OracleDriver");
 
 		String url =
-				"jdbc:oracle:thin:@//125.181.132.133:51521/xe";
+			"jdbc:oracle:thin:@//125.181.132.133:51521/xe";
 
 		String id = "tofhdl";
 		String pw = "rlatofhdl";
 
-		return DriverManager.getConnection(
-				url,
-				id,
-				pw);
+		return DriverManager.getConnection(url, id, pw);
 	}
 
-	// ==================================================
+	// =========================================================================
 	// 재고 목록 조회
-	// ==================================================
+	// =========================================================================
 	@Override
 	public List<InventoryDTO> selectInventoryList(
 			String searchType,
@@ -43,187 +42,170 @@ public class InventoryDAOImpl implements InventoryDAO {
 			String endDate) {
 
 		List<InventoryDTO> list =
-				new ArrayList<InventoryDTO>();
+			new ArrayList<InventoryDTO>();
 
 		try {
 
 			Connection conn =
-					getConnection();
+				getConnection();
 
 			String sql = "";
 
 			sql += " SELECT ";
-			sql += "     IV.INVENTORY_ID, ";
-			sql += "     IV.INVENTORY_STOCK, ";
-			sql += "     IV.REMARK, ";
-			sql += "     IV.STOCK_LOCATION, ";
-			sql += "     IV.CREATED_DATE, ";
-			sql += "     IV.UPDATED_DATE, ";
-			sql += "     IV.ITEM_ID, ";
+			sql += "     INV.*, ";
 			sql += "     I.ITEM_CODE, ";
 			sql += "     I.ITEM_NAME, ";
 			sql += "     I.ITEM_TYPE, ";
 			sql += "     I.ITEM_UNIT ";
-			sql += " FROM INVENTORY IV ";
+			sql += " FROM INVENTORY INV ";
 			sql += " JOIN ITEM I ";
-			sql += " ON IV.ITEM_ID = I.ITEM_ID ";
-			sql += " WHERE 1 = 1 ";
+			sql += "     ON INV.ITEM_ID = I.ITEM_ID ";
+			sql += " WHERE 1=1 ";
 
-			// 검색어가 있을 때
-			if (keyword != null &&
-					!keyword.equals("")) {
+			// =============================================================
+			// 날짜 검색
+			// =============================================================
 
-				// 품목코드 검색
+			if (startDate != null
+				&& !"".equals(startDate)) {
+
+				sql += " AND INV.CREATED_DATE >= ";
+				sql += " TO_DATE(?, 'YYYY-MM-DD') ";
+			}
+
+			if (endDate != null
+				&& !"".equals(endDate)) {
+
+				sql += " AND INV.CREATED_DATE <= ";
+				sql += " TO_DATE(?, 'YYYY-MM-DD') + 0.99999 ";
+			}
+
+			// =============================================================
+			// 검색 기능
+			// =============================================================
+
+			if (keyword != null
+				&& !"".equals(keyword.trim())) {
+
 				if ("itemCode".equals(searchType)) {
 
 					sql += " AND I.ITEM_CODE LIKE ? ";
+				}
 
-				// 품목명 검색
-				} else if ("itemName".equals(searchType)) {
+				else if ("itemName".equals(searchType)) {
 
 					sql += " AND I.ITEM_NAME LIKE ? ";
+				}
 
-				// 전체 검색
-				} else {
+				else {
 
-					// 상세페이지 값까지 전체 검색되게 수정
 					sql += " AND ( ";
-					sql += " I.ITEM_CODE LIKE ? ";
-					sql += " OR I.ITEM_NAME LIKE ? ";
-					sql += " OR I.ITEM_TYPE LIKE ? ";
-					sql += " OR I.ITEM_UNIT LIKE ? ";
-					sql += " OR IV.STOCK_LOCATION LIKE ? ";
-					sql += " OR IV.REMARK LIKE ? ";
+
+					sql += "     I.ITEM_CODE LIKE ? ";
+					sql += "     OR I.ITEM_NAME LIKE ? ";
+					sql += "     OR INV.STOCK_LOCATION LIKE ? ";
+					sql += "     OR INV.REMARK LIKE ? ";
+
+					sql += "     OR ( ";
+					sql += "         I.ITEM_TYPE = 'FG' ";
+					sql += "         AND ? LIKE '%완제품%' ";
+					sql += "     ) ";
+
+					sql += "     OR ( ";
+					sql += "         (I.ITEM_TYPE = 'RM' ";
+					sql += "          OR I.ITEM_TYPE = 'SM') ";
+					sql += "         AND ? LIKE '%원자재%' ";
+					sql += "     ) ";
+
 					sql += " ) ";
 				}
 			}
 
-			// 시작일 검색
-			if (startDate != null &&
-					!startDate.equals("")) {
-
-				sql += " AND IV.CREATED_DATE >= ";
-				sql += " TO_DATE(?, 'YYYY-MM-DD') ";
-			}
-
-			// 종료일 검색
-			if (endDate != null &&
-					!endDate.equals("")) {
-
-				sql += " AND IV.CREATED_DATE <= ";
-				sql += " TO_DATE(?, 'YYYY-MM-DD') ";
-			}
-
-			// 재고번호 1번부터 나오게 정렬
-			sql += " ORDER BY IV.INVENTORY_ID ASC ";
+			sql += " ORDER BY INV.INVENTORY_ID DESC ";
 
 			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+				conn.prepareStatement(sql);
 
 			int idx = 1;
 
-			// 검색어 값 넣기
-			if (keyword != null &&
-					!keyword.equals("")) {
+			// =============================================================
+			// 날짜 바인딩
+			// =============================================================
 
-				if ("itemCode".equals(searchType)) {
+			if (startDate != null
+				&& !"".equals(startDate)) {
 
-					pstmt.setString(
-							idx++,
-							"%" + keyword + "%");
+				pstmt.setString(idx++, startDate);
+			}
 
-				} else if ("itemName".equals(searchType)) {
+			if (endDate != null
+				&& !"".equals(endDate)) {
 
-					pstmt.setString(
-							idx++,
-							"%" + keyword + "%");
+				pstmt.setString(idx++, endDate);
+			}
 
-				} else {
+			// =============================================================
+			// 검색어 바인딩
+			// =============================================================
 
-					pstmt.setString(
-							idx++,
-							"%" + keyword + "%");
+			if (keyword != null
+				&& !"".equals(keyword.trim())) {
 
-					pstmt.setString(
-							idx++,
-							"%" + keyword + "%");
+				String likeKey =
+					"%" + keyword.trim() + "%";
 
-					pstmt.setString(
-							idx++,
-							"%" + keyword + "%");
+				if ("itemCode".equals(searchType)
+					|| "itemName".equals(searchType)) {
 
-					pstmt.setString(
-							idx++,
-							"%" + keyword + "%");
+					pstmt.setString(idx++, likeKey);
+				}
 
-					pstmt.setString(
-							idx++,
-							"%" + keyword + "%");
+				else {
 
-					pstmt.setString(
-							idx++,
-							"%" + keyword + "%");
+					pstmt.setString(idx++, likeKey);
+					pstmt.setString(idx++, likeKey);
+					pstmt.setString(idx++, likeKey);
+					pstmt.setString(idx++, likeKey);
+
+					pstmt.setString(idx++, keyword);
+					pstmt.setString(idx++, keyword);
 				}
 			}
 
-			// 시작일 값
-			if (startDate != null &&
-					!startDate.equals("")) {
-
-				pstmt.setString(
-						idx++,
-						startDate);
-			}
-
-			// 종료일 값
-			if (endDate != null &&
-					!endDate.equals("")) {
-
-				pstmt.setString(
-						idx++,
-						endDate);
-			}
-
 			ResultSet rs =
-					pstmt.executeQuery();
+				pstmt.executeQuery();
 
 			while (rs.next()) {
 
 				InventoryDTO dto =
-						new InventoryDTO();
+					new InventoryDTO();
 
 				dto.setInventoryId(
-						rs.getInt("INVENTORY_ID"));
-
-				dto.setInventoryStock(
-						rs.getInt("INVENTORY_STOCK"));
-
-				dto.setRemark(
-						rs.getString("REMARK"));
-
-				dto.setStockLocation(
-						rs.getString("STOCK_LOCATION"));
-
-				dto.setCreatedDate(
-						rs.getDate("CREATED_DATE"));
-
-				dto.setUpdatedDate(
-						rs.getDate("UPDATED_DATE"));
+					rs.getInt("INVENTORY_ID"));
 
 				dto.setItemId(
-						rs.getInt("ITEM_ID"));
+					rs.getInt("ITEM_ID"));
 
 				dto.setItemCode(
-						rs.getString("ITEM_CODE"));
+					rs.getString("ITEM_CODE"));
 
 				dto.setItemName(
-						rs.getString("ITEM_NAME"));
+					rs.getString("ITEM_NAME"));
 
 				dto.setItemType(
-						rs.getString("ITEM_TYPE"));
+					rs.getString("ITEM_TYPE"));
 
 				dto.setItemUnit(
-						rs.getString("ITEM_UNIT"));
+					rs.getString("ITEM_UNIT"));
+
+				dto.setInventoryStock(
+					rs.getInt("INVENTORY_STOCK"));
+
+				dto.setStockLocation(
+					rs.getString("STOCK_LOCATION"));
+
+				dto.setRemark(
+					rs.getString("REMARK"));
 
 				list.add(dto);
 			}
@@ -240,21 +222,27 @@ public class InventoryDAOImpl implements InventoryDAO {
 		return list;
 	}
 
-	// ==================================================
-	// 품목 목록 조회
-	// ==================================================
+	// =========================================================================
+	// 등록 모달 품목 리스트 조회
+	// - 품목 선택 시 창고위치 자동입력
+	// - 등록 오류 안나게 수정 완료
+	// =========================================================================
 	@Override
 	public List<InventoryDTO> selectItemList() {
 
 		List<InventoryDTO> list =
-				new ArrayList<InventoryDTO>();
+			new ArrayList<InventoryDTO>();
 
 		try {
 
 			Connection conn =
-					getConnection();
+				getConnection();
 
 			String sql = "";
+
+			// =============================================================
+			// ITEM + INVENTORY LEFT JOIN
+			// =============================================================
 
 			sql += " SELECT ";
 			sql += "     I.ITEM_ID, ";
@@ -262,43 +250,65 @@ public class InventoryDAOImpl implements InventoryDAO {
 			sql += "     I.ITEM_NAME, ";
 			sql += "     I.ITEM_TYPE, ";
 			sql += "     I.ITEM_UNIT, ";
-			sql += "     ( ";
-			sql += "         SELECT MAX(IV.STOCK_LOCATION) ";
-			sql += "         FROM INVENTORY IV ";
-			sql += "         WHERE IV.ITEM_ID = I.ITEM_ID ";
-			sql += "     ) AS STOCK_LOCATION ";
+
+			// =============================================================
+			// INVENTORY 테이블에서 창고위치 가져오기
+			// 값 없으면 공백 처리
+			// =============================================================
+
+			sql += "     NVL(MAX(INV.STOCK_LOCATION), '') ";
+			sql += "         AS STOCK_LOCATION ";
+
 			sql += " FROM ITEM I ";
-			sql += " ORDER BY I.ITEM_ID ASC ";
+
+			sql += " LEFT JOIN INVENTORY INV ";
+			sql += "     ON I.ITEM_ID = INV.ITEM_ID ";
+
+			// =============================================================
+			// GROUP BY
+			// =============================================================
+
+			sql += " GROUP BY ";
+			sql += "     I.ITEM_ID, ";
+			sql += "     I.ITEM_CODE, ";
+			sql += "     I.ITEM_NAME, ";
+			sql += "     I.ITEM_TYPE, ";
+			sql += "     I.ITEM_UNIT ";
+
+			sql += " ORDER BY I.ITEM_CODE ASC ";
 
 			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+				conn.prepareStatement(sql);
 
 			ResultSet rs =
-					pstmt.executeQuery();
+				pstmt.executeQuery();
 
 			while (rs.next()) {
 
 				InventoryDTO dto =
-						new InventoryDTO();
+					new InventoryDTO();
 
 				dto.setItemId(
-						rs.getInt("ITEM_ID"));
+					rs.getInt("ITEM_ID"));
 
 				dto.setItemCode(
-						rs.getString("ITEM_CODE"));
+					rs.getString("ITEM_CODE"));
 
 				dto.setItemName(
-						rs.getString("ITEM_NAME"));
+					rs.getString("ITEM_NAME"));
 
 				dto.setItemType(
-						rs.getString("ITEM_TYPE"));
+					rs.getString("ITEM_TYPE"));
 
 				dto.setItemUnit(
-						rs.getString("ITEM_UNIT"));
+					rs.getString("ITEM_UNIT"));
 
-				// 품목 선택 시 창고위치 자동 입력용
+				// =========================================================
+				// 창고위치 추가
+				// =========================================================
+
 				dto.setStockLocation(
-						rs.getString("STOCK_LOCATION"));
+					rs.getString("STOCK_LOCATION"));
 
 				list.add(dto);
 			}
@@ -315,66 +325,94 @@ public class InventoryDAOImpl implements InventoryDAO {
 		return list;
 	}
 
-	// ==================================================
-	// 재고 등록
-	// ==================================================
+	// =========================================================================
+	// 품목 선택 시 창고위치 조회
+	// =========================================================================
 	@Override
-	public int insertInventory(
-			InventoryDTO dto) {
+	public String getStockLocationByItemId(int itemId) {
+
+		String stockLocation = "";
+
+		try {
+
+			Connection conn =
+				getConnection();
+
+			String sql = "";
+
+			sql += " SELECT NVL(MAX(STOCK_LOCATION), '') ";
+			sql += " FROM INVENTORY ";
+			sql += " WHERE ITEM_ID = ? ";
+
+			PreparedStatement pstmt =
+				conn.prepareStatement(sql);
+
+			pstmt.setInt(1, itemId);
+
+			ResultSet rs =
+				pstmt.executeQuery();
+
+			if (rs.next()) {
+
+				stockLocation =
+					rs.getString(1);
+			}
+
+			rs.close();
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return stockLocation;
+	}
+
+	// =========================================================================
+	// 재고 등록
+	// =========================================================================
+	@Override
+	public int insertInventory(InventoryDTO dto) {
 
 		int result = 0;
 
 		try {
 
 			Connection conn =
-					getConnection();
-
-			int inventoryId = 1;
-
-			String idSql =
-					" SELECT NVL(MAX(INVENTORY_ID), 0) + 1 FROM INVENTORY ";
-
-			PreparedStatement idPstmt =
-					conn.prepareStatement(idSql);
-
-			ResultSet idRs =
-					idPstmt.executeQuery();
-
-			if (idRs.next()) {
-
-				inventoryId =
-						idRs.getInt(1);
-			}
-
-			idRs.close();
-			idPstmt.close();
+				getConnection();
 
 			String sql = "";
 
-			sql += " INSERT INTO INVENTORY ( ";
+			sql += " INSERT INTO INVENTORY ";
+			sql += " ( ";
 			sql += "     INVENTORY_ID, ";
+			sql += "     ITEM_ID, ";
 			sql += "     INVENTORY_STOCK, ";
-			sql += "     REMARK, ";
 			sql += "     STOCK_LOCATION, ";
-			sql += "     CREATED_DATE, ";
-			sql += "     UPDATED_DATE, ";
-			sql += "     ITEM_ID ";
-			sql += " ) VALUES ( ";
-			sql += "     ?, ?, ?, ?, ";
-			sql += "     SYSDATE, SYSDATE, ? ";
+			sql += "     REMARK, ";
+			sql += "     CREATED_DATE ";
+			sql += " ) ";
+			sql += " VALUES ";
+			sql += " ( ";
+			sql += "     SEQ_INVENTORY_ID.NEXTVAL, ";
+			sql += "     ?, ?, ?, ?, SYSDATE ";
 			sql += " ) ";
 
 			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+				conn.prepareStatement(sql);
 
-			pstmt.setInt(1, inventoryId);
+			pstmt.setInt(1, dto.getItemId());
+
 			pstmt.setInt(2, dto.getInventoryStock());
-			pstmt.setString(3, dto.getRemark());
-			pstmt.setString(4, dto.getStockLocation());
-			pstmt.setInt(5, dto.getItemId());
+
+			pstmt.setString(3, dto.getStockLocation());
+
+			pstmt.setString(4, dto.getRemark());
 
 			result =
-					pstmt.executeUpdate();
+				pstmt.executeUpdate();
 
 			pstmt.close();
 			conn.close();
@@ -387,9 +425,9 @@ public class InventoryDAOImpl implements InventoryDAO {
 		return result;
 	}
 
-	// ==================================================
-	// 재고 상세조회
-	// ==================================================
+	// =========================================================================
+	// 재고 상세 조회
+	// =========================================================================
 	@Override
 	public InventoryDTO selectInventoryDetail(
 			int inventoryId) {
@@ -399,72 +437,59 @@ public class InventoryDAOImpl implements InventoryDAO {
 		try {
 
 			Connection conn =
-					getConnection();
+				getConnection();
 
 			String sql = "";
 
 			sql += " SELECT ";
-			sql += "     IV.INVENTORY_ID, ";
-			sql += "     IV.INVENTORY_STOCK, ";
-			sql += "     IV.REMARK, ";
-			sql += "     IV.STOCK_LOCATION, ";
-			sql += "     IV.CREATED_DATE, ";
-			sql += "     IV.UPDATED_DATE, ";
-			sql += "     IV.ITEM_ID, ";
+			sql += "     INV.*, ";
 			sql += "     I.ITEM_CODE, ";
 			sql += "     I.ITEM_NAME, ";
 			sql += "     I.ITEM_TYPE, ";
 			sql += "     I.ITEM_UNIT ";
-			sql += " FROM INVENTORY IV ";
+			sql += " FROM INVENTORY INV ";
 			sql += " JOIN ITEM I ";
-			sql += " ON IV.ITEM_ID = I.ITEM_ID ";
-			sql += " WHERE IV.INVENTORY_ID = ? ";
+			sql += "     ON INV.ITEM_ID = I.ITEM_ID ";
+			sql += " WHERE INV.INVENTORY_ID = ? ";
 
 			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+				conn.prepareStatement(sql);
 
 			pstmt.setInt(1, inventoryId);
 
 			ResultSet rs =
-					pstmt.executeQuery();
+				pstmt.executeQuery();
 
 			if (rs.next()) {
 
-				dto =
-						new InventoryDTO();
+				dto = new InventoryDTO();
 
 				dto.setInventoryId(
-						rs.getInt("INVENTORY_ID"));
-
-				dto.setInventoryStock(
-						rs.getInt("INVENTORY_STOCK"));
-
-				dto.setRemark(
-						rs.getString("REMARK"));
-
-				dto.setStockLocation(
-						rs.getString("STOCK_LOCATION"));
-
-				dto.setCreatedDate(
-						rs.getDate("CREATED_DATE"));
-
-				dto.setUpdatedDate(
-						rs.getDate("UPDATED_DATE"));
+					rs.getInt("INVENTORY_ID"));
 
 				dto.setItemId(
-						rs.getInt("ITEM_ID"));
+					rs.getInt("ITEM_ID"));
 
 				dto.setItemCode(
-						rs.getString("ITEM_CODE"));
+					rs.getString("ITEM_CODE"));
 
 				dto.setItemName(
-						rs.getString("ITEM_NAME"));
+					rs.getString("ITEM_NAME"));
 
 				dto.setItemType(
-						rs.getString("ITEM_TYPE"));
+					rs.getString("ITEM_TYPE"));
 
 				dto.setItemUnit(
-						rs.getString("ITEM_UNIT"));
+					rs.getString("ITEM_UNIT"));
+
+				dto.setInventoryStock(
+					rs.getInt("INVENTORY_STOCK"));
+
+				dto.setStockLocation(
+					rs.getString("STOCK_LOCATION"));
+
+				dto.setRemark(
+					rs.getString("REMARK"));
 			}
 
 			rs.close();
@@ -479,39 +504,33 @@ public class InventoryDAOImpl implements InventoryDAO {
 		return dto;
 	}
 
-	// ==================================================
-	// 재고 선택 삭제
-	// ==================================================
+	// =========================================================================
+	// 재고 삭제
+	// =========================================================================
 	@Override
-	public int deleteInventory(
-			String[] inventoryIds) {
+	public int deleteInventory(String[] inventoryIds) {
 
 		int result = 0;
 
 		try {
 
 			Connection conn =
-					getConnection();
+				getConnection();
 
-			String sql = "";
-
-			sql += " DELETE FROM INVENTORY ";
-			sql += " WHERE INVENTORY_ID = ? ";
+			String sql =
+				" DELETE FROM INVENTORY WHERE INVENTORY_ID = ? ";
 
 			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+				conn.prepareStatement(sql);
 
-			for (int i = 0;
-					i < inventoryIds.length;
-					i++) {
+			for (int i = 0; i < inventoryIds.length; i++) {
 
 				pstmt.setInt(
-						1,
-						Integer.parseInt(
-								inventoryIds[i]));
+					1,
+					Integer.parseInt(inventoryIds[i]));
 
 				result +=
-						pstmt.executeUpdate();
+					pstmt.executeUpdate();
 			}
 
 			pstmt.close();
@@ -525,19 +544,18 @@ public class InventoryDAOImpl implements InventoryDAO {
 		return result;
 	}
 
-	// ==================================================
+	// =========================================================================
 	// 재고 수정
-	// ==================================================
+	// =========================================================================
 	@Override
-	public int updateInventory(
-			InventoryDTO dto) {
+	public int updateInventory(InventoryDTO dto) {
 
 		int result = 0;
 
 		try {
 
 			Connection conn =
-					getConnection();
+				getConnection();
 
 			String sql = "";
 
@@ -550,26 +568,18 @@ public class InventoryDAOImpl implements InventoryDAO {
 			sql += " WHERE INVENTORY_ID = ? ";
 
 			PreparedStatement pstmt =
-					conn.prepareStatement(sql);
+				conn.prepareStatement(sql);
 
-			pstmt.setInt(
-					1,
-					dto.getInventoryStock());
+			pstmt.setInt(1, dto.getInventoryStock());
 
-			pstmt.setString(
-					2,
-					dto.getStockLocation());
+			pstmt.setString(2, dto.getStockLocation());
 
-			pstmt.setString(
-					3,
-					dto.getRemark());
+			pstmt.setString(3, dto.getRemark());
 
-			pstmt.setInt(
-					4,
-					dto.getInventoryId());
+			pstmt.setInt(4, dto.getInventoryId());
 
 			result =
-					pstmt.executeUpdate();
+				pstmt.executeUpdate();
 
 			pstmt.close();
 			conn.close();
