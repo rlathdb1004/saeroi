@@ -1,178 +1,312 @@
 package kr.or.saeroi.dto;
 
-import java.util.Date;
+import java.sql.Date;
 
 /**
  * BOM 상세 DTO
- *
- * 역할:
- * - bom_detail 테이블의 기본 컬럼을 담는다.
- * - BOM 상세 화면에서 원자재/부자재 품목 조인 표시값을 함께 담는다.
- *
- * 기준 테이블:
- * - bom_detail
- *
- * 주요 조인:
- * - bom_detail.item_id = item.item_id
+ * - 기준정보관리 > BOM관리 > BOM 상세에서 사용
+ * - bom_detail 테이블 기본 컬럼 + 자재/완제품 표시용 조인 컬럼 + 검색조건 포함
  */
 public class BomDetailDTO {
 
-	// =========================================================
-	// 1. bom_detail 테이블 기본 컬럼
-	// =========================================================
+    // =========================================================
+    // bom_detail 테이블 기본 컬럼
+    // =========================================================
 
-	private Integer bomDetailId;
-	private Integer bomId;
-	private Double qty;
-	private Date createdDate;
-	private Date updatedDate;
-	private String remark;
-	private Integer itemId;
+    private Integer bomDetailId;   // BOM 상세 ID
+    private Integer bomId;         // BOM ID
 
-	// =========================================================
-	// 2. 원자재/부자재 item 조인 표시 컬럼
-	// =========================================================
+    private Double qty;            // 소요량
 
-	private String itemCode;
-	private String itemName;
-	private String itemType;
-	private String itemTypeName;
-	private String itemUnit;
+    private Date createdDate;      // 등록일
+    private Date updatedDate;      // 수정일
 
-	// =========================================================
-	// 3. BOM 마스터 조인 표시 컬럼
-	// =========================================================
+    private String remark;         // 비고
 
-	private String bomCode;
-	private Integer version;
-	private String useYn;
+    // 투입 품목 ID
+    private Integer itemId;
 
-	public Integer getBomDetailId() {
-		return bomDetailId;
-	}
 
-	public void setBomDetailId(Integer bomDetailId) {
-		this.bomDetailId = bomDetailId;
-	}
+    // =========================================================
+    // 자재/부자재 품목 표시용 컬럼
+    // =========================================================
 
-	public Integer getBomId() {
-		return bomId;
-	}
+    private String itemCode;       // 투입 품목 코드
+    private String itemName;       // 투입 품목명
+    private String itemType;       // 투입 품목구분 코드
+    private String itemTypeName;   // 투입 품목구분 표시명
+    private String itemUnit;       // 투입 품목 단위
 
-	public void setBomId(Integer bomId) {
-		this.bomId = bomId;
-	}
 
-	public Double getQty() {
-		return qty;
-	}
+    // =========================================================
+    // BOM 마스터 표시용 컬럼
+    // =========================================================
 
-	public void setQty(Double qty) {
-		this.qty = qty;
-	}
+    private String bomCode;        // BOM 코드
+    private Integer version;       // BOM 버전
 
-	public Date getCreatedDate() {
-		return createdDate;
-	}
+    private String useYn;          // BOM 사용여부
+    private String useYnName;      // BOM 사용여부 표시명
 
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
 
-	public Date getUpdatedDate() {
-		return updatedDate;
-	}
+    // =========================================================
+    // 완제품 표시용 컬럼
+    // =========================================================
 
-	public void setUpdatedDate(Date updatedDate) {
-		this.updatedDate = updatedDate;
-	}
+    private Integer productItemId;     // 완제품 품목 ID
+    private String productItemCode;    // 완제품 코드
+    private String productItemName;    // 완제품명
+    private String productItemType;    // 완제품 품목구분 코드
+    private String productItemTypeName;// 완제품 품목구분 표시명
+    private String productItemUnit;    // 완제품 단위
 
-	public String getRemark() {
-		return remark;
-	}
 
-	public void setRemark(String remark) {
-		this.remark = remark;
-	}
+    // =========================================================
+    // 검색 조건
+    // =========================================================
 
-	public Integer getItemId() {
-		return itemId;
-	}
+    // 검색구분: bomCode, productItemCode, productItemName, itemCode, itemName
+    private String searchType;
 
-	public void setItemId(Integer itemId) {
-		this.itemId = itemId;
-	}
+    // 검색어
+    private String searchKeyword;
 
-	public String getItemCode() {
-		return itemCode;
-	}
 
-	public void setItemCode(String itemCode) {
-		this.itemCode = itemCode;
-	}
+    // =========================================================
+    // 기본 생성자
+    // =========================================================
 
-	public String getItemName() {
-		return itemName;
-	}
+    public BomDetailDTO() {
+    }
 
-	public void setItemName(String itemName) {
-		this.itemName = itemName;
-	}
 
-	public String getItemType() {
-		return itemType;
-	}
+    // =========================================================
+    // Getter / Setter
+    // =========================================================
 
-	public void setItemType(String itemType) {
-		this.itemType = itemType;
-	}
+    public Integer getBomDetailId() {
+        return bomDetailId;
+    }
 
-	public String getItemTypeName() {
-		return itemTypeName;
-	}
+    public void setBomDetailId(Integer bomDetailId) {
+        this.bomDetailId = bomDetailId;
+    }
 
-	public void setItemTypeName(String itemTypeName) {
-		this.itemTypeName = itemTypeName;
-	}
+    public Integer getBomId() {
+        return bomId;
+    }
 
-	public String getItemUnit() {
-		return itemUnit;
-	}
+    public void setBomId(Integer bomId) {
+        this.bomId = bomId;
+    }
 
-	public void setItemUnit(String itemUnit) {
-		this.itemUnit = itemUnit;
-	}
+    public Double getQty() {
+        return qty;
+    }
 
-	public String getBomCode() {
-		return bomCode;
-	}
+    public void setQty(Double qty) {
+        this.qty = qty;
+    }
 
-	public void setBomCode(String bomCode) {
-		this.bomCode = bomCode;
-	}
+    public Date getCreatedDate() {
+        return createdDate;
+    }
 
-	public Integer getVersion() {
-		return version;
-	}
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
 
-	public void setVersion(Integer version) {
-		this.version = version;
-	}
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
 
-	public String getUseYn() {
-		return useYn;
-	}
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
 
-	public void setUseYn(String useYn) {
-		this.useYn = useYn;
-	}
+    public String getRemark() {
+        return remark;
+    }
 
-	@Override
-	public String toString() {
-		return "BomDetailDTO [bomDetailId=" + bomDetailId + ", bomId=" + bomId + ", qty=" + qty + ", createdDate="
-				+ createdDate + ", updatedDate=" + updatedDate + ", remark=" + remark + ", itemId=" + itemId
-				+ ", itemCode=" + itemCode + ", itemName=" + itemName + ", itemType=" + itemType
-				+ ", itemTypeName=" + itemTypeName + ", itemUnit=" + itemUnit + ", bomCode=" + bomCode
-				+ ", version=" + version + ", useYn=" + useYn + "]";
-	}
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public Integer getItemId() {
+        return itemId;
+    }
+
+    public void setItemId(Integer itemId) {
+        this.itemId = itemId;
+    }
+
+    public String getItemCode() {
+        return itemCode;
+    }
+
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public String getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
+
+    public String getItemTypeName() {
+        return itemTypeName;
+    }
+
+    public void setItemTypeName(String itemTypeName) {
+        this.itemTypeName = itemTypeName;
+    }
+
+    public String getItemUnit() {
+        return itemUnit;
+    }
+
+    public void setItemUnit(String itemUnit) {
+        this.itemUnit = itemUnit;
+    }
+
+    public String getBomCode() {
+        return bomCode;
+    }
+
+    public void setBomCode(String bomCode) {
+        this.bomCode = bomCode;
+    }
+
+    public Integer getVersion() {
+        return version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public String getUseYn() {
+        return useYn;
+    }
+
+    public void setUseYn(String useYn) {
+        this.useYn = useYn;
+    }
+
+    public String getUseYnName() {
+        return useYnName;
+    }
+
+    public void setUseYnName(String useYnName) {
+        this.useYnName = useYnName;
+    }
+
+    public Integer getProductItemId() {
+        return productItemId;
+    }
+
+    public void setProductItemId(Integer productItemId) {
+        this.productItemId = productItemId;
+    }
+
+    public String getProductItemCode() {
+        return productItemCode;
+    }
+
+    public void setProductItemCode(String productItemCode) {
+        this.productItemCode = productItemCode;
+    }
+
+    public String getProductItemName() {
+        return productItemName;
+    }
+
+    public void setProductItemName(String productItemName) {
+        this.productItemName = productItemName;
+    }
+
+    public String getProductItemType() {
+        return productItemType;
+    }
+
+    public void setProductItemType(String productItemType) {
+        this.productItemType = productItemType;
+    }
+
+    public String getProductItemTypeName() {
+        return productItemTypeName;
+    }
+
+    public void setProductItemTypeName(String productItemTypeName) {
+        this.productItemTypeName = productItemTypeName;
+    }
+
+    public String getProductItemUnit() {
+        return productItemUnit;
+    }
+
+    public void setProductItemUnit(String productItemUnit) {
+        this.productItemUnit = productItemUnit;
+    }
+
+    public String getSearchType() {
+        return searchType;
+    }
+
+    public void setSearchType(String searchType) {
+        this.searchType = searchType;
+    }
+
+    public String getSearchKeyword() {
+        return searchKeyword;
+    }
+
+    public void setSearchKeyword(String searchKeyword) {
+        this.searchKeyword = searchKeyword;
+    }
+
+
+    // =========================================================
+    // toString
+    // =========================================================
+
+    @Override
+    public String toString() {
+        return "BomDetailDTO [bomDetailId=" + bomDetailId
+                + ", bomId=" + bomId
+                + ", qty=" + qty
+                + ", createdDate=" + createdDate
+                + ", updatedDate=" + updatedDate
+                + ", remark=" + remark
+                + ", itemId=" + itemId
+                + ", itemCode=" + itemCode
+                + ", itemName=" + itemName
+                + ", itemType=" + itemType
+                + ", itemTypeName=" + itemTypeName
+                + ", itemUnit=" + itemUnit
+                + ", bomCode=" + bomCode
+                + ", version=" + version
+                + ", useYn=" + useYn
+                + ", useYnName=" + useYnName
+                + ", productItemId=" + productItemId
+                + ", productItemCode=" + productItemCode
+                + ", productItemName=" + productItemName
+                + ", productItemType=" + productItemType
+                + ", productItemTypeName=" + productItemTypeName
+                + ", productItemUnit=" + productItemUnit
+                + ", searchType=" + searchType
+                + ", searchKeyword=" + searchKeyword
+                + "]";
+    }
 }

@@ -49,12 +49,12 @@ public class ItemController {
 	public String itemList(
 			@ModelAttribute ItemDTO itemDTO,
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "10") int size,
+			@RequestParam(value = "size", defaultValue = "5") int size,
 			Model model) {
 
 		// 허용하지 않는 size 값이 들어오면 기본값으로 보정
 		if (size != 5 && size != 10 && size != 20 && size != 30) {
-			size = 10;
+			size = 5;
 		}
 
 		// 1보다 작은 페이지가 들어오면 1페이지로 보정

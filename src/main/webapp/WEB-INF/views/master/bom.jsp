@@ -1,73 +1,59 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 <%--
-	파일명 : bom.jsp
-	메뉴   : 기준정보관리 > BOM관리
+    파일명: bom.jsp
+    메뉴: 기준정보관리 > BOM관리
 
-	역할:
-	- BOM 마스터 목록을 조회한다.
-	- BOM 등록 모달을 제공한다.
-	- BOM 선택삭제는 실제 삭제가 아니라 use_yn = 'N' 미사용 처리한다.
-	- 상세 버튼 클릭 시 BOM 상세 페이지로 이동한다.
-
-	공용 CSS 기준:
-	- 목록/테이블/페이징: content.css
-	- 검색 영역/버튼: searchtable.css
-	- 등록 모달: modal.css
-	- 모바일 대응: mobile.css
-
-	모바일 목록 기준:
-	- 총 5개 컬럼만 표시한다.
-	- 체크박스 + BOM코드 + 완제품명 + 구성수 + 상세
+    기준:
+    - 품목관리 item.jsp 구조 기준
+    - 등록 버튼 클릭 시 BOM 등록 모달 열림
+    - 선택 컬럼명 클릭 시 현재 목록 체크박스 전체선택/해제
+    - 선택삭제는 bomIdList 전달
+    - 등록 시 detailItemIds, detailQtys, detailRemarks 배열 전달
+    - 소요량은 화면에서 천단위 콤마 표시
+    - 소요량 옆 단위는 자재/부자재 선택 시 자동 표시
+    - 서버 전송용 소요량은 hidden detailQtys로 숫자만 전송
 --%>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
-<c:if test="${not empty msg}">
-	<script>
-		alert("${msg}");
-	</script>
-</c:if>
-
-
 <div class="coPageWrap">
 
 	<%-- =========================================================
-	     1. 검색 영역
-	     ========================================================= --%>
+         1. 검색 영역
+         ========================================================= --%>
 	<div class="search-box">
-		<form action="${contextPath}/master/bom" method="get" class="search-form">
+		<form class="search-form" method="get"
+			action="${contextPath}/master/bom">
 
 			<div class="search-row">
 
 				<div class="search-item">
-					<label class="search-label">검색구분</label>
+					<label class="search-label">구분</label>
 
 					<select name="searchType" class="search-select">
-						<option value="" <c:if test="${empty bomDTO.searchType}">selected</c:if>>
-							전체
-						</option>
+						<option value="">선택</option>
 
-						<option value="bomCode" <c:if test="${bomDTO.searchType == 'bomCode'}">selected</c:if>>
+						<option value="bomCode"
+							<c:if test="${bomDTO.searchType == 'bomCode'}">selected</c:if>>
 							BOM코드
 						</option>
 
-						<option value="itemCode" <c:if test="${bomDTO.searchType == 'itemCode'}">selected</c:if>>
+						<option value="itemCode"
+							<c:if test="${bomDTO.searchType == 'itemCode'}">selected</c:if>>
 							완제품코드
 						</option>
 
-						<option value="itemName" <c:if test="${bomDTO.searchType == 'itemName'}">selected</c:if>>
+						<option value="itemName"
+							<c:if test="${bomDTO.searchType == 'itemName'}">selected</c:if>>
 							완제품명
 						</option>
 
-						<option value="material" <c:if test="${bomDTO.searchType == 'material'}">selected</c:if>>
-							구성자재
-						</option>
-
-						<option value="useYn" <c:if test="${bomDTO.searchType == 'useYn'}">selected</c:if>>
+						<option value="useYn"
+							<c:if test="${bomDTO.searchType == 'useYn'}">selected</c:if>>
 							사용여부
 						</option>
 					</select>
@@ -76,33 +62,53 @@
 				<div class="search-item">
 					<label class="search-label">검색어</label>
 
-					<input type="text"
-						   name="searchKeyword"
-						   class="search-input"
-						   value="${bomDTO.searchKeyword}"
-						   placeholder="검색어를 입력하세요. 사용여부는 Y 또는 N" />
+					<input type="text" name="searchKeyword" class="search-input"
+						value="${bomDTO.searchKeyword}" placeholder="내용을 입력하세요." />
 				</div>
 
 				<div class="search-btn-wrap">
 					<button type="submit" class="search-btn search-btn-main">
+						<svg viewBox="0 0 24 24" fill="none">
+							<circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor"
+								stroke-width="2"></circle>
+							<path d="M16 16L21 21" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round"></path>
+						</svg>
 						검색
 					</button>
 
-					<button type="button" class="search-btn search-btn-sub"
-							onclick="location.href='${contextPath}/master/bom'">
+					<button type="button"
+						class="search-btn search-btn-sub search-reset-btn"
+						onclick="location.href='${contextPath}/master/bom'">
+						<svg viewBox="0 0 24 24" fill="none">
+							<path
+								d="M20 12C20 16.4 16.4 20 12 20C7.6 20 4 16.4 4 12C4 7.6 7.6 4 12 4C14.4 4 16.5 5.1 18 6.8"
+								stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
+							<path d="M18 4V7H21" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round" stroke-linejoin="round"></path>
+						</svg>
 						초기화
 					</button>
 				</div>
 
 			</div>
-
 		</form>
 	</div>
 
 
 	<%-- =========================================================
-	     2. 목록 상단 영역
-	     ========================================================= --%>
+         2. 처리 메시지
+         ========================================================= --%>
+	<c:if test="${not empty msg}">
+		<script>
+			alert("${msg}");
+		</script>
+	</c:if>
+
+
+	<%-- =========================================================
+         3. 총 건수 / 버튼 영역
+         ========================================================= --%>
 	<div class="search-table-top">
 
 		<div class="search-total-area">
@@ -111,183 +117,83 @@
 
 		<div class="search-btn-right">
 			<button type="button" class="search-btn search-btn-main"
-					onclick="openBomAddModal();">
-				등록
-			</button>
+				onclick="openBomModal();">등록</button>
 
-			<button type="button" class="search-btn search-btn-sub"
-					onclick="submitBomDeleteForm();">
-				선택삭제
-			</button>
+			<button type="button"
+				class="search-btn search-btn-sub pc-only-delete-btn"
+				onclick="submitDeleteForm();">선택 삭제</button>
 		</div>
-
 	</div>
 
 
 	<%-- =========================================================
-	     3. BOM 목록 테이블
-	     ========================================================= --%>
-	<form id="bomDeleteForm"
-		  action="${contextPath}/master/bom/delete"
-		  method="post"
-		  accept-charset="UTF-8">
+         4. BOM 목록
+         ========================================================= --%>
+	<form id="bomDeleteForm" method="post"
+		action="${contextPath}/master/bom/delete">
 
 		<div class="coTableWrap">
-			<table class="coTable" id="bomListTable">
+			<table class="coTable bom-table" id="bomListTable">
 
 				<thead>
 					<tr>
-						<%--
-							모바일 표시 컬럼 1: 체크박스
-							- 선택삭제 기능을 위해 모바일에서도 표시한다.
-						--%>
-						<th class="mobile_show">
-							<input type="checkbox" id="checkAll" onclick="toggleAllCheck(this);">
-						</th>
+						<th class="mobile_show" onclick="toggleAllCheckByTitle();"
+							title="전체 선택/해제">선택</th>
 
-						<%--
-							모바일 표시 컬럼 2: BOM코드
-							- BOM을 식별하는 핵심 코드이므로 모바일에서도 표시한다.
-						--%>
 						<th class="mobile_show">BOM코드</th>
-
-						<%--
-							PC 전용 컬럼
-							- 완제품코드는 BOM코드와 일부 중복되므로 모바일에서는 숨긴다.
-						--%>
 						<th class="mobile_hidden">완제품코드</th>
-
-						<%--
-							모바일 표시 컬럼 3: 완제품명
-							- BOM 대상 품목을 가장 쉽게 확인할 수 있는 핵심 표시값이다.
-						--%>
 						<th class="mobile_show">완제품명</th>
-
-						<%--
-							PC 전용 컬럼
-							- 버전은 PC 목록에서는 표시하지만 모바일 5컬럼 기준에서는 제외한다.
-						--%>
 						<th class="mobile_hidden">버전</th>
-
-						<%--
-							모바일 표시 컬럼 4: 구성수
-							- BOM에 등록된 자재 개수를 빠르게 확인하기 위한 핵심값이다.
-						--%>
-						<th class="mobile_show">구성수</th>
-
-						<%--
-							PC 전용 컬럼
-							- 사용여부는 PC에서는 표시하되 모바일 5컬럼 기준에서는 우선순위가 낮아 숨긴다.
-						--%>
-						<th class="mobile_hidden">사용여부</th>
-
-						<%--
-							모바일 표시 컬럼 5: 상세
-							- 상세 이동은 모든 목록 화면에서 반드시 표시한다.
-						--%>
+						<th class="mobile_hidden">구성품수</th>
+						<th class="mobile_show">사용여부</th>
 						<th class="mobile_show">상세</th>
 					</tr>
 				</thead>
 
 				<tbody>
 					<c:choose>
-
 						<c:when test="${not empty bomList}">
 							<c:forEach var="bom" items="${bomList}">
 								<tr>
-									<%--
-										모바일 표시 컬럼 1: 체크박스
-										- 선택삭제 기능을 위해 모바일에서도 표시한다.
-									--%>
 									<td class="mobile_show">
-										<input type="checkbox" name="bomIdList" value="${bom.bomId}">
+										<input type="checkbox" name="bomIdList"
+											value="${bom.bomId}">
 									</td>
 
-									<%--
-										모바일 표시 컬럼 2: BOM코드
-										- 긴 값은 공용 CSS에서 말줄임 처리된다.
-										- title 속성으로 PC에서 전체 값을 확인할 수 있다.
-									--%>
 									<td class="mobile_show" title="${bom.bomCode}">
 										${bom.bomCode}
 									</td>
 
-									<%--
-										PC 전용 컬럼: 완제품코드
-										- 모바일에서는 BOM코드와 정보가 겹치므로 숨긴다.
-									--%>
 									<td class="mobile_hidden" title="${bom.itemCode}">
 										${bom.itemCode}
 									</td>
 
-									<%--
-										모바일 표시 컬럼 3: 완제품명
-										- BOM 대상 품목을 확인하는 핵심 표시값이다.
-									--%>
 									<td class="mobile_show" title="${bom.itemName}">
 										${bom.itemName}
 									</td>
 
-									<%--
-										PC 전용 컬럼: 버전
-										- 모바일에서는 구성수보다 우선순위가 낮아 숨긴다.
-									--%>
 									<td class="mobile_hidden">
 										V${bom.version}
 									</td>
 
-									<%--
-										모바일 표시 컬럼 4: 구성수
-										- BOM 상세 자재 개수를 표시한다.
-									--%>
-									<td class="mobile_show">
-										<c:choose>
-											<c:when test="${not empty bom.detailCount}">
-												<fmt:formatNumber value="${bom.detailCount}" pattern="#,##0" />개
-											</c:when>
-											<c:otherwise>0개</c:otherwise>
-										</c:choose>
+									<td class="mobile_hidden">
+										${bom.detailCount}
 									</td>
 
-									<%--
-										PC 전용 컬럼: 사용여부
-										- PC에서는 표시하지만 모바일 5컬럼 기준에서는 숨긴다.
-									--%>
-									<td class="mobile_hidden">
+									<td class="mobile_show">
 										<c:choose>
 											<c:when test="${bom.useYn == 'Y'}">
-												<span class="coStatus coStatusUse">
-													<c:choose>
-														<c:when test="${not empty bom.useYnName}">
-															${bom.useYnName}
-														</c:when>
-														<c:otherwise>사용</c:otherwise>
-													</c:choose>
-												</span>
+												<span class="coStatus coStatusUse">사용</span>
 											</c:when>
-
 											<c:otherwise>
-												<span class="coStatus coStatusStop">
-													<c:choose>
-														<c:when test="${not empty bom.useYnName}">
-															${bom.useYnName}
-														</c:when>
-														<c:otherwise>미사용</c:otherwise>
-													</c:choose>
-												</span>
+												<span class="coStatus coStatusStop">미사용</span>
 											</c:otherwise>
 										</c:choose>
 									</td>
 
-									<%--
-										모바일 표시 컬럼 5: 상세
-										- BOM 상세 화면으로 이동한다.
-									--%>
 									<td class="mobile_show">
 										<a href="${contextPath}/master/bom/detail?bomId=${bom.bomId}"
-										   class="coDetailBtn">
-											보기
-										</a>
+											class="coDetailBtn">보기</a>
 									</td>
 								</tr>
 							</c:forEach>
@@ -295,26 +201,22 @@
 
 						<c:otherwise>
 							<tr>
-								<td colspan="8">
+								<td colspan="8" style="text-align: center;">
 									조회된 BOM 정보가 없습니다.
 								</td>
 							</tr>
 						</c:otherwise>
-
 					</c:choose>
 				</tbody>
 
 			</table>
 		</div>
-
 	</form>
 
 
 	<%-- =========================================================
-	     4. 공용 페이징
-	     - 공용 paging.jsp는 수정하지 않는다.
-	     - Controller에서 pageInfo/pageUrl을 전달한다.
-	     ========================================================= --%>
+         5. 페이징
+         ========================================================= --%>
 	<c:if test="${not empty pageInfo}">
 		<c:set var="pageUrl" value="/master/bom" scope="request" />
 		<jsp:include page="/WEB-INF/views/common/paging.jsp" />
@@ -324,9 +226,9 @@
 
 
 <%-- =============================================================
-     5. BOM 등록 모달
+     6. BOM 등록 모달
      ============================================================= --%>
-<div id="bomAddModal" class="modal_wrap">
+<div id="bomModal" class="modal_wrap" aria-hidden="true">
 
 	<div class="modal_box">
 
@@ -334,114 +236,93 @@
 			<h3 class="modal_title">BOM 등록</h3>
 		</div>
 
-		<form action="${contextPath}/master/bom/add"
-			  method="post"
-			  accept-charset="UTF-8"
-			  class="modal_form"
-			  onsubmit="return validateBomAddForm();">
+		<form id="bomAddForm" class="modal_form" method="post"
+			action="${contextPath}/master/bom/add"
+			onsubmit="return validateBomAddForm();">
 
 			<div class="modal_body modal_body_2col">
 
-				<%--
-					완제품 선택
-					- BOM은 완제품 1개를 기준으로 구성자재를 관리한다.
-					- 완제품은 직접 ID를 입력하지 않고 자동완성 목록에서 선택한다.
-				--%>
 				<div class="modal_item modal_item_full autocomplete-wrap">
 					<label class="modal_label">
 						완제품 <span class="modal_required">*</span>
 					</label>
 
+					<input type="text" id="productItemInput" class="modal_input"
+						placeholder="완제품명 또는 완제품코드를 입력하세요."
+						autocomplete="off" required />
+
 					<input type="hidden" name="itemId" id="productItemId" />
 
-					<input type="text"
-						   id="productItemKeyword"
-						   class="modal_input"
-						   placeholder="완제품코드 또는 완제품명을 입력하세요."
-						   autocomplete="off"
-						   oninput="searchProductItem();" />
+					<div id="productItemAutoList" class="autocomplete-list"></div>
 
-					<div id="productItemAutoCompleteBox"></div>
-
-					<p id="productItemSelectedText" class="autocomplete-id-text">
-						자동완성 목록에서 완제품을 선택하세요.
+					<p id="productItemIdText" class="autocomplete-id-text">
+						완제품 ID: 선택 안 됨
 					</p>
 				</div>
 
-				<%--
-					BOM코드
-					- 완제품 선택 시 BOM-완제품코드 형태로 자동 입력된다.
-					- 예: BOM-FG-GSK-ION5-EPDM-001
-				--%>
-				<div class="modal_item modal_item_full">
+				<div class="modal_item">
 					<label class="modal_label">
 						BOM코드 <span class="modal_required">*</span>
 					</label>
 
-					<input type="text"
-						   name="bomCode"
-						   id="bomCode"
-						   class="modal_input"
-						   placeholder="완제품 선택 시 자동 입력됩니다."
-						   readonly
-						   required />
+					<div class="bom-code-generate-box">
+						<input type="text" name="bomCode" id="bomCode"
+							class="modal_input" placeholder="완제품 선택 시 자동생성됩니다."
+							readonly required />
+
+						<button type="button"
+							class="search-btn search-btn-main bom-code-btn"
+							onclick="generateBomCodeAndVersion();">자동생성</button>
+					</div>
 				</div>
 
-				<%--
-					버전
-					- 기본값은 1이다.
-					- 이후 설계 변경 시 버전을 올릴 수 있다.
-				--%>
 				<div class="modal_item">
 					<label class="modal_label">
 						버전 <span class="modal_required">*</span>
 					</label>
 
-					<input type="number"
-						   name="version"
-						   id="version"
-						   class="modal_input"
-						   value="1"
-						   min="1"
-						   required />
+					<input type="number" name="version" id="version"
+						class="modal_input" value="1" min="1" readonly required />
 				</div>
 
-				<%--
-					사용여부
-					- 기준정보 등록 시 기본값은 사용(Y)이다.
-				--%>
 				<div class="modal_item">
-					<label class="modal_label">
-						사용여부 <span class="modal_required">*</span>
-					</label>
+					<label class="modal_label">사용여부</label>
 
-					<select name="useYn" id="useYn" class="modal_select" required>
-						<option value="Y" selected>사용</option>
+					<select name="useYn" class="modal_select">
+						<option value="Y">사용</option>
 						<option value="N">미사용</option>
 					</select>
 				</div>
 
-				<%--
-					비고
-					- BOM 마스터에 대한 간단한 설명을 입력한다.
-					- 구성자재 상세 비고는 bomDetail.jsp에서 별도로 관리한다.
-				--%>
-				<div class="modal_item modal_item_full">
+				<div class="modal_item">
 					<label class="modal_label">비고</label>
 
-					<textarea name="remark"
-							  id="remark"
-							  class="modal_textarea"
-							  placeholder="비고를 입력하세요."></textarea>
+					<textarea name="remark" class="modal_textarea" maxlength="30"
+						placeholder="비고는 30자 이내로 입력하세요."></textarea>
+				</div>
+
+				<div class="modal_item modal_item_full">
+					<div class="bom-detail-title-row">
+						<label class="modal_label">
+							BOM 구성품 <span class="modal_required">*</span>
+						</label>
+
+						<button type="button" class="search-btn search-btn-sub"
+							onclick="addBomDetailRow();">구성품 추가</button>
+					</div>
+
+					<div id="bomDetailRowArea" class="bom-detail-row-area"></div>
+
+					<p class="autocomplete-id-text">
+						원자재/부자재는 자동완성 목록에서 선택해야 저장됩니다.
+					</p>
 				</div>
 
 			</div>
 
 			<div class="modal_footer">
 				<button type="button" class="modal_btn modal_btn_cancel"
-						onclick="closeBomAddModal();">
-					취소
-				</button>
+					onclick="closeBomModal();">취소</button>
 
 				<button type="submit" class="modal_btn modal_btn_submit">
 					등록
@@ -449,32 +330,36 @@
 			</div>
 
 		</form>
-
 	</div>
-
 </div>
 
 
 <%-- =============================================================
-     6. bom.jsp 전용 최소 CSS
-     - 공용 CSS에 없는 기능만 작성한다.
+     7. BOM 화면 전용 최소 스타일
      ============================================================= --%>
 <style>
-/* 완제품 자동완성 input 기준 위치 */
 .autocomplete-wrap {
 	position: relative;
+	min-width: 0;
 }
 
-/* 완제품 자동완성 목록 박스 */
-#productItemAutoCompleteBox {
+.autocomplete-id-text {
+	margin: 4px 0 0 2px;
+	color: #6B7280;
+	font-size: 12px;
+	line-height: 1.4;
+}
+
+.autocomplete-list {
 	display: none;
 	position: absolute;
 	left: 0;
 	right: 0;
-	top: 76px;
-	z-index: 30;
-	max-height: 190px;
+	top: 100%;
+	z-index: 3000;
+	max-height: 180px;
 	overflow-y: auto;
+	margin-top: 4px;
 	border: 1px solid #D6DEE0;
 	border-radius: 8px;
 	background-color: #FFFFFF;
@@ -482,7 +367,6 @@
 	box-sizing: border-box;
 }
 
-/* 자동완성 목록 한 줄 */
 .autocomplete-item {
 	padding: 9px 12px;
 	color: #1F2933;
@@ -503,101 +387,233 @@
 	color: #2F7D62;
 }
 
-/* 자동완성 선택 후 ID 안내 문구 */
-.autocomplete-id-text {
-	margin: 4px 0 0 2px;
+.autocomplete-name {
+	display: inline-block;
+	margin-right: 6px;
+	font-weight: 700;
+}
+
+.autocomplete-code {
 	color: #6B7280;
 	font-size: 12px;
-	line-height: 1.4;
 }
 
-/* 목록 테이블 컬럼폭 드래그 */
-#bomListTable th {
-	position: relative;
-	user-select: none;
+.bom-code-generate-box {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+	width: 100%;
+	box-sizing: border-box;
 }
 
-/* 컬럼 경계 드래그 핸들 */
-.column-resizer {
-	position: absolute;
-	top: 0;
-	right: 0;
-	width: 7px;
-	height: 100%;
-	cursor: col-resize;
-	z-index: 5;
+.bom-code-generate-box > input {
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
-.column-resizer:hover {
-	background-color: rgba(47, 125, 96, 0.18);
+.bom-code-btn {
+	flex: 0 0 auto;
+	white-space: nowrap;
 }
 
-/* 상세 컬럼은 보기 옆에 말줄임 점이 생기지 않도록 제외 */
-#bomListTable th:last-child,
-#bomListTable td:last-child {
-	text-overflow: clip !important;
+.bom-detail-title-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 8px;
 }
 
-#bomListTable td:last-child .coDetailBtn {
-	max-width: 100%;
-	overflow: hidden;
-	text-overflow: clip !important;
+.bom-detail-row-area {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.bom-detail-row {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #E5E7EB;
+	border-radius: 10px;
+	background-color: #F9FAFB;
+	box-sizing: border-box;
+}
+
+.bom-detail-row-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) 160px minmax(0, 1.5fr) 92px;
+	gap: 8px;
+	align-items: start;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.bom-detail-row-grid > div {
+	min-width: 0;
+	box-sizing: border-box;
+}
+
+.bom-detail-row-grid input {
+	width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
+}
+
+.bom-detail-qty-box {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
+}
+
+.bom-detail-qty-box .qtyDisplayInput {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.bom-detail-unit-text {
+	flex: 0 0 auto;
+	min-width: 28px;
+	color: #4B5563;
+	font-size: 13px;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.bom-detail-remove-btn {
+	width: 100%;
+	min-width: 0;
+	padding-left: 0;
+	padding-right: 0;
+	box-sizing: border-box;
 	white-space: nowrap;
 }
 </style>
 
 
+<%-- =============================================================
+     8. BOM 화면 전용 스크립트
+     ============================================================= --%>
 <script>
 	var contextPath = "${contextPath}";
 
+	var productAutoTimer = null;
+	var materialAutoTimerMap = {};
+	var bomDetailRowSeq = 0;
 
-	// =========================================================
-	// 1. 등록 모달 열기 / 닫기
-	// =========================================================
 
-	function openBomAddModal() {
-		var modal = document.getElementById("bomAddModal");
+	function openBomModal() {
+		resetBomAddForm();
 
-		if (modal != null) {
-			modal.classList.add("modal_is_open");
-			document.body.classList.add("modal_body_lock");
+		var modal = document.getElementById("bomModal");
+
+		if (modal == null) {
+			alert("BOM 등록 모달 영역을 찾을 수 없습니다.");
+			return;
 		}
+
+		modal.classList.add("modal_is_open");
+		modal.setAttribute("aria-hidden", "false");
+		document.body.classList.add("modal_body_lock");
 	}
 
 
-	function closeBomAddModal() {
-		var modal = document.getElementById("bomAddModal");
+	function closeBomModal() {
+		var modal = document.getElementById("bomModal");
 
-		if (modal != null) {
-			modal.classList.remove("modal_is_open");
+		if (modal == null) {
+			return;
+		}
+
+		modal.classList.remove("modal_is_open");
+		modal.setAttribute("aria-hidden", "true");
+
+		if (document.querySelectorAll(".modal_wrap.modal_is_open").length === 0) {
 			document.body.classList.remove("modal_body_lock");
 		}
-
-		clearBomAddForm();
 	}
 
 
-	function clearBomAddForm() {
-		document.getElementById("productItemId").value = "";
-		document.getElementById("productItemKeyword").value = "";
-		document.getElementById("bomCode").value = "";
-		document.getElementById("version").value = "1";
-		document.getElementById("useYn").value = "Y";
-		document.getElementById("remark").value = "";
+	function resetBomAddForm() {
+		var form = document.getElementById("bomAddForm");
 
-		document.getElementById("productItemSelectedText").innerText =
-			"자동완성 목록에서 완제품을 선택하세요.";
+		if (form != null) {
+			form.reset();
+		}
 
-		hideProductItemAutoCompleteBox();
+		setValueById("productItemId", "");
+		setValueById("productItemInput", "");
+		setTextById("productItemIdText", "완제품 ID: 선택 안 됨");
+
+		var productItemAutoList = document.getElementById("productItemAutoList");
+
+		if (productItemAutoList != null) {
+			productItemAutoList.innerHTML = "";
+			productItemAutoList.style.display = "none";
+		}
+
+		setValueById("bomCode", "");
+		setValueById("version", "1");
+
+		var bomDetailRowArea = document.getElementById("bomDetailRowArea");
+
+		if (bomDetailRowArea != null) {
+			bomDetailRowArea.innerHTML = "";
+		}
+
+		bomDetailRowSeq = 0;
+		addBomDetailRow();
 	}
 
 
-	// =========================================================
-	// 2. 선택삭제
-	// =========================================================
+	function setValueById(id, value) {
+		var element = document.getElementById(id);
+
+		if (element != null) {
+			element.value = value;
+		}
+	}
+
+
+	function setTextById(id, value) {
+		var element = document.getElementById(id);
+
+		if (element != null) {
+			element.innerText = value;
+		}
+	}
+
+
+	function toggleAllCheckByTitle() {
+		var checkboxList = document.querySelectorAll("#bomDeleteForm input[name='bomIdList']");
+
+		if (checkboxList.length === 0) {
+			return;
+		}
+
+		var allChecked = true;
+
+		for (var i = 0; i < checkboxList.length; i++) {
+			if (!checkboxList[i].checked) {
+				allChecked = false;
+				break;
+			}
+		}
+
+		var nextChecked = !allChecked;
+
+		for (var j = 0; j < checkboxList.length; j++) {
+			checkboxList[j].checked = nextChecked;
+		}
+	}
+
 
 	function toggleAllCheck(checkAll) {
-		var checkboxList = document.querySelectorAll("input[name='bomIdList']");
+		var checkboxList = document.querySelectorAll("#bomDeleteForm input[name='bomIdList']");
 
 		for (var i = 0; i < checkboxList.length; i++) {
 			checkboxList[i].checked = checkAll.checked;
@@ -605,10 +621,10 @@
 	}
 
 
-	function submitBomDeleteForm() {
-		var checkedList = document.querySelectorAll("input[name='bomIdList']:checked");
+	function submitDeleteForm() {
+		var checkedItems = document.querySelectorAll("#bomDeleteForm input[name='bomIdList']:checked");
 
-		if (checkedList.length === 0) {
+		if (checkedItems.length === 0) {
 			alert("삭제할 BOM을 선택하세요.");
 			return;
 		}
@@ -619,425 +635,505 @@
 	}
 
 
-	// =========================================================
-	// 3. 완제품 자동완성
-	// =========================================================
+	function searchProductItemAutoComplete(keyword) {
+		var listBox = document.getElementById("productItemAutoList");
 
-	function searchProductItem() {
-		var keywordInput = document.getElementById("productItemKeyword");
-		var itemIdInput = document.getElementById("productItemId");
-		var selectedText = document.getElementById("productItemSelectedText");
-
-		var keyword = keywordInput.value.trim();
-
-		itemIdInput.value = "";
-		document.getElementById("bomCode").value = "";
-
-		selectedText.innerText = "자동완성 목록에서 완제품을 선택하세요.";
-
-		if (keyword.length < 1) {
-			hideProductItemAutoCompleteBox();
+		if (listBox == null) {
 			return;
 		}
 
-		fetch(contextPath + "/master/bom/productAutoComplete?keyword=" + encodeURIComponent(keyword))
+		if (keyword == null || keyword.length < 1) {
+			listBox.style.display = "none";
+			listBox.innerHTML = "";
+			return;
+		}
+
+		fetch(contextPath + "/master/bom/productAutoComplete?keyword="
+				+ encodeURIComponent(keyword))
 			.then(function(response) {
 				return response.json();
 			})
 			.then(function(itemList) {
-				renderProductItemAutoComplete(itemList);
+				listBox.innerHTML = "";
+
+				if (itemList == null || itemList.length === 0) {
+					listBox.style.display = "none";
+					return;
+				}
+
+				for (var i = 0; i < itemList.length; i++) {
+					var item = itemList[i];
+
+					var div = document.createElement("div");
+					div.className = "autocomplete-item";
+
+					var nameSpan = document.createElement("span");
+					nameSpan.className = "autocomplete-name";
+					nameSpan.textContent = item.itemName;
+
+					var codeSpan = document.createElement("span");
+					codeSpan.className = "autocomplete-code";
+					codeSpan.textContent = "(" + item.itemCode + " / ID " + item.itemId + ")";
+
+					div.appendChild(nameSpan);
+					div.appendChild(codeSpan);
+
+					div.setAttribute("data-item-id", item.itemId);
+					div.setAttribute("data-item-code", item.itemCode);
+					div.setAttribute("data-item-name", item.itemName);
+
+					div.onclick = function() {
+						var selectedId = this.getAttribute("data-item-id");
+						var selectedCode = this.getAttribute("data-item-code");
+						var selectedName = this.getAttribute("data-item-name");
+
+						setValueById("productItemInput", selectedName + " (" + selectedCode + ")");
+						setValueById("productItemId", selectedId);
+						setTextById("productItemIdText", "완제품 ID: " + selectedId);
+
+						listBox.style.display = "none";
+						listBox.innerHTML = "";
+
+						generateBomCodeAndVersion();
+					};
+
+					listBox.appendChild(div);
+				}
+
+				listBox.style.display = "block";
 			})
 			.catch(function() {
-				hideProductItemAutoCompleteBox();
+				listBox.style.display = "none";
+				listBox.innerHTML = "";
 			});
 	}
 
 
-	function renderProductItemAutoComplete(itemList) {
-		var box = document.getElementById("productItemAutoCompleteBox");
+	function generateBomCodeAndVersion() {
+		var productItemId = document.getElementById("productItemId").value;
 
-		box.innerHTML = "";
-
-		if (itemList == null || itemList.length === 0) {
-			hideProductItemAutoCompleteBox();
+		if (productItemId === "") {
+			alert("완제품을 자동완성 목록에서 선택하세요.");
+			document.getElementById("productItemInput").focus();
 			return;
 		}
 
-		for (var i = 0; i < itemList.length; i++) {
-			(function(item) {
-				var itemId = item.itemId;
-				var itemCode = item.itemCode;
-				var itemName = item.itemName;
-				var itemUnit = item.itemUnit;
+		fetch(contextPath + "/master/bom/nextCode?itemId="
+				+ encodeURIComponent(productItemId))
+			.then(function(response) {
+				return response.text();
+			})
+			.then(function(nextBomCode) {
+				setValueById("bomCode", nextBomCode);
+			})
+			.catch(function() {
+				alert("BOM코드 자동생성 중 오류가 발생했습니다.");
+			});
 
-				var row = document.createElement("div");
-				row.className = "autocomplete-item";
+		fetch(contextPath + "/master/bom/nextVersion?itemId="
+				+ encodeURIComponent(productItemId))
+			.then(function(response) {
+				return response.text();
+			})
+			.then(function(nextVersion) {
+				setValueById("version", nextVersion);
+			})
+			.catch(function() {
+				setValueById("version", "1");
+			});
+	}
 
-				var label = "";
 
-				if (itemCode != null && itemCode !== "") {
-					label += "[" + itemCode + "] ";
-				}
+	function addBomDetailRow() {
+		bomDetailRowSeq++;
 
-				label += itemName;
+		var inputId = "materialItemInput_" + bomDetailRowSeq;
+		var hiddenId = "detailItemId_" + bomDetailRowSeq;
+		var listId = "materialItemAutoList_" + bomDetailRowSeq;
+		var unitId = "materialItemUnit_" + bomDetailRowSeq;
 
-				if (itemUnit != null && itemUnit !== "") {
-					label += " / " + itemUnit;
-				}
+		var rowArea = document.getElementById("bomDetailRowArea");
 
-				if (itemId != null && itemId !== "") {
-					label += " / ID: " + itemId;
-				}
-
-				row.innerText = label;
-
-				row.addEventListener("click", function() {
-					selectProductItem(itemId, itemCode, itemName);
-				});
-
-				box.appendChild(row);
-			})(itemList[i]);
+		if (rowArea == null) {
+			return;
 		}
 
-		box.style.display = "block";
-	}
+		var row = document.createElement("div");
+		row.className = "bom-detail-row";
 
+		row.innerHTML =
+			'<div class="bom-detail-row-grid">' +
 
-	function selectProductItem(itemId, itemCode, itemName) {
-		document.getElementById("productItemId").value = itemId;
-		document.getElementById("productItemKeyword").value = itemName;
-		document.getElementById("bomCode").value = "BOM-" + itemCode;
+				'<div class="autocomplete-wrap">' +
+					'<input type="text" id="' + inputId + '" class="modal_input" ' +
+						'placeholder="자재/부자재명 또는 코드를 입력하세요." autocomplete="off" required />' +
+					'<input type="hidden" name="detailItemIds" id="' + hiddenId + '" />' +
+					'<div id="' + listId + '" class="autocomplete-list"></div>' +
+					'<p class="autocomplete-id-text">구성품 ID: 선택 안 됨</p>' +
+				'</div>' +
 
-		document.getElementById("productItemSelectedText").innerText =
-			"선택된 완제품 ID: " + itemId + " / " + itemCode;
+				'<div class="bom-detail-qty-box">' +
+					'<input type="text" class="modal_input qtyDisplayInput" ' +
+						'placeholder="소요량" inputmode="decimal" autocomplete="off" ' +
+						'oninput="handleQtyInput(this);" required />' +
+					'<input type="hidden" name="detailQtys" class="qtyValueInput" />' +
+					'<span id="' + unitId + '" class="bom-detail-unit-text">단위</span>' +
+				'</div>' +
 
-		hideProductItemAutoCompleteBox();
-	}
+				'<div>' +
+					'<input type="text" name="detailRemarks" class="modal_input" ' +
+						'placeholder="비고 30자 이내" maxlength="30" />' +
+				'</div>' +
 
+				'<div>' +
+					'<button type="button" class="search-btn search-btn-sub bom-detail-remove-btn" ' +
+						'onclick="removeBomDetailRow(this);">삭제</button>' +
+				'</div>' +
 
-	function hideProductItemAutoCompleteBox() {
-		var box = document.getElementById("productItemAutoCompleteBox");
+			'</div>';
 
-		if (box != null) {
-			box.style.display = "none";
-			box.innerHTML = "";
+		rowArea.appendChild(row);
+
+		var materialInput = document.getElementById(inputId);
+
+		if (materialInput != null) {
+			materialInput.addEventListener("input", function() {
+				var keyword = this.value.trim();
+
+				setValueById(hiddenId, "");
+
+				var unitText = document.getElementById(unitId);
+
+				if (unitText != null) {
+					unitText.innerText = "단위";
+				}
+
+				var guideText = this.parentNode.querySelector(".autocomplete-id-text");
+
+				if (guideText != null) {
+					guideText.innerText = "구성품 ID: 선택 안 됨";
+				}
+
+				if (materialAutoTimerMap[inputId] != null) {
+					clearTimeout(materialAutoTimerMap[inputId]);
+				}
+
+				materialAutoTimerMap[inputId] = setTimeout(function() {
+					searchMaterialItemAutoComplete(keyword, inputId, hiddenId, listId, unitId);
+				}, 300);
+			});
 		}
 	}
 
 
-	// =========================================================
-	// 4. 등록 검증
-	// =========================================================
+	function removeBomDetailRow(target) {
+		var rowArea = document.getElementById("bomDetailRowArea");
+
+		if (rowArea == null) {
+			return;
+		}
+
+		var row = null;
+
+		if (target != null) {
+			row = target.closest(".bom-detail-row");
+		}
+
+		if (row == null) {
+			return;
+		}
+
+		if (rowArea.children.length <= 1) {
+			alert("BOM 구성품은 최소 1개 이상 필요합니다.");
+			return;
+		}
+
+		rowArea.removeChild(row);
+	}
+
+
+	function searchMaterialItemAutoComplete(keyword, inputId, hiddenId, listId, unitId) {
+		var listBox = document.getElementById(listId);
+
+		if (listBox == null) {
+			return;
+		}
+
+		if (keyword == null || keyword.length < 1) {
+			listBox.style.display = "none";
+			listBox.innerHTML = "";
+			return;
+		}
+
+		fetch(contextPath + "/master/bom/materialAutoComplete?keyword="
+				+ encodeURIComponent(keyword))
+			.then(function(response) {
+				return response.json();
+			})
+			.then(function(itemList) {
+				listBox.innerHTML = "";
+
+				if (itemList == null || itemList.length === 0) {
+					listBox.style.display = "none";
+					return;
+				}
+
+				for (var i = 0; i < itemList.length; i++) {
+					var item = itemList[i];
+
+					var div = document.createElement("div");
+					div.className = "autocomplete-item";
+
+					var nameSpan = document.createElement("span");
+					nameSpan.className = "autocomplete-name";
+					nameSpan.textContent = item.itemName;
+
+					var codeSpan = document.createElement("span");
+					codeSpan.className = "autocomplete-code";
+					codeSpan.textContent = "(" + item.itemCode + " / " + item.itemType + " / ID " + item.itemId + ")";
+
+					div.appendChild(nameSpan);
+					div.appendChild(codeSpan);
+
+					div.setAttribute("data-item-id", item.itemId);
+					div.setAttribute("data-item-code", item.itemCode);
+					div.setAttribute("data-item-name", item.itemName);
+					div.setAttribute("data-item-unit", item.itemUnit);
+
+					div.onclick = function() {
+						var selectedId = this.getAttribute("data-item-id");
+						var selectedCode = this.getAttribute("data-item-code");
+						var selectedName = this.getAttribute("data-item-name");
+						var selectedUnit = this.getAttribute("data-item-unit");
+
+						setValueById(inputId, selectedName + " (" + selectedCode + ")");
+						setValueById(hiddenId, selectedId);
+
+						var unitText = document.getElementById(unitId);
+
+						if (unitText != null) {
+							if (selectedUnit != null && selectedUnit !== "" && selectedUnit !== "null") {
+								unitText.innerText = selectedUnit;
+							} else {
+								unitText.innerText = "단위";
+							}
+						}
+
+						var input = document.getElementById(inputId);
+
+						if (input != null) {
+							var guideText = input.parentNode.querySelector(".autocomplete-id-text");
+
+							if (guideText != null) {
+								guideText.innerText = "구성품 ID: " + selectedId;
+							}
+						}
+
+						listBox.style.display = "none";
+						listBox.innerHTML = "";
+					};
+
+					listBox.appendChild(div);
+				}
+
+				listBox.style.display = "block";
+			})
+			.catch(function() {
+				listBox.style.display = "none";
+				listBox.innerHTML = "";
+			});
+	}
+
+
+	function handleQtyInput(input) {
+		if (input == null) {
+			return;
+		}
+
+		var rawValue = normalizeQtyValue(input.value);
+		var formattedValue = formatQtyWithComma(rawValue);
+
+		input.value = formattedValue;
+
+		var row = input.closest(".bom-detail-row");
+
+		if (row == null) {
+			return;
+		}
+
+		var hiddenInput = row.querySelector(".qtyValueInput");
+
+		if (hiddenInput != null) {
+			hiddenInput.value = rawValue;
+		}
+	}
+
+
+	function normalizeQtyValue(value) {
+		if (value == null) {
+			return "";
+		}
+
+		var rawValue = value.replace(/,/g, "");
+		rawValue = rawValue.replace(/[^\d.]/g, "");
+
+		var parts = rawValue.split(".");
+
+		if (parts.length > 1) {
+			rawValue = parts[0] + "." + parts.slice(1).join("");
+		}
+
+		return rawValue;
+	}
+
+
+	function formatQtyWithComma(rawValue) {
+		if (rawValue == null || rawValue === "") {
+			return "";
+		}
+
+		var hasDot = rawValue.indexOf(".") > -1;
+		var parts = rawValue.split(".");
+		var intPart = parts[0];
+		var decimalPart = "";
+
+		if (parts.length > 1) {
+			decimalPart = parts[1];
+		}
+
+		intPart = intPart.replace(/^0+(?=\d)/, "");
+
+		if (intPart === "") {
+			intPart = "0";
+		}
+
+		var formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+		if (hasDot) {
+			return formattedInt + "." + decimalPart;
+		}
+
+		return formattedInt;
+	}
+
 
 	function validateBomAddForm() {
-		var productItemId = document.getElementById("productItemId").value.trim();
+		var productItemId = document.getElementById("productItemId").value;
 		var bomCode = document.getElementById("bomCode").value.trim();
-		var version = document.getElementById("version").value.trim();
+		var version = document.getElementById("version").value;
+		var detailHiddenList = document.querySelectorAll("#bomAddForm input[name='detailItemIds']");
+		var detailQtyValueList = document.querySelectorAll("#bomAddForm input[name='detailQtys']");
+		var detailQtyDisplayList = document.querySelectorAll("#bomAddForm .qtyDisplayInput");
 
 		if (productItemId === "") {
-			alert("완제품은 자동완성 목록에서 선택하세요.");
-			document.getElementById("productItemKeyword").focus();
+			alert("완제품은 자동완성 목록에서 선택해야 합니다.");
+			document.getElementById("productItemInput").focus();
 			return false;
 		}
 
 		if (bomCode === "") {
-			alert("BOM코드가 생성되지 않았습니다. 완제품을 다시 선택하세요.");
-			document.getElementById("productItemKeyword").focus();
+			alert("BOM코드를 자동생성하세요.");
+			document.getElementById("bomCode").focus();
 			return false;
 		}
 
-		if (version === "" || parseInt(version, 10) < 1) {
-			alert("버전은 1 이상으로 입력하세요.");
+		if (version === "" || Number(version) <= 0) {
+			alert("BOM 버전은 1 이상이어야 합니다.");
 			document.getElementById("version").focus();
 			return false;
 		}
 
-		return confirm("BOM을 등록하시겠습니까?");
+		if (detailHiddenList.length === 0) {
+			alert("BOM 구성품을 1개 이상 추가하세요.");
+			return false;
+		}
+
+		var selectedItemMap = {};
+
+		for (var i = 0; i < detailHiddenList.length; i++) {
+			var itemId = detailHiddenList[i].value;
+
+			if (detailQtyDisplayList[i] != null) {
+				handleQtyInput(detailQtyDisplayList[i]);
+			}
+
+			var qty = detailQtyValueList[i].value;
+
+			if (itemId === "") {
+				alert("구성품은 자동완성 목록에서 선택해야 합니다.");
+				return false;
+			}
+
+			if (qty === "" || Number(qty) <= 0 || isNaN(Number(qty))) {
+				alert("구성품 소요량은 0보다 커야 합니다.");
+
+				if (detailQtyDisplayList[i] != null) {
+					detailQtyDisplayList[i].focus();
+				}
+
+				return false;
+			}
+
+			if (selectedItemMap[itemId] === true) {
+				alert("같은 구성품이 중복되었습니다.");
+				return false;
+			}
+
+			selectedItemMap[itemId] = true;
+		}
+
+		return true;
 	}
 
-
-	// =========================================================
-	// 5. 목록 테이블 컬럼폭 드래그
-	// - 새로고침 시 기본폭으로 복구
-	// - 전체 테이블 폭은 화면 밖으로 나가지 않도록 보정
-	// =========================================================
 
 	document.addEventListener("DOMContentLoaded", function() {
-		initResizableBomTable();
-	});
+		var productInput = document.getElementById("productItemInput");
 
+		if (productInput != null) {
+			productInput.addEventListener("input", function() {
+				clearTimeout(productAutoTimer);
 
-	window.addEventListener("resize", function() {
-		var table = document.getElementById("bomListTable");
+				var keyword = this.value.trim();
 
-		if (table == null) {
-			return;
+				setValueById("productItemId", "");
+				setTextById("productItemIdText", "완제품 ID: 선택 안 됨");
+				setValueById("bomCode", "");
+				setValueById("version", "1");
+
+				productAutoTimer = setTimeout(function() {
+					searchProductItemAutoComplete(keyword);
+				}, 300);
+			});
 		}
 
-		var colList = table.querySelectorAll("colgroup col");
+		var modal = document.getElementById("bomModal");
 
-		if (colList.length > 0) {
-			fitBomColumnWidthsToTable(table, colList);
-		}
-	});
-
-
-	function initResizableBomTable() {
-		var table = document.getElementById("bomListTable");
-
-		if (table == null) {
-			return;
+		if (modal != null) {
+			modal.addEventListener("click", function(event) {
+				if (event.target === modal) {
+					closeBomModal();
+				}
+			});
 		}
 
-		createBomColgroupIfNotExists(table);
-
-		var colList = table.querySelectorAll("colgroup col");
-		var thList = table.querySelectorAll("thead th");
-
-		if (colList.length === 0 || thList.length === 0) {
-			return;
-		}
-
-		resetDefaultBomColumnWidths(table, colList);
-
-		for (var index = 0; index < thList.length - 1; index++) {
-			addBomColumnResizeHandle(table, colList, thList[index], index);
-		}
-	}
-
-
-	function createBomColgroupIfNotExists(table) {
-		var existingColgroup = table.querySelector("colgroup");
-
-		if (existingColgroup != null) {
-			return;
-		}
-
-		var thList = table.querySelectorAll("thead th");
-
-		if (thList.length === 0) {
-			return;
-		}
-
-		var colgroup = document.createElement("colgroup");
-
-		for (var i = 0; i < thList.length; i++) {
-			var col = document.createElement("col");
-			colgroup.appendChild(col);
-		}
-
-		table.insertBefore(colgroup, table.firstChild);
-	}
-
-
-	function addBomColumnResizeHandle(table, colList, th, index) {
-		var resizer = document.createElement("span");
-		resizer.className = "column-resizer";
-
-		th.appendChild(resizer);
-
-		var startX = 0;
-		var leftStartWidth = 0;
-		var rightStartWidth = 0;
-		var rightIndex = index + 1;
-
-		resizer.addEventListener("mousedown", function(event) {
-			event.preventDefault();
-			event.stopPropagation();
-
-			startX = event.pageX;
-			leftStartWidth = getBomColWidth(colList[index]);
-			rightStartWidth = getBomColWidth(colList[rightIndex]);
-
-			document.addEventListener("mousemove", resizeBomColumnPair);
-			document.addEventListener("mouseup", stopResizeBomColumnPair);
+		document.addEventListener("keydown", function(event) {
+			if (event.key === "Escape") {
+				closeBomModal();
+			}
 		});
 
+		document.addEventListener("click", function(event) {
+			var isAutoCompleteArea = event.target.closest(".autocomplete-wrap");
 
-		function resizeBomColumnPair(event) {
-			var diffX = event.pageX - startX;
-
-			var leftMinWidth = getBomColumnMinWidth(index);
-			var rightMinWidth = getBomColumnMinWidth(rightIndex);
-
-			var newLeftWidth = leftStartWidth + diffX;
-			var newRightWidth = rightStartWidth - diffX;
-
-			if (newLeftWidth < leftMinWidth) {
-				newLeftWidth = leftMinWidth;
-				newRightWidth = leftStartWidth + rightStartWidth - newLeftWidth;
+			if (isAutoCompleteArea != null) {
+				return;
 			}
 
-			if (newRightWidth < rightMinWidth) {
-				newRightWidth = rightMinWidth;
-				newLeftWidth = leftStartWidth + rightStartWidth - newRightWidth;
+			var listBoxList = document.querySelectorAll(".autocomplete-list");
+
+			for (var i = 0; i < listBoxList.length; i++) {
+				listBoxList[i].style.display = "none";
 			}
-
-			colList[index].style.width = newLeftWidth + "px";
-			colList[rightIndex].style.width = newRightWidth + "px";
-
-			fitBomColumnWidthsToTable(table, colList);
-		}
-
-
-		function stopResizeBomColumnPair() {
-			document.removeEventListener("mousemove", resizeBomColumnPair);
-			document.removeEventListener("mouseup", stopResizeBomColumnPair);
-		}
-
-
-		resizer.addEventListener("dblclick", function(event) {
-			event.preventDefault();
-			event.stopPropagation();
-
-			resetDefaultBomColumnWidths(table, colList);
 		});
-	}
-
-
-	function resetDefaultBomColumnWidths(table, colList) {
-		var defaultWidths = [48, 190, 170, 230, 80, 90, 90, 70];
-
-		for (var i = 0; i < colList.length; i++) {
-			if (i < defaultWidths.length) {
-				colList[i].style.width = defaultWidths[i] + "px";
-			} else {
-				colList[i].style.width = "120px";
-			}
-		}
-
-		fitBomColumnWidthsToTable(table, colList);
-	}
-
-
-	function fitBomColumnWidthsToTable(table, colList) {
-		var tableWidth = getBomAvailableTableWidth(table);
-
-		if (tableWidth <= 0) {
-			return;
-		}
-
-		var totalWidth = 0;
-
-		for (var i = 0; i < colList.length; i++) {
-			totalWidth += getBomColWidth(colList[i]);
-		}
-
-		if (totalWidth <= 0) {
-			return;
-		}
-
-		if (totalWidth > tableWidth) {
-			var ratio = tableWidth / totalWidth;
-
-			for (var j = 0; j < colList.length; j++) {
-				var newWidth = getBomColWidth(colList[j]) * ratio;
-				var minWidth = getBomColumnMinWidth(j);
-
-				if (newWidth < minWidth) {
-					newWidth = minWidth;
-				}
-
-				colList[j].style.width = newWidth + "px";
-			}
-		}
-
-		var adjustedTotal = 0;
-
-		for (var k = 0; k < colList.length; k++) {
-			adjustedTotal += getBomColWidth(colList[k]);
-		}
-
-		if (adjustedTotal > tableWidth) {
-			var overWidth = adjustedTotal - tableWidth;
-
-			for (var x = colList.length - 1; x >= 0; x--) {
-				var currentWidth = getBomColWidth(colList[x]);
-				var min = getBomColumnAbsoluteMinWidth(x);
-				var reducible = currentWidth - min;
-
-				if (reducible <= 0) {
-					continue;
-				}
-
-				var reduce = Math.min(reducible, overWidth);
-
-				colList[x].style.width = (currentWidth - reduce) + "px";
-				overWidth -= reduce;
-
-				if (overWidth <= 0) {
-					break;
-				}
-			}
-		}
-
-		var finalTotal = 0;
-
-		for (var y = 0; y < colList.length; y++) {
-			finalTotal += getBomColWidth(colList[y]);
-		}
-
-		var remainWidth = tableWidth - finalTotal;
-
-		if (remainWidth > 2 && colList.length >= 4) {
-			colList[1].style.width = (getBomColWidth(colList[1]) + remainWidth / 2) + "px";
-			colList[3].style.width = (getBomColWidth(colList[3]) + remainWidth / 2) + "px";
-		}
-	}
-
-
-	function getBomAvailableTableWidth(table) {
-		var parent = table.parentElement;
-
-		if (parent == null) {
-			return Math.floor(table.getBoundingClientRect().width);
-		}
-
-		return Math.floor(parent.getBoundingClientRect().width);
-	}
-
-
-	function getBomColWidth(col) {
-		var width = parseFloat(col.style.width);
-
-		if (isNaN(width) || width <= 0) {
-			width = col.getBoundingClientRect().width;
-		}
-
-		if (isNaN(width) || width <= 0) {
-			width = 100;
-		}
-
-		return width;
-	}
-
-
-	function getBomColumnMinWidth(index) {
-		if (index === 0) {
-			return 42;
-		}
-
-		if (index === 4 || index === 5 || index === 6) {
-			return 70;
-		}
-
-		if (index === 7) {
-			return 60;
-		}
-
-		return 90;
-	}
-
-
-	function getBomColumnAbsoluteMinWidth(index) {
-		if (index === 0) {
-			return 36;
-		}
-
-		if (index === 7) {
-			return 54;
-		}
-
-		return 64;
-	}
+	});
 </script>
