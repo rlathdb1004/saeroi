@@ -3,253 +3,126 @@
 
 /* 대시보드 전체 본문 영역 */
 .dashboard-page {
-	/* 공통 content 영역에서 이미 여백을 잡고 있어서 대시보드 자체 여백은 제거한다. */
 	padding: 0;
-
-	/* 다른 페이지와 배경 톤이 다르게 보이지 않도록 투명 처리한다. */
 	background-color: transparent;
-
-	/* 공통 화면에서 쓰는 진한 회색 계열로 글자색을 맞춘다. */
 	color: #1F2933;
-
-	/* 화면 높이만 유지한다. */
 	min-height: calc(100vh - 90px);
-
-	/* 너비 계산을 안정적으로 맞춘다. */
 	box-sizing: border-box;
 }
 
 /* 대시보드 상단 제목 영역 */
 .dashboard-head {
-	/* 제목과 아래 KPI 영역 사이 간격을 준다. */
 	margin-bottom: 18px;
 }
 
 /* 대시보드 제목 */
 .dashboard-title {
-	/* h2 기본 여백을 제거해서 위치를 직접 조절하기 쉽게 한다. */
 	margin: 0 0 8px 0;
-
-	/* 화면 제목이 잘 보이도록 크기를 설정한다. */
 	font-size: 24px;
-
-	/* 제목은 조금 두껍게 표시한다. */
 	font-weight: 700;
-
-	/* 프로젝트 포인트 컬러인 초록 계열을 적용한다. */
 	color: #2F7D62;
-
-	/* 줄 높이를 안정적으로 맞춘다. */
 	line-height: 1.2;
 }
 
 /* 대시보드 설명 문구 */
 .dashboard-desc {
-	/* p 태그의 기본 여백을 제거한다. */
 	margin: 0;
-
-	/* 설명 문구는 제목보다 작게 표시한다. */
 	font-size: 14px;
-
-	/* 설명 문구는 너무 진하지 않게 한다. */
 	color: #6B7280;
-
-	/* 줄 높이를 안정적으로 맞춘다. */
 	line-height: 1.4;
 }
 
 /* 대시보드 안에서 공통으로 사용하는 흰색 박스 */
 .dashboard-section {
-	/* 카드 느낌을 주기 위해 배경을 흰색으로 설정한다. */
 	background-color: #FFFFFF;
-
-	/* 공통 검색/테이블 박스와 같은 테두리 색상으로 맞춘다. */
 	border: 1px solid #DDE5E1;
-
-	/* 공통 박스와 비슷한 둥근 정도로 맞춘다. */
 	border-radius: 10px;
-
-	/* 기존보다 안쪽 여백을 줄여서 내용이 안쪽으로 많이 들어가 보이지 않게 한다. */
 	padding: 16px;
-
-	/* 다음 영역과 간격을 준다. */
 	margin-bottom: 16px;
-
-	/* 다른 페이지와 튀지 않도록 강한 그림자는 제거한다. */
 	box-shadow: none;
-
-	/* 너비 계산을 안정적으로 맞춘다. */
 	box-sizing: border-box;
 }
 
 /* 섹션 제목과 오른쪽 뱃지/더보기 등을 가로로 배치하는 영역 */
 .section-title-box {
-	/* 제목과 오른쪽 요소를 한 줄에 배치한다. */
 	display: flex;
-
-	/* 왼쪽 제목과 오른쪽 요소를 양끝으로 보낸다. */
 	justify-content: space-between;
-
-	/* 세로 위치를 가운데로 맞춘다. */
 	align-items: center;
-
-	/* 제목 아래 콘텐츠와 간격을 준다. */
 	margin-bottom: 12px;
-
-	/* 요소 사이 간격을 준다. */
 	gap: 12px;
 }
 
 /* 섹션 제목 */
 .section-title {
-	/* h3 기본 여백을 제거한다. */
 	margin: 0;
-
-	/* 섹션 제목 크기를 공통 화면과 맞춘다. */
 	font-size: 18px;
-
-	/* 제목은 두껍게 표시한다. */
 	font-weight: 700;
-
-	/* 공통 글자색과 맞춘다. */
-	color: #1F2933;
-
-	/* 줄 높이를 안정적으로 맞춘다. */
+	color: #111827;
 	line-height: 1.2;
 }
 
 /* 오른쪽 작은 뱃지 */
 .section-badge {
-	/* 뱃지처럼 보이게 안쪽 여백을 준다. */
 	padding: 6px 12px;
-
-	/* 공통 초록 계열 배경으로 맞춘다. */
 	background-color: #E6F2ED;
-
-	/* 공통 포인트 초록색을 사용한다. */
 	color: #2F7D62;
-
-	/* 테두리를 추가해서 공통 상태값 느낌으로 맞춘다. */
 	border: 1px solid #CFE6DB;
-
-	/* 둥근 뱃지 모양을 만든다. */
 	border-radius: 999px;
-
-	/* 글자 크기를 작게 설정한다. */
 	font-size: 12px;
-
-	/* 글자를 살짝 두껍게 한다. */
 	font-weight: 600;
-
-	/* 줄바꿈되지 않게 한다. */
 	white-space: nowrap;
 }
 
 /* KPI 카드 6개를 배치하는 영역 */
 .kpi-grid {
-	/* 카드들을 그리드 형태로 배치한다. */
 	display: grid;
-
-	/* 한 줄에 3개씩 배치한다. */
 	grid-template-columns: repeat(3, 1fr);
-
-	/* 카드 사이 간격을 설정한다. */
 	gap: 12px;
 }
 
 /* KPI 카드 한 개 */
 .kpi-card {
-	/* 카드 배경은 흰색으로 설정한다. */
 	background-color: #FFFFFF;
-
-	/* 공통 테이블/검색 영역과 같은 테두리 색상으로 맞춘다. */
 	border: 1px solid #DDE5E1;
-
-	/* 공통 박스와 둥근 정도를 맞춘다. */
 	border-radius: 10px;
-
-	/* 카드 내부 여백을 줄여서 글씨가 흩어져 보이지 않게 한다. */
 	padding: 14px;
-
-	/* 카드 높이를 줄여서 빈 공간이 과하게 생기지 않게 한다. */
 	min-height: 124px;
-
-	/* 카드 안의 내용을 위에서 아래로 배치한다. */
 	display: flex;
 	flex-direction: column;
-
-	/* 카드 안 요소 사이 간격을 줄인다. */
 	gap: 8px;
-
-	/* 다른 공통 화면과 맞추기 위해 그림자를 제거한다. */
 	box-shadow: none;
-
-	/* 너비 계산을 안정적으로 맞춘다. */
 	box-sizing: border-box;
 }
 
 /* KPI 카드 상단 아이콘 + 이름 영역 */
 .kpi-card-top {
-	/* 아이콘과 이름을 한 줄에 배치한다. */
 	display: flex;
-
-	/* 세로 위치를 가운데로 맞춘다. */
 	align-items: center;
-
-	/* 아이콘과 이름 사이 간격을 준다. */
 	gap: 8px;
-
-	/* 글씨가 밀리지 않게 한다. */
 	min-width: 0;
 }
 
 /* KPI 아이콘 */
 .kpi-icon {
-	/* 아이콘을 원 안에 넣기 위해 가로 크기를 정한다. */
 	width: 28px;
-
-	/* 아이콘을 원 안에 넣기 위해 세로 크기를 정한다. */
 	height: 28px;
-
-	/* 아이콘 배경을 연한 초록색으로 설정한다. */
 	background-color: #E6F2ED;
-
-	/* 아이콘 색상을 초록색으로 설정한다. */
 	color: #2F7D62;
-
-	/* 원형 아이콘을 만든다. */
 	border-radius: 50%;
-
-	/* 아이콘을 가운데 정렬한다. */
 	display: flex;
 	align-items: center;
 	justify-content: center;
-
-	/* 아이콘 크기를 설정한다. */
 	font-size: 13px;
-
-	/* 아이콘 글자를 조금 두껍게 한다. */
 	font-weight: 700;
-
-	/* 아이콘 크기가 줄어들지 않게 한다. */
 	flex-shrink: 0;
 }
 
 /* KPI 이름 */
 .kpi-name {
-	/* KPI 이름 글자 크기를 설정한다. */
 	font-size: 14px;
-
-	/* KPI 이름을 두껍게 표시한다. */
 	font-weight: 700;
-
-	/* 공통 글자색과 맞춘다. */
 	color: #1F2933;
-
-	/* 줄 높이를 안정적으로 맞춘다. */
 	line-height: 1.2;
-
-	/* 긴 텍스트가 카드 밖으로 나가지 않게 한다. */
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -257,473 +130,441 @@
 
 /* KPI 숫자 영역 */
 .kpi-value-box {
-	/* 숫자와 단위를 한 줄에 배치한다. */
 	display: flex;
-
-	/* 숫자와 단위가 아래쪽 기준으로 맞도록 한다. */
 	align-items: flex-end;
-
-	/* 숫자와 단위 사이 간격을 준다. */
 	gap: 6px;
 }
 
 /* KPI 큰 숫자 */
 .kpi-value {
-	/* KPI 숫자를 크게 표시하되 기존보다 살짝 줄인다. */
 	font-size: 30px;
-
-	/* KPI 숫자를 두껍게 표시한다. */
 	font-weight: 700;
-
-	/* 공통 글자색과 맞춘다. */
 	color: #1F2933;
-
-	/* 숫자 줄 높이를 줄여서 카드 안에서 안정적으로 보이게 한다. */
 	line-height: 1;
 }
 
 /* KPI 단위 */
 .kpi-unit {
-	/* 단위는 숫자보다 작게 표시한다. */
 	font-size: 15px;
-
-	/* 단위도 어느 정도 두껍게 표시한다. */
 	font-weight: 600;
-
-	/* 공통 보조 글자색과 맞춘다. */
 	color: #4B5563;
-
-	/* 숫자와 아래 기준이 맞게 약간 올린다. */
 	margin-bottom: 3px;
 }
 
 /* KPI 하단 목표 영역 */
 .kpi-bottom {
-	/* 목표 텍스트와 값을 한 줄에 배치한다. */
 	display: flex;
-
-	/* 목표와 값을 양끝으로 보낸다. */
 	justify-content: space-between;
-
-	/* 세로 위치를 가운데로 맞춘다. */
 	align-items: center;
-
-	/* 목표 영역을 뱃지처럼 보이게 여백을 준다. */
 	padding: 7px 10px;
-
-	/* 공통 초록 계열 배경으로 맞춘다. */
 	background-color: #E6F2ED;
-
-	/* 테두리를 추가해서 상태 박스처럼 보이게 한다. */
 	border: 1px solid #CFE6DB;
-
-	/* 둥근 모서리를 준다. */
 	border-radius: 8px;
-
-	/* 글자 크기를 작게 설정한다. */
 	font-size: 13px;
-
-	/* 공통 초록 계열 글자색으로 맞춘다. */
 	color: #2F7D62;
-
-	/* 줄 높이를 안정적으로 맞춘다. */
 	line-height: 1.2;
 }
 
 /* KPI 안의 세부 행 */
 .kpi-detail-row {
-	/* 항목명과 값을 한 줄에 배치한다. */
 	display: flex;
-
-	/* 항목명은 왼쪽, 값은 오른쪽으로 보낸다. */
 	justify-content: space-between;
-
-	/* 항목과 값 사이 간격을 준다. */
 	gap: 8px;
-
-	/* 글자 크기를 설정한다. */
 	font-size: 13px;
-
-	/* 공통 보조 글자색과 맞춘다. */
 	color: #4B5563;
-
-	/* 행 높이를 안정적으로 맞춘다. */
 	line-height: 1.3;
 }
 
 /* KPI 세부 값 */
 .kpi-detail-row strong {
-	/* 세부 값은 더 잘 보이게 진한 색으로 표시한다. */
 	color: #1F2933;
-
-	/* 세부 값은 살짝 두껍게 표시한다. */
 	font-weight: 700;
-
-	/* 값이 줄바꿈되지 않게 한다. */
 	white-space: nowrap;
 }
 
 /* 위험하거나 강조가 필요한 숫자 */
 .danger-text {
-	/* 불량 수량처럼 주의가 필요한 값은 빨간색으로 표시한다. */
 	color: #DC2626 !important;
 }
 
 /* 일일생산평가 카드 안의 비어있는 영역 */
 .kpi-empty-box {
-	/* 남는 공간을 채워서 카드 높이를 안정적으로 맞춘다. */
 	flex: 1;
-
-	/* 안내 문구를 가운데 정렬한다. */
 	display: flex;
 	align-items: center;
 	justify-content: center;
-
-	/* 공통 배경 톤으로 맞춘다. */
 	background-color: #FAFBFB;
-
-	/* 점선 테두리로 준비중 느낌을 준다. */
 	border: 1px dashed #C9D5D0;
-
-	/* 모서리를 둥글게 한다. */
 	border-radius: 8px;
-
-	/* 글자 크기를 작게 설정한다. */
 	font-size: 13px;
-
-	/* 글자 색상을 연하게 한다. */
 	color: #6B7280;
-
-	/* 가운데 정렬한다. */
 	text-align: center;
 }
 
-/* 최근 7일 추이 그래프 4개를 한 줄에 배치하는 영역 */
+/* 최근 7일 추이 그래프를 한 줄에 하나씩 배치하는 영역 */
 .chart-grid {
-	/* 그래프 카드를 가로 그리드로 배치한다. */
 	display: grid;
-
-	/* 한 줄에 4개가 같은 너비로 들어가게 한다. */
-	grid-template-columns: repeat(4, 1fr);
-
-	/* 그래프 카드 사이 간격을 준다. */
-	gap: 12px;
+	grid-template-columns: 1fr;
+	gap: 16px;
 }
 
 /* 그래프 카드 한 개 */
 .chart-card {
-	/* 카드 배경은 흰색으로 설정한다. */
 	background-color: #FFFFFF;
-
-	/* 공통 테두리 색상으로 맞춘다. */
 	border: 1px solid #DDE5E1;
-
-	/* 공통 박스와 둥근 정도를 맞춘다. */
 	border-radius: 10px;
-
-	/* 그래프 카드 안쪽 여백을 줄인다. */
-	padding: 14px;
-
-	/* 그래프 카드 높이를 일정하게 맞춘다. */
-	min-height: 220px;
-
-	/* 카드 안의 제목, 설명, 그래프 영역을 세로로 배치한다. */
+	padding: 16px;
+	min-height: 330px;
 	display: flex;
 	flex-direction: column;
-
-	/* 그림자를 제거해서 다른 페이지와 톤을 맞춘다. */
 	box-shadow: none;
-
-	/* 너비 계산을 안정적으로 맞춘다. */
 	box-sizing: border-box;
 }
 
 /* 그래프 카드 제목 */
 .chart-card h4 {
-	/* h4 태그의 기본 여백을 제거한다. */
 	margin: 0 0 4px 0;
-
-	/* 그래프 제목 크기를 설정한다. */
 	font-size: 15px;
-
-	/* 제목은 두껍게 표시한다. */
 	font-weight: 700;
-
-	/* 공통 글자색과 맞춘다. */
 	color: #1F2933;
-
-	/* 줄 높이를 안정적으로 맞춘다. */
 	line-height: 1.2;
 }
 
 /* 그래프 카드 설명 문구 */
 .chart-card p {
-	/* p 태그의 기본 여백을 제거한다. */
 	margin: 0 0 10px 0;
-
-	/* 설명 문구는 제목보다 작게 표시한다. */
 	font-size: 12px;
-
-	/* 공통 보조 글자색과 맞춘다. */
 	color: #6B7280;
-
-	/* 줄 높이를 안정적으로 맞춘다. */
 	line-height: 1.3;
 }
 
 /* 실제 그래프가 들어갈 임시 영역 */
 .chart-placeholder {
-	/* 남은 공간을 그래프 영역이 채우게 한다. */
 	flex: 1;
-
-	/* 공통 배경 톤으로 맞춘다. */
 	background-color: #FAFBFB;
-
-	/* 공통 테두리 색상으로 맞춘다. */
 	border: 1px solid #DDE5E1;
-
-	/* 공통 둥근 정도로 맞춘다. */
 	border-radius: 8px;
-
-	/* 그래프를 가운데 정렬한다. */
 	display: flex;
 	align-items: center;
 	justify-content: center;
-
-	/* 임시 안내 문구 크기를 작게 설정한다. */
-	font-size: 13px;
-
-	/* 임시 안내 문구 색상을 연하게 설정한다. */
-	color: #6B7280;
-
-	/* 넘치는 SVG가 카드 밖으로 나가지 않게 한다. */
+	min-height: 250px;
 	overflow: hidden;
 }
 
-/* 하단 전체 영역이다. 왼쪽에는 MES 운영 흐름과 최근 작업지시, 오른쪽에는 오늘 알림과 공지사항이 들어간다. */
-.bottom-grid {
-	/* 왼쪽 영역과 오른쪽 영역을 가로로 배치한다. */
-	display: grid;
-
-	/* 왼쪽은 넓게, 오른쪽은 좁게 배치한다. */
-	grid-template-columns: 2fr 1fr;
-
-	/* 왼쪽 영역과 오른쪽 영역 사이 간격을 준다. */
-	gap: 16px;
-
-	/* 하단 영역 전체의 세로 위치를 맞춘다. */
-	align-items: start;
+/* SVG 그래프 전체 크기 설정 */
+.mini-chart {
+	width: 100%;
+	height: 250px;
+	font-family: inherit;
 }
 
-/* 하단 왼쪽 영역이다. MES 운영 흐름과 최근 작업지시가 세로로 들어간다. */
-.bottom-left {
-	/* 내부 박스들을 세로로 배치한다. */
-	display: flex;
-
-	/* 세로 방향으로 쌓이게 한다. */
-	flex-direction: column;
-
-	/* 박스 사이 간격을 준다. */
-	gap: 16px;
-
-	/* 너비 계산을 안정적으로 한다. */
-	min-width: 0;
+/* SVG 안의 배경 가로선 */
+.mini-chart line {
+	stroke: #DDE5E1;
+	stroke-width: 1;
 }
 
-/* 하단 오른쪽 영역이다. 오늘 알림과 공지사항이 세로로 들어간다. */
-.bottom-right {
-	/* 내부 박스들을 세로로 배치한다. */
-	display: flex;
+/* SVG 안의 하단 날짜 글자 */
+.mini-chart text {
+	font-size: 10px;
+	fill: #6B7280;
+}
 
-	/* 세로 방향으로 쌓이게 한다. */
-	flex-direction: column;
+/* 그래프 하단 날짜 */
+.mini-chart .chart-date {
+	font-size: 10px;
+	fill: #6B7280;
+	text-anchor: middle;
+}
 
-	/* 박스 사이 간격을 준다. */
-	gap: 16px;
+/* 그래프 위 숫자 표시 */
+.mini-chart .chart-value {
+	font-size: 12px;
+	font-weight: 700;
+	fill: #1F2933;
+	text-anchor: middle;
+}
 
-	/* 너비 계산을 안정적으로 한다. */
-	min-width: 0;
+/* 그래프 선 공통 설정 */
+.chart-line {
+	fill: none;
+	stroke-width: 3;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+/* 파란색 그래프 선 */
+.blue-line {
+	stroke: #3B82F6;
+}
+
+/* 초록색 그래프 선 */
+.green-line {
+	stroke: #2F7D62;
+}
+
+/* 주황색 그래프 선 */
+.orange-line {
+	stroke: #F59E0B;
+}
+
+/* 파란색 그래프 점 */
+.blue-dot {
+	fill: #3B82F6;
+	stroke: #FFFFFF;
+	stroke-width: 2;
+}
+
+/* 초록색 그래프 점 */
+.green-dot {
+	fill: #2F7D62;
+	stroke: #FFFFFF;
+	stroke-width: 2;
+}
+
+/* 주황색 그래프 점 */
+.orange-dot {
+	fill: #F59E0B;
+	stroke: #FFFFFF;
+	stroke-width: 2;
+}
+
+/* MES 운영 흐름 전체 섹션 */
+.flow-section {
+	padding: 22px 18px 28px;
 }
 
 /* MES 운영 흐름 카드들을 한 줄로 배치하는 영역이다. */
 .flow-grid {
-	/* 흐름 카드를 가로 그리드로 배치한다. */
 	display: grid;
-
-	/* 한 줄에 6개가 같은 너비로 들어가게 한다. */
 	grid-template-columns: repeat(6, 1fr);
-
-	/* 카드 사이 간격을 준다. */
-	gap: 10px;
+	gap: 34px;
+	align-items: stretch;
 }
 
 /* MES 운영 흐름 카드 한 개이다. */
 .flow-card {
-	/* 카드 배경을 흰색으로 설정한다. */
+	position: relative;
 	background-color: #FFFFFF;
-
-	/* 공통 테두리 색상으로 맞춘다. */
 	border: 1px solid #DDE5E1;
-
-	/* 공통 박스와 둥근 정도를 맞춘다. */
-	border-radius: 10px;
-
-	/* 안쪽 여백을 줄여 글씨가 너무 떨어져 보이지 않게 한다. */
-	padding: 12px 10px;
-
-	/* 카드 안의 글자를 가운데 정렬한다. */
+	border-radius: 8px;
+	padding: 24px 16px 18px;
 	text-align: center;
-
-	/* 카드 내용을 세로로 배치한다. */
 	display: flex;
 	flex-direction: column;
-
-	/* 카드 안 요소 사이 간격을 줄인다. */
-	gap: 5px;
-
-	/* 흐름 카드 높이를 줄여 빈 공간을 줄인다. */
-	min-height: 104px;
-
-	/* 그림자를 제거한다. */
-	box-shadow: none;
-
-	/* 너비 계산을 안정적으로 한다. */
+	align-items: center;
+	min-height: 258px;
+	box-shadow: 0 2px 8px rgba(31, 41, 51, 0.04);
 	box-sizing: border-box;
+}
 
-	/* 카드 안의 긴 글자가 밖으로 나가지 않게 한다. */
-	min-width: 0;
+/* 마지막 카드가 아닌 경우 오른쪽에 흐름 화살표를 표시한다. */
+.flow-card:not(:last-child)::after {
+	content: "→";
+	position: absolute;
+	right: -27px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: #0B4FA3;
+	font-size: 30px;
+	font-weight: 400;
+	line-height: 1;
+	z-index: 2;
+}
+
+/* MES 운영 흐름 아이콘 영역 */
+.flow-icon {
+	width: 58px;
+	height: 58px;
+	margin: 0 auto 13px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* MES 운영 흐름 SVG 공통 */
+.flow-icon svg {
+	width: 54px;
+	height: 54px;
+	fill: currentColor;
+}
+
+/* 아이콘 안의 흰색 포인트 */
+.flow-icon .icon-white {
+	fill: #FFFFFF;
+}
+
+/* MES 운영 흐름 아이콘의 선 전용 스타일이다. */
+.flow-icon .icon-stroke {
+	/* 선 아이콘은 내부를 채우지 않는다. */
+	fill: none;
+
+	/* 선 색상은 현재 아이콘 색상을 사용한다. */
+	stroke: currentColor;
+
+	/* 선 두께를 이미지 느낌에 맞게 준다. */
+	stroke-width: 3.5;
+
+	/* 선 끝을 둥글게 만든다. */
+	stroke-linecap: round;
+
+	/* 선 꺾이는 부분을 둥글게 만든다. */
+	stroke-linejoin: round;
+}
+
+/* 자재관리 아이콘 색상 */
+.flow-blue {
+	color: #2563EB;
+}
+
+/* 생산계획 아이콘 색상 */
+.flow-green {
+	color: #16A34A;
+}
+
+/* 작업지시 아이콘 색상 */
+.flow-orange {
+	color: #F97316;
+}
+
+/* 품질관리 아이콘 색상 */
+.flow-purple {
+	color: #5B35D5;
+}
+
+/* 생산실적 아이콘 색상 */
+.flow-teal {
+	color: #0891B2;
+}
+
+/* 출하관리 아이콘 색상 */
+.flow-indigo {
+	color: #4C1D95;
 }
 
 /* MES 운영 흐름 카드의 제목이다. */
 .flow-card strong {
-	/* 제목 글자 크기를 설정한다. */
-	font-size: 14px;
-
-	/* 제목을 두껍게 표시한다. */
+	margin: 0 0 22px;
+	font-size: 15px;
 	font-weight: 700;
-
-	/* 공통 글자색과 맞춘다. */
-	color: #1F2933;
-
-	/* 제목 아래쪽 간격을 조금 준다. */
-	margin-bottom: 2px;
-
-	/* 줄 높이를 안정적으로 맞춘다. */
+	color: #111827;
 	line-height: 1.2;
+}
 
-	/* 긴 제목은 말줄임 처리한다. */
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+/* MES 운영 흐름 수치 영역 */
+.flow-info {
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin-bottom: 20px;
+	flex: 1;
 }
 
 /* MES 운영 흐름 카드의 세부 내용이다. */
-.flow-card span {
-	/* 세부 내용 글자 크기를 설정한다. */
-	font-size: 12px;
-
-	/* 공통 보조 글자색과 맞춘다. */
+.flow-info span {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+	font-size: 13px;
 	color: #4B5563;
-
-	/* 줄 높이를 줄여 글씨가 떨어져 보이지 않게 한다. */
 	line-height: 1.3;
+}
 
-	/* 긴 내용은 말줄임 처리한다. */
-	overflow: hidden;
-	text-overflow: ellipsis;
+/* MES 운영 흐름 항목명 */
+.flow-info em {
+	font-style: normal;
 	white-space: nowrap;
+}
+
+/* MES 운영 흐름 수치 강조 */
+.flow-info b {
+	color: #111827;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+/* MES 운영 흐름 더보기 링크 */
+.flow-more {
+	width: 100%;
+	padding-top: 15px;
+	border-top: 1px solid #EEF1F4;
+	text-decoration: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 13px;
+	font-weight: 700;
+	color: #111827;
+}
+
+/* MES 운영 흐름 더보기 hover */
+.flow-more:hover {
+	color: #2F7D62;
+}
+
+/* 하단 전체 영역이다. */
+.bottom-grid {
+	display: grid;
+	grid-template-columns: 2fr 1fr;
+	gap: 16px;
+	align-items: start;
+}
+
+/* 하단 왼쪽 영역이다. */
+.bottom-left {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	min-width: 0;
+}
+
+/* 하단 오른쪽 영역이다. */
+.bottom-right {
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	min-width: 0;
 }
 
 /* 최근 작업지시 테이블이다. */
 .dashboard-table {
-	/* 테이블 너비를 부모 영역에 맞춘다. */
 	width: 100%;
-
-	/* 테두리가 겹쳐 보이지 않게 정리한다. */
 	border-collapse: collapse;
-
-	/* 공통 테이블과 같은 테두리 색상을 사용한다. */
 	border: 1px solid #DDE5E1;
-
-	/* 테이블 글자 크기를 공통 테이블과 맞춘다. */
 	font-size: 14px;
-
-	/* 테이블 배경을 흰색으로 설정한다. */
 	background-color: #FFFFFF;
-
-	/* 열 너비 계산을 안정적으로 한다. */
 	table-layout: fixed;
 }
 
 /* 최근 작업지시 테이블의 제목 칸이다. */
 .dashboard-table thead th {
-	/* 공통 테이블 제목 배경색과 맞춘다. */
 	background-color: #F1F4F3;
-
-	/* 공통 테이블 제목 글자색과 맞춘다. */
 	color: #1F2933;
-
-	/* 제목 칸 글자를 두껍게 표시한다. */
 	font-weight: 700;
-
-	/* 제목 높이를 공통 테이블과 비슷하게 맞춘다. */
 	height: 46px;
-
-	/* 좌우 여백을 공통 테이블과 비슷하게 맞춘다. */
 	padding: 0 10px;
-
-	/* 제목 칸 아래쪽에 선을 준다. */
 	border-bottom: 1px solid #DDE5E1;
-
-	/* 열 구분선을 추가한다. */
 	border-right: 1px solid #DDE5E1;
-
-	/* 제목 글자를 가운데 정렬한다. */
 	text-align: center;
-
-	/* 세로 위치를 가운데로 맞춘다. */
 	vertical-align: middle;
-
-	/* 긴 제목은 줄바꿈하지 않는다. */
 	white-space: nowrap;
-
-	/* 넘치는 제목은 숨긴다. */
 	overflow: hidden;
-
-	/* 넘치는 제목은 ...으로 표시한다. */
 	text-overflow: ellipsis;
 }
 
 /* 최근 작업지시 테이블의 내용 칸이다. */
 .dashboard-table tbody td {
-	/* 내용 높이를 공통 테이블과 비슷하게 맞춘다. */
 	height: 50px;
-
-	/* 좌우 여백을 공통 테이블과 비슷하게 맞춘다. */
 	padding: 0 10px;
-
-	/* 행 구분선을 준다. */
 	border-bottom: 1px solid #DDE5E1;
-
-	/* 열 구분선을 추가한다. */
 	border-right: 1px solid #DDE5E1;
-
-	/* 공통 테이블 글자색과 맞춘다. */
 	color: #1F2933;
-
-	/* 내용은 가운데 정렬한다. */
 	text-align: center;
-
-	/* 세로 위치를 가운데로 맞춘다. */
 	vertical-align: middle;
-
-	/* 긴 내용은 줄바꿈하지 않는다. */
 	white-space: nowrap;
-
-	/* 넘치는 내용은 숨긴다. */
 	overflow: hidden;
-
-	/* 넘치는 내용은 ...으로 표시한다. */
 	text-overflow: ellipsis;
 }
 
@@ -740,124 +581,68 @@
 
 /* 대시보드 테이블 행 hover */
 .dashboard-table tbody tr:hover {
-	/* 공통 테이블 hover 색상과 맞춘다. */
 	background-color: #F4FAF7;
 }
 
 /* 상태 표시 칩의 공통 디자인이다. */
 .status-chip {
-	/* 공통 상태값과 비슷한 높이로 맞춘다. */
 	min-width: 54px;
-
-	/* 상태값 높이를 고정한다. */
 	height: 26px;
-
-	/* 상태 글씨를 가운데 정렬한다. */
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-
-	/* 둥근 정도를 공통 상태값과 맞춘다. */
 	border-radius: 7px;
-
-	/* 기존보다 안정적인 여백으로 맞춘다. */
 	padding: 0 10px;
-
-	/* 글자 크기를 공통 상태값과 비슷하게 맞춘다. */
 	font-size: 13px;
-
-	/* 글자를 두껍게 표시한다. */
 	font-weight: 700;
-
-	/* 줄 높이를 안정적으로 맞춘다. */
 	line-height: 1;
-
-	/* 너비 계산을 안정적으로 한다. */
 	box-sizing: border-box;
-
-	/* 줄바꿈되지 않게 한다. */
 	white-space: nowrap;
 }
 
 /* 진행중 상태 칩이다. */
 .status-chip.progress {
-	/* 진행중은 공통 초록 계열로 표시한다. */
 	background-color: #E6F2ED;
-
-	/* 진행중 글자색을 초록색으로 표시한다. */
 	color: #0F7A3A;
-
-	/* 공통 초록 계열 테두리를 사용한다. */
 	border: 1px solid #CFE6DB;
 }
 
 /* 대기 상태 칩이다. */
 .status-chip.wait {
-	/* 대기는 너무 튀지 않는 연한 회색으로 맞춘다. */
 	background-color: #F3F4F6;
-
-	/* 공통 글자색과 맞춘다. */
 	color: #374151;
-
-	/* 공통 테두리 색상으로 맞춘다. */
 	border: 1px solid #DDE5E1;
 }
 
 /* 더보기 링크이다. */
 .more-link {
-	/* 링크 밑줄을 제거한다. */
 	text-decoration: none;
-
-	/* 글자 크기를 작게 설정한다. */
 	font-size: 12px;
-
-	/* 글자를 두껍게 표시한다. */
 	font-weight: 700;
-
-	/* 공통 링크 느낌으로 글자색을 맞춘다. */
 	color: #374151;
-
-	/* 줄바꿈되지 않게 한다. */
 	white-space: nowrap;
 }
 
 /* 더보기 링크에 마우스를 올렸을 때이다. */
 .more-link:hover {
-	/* 마우스를 올리면 초록색으로 바뀌게 한다. */
 	color: #2F7D62;
 }
 
 /* 오늘 알림 목록과 공지사항 목록의 공통 설정이다. */
 .alert-list,
 .notice-list {
-	/* ul 태그 기본 점을 제거한다. */
 	list-style: none;
-
-	/* ul 태그 기본 여백을 제거한다. */
 	margin: 0;
-
-	/* ul 태그 기본 안쪽 여백을 제거한다. */
 	padding: 0;
 }
 
 /* 오늘 알림 한 줄이다. */
 .alert-list li {
-	/* 알림 내용을 세로로 배치한다. */
 	display: grid;
-
-	/* 제목/내용 영역과 시간 영역을 나눈다. */
 	grid-template-columns: 1fr auto;
-
-	/* 세로 방향 간격을 준다. */
 	row-gap: 4px;
-
-	/* 제목과 시간 사이 간격을 준다. */
 	column-gap: 10px;
-
-	/* 한 줄의 안쪽 여백을 준다. */
 	padding: 12px 0;
-
-	/* 알림 사이 구분선을 준다. */
 	border-bottom: 1px solid #DDE5E1;
 }
 
@@ -868,19 +653,10 @@
 
 /* 오늘 알림 제목이다. */
 .alert-list strong {
-	/* 제목은 첫 번째 칸에 들어간다. */
 	grid-column: 1 / 2;
-
-	/* 제목 글자 크기를 설정한다. */
 	font-size: 13px;
-
-	/* 제목을 두껍게 표시한다. */
 	font-weight: 700;
-
-	/* 공통 글자색과 맞춘다. */
 	color: #1F2933;
-
-	/* 긴 제목은 말줄임 처리한다. */
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -888,16 +664,9 @@
 
 /* 오늘 알림 설명이다. */
 .alert-list span {
-	/* 설명은 첫 번째 칸에 들어간다. */
 	grid-column: 1 / 2;
-
-	/* 설명 글자 크기를 설정한다. */
 	font-size: 12px;
-
-	/* 설명 색상을 연하게 설정한다. */
 	color: #6B7280;
-
-	/* 긴 설명은 말줄임 처리한다. */
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -905,46 +674,22 @@
 
 /* 오늘 알림 시간이다. */
 .alert-list em {
-	/* 시간은 오른쪽 칸에 들어간다. */
 	grid-column: 2 / 3;
-
-	/* 시간은 첫 번째 줄부터 배치한다. */
 	grid-row: 1 / 3;
-
-	/* 글자 스타일 기울임을 제거한다. */
 	font-style: normal;
-
-	/* 시간 글자 크기를 설정한다. */
 	font-size: 12px;
-
-	/* 공통 보조 글자색과 맞춘다. */
 	color: #4B5563;
-
-	/* 시간 위치를 위쪽으로 맞춘다. */
 	align-self: start;
-
-	/* 줄바꿈되지 않게 한다. */
 	white-space: nowrap;
 }
 
 /* 공지사항 한 줄이다. */
 .notice-list li {
-	/* 공지 제목과 날짜를 한 줄에 배치한다. */
 	display: flex;
-
-	/* 제목은 왼쪽, 날짜는 오른쪽으로 보낸다. */
 	justify-content: space-between;
-
-	/* 세로 위치를 가운데로 맞춘다. */
 	align-items: center;
-
-	/* 한 줄의 안쪽 여백을 준다. */
 	padding: 12px 0;
-
-	/* 공지 사이 구분선을 준다. */
 	border-bottom: 1px solid #DDE5E1;
-
-	/* 제목과 날짜 사이 간격을 준다. */
 	gap: 12px;
 }
 
@@ -955,13 +700,8 @@
 
 /* 공지사항 제목이다. */
 .notice-list span {
-	/* 제목 글자 크기를 설정한다. */
 	font-size: 13px;
-
-	/* 공통 글자색과 맞춘다. */
 	color: #1F2933;
-
-	/* 긴 제목은 말줄임 처리한다. */
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -969,114 +709,8 @@
 
 /* 공지사항 날짜이다. */
 .notice-list em {
-	/* 날짜 글자 기울임을 제거한다. */
 	font-style: normal;
-
-	/* 날짜 글자 크기를 설정한다. */
 	font-size: 12px;
-
-	/* 공통 보조 글자색과 맞춘다. */
 	color: #6B7280;
-
-	/* 날짜가 줄바꿈되지 않게 한다. */
 	white-space: nowrap;
-}
-
-/* SVG 그래프 전체 크기 설정 */
-.mini-chart {
-	/* 그래프가 카드 안에서 가로 전체를 사용하게 한다. */
-	width: 100%;
-
-	/* 그래프 높이를 고정해서 4개 카드가 균일하게 보이게 한다. */
-	height: 100%;
-
-	/* SVG 안의 글자도 현재 프로젝트 폰트를 따라가게 한다. */
-	font-family: inherit;
-}
-
-/* SVG 안의 배경 가로선 */
-.mini-chart line {
-	/* 가로선 색상을 공통 테두리 색상과 맞춘다. */
-	stroke: #DDE5E1;
-
-	/* 가로선 두께를 얇게 설정한다. */
-	stroke-width: 1;
-}
-
-/* SVG 안의 하단 날짜 글자 */
-.mini-chart text {
-	/* 날짜 글자 크기를 작게 설정한다. */
-	font-size: 10px;
-
-	/* 날짜 글자 색상을 연하게 설정한다. */
-	fill: #6B7280;
-}
-
-/* 그래프 선 공통 설정 */
-.chart-line {
-	/* 선 내부는 채우지 않는다. */
-	fill: none;
-
-	/* 선 두께를 설정한다. */
-	stroke-width: 3;
-
-	/* 선 끝부분을 둥글게 만든다. */
-	stroke-linecap: round;
-
-	/* 선이 꺾이는 부분도 둥글게 만든다. */
-	stroke-linejoin: round;
-}
-
-/* 파란색 그래프 선 */
-.blue-line {
-	/* 생산, 출하 그래프에 사용할 차분한 파란색 선이다. */
-	stroke: #3B82F6;
-}
-
-/* 초록색 그래프 선 */
-.green-line {
-	/* 품질 그래프에 사용할 초록색 선이다. */
-	stroke: #2F7D62;
-}
-
-/* 주황색 그래프 선 */
-.orange-line {
-	/* 생산원가 그래프에 사용할 주황색 선이다. */
-	stroke: #F59E0B;
-}
-
-/* 파란색 그래프 점 */
-.blue-dot {
-	/* 점 안쪽 색상을 파란색으로 채운다. */
-	fill: #3B82F6;
-
-	/* 점 테두리는 흰색으로 설정해서 선 위에서도 잘 보이게 한다. */
-	stroke: #FFFFFF;
-
-	/* 점 테두리 두께를 설정한다. */
-	stroke-width: 2;
-}
-
-/* 초록색 그래프 점 */
-.green-dot {
-	/* 점 안쪽 색상을 초록색으로 채운다. */
-	fill: #2F7D62;
-
-	/* 점 테두리는 흰색으로 설정한다. */
-	stroke: #FFFFFF;
-
-	/* 점 테두리 두께를 설정한다. */
-	stroke-width: 2;
-}
-
-/* 주황색 그래프 점 */
-.orange-dot {
-	/* 점 안쪽 색상을 주황색으로 채운다. */
-	fill: #F59E0B;
-
-	/* 점 테두리는 흰색으로 설정한다. */
-	stroke: #FFFFFF;
-
-	/* 점 테두리 두께를 설정한다. */
-	stroke-width: 2;
 }
