@@ -4,8 +4,20 @@
 
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
+	
+	<style>
+	.lotHistoryPage .search-form {
+		/* 검색 박스와 총 건수/테이블 사이 간격이다. */
+		margin-bottom: 30px;
+	}
 
-<div class="coPageWrap">
+	.lotHistoryPage .coTableTop {
+		/* 총 건수가 검색 박스에 너무 붙어 보이지 않게 한다. */
+		margin-bottom: 8px;
+	}
+</style>
+
+<div class="coPageWrap lotHistoryPage">
 
 	<form class="search-form"
 		method="get"
@@ -36,36 +48,34 @@
 				<div class="search-item">
 					<label class="search-label">구분</label>
 
-					<select name="progressStatus"
+					<select name="searchType"
 						class="search-select">
 
-						<option value="">전체</option>
-
-						<option value="대기"
-							<c:if test="${progressStatus eq '대기'}">selected</c:if>>
-							대기
+						<option value=""
+							<c:if test="${empty searchType}">selected</c:if>>
+							전체
 						</option>
 
-						<option value="진행중"
-							<c:if test="${progressStatus eq '진행중'}">selected</c:if>>
-							진행중
+						<option value="lotNo"
+							<c:if test="${searchType eq 'lotNo'}">selected</c:if>>
+							LOT번호
 						</option>
 
-						<option value="보류"
-							<c:if test="${progressStatus eq '보류'}">selected</c:if>>
-							보류
+						<option value="workOrderNo"
+							<c:if test="${searchType eq 'workOrderNo'}">selected</c:if>>
+							작업지시번호
 						</option>
 
-						<option value="완료"
-							<c:if test="${progressStatus eq '완료'}">selected</c:if>>
-							완료
+						<option value="itemName"
+							<c:if test="${searchType eq 'itemName'}">selected</c:if>>
+							품목명
 						</option>
 
 					</select>
 				</div>
 
 				<div class="search-item">
-					<label class="search-label">검색</label>
+					<label class="search-label">검색어</label>
 
 					<input type="text"
 						name="keyword"
