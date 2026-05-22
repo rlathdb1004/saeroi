@@ -1,0 +1,835 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    공정관리 Mapper
+
+    역할:
+    - 기준정보관리 > 공정관리에서 사용하는 SQL을 관리한다.
+    - process 테이블 기준 공정 목록/상세/등록/수정/삭제를 처리한다.
+    - process_detail 테이블 기준 공정별 이미지/작업표준서/상세설명을 관리한다.
+    - item, equipment, line 테이블을 JOIN하여 화면 표시용 정보를 함께 조회한다.
+
+    주의:
+    - process 테이블에는 use_yn 컬럼이 없다.
+    - process_detail.proc_id  = 공정상세 ID
+    - process_detail.proc_id2 = process.proc_id 참조값
+    - proc_code는 품목별로 반복될 수 있으므로 proc_code 단독 UNIQUE로 보면 안 된다.
+-->
+<mapper namespace="process">
+
+
+    <!-- =========================================================
+         1. ResultMap
+         ========================================================= -->
+
+    <resultMap id="processResultMap" type="kr.or.saeroi.dto.ProcessDTO">
+
+        <!-- process 테이블 기본 컬럼 -->
+        <id property="procId" column="proc_id" />
+
+        <result property="itemId" column="item_id" />
+        <result property="equipId" column="equip_id" />
+        <result property="procCode" column="proc_code" />
+        <result property="procName" column="proc_name" />
+        <result property="procContent" column="proc_content" />
+        <result property="createdDate" column="created_date" />
+        <result property="updatedDate" column="updated_date" />
+        <result property="remark" column="remark" />
+
+        <!-- 품목 표시용 컬럼 -->
+        <result property="itemCode" column="item_code" />
+        <result property="itemName" column="item_name" />
+        <result property="itemType" column="item_type" />
+        <result property="itemTypeName" column="item_type_name" />
+        <result property="itemUnit" column="item_unit" />
+
+        <!-- 설비 표시용 컬럼 -->
+        <result property="equipCode" column="equip_code" />
+        <result property="equipName" column="equip_name" />
+        <result property="equipStatus" column="equip_status" />
+        <result property="equipLoc" column="equip_loc" />
+
+        <!-- 라인 표시용 컬럼 -->
+        <result property="lineId" column="line_id" />
+        <result property="lineCode" column="line_code" />
+        <result property="lineName" column="line_name" />
+        <result property="lineStatus" column="line_status" />
+
+        <!-- 화면 표시용 컬럼 -->
+        <result property="equipDisplayName" column="equip_display_name" />
+        <result property="lineDisplayName" column="line_display_name" />
+
+    </resultMap>
+
+
+    <resultMap id="processDetailResultMap" type="kr.or.saeroi.dto.ProcessDetailDTO">
+
+        <!-- process_detail 테이블 기본 컬럼 -->
+        <id property="procDetailId" column="proc_detail_id" />
+
+        <result property="procId" column="proc_id" />
+        <result property="procPicture" column="proc_picture" />
+        <result property="procContent" column="proc_content" />
+        <result property="createdDate" column="created_date" />
+        <result property="updatedDate" column="updated_date" />
+        <result property="remark" column="remark" />
+
+        <!-- process JOIN 표시용 -->
+        <result property="procCode" column="proc_code" />
+        <result property="procName" column="proc_name" />
+
+        <!-- item JOIN 표시용 -->
+        <result property="itemId" column="item_id" />
+        <result property="itemCode" column="item_code" />
+        <result property="itemName" column="item_name" />
+
+        <!-- equipment JOIN 표시용 -->
+        <result property="equipId" column="equip_id" />
+        <result property="equipCode" column="equip_code" />
+        <result property="equipName" column="equip_name" />
+
+        <!-- line JOIN 표시용 -->
+        <result property="lineId" column="line_id" />
+        <result property="lineCode" column="line_code" />
+        <result property="lineName" column="line_name" />
+
+    </resultMap>
+
+
+    <resultMap id="productItemResultMap" type="kr.or.saeroi.dto.ItemDTO">
+
+        <id property="itemId" column="item_id" />
+
+        <result property="supplierId" column="supplier_id" />
+        <result property="clientId" column="client_id" />
+        <result property="itemCode" column="item_code" />
+        <result property="itemName" column="item_name" />
+        <result property="itemType" column="item_type" />
+        <result property="safetyStock" column="safety_stock" />
+        <result property="itemUnit" column="item_unit" />
+        <result property="remark" column="remark" />
+        <result property="createdDate" column="created_date" />
+        <result property="updatedDate" column="updated_date" />
+        <result property="useYn" column="use_yn" />
+
+        <result property="itemTypeName" column="item_type_name" />
+        <result property="useYnName" column="use_yn_name" />
+
+    </resultMap>
+
+
+    <!-- =========================================================
+         2. 공통 검색조건
+         ========================================================= -->
+
+    <sql id="processSearchWhere">
+
+        <where>
+            <if test="searchType != null and searchType != ''
+                      and searchKeyword != null and searchKeyword != ''">
+
+                <choose>
+
+                    <when test="searchType == 'procCode'">
+                        AND UPPER(p.proc_code) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'procName'">
+                        AND UPPER(p.proc_name) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'itemCode'">
+                        AND UPPER(i.item_code) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'itemName'">
+                        AND UPPER(i.item_name) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'equipCode'">
+                        AND UPPER(e.equip_code) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'equipName'">
+                        AND UPPER(e.equip_name) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'lineName'">
+                        AND UPPER(l.line_name) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                </choose>
+
+            </if>
+        </where>
+
+    </sql>
+
+
+    <!-- =========================================================
+         3. 공정 목록 / 상세
+         ========================================================= -->
+
+    <select id="selectProcessList"
+            parameterType="kr.or.saeroi.dto.ProcessDTO"
+            resultMap="processResultMap">
+
+        SELECT
+            p.proc_id,
+            p.item_id,
+            p.equip_id,
+            p.proc_code,
+            p.proc_name,
+            p.proc_content,
+            p.created_date,
+            p.updated_date,
+            p.remark,
+
+            i.item_code,
+            i.item_name,
+            i.item_type,
+            i.item_unit,
+
+            CASE
+                WHEN i.item_type = 'FG' THEN '완제품'
+                WHEN i.item_type = 'RM' THEN '원자재'
+                WHEN i.item_type = 'SM' THEN '부자재'
+                ELSE i.item_type
+            END AS item_type_name,
+
+            e.equip_code,
+            e.equip_name,
+            e.equip_status,
+            e.equip_loc,
+
+            l.line_id,
+            l.line_code,
+            l.line_name,
+            l.line_status,
+
+            e.equip_code || ' / ' || e.equip_name AS equip_display_name,
+            l.line_code || ' / ' || l.line_name AS line_display_name
+
+        FROM process p
+
+        LEFT JOIN item i
+            ON i.item_id = p.item_id
+
+        LEFT JOIN equipment e
+            ON e.equip_id = p.equip_id
+
+        LEFT JOIN line l
+            ON l.line_id = e.line_id
+
+        <include refid="processSearchWhere" />
+
+        ORDER BY
+            p.proc_id DESC
+
+    </select>
+
+
+    <select id="selectProcessCount"
+            parameterType="kr.or.saeroi.dto.ProcessDTO"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+
+        FROM process p
+
+        LEFT JOIN item i
+            ON i.item_id = p.item_id
+
+        LEFT JOIN equipment e
+            ON e.equip_id = p.equip_id
+
+        LEFT JOIN line l
+            ON l.line_id = e.line_id
+
+        <include refid="processSearchWhere" />
+
+    </select>
+
+
+    <select id="selectProcessDetail"
+            parameterType="int"
+            resultMap="processResultMap">
+
+        SELECT
+            p.proc_id,
+            p.item_id,
+            p.equip_id,
+            p.proc_code,
+            p.proc_name,
+            p.proc_content,
+            p.created_date,
+            p.updated_date,
+            p.remark,
+
+            i.item_code,
+            i.item_name,
+            i.item_type,
+            i.item_unit,
+
+            CASE
+                WHEN i.item_type = 'FG' THEN '완제품'
+                WHEN i.item_type = 'RM' THEN '원자재'
+                WHEN i.item_type = 'SM' THEN '부자재'
+                ELSE i.item_type
+            END AS item_type_name,
+
+            e.equip_code,
+            e.equip_name,
+            e.equip_status,
+            e.equip_loc,
+
+            l.line_id,
+            l.line_code,
+            l.line_name,
+            l.line_status,
+
+            e.equip_code || ' / ' || e.equip_name AS equip_display_name,
+            l.line_code || ' / ' || l.line_name AS line_display_name
+
+        FROM process p
+
+        LEFT JOIN item i
+            ON i.item_id = p.item_id
+
+        LEFT JOIN equipment e
+            ON e.equip_id = p.equip_id
+
+        LEFT JOIN line l
+            ON l.line_id = e.line_id
+
+        WHERE p.proc_id = #{procId}
+
+    </select>
+
+
+    <!-- =========================================================
+         4. 공정 등록 / 수정 / 삭제
+         ========================================================= -->
+
+    <insert id="insertProcess"
+            parameterType="kr.or.saeroi.dto.ProcessDTO">
+
+        <selectKey keyProperty="procId" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(proc_id), 0) + 1
+            FROM process
+        </selectKey>
+
+        INSERT INTO process (
+            proc_id,
+            item_id,
+            equip_id,
+            proc_code,
+            proc_name,
+            proc_content,
+            created_date,
+            updated_date,
+            remark
+        ) VALUES (
+            #{procId},
+            #{itemId},
+            #{equipId},
+            #{procCode},
+            #{procName},
+            #{procContent},
+            SYSDATE,
+            SYSDATE,
+            #{remark}
+        )
+
+    </insert>
+
+
+    <update id="updateProcess"
+            parameterType="kr.or.saeroi.dto.ProcessDTO">
+
+        UPDATE process
+        SET
+            item_id = #{itemId},
+            equip_id = #{equipId},
+            proc_code = #{procCode},
+            proc_name = #{procName},
+            proc_content = #{procContent},
+            updated_date = SYSDATE,
+            remark = #{remark}
+        WHERE proc_id = #{procId}
+
+    </update>
+
+
+    <delete id="deleteProcessDetailByProcIdList"
+            parameterType="java.util.List">
+
+        DELETE FROM process_detail
+        WHERE proc_id2 IN
+        <foreach collection="list"
+                 item="procId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{procId}
+        </foreach>
+
+    </delete>
+
+
+    <delete id="deleteProcessList"
+            parameterType="java.util.List">
+
+        DELETE FROM process
+        WHERE proc_id IN
+        <foreach collection="list"
+                 item="procId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{procId}
+        </foreach>
+
+    </delete>
+
+
+    <select id="selectProcessDuplicateCount"
+        parameterType="kr.or.saeroi.dto.ProcessDTO"
+        resultType="int">
+
+	    SELECT
+	        COUNT(*)
+	
+	    FROM process
+	
+	    WHERE UPPER(proc_code) = UPPER(#{procCode})
+	
+	    <if test="procId != null">
+	        AND proc_id != #{procId}
+	    </if>
+	
+	</select>
+
+
+    <!-- =========================================================
+         5. 공정상세 이미지 / 작업표준서 목록 / 단건
+         ========================================================= -->
+
+    <select id="selectProcessDetailList"
+            parameterType="int"
+            resultMap="processDetailResultMap">
+
+        SELECT
+            pd.proc_id AS proc_detail_id,
+            pd.proc_id2 AS proc_id,
+            pd.proc_picture,
+            pd.proc_content,
+            pd.created_date,
+            pd.updated_date,
+            pd.remark,
+
+            p.proc_code,
+            p.proc_name,
+            p.item_id,
+            p.equip_id,
+
+            i.item_code,
+            i.item_name,
+
+            e.equip_code,
+            e.equip_name,
+
+            l.line_id,
+            l.line_code,
+            l.line_name
+
+        FROM process_detail pd
+
+        LEFT JOIN process p
+            ON p.proc_id = pd.proc_id2
+
+        LEFT JOIN item i
+            ON i.item_id = p.item_id
+
+        LEFT JOIN equipment e
+            ON e.equip_id = p.equip_id
+
+        LEFT JOIN line l
+            ON l.line_id = e.line_id
+
+        WHERE pd.proc_id2 = #{procId}
+
+        ORDER BY
+            pd.proc_id DESC
+
+    </select>
+
+
+    <select id="selectProcessDetailOne"
+            parameterType="int"
+            resultMap="processDetailResultMap">
+
+        SELECT
+            pd.proc_id AS proc_detail_id,
+            pd.proc_id2 AS proc_id,
+            pd.proc_picture,
+            pd.proc_content,
+            pd.created_date,
+            pd.updated_date,
+            pd.remark,
+
+            p.proc_code,
+            p.proc_name,
+            p.item_id,
+            p.equip_id,
+
+            i.item_code,
+            i.item_name,
+
+            e.equip_code,
+            e.equip_name,
+
+            l.line_id,
+            l.line_code,
+            l.line_name
+
+        FROM process_detail pd
+
+        LEFT JOIN process p
+            ON p.proc_id = pd.proc_id2
+
+        LEFT JOIN item i
+            ON i.item_id = p.item_id
+
+        LEFT JOIN equipment e
+            ON e.equip_id = p.equip_id
+
+        LEFT JOIN line l
+            ON l.line_id = e.line_id
+
+        WHERE pd.proc_id = #{procDetailId}
+
+    </select>
+
+
+    <!-- =========================================================
+         6. 공정상세 이미지 / 작업표준서 등록 / 수정 / 삭제
+         ========================================================= -->
+
+    <insert id="insertProcessDetail"
+            parameterType="kr.or.saeroi.dto.ProcessDetailDTO">
+
+        <selectKey keyProperty="procDetailId" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(proc_id), 0) + 1
+            FROM process_detail
+        </selectKey>
+
+        INSERT INTO process_detail (
+            proc_id,
+            proc_id2,
+            proc_picture,
+            created_date,
+            updated_date,
+            remark,
+            proc_content
+        ) VALUES (
+            #{procDetailId},
+            #{procId},
+            #{procPicture},
+            SYSDATE,
+            SYSDATE,
+            #{remark},
+            #{procContent}
+        )
+
+    </insert>
+
+
+    <update id="updateProcessDetail"
+            parameterType="kr.or.saeroi.dto.ProcessDetailDTO">
+
+        UPDATE process_detail
+        SET
+            proc_content = #{procContent},
+            remark = #{remark},
+            updated_date = SYSDATE
+
+            <if test="procPicture != null and procPicture != ''">
+                , proc_picture = #{procPicture}
+            </if>
+
+        WHERE proc_id = #{procDetailId}
+          AND proc_id2 = #{procId}
+
+    </update>
+
+
+    <delete id="deleteProcessDetailList"
+            parameterType="java.util.List">
+
+        DELETE FROM process_detail
+        WHERE proc_id IN
+        <foreach collection="list"
+                 item="procDetailId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{procDetailId}
+        </foreach>
+
+    </delete>
+
+
+    <delete id="deleteProcessDetailOne"
+            parameterType="int">
+
+        DELETE FROM process_detail
+        WHERE proc_id = #{procDetailId}
+
+    </delete>
+
+
+    <!-- =========================================================
+         7. 완제품 자동완성 / 선택 목록
+         ========================================================= -->
+
+    <select id="selectProductItemAutoComplete"
+            parameterType="map"
+            resultMap="productItemResultMap">
+
+        SELECT
+            item_id,
+            supplier_id,
+            client_id,
+            item_code,
+            item_name,
+            item_type,
+            safety_stock,
+            item_unit,
+            remark,
+            created_date,
+            updated_date,
+            use_yn,
+
+            CASE
+                WHEN item_type = 'FG' THEN '완제품'
+                WHEN item_type = 'RM' THEN '원자재'
+                WHEN item_type = 'SM' THEN '부자재'
+                ELSE item_type
+            END AS item_type_name,
+
+            CASE
+                WHEN use_yn = 'Y' THEN '사용'
+                WHEN use_yn = 'N' THEN '미사용'
+                ELSE use_yn
+            END AS use_yn_name
+
+        FROM (
+            SELECT
+                i.item_id,
+                i.supplier_id,
+                i.client_id,
+                i.item_code,
+                i.item_name,
+                i.item_type,
+                i.safety_stock,
+                i.item_unit,
+                i.remark,
+                i.created_date,
+                i.updated_date,
+                i.use_yn
+            FROM item i
+            WHERE i.item_type = 'FG'
+              AND NVL(i.use_yn, 'Y') = 'Y'
+              AND (
+                    UPPER(i.item_code) LIKE '%' || UPPER(#{keyword}) || '%'
+                    OR UPPER(i.item_name) LIKE '%' || UPPER(#{keyword}) || '%'
+              )
+            ORDER BY
+                CASE
+                    WHEN UPPER(i.item_code) = UPPER(#{keyword}) THEN 1
+                    WHEN UPPER(i.item_name) = UPPER(#{keyword}) THEN 2
+                    WHEN UPPER(i.item_code) LIKE UPPER(#{keyword}) || '%' THEN 3
+                    WHEN UPPER(i.item_name) LIKE UPPER(#{keyword}) || '%' THEN 4
+                    ELSE 5
+                END,
+                i.item_code
+        )
+        WHERE ROWNUM &lt;= 10
+
+    </select>
+
+
+    <select id="selectProductItemList"
+            resultMap="productItemResultMap">
+
+        SELECT
+            i.item_id,
+            i.supplier_id,
+            i.client_id,
+            i.item_code,
+            i.item_name,
+            i.item_type,
+            i.safety_stock,
+            i.item_unit,
+            i.remark,
+            i.created_date,
+            i.updated_date,
+            i.use_yn,
+
+            CASE
+                WHEN i.item_type = 'FG' THEN '완제품'
+                WHEN i.item_type = 'RM' THEN '원자재'
+                WHEN i.item_type = 'SM' THEN '부자재'
+                ELSE i.item_type
+            END AS item_type_name,
+
+            CASE
+                WHEN i.use_yn = 'Y' THEN '사용'
+                WHEN i.use_yn = 'N' THEN '미사용'
+                ELSE i.use_yn
+            END AS use_yn_name
+
+        FROM item i
+
+        WHERE i.item_type = 'FG'
+          AND NVL(i.use_yn, 'Y') = 'Y'
+
+        ORDER BY
+            i.item_code
+
+    </select>
+
+
+    <!-- =========================================================
+         8. 설비 자동완성 / 선택 목록
+         ========================================================= -->
+
+    <select id="selectEquipmentAutoComplete"
+            parameterType="map"
+            resultMap="processResultMap">
+
+        SELECT
+            equip_id,
+            equip_code,
+            equip_name,
+            equip_status,
+            equip_loc,
+            line_id,
+            line_code,
+            line_name,
+            line_status,
+            equip_display_name,
+            line_display_name
+        FROM (
+            SELECT
+                e.equip_id,
+                e.equip_code,
+                e.equip_name,
+                e.equip_status,
+                e.equip_loc,
+
+                l.line_id,
+                l.line_code,
+                l.line_name,
+                l.line_status,
+
+                e.equip_code || ' / ' || e.equip_name AS equip_display_name,
+                l.line_code || ' / ' || l.line_name AS line_display_name
+
+            FROM equipment e
+
+            LEFT JOIN line l
+                ON l.line_id = e.line_id
+
+            WHERE NVL(e.use_yn, 'Y') = 'Y'
+              AND (
+                    UPPER(e.equip_code) LIKE '%' || UPPER(#{keyword}) || '%'
+                    OR UPPER(e.equip_name) LIKE '%' || UPPER(#{keyword}) || '%'
+                    OR UPPER(l.line_code) LIKE '%' || UPPER(#{keyword}) || '%'
+                    OR UPPER(l.line_name) LIKE '%' || UPPER(#{keyword}) || '%'
+              )
+
+            ORDER BY
+                CASE
+                    WHEN UPPER(e.equip_code) = UPPER(#{keyword}) THEN 1
+                    WHEN UPPER(e.equip_name) = UPPER(#{keyword}) THEN 2
+                    WHEN UPPER(e.equip_code) LIKE UPPER(#{keyword}) || '%' THEN 3
+                    WHEN UPPER(e.equip_name) LIKE UPPER(#{keyword}) || '%' THEN 4
+                    ELSE 5
+                END,
+                e.equip_code
+        )
+        WHERE ROWNUM &lt;= 10
+
+    </select>
+
+
+    <select id="selectEquipmentList"
+            resultMap="processResultMap">
+
+        SELECT
+            e.equip_id,
+            e.equip_code,
+            e.equip_name,
+            e.equip_status,
+            e.equip_loc,
+
+            l.line_id,
+            l.line_code,
+            l.line_name,
+            l.line_status,
+
+            e.equip_code || ' / ' || e.equip_name AS equip_display_name,
+            l.line_code || ' / ' || l.line_name AS line_display_name
+
+        FROM equipment e
+
+        LEFT JOIN line l
+            ON l.line_id = e.line_id
+
+        WHERE NVL(e.use_yn, 'Y') = 'Y'
+
+        ORDER BY
+            l.line_code,
+            e.equip_code
+
+    </select>
+    
+    <select id="selectProcCodeAutoComplete"
+        parameterType="map"
+        resultMap="processResultMap">
+
+	    SELECT
+	        proc_code,
+	        proc_name
+	    FROM (
+	        SELECT
+	            p.proc_code,
+	            MAX(p.proc_name) AS proc_name
+	        FROM process p
+	        WHERE p.proc_code IS NOT NULL
+	          AND (
+	                UPPER(p.proc_code) LIKE '%' || UPPER(#{keyword}) || '%'
+	                OR UPPER(p.proc_name) LIKE '%' || UPPER(#{keyword}) || '%'
+	          )
+	        GROUP BY
+	            p.proc_code
+	        ORDER BY
+	            CASE
+	                WHEN UPPER(p.proc_code) = UPPER(#{keyword}) THEN 1
+	                WHEN UPPER(p.proc_code) LIKE UPPER(#{keyword}) || '%' THEN 2
+	                ELSE 3
+	            END,
+	            p.proc_code
+	    )
+	    WHERE ROWNUM &lt;= 10
+	
+	</select>
+
+</mapper>
