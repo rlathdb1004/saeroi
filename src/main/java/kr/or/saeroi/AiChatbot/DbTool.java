@@ -83,13 +83,14 @@ public class DbTool {
 			"일수까지 물어본다면 구분(sarchType)을 day로 넣어주고"+
 			"년도만 물어보면 구분(sarchType)을 year로 넣어주는데" +
 			"이용자가 합을 물어본다면  year_sum 평균을 물어본다면 uear_avg를 넣고 기본은 year_sum이야"+
-			"이용자가 '어제', '오늘' 혹은 '특정 날짜'를 언급하면, 분석된 날짜를 반드시 today 매개변수에 YYYY-MM-DD 형식으로 넣어주어야 합니다."
+			"이용자가 '어제', '오늘' 혹은 '특정 날짜'를 언급하면, 분석된 날짜를 반드시 today 매개변수에 YYYY-MM-DD 형식으로 넣어주어야 합니다." 
+			
 			)
-	public String getChart(String searchType, String today) {
+	public String getChart(String searchType, String today, String searchItem) {
 		
 		String type = (searchType != null && !searchType.isEmpty()) ? searchType : null; 
 		
-		List<Map<String, Object>> list = chartDAO.chartday(searchType);
+		List<Map<String, Object>> list = chartDAO.chartday(searchType,searchItem);
 		return list.isEmpty() ? "해당 날짜(" + today + ")로 조회된 리포트 기록이 없습니다." :list.toString();
 	}
 }
