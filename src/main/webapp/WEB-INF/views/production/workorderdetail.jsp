@@ -181,18 +181,20 @@
 			<table class="detail_info_table">
 
 				<tbody>
+					<%-- 생산계획번호와 품목코드는 값이 길 수 있어서 두 항목만 한 줄에 배치한다. --%>
 					<tr>
 						<th>생산계획번호</th>
-						<td>${workOrder.prodPlanDocNo}</td>
+						<td colspan="2">${workOrder.prodPlanDocNo}</td>
 
 						<th>품목코드</th>
-						<td>${workOrder.itemCode}</td>
-
-						<th>품목명</th>
-						<td>${workOrder.itemName}</td>
+						<td colspan="2">${workOrder.itemCode}</td>
 					</tr>
 
+					<%-- 품목명, 품목구분, 라인을 한 줄에 배치한다. --%>
 					<tr>
+						<th>품목명</th>
+						<td>${workOrder.itemName}</td>
+
 						<th>품목구분</th>
 						<td>
 							<c:choose>
@@ -203,40 +205,6 @@
 							</c:choose>
 						</td>
 
-						<th>계획수량</th>
-						<td>${workOrder.prodPlanQty}</td>
-
-						<th>단위</th>
-						<td>${workOrder.itemUnit}</td>
-					</tr>
-
-					<tr>
-						<th>지시수량</th>
-						<td>
-							<c:choose>
-								<c:when test="${mode eq 'edit'}">
-									<input type="number"
-										name="orderQty"
-										class="search-input"
-										min="1"
-										value="${workOrder.orderQty}"
-										required>
-								</c:when>
-
-								<c:otherwise>
-									${workOrder.orderQty}
-								</c:otherwise>
-							</c:choose>
-						</td>
-
-						<th>작업지시일</th>
-						<td>${workOrder.orderDate}</td>
-
-						<th>생성일</th>
-						<td>${workOrder.createdDate}</td>
-					</tr>
-
-					<tr>
 						<th>라인</th>
 						<td>
 							<c:choose>
@@ -265,6 +233,37 @@
 								</c:otherwise>
 							</c:choose>
 						</td>
+					</tr>
+
+					<tr>
+						<th>계획수량</th>
+						<td>${workOrder.prodPlanQty}</td>
+
+						<th>지시수량</th>
+						<td>
+							<c:choose>
+								<c:when test="${mode eq 'edit'}">
+									<input type="number"
+										name="orderQty"
+										class="search-input"
+										min="1"
+										value="${workOrder.orderQty}"
+										required>
+								</c:when>
+
+								<c:otherwise>
+									${workOrder.orderQty}
+								</c:otherwise>
+							</c:choose>
+						</td>
+
+						<th>단위</th>
+						<td>${workOrder.itemUnit}</td>
+					</tr>
+
+					<tr>
+						<th>작업지시일</th>
+						<td>${workOrder.orderDate}</td>
 
 						<th>담당자</th>
 						<td>
@@ -298,13 +297,25 @@
 							</c:choose>
 						</td>
 
-						<th>수정일</th>
-						<td>${workOrder.updatedDate}</td>
+						<th>생성일</th>
+						<td>${workOrder.createdDate}</td>
 					</tr>
 
 					<tr>
+						<th>수정일</th>
+						<td>${workOrder.updatedDate}</td>
+
+						<th></th>
+						<td></td>
+
+						<th></th>
+						<td></td>
+					</tr>
+
+					<%-- 비고는 요청대로 한 칸만 사용한다. --%>
+					<tr>
 						<th>비고</th>
-						<td colspan="5">
+						<td>
 							<c:choose>
 								<c:when test="${mode eq 'edit'}">
 									<textarea name="remark"
@@ -325,6 +336,12 @@
 								</c:otherwise>
 							</c:choose>
 						</td>
+
+						<th></th>
+						<td></td>
+
+						<th></th>
+						<td></td>
 					</tr>
 				</tbody>
 

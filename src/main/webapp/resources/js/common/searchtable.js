@@ -77,6 +77,11 @@ function getSearchTodayDateValue() {
  */
 function setSearchStartDateDefaultToday(searchForm, todayValue) {
 
+	// 리포트처럼 시작일 기본값을 넣지 않아야 하는 검색 영역은 제외한다.
+    if (searchForm.classList.contains("search-no-default-date")) {
+        return;
+    }
+    
     // 검색 영역 안의 시작일 달력만 찾는다.
     var startDateList = searchForm.querySelectorAll("input[type='date'][name='startDate'].search-date");
 

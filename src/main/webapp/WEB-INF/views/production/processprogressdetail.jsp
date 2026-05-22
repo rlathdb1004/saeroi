@@ -216,9 +216,6 @@
 						<th>품목코드</th>
 						<td>${progress.itemCode}</td>
 
-						<th>품목명</th>
-						<td>${progress.itemName}</td>
-
 						<th>품목구분</th>
 						<td>
 							<c:choose>
@@ -228,28 +225,39 @@
 								<c:otherwise>${progress.itemType}</c:otherwise>
 							</c:choose>
 						</td>
+
+						<th>라인</th>
+						<td>${progress.lineName}</td>
 					</tr>
 
 					<tr>
-						<th>라인</th>
-						<td>${progress.lineName}</td>
+						<th>품목명</th>
+						<td colspan="3">${progress.itemName}</td>
 
 						<th>작업지시일</th>
 						<td>${progress.orderDate}</td>
-
-						<th>단위</th>
-						<td>${progress.itemUnit}</td>
 					</tr>
 
 					<tr>
+						<th>단위</th>
+						<td>${progress.itemUnit}</td>
+
 						<th>지시수량</th>
 						<td>${progress.orderQty}</td>
 
+						<th>진행률</th>
+						<td>${progress.progressRate}%</td>
+					</tr>
+
+					<tr>
 						<th>누적 생산수량</th>
 						<td>${progress.totalProdQty}</td>
 
 						<th>누적 불량수량</th>
 						<td>${progress.totalLossQty}</td>
+
+						<th>양품수량</th>
+						<td>${progress.totalProdQty - progress.totalLossQty}</td>
 					</tr>
 
 					<tr>
@@ -290,17 +298,11 @@
 							</c:choose>
 						</td>
 
-						<th>진행률</th>
-						<td>${progress.progressRate}%</td>
+						<th>잔여수량</th>
+						<td>${progress.orderQty - progress.totalProdQty}</td>
 					</tr>
 
 					<tr>
-						<th>양품수량</th>
-						<td>${progress.totalProdQty - progress.totalLossQty}</td>
-
-						<th>잔여수량</th>
-						<td>${progress.orderQty - progress.totalProdQty}</td>
-
 						<th>담당자</th>
 						<td>
 							<c:choose>
@@ -333,11 +335,9 @@
 								</c:otherwise>
 							</c:choose>
 						</td>
-					</tr>
 
-					<tr>
 						<th>비고</th>
-						<td colspan="5">
+						<td>
 							<c:choose>
 								<c:when test="${mode eq 'edit'}">
 									<textarea name="remark"
@@ -358,6 +358,9 @@
 								</c:otherwise>
 							</c:choose>
 						</td>
+
+						<th></th>
+						<td></td>
 					</tr>
 				</tbody>
 

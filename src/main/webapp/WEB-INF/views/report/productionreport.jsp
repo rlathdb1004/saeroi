@@ -87,7 +87,7 @@
 	<!-- 라이브러리 -->
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	
-	<form class="search-form" method="get">
+	<form class="search-form search-no-default-date" method="get">
 		<div class="search-box">
 			<div class="search-row">
 				<!-- 구분 -->
