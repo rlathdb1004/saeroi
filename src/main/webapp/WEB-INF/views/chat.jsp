@@ -73,11 +73,20 @@
 
 /* 2. 챗봇 채팅창 전체 컨테이너 */
 #chatbot-container {
+/* PC화면에서 정중앙으로 오게 수정  */
+/* 	position: fixed; */
+/* 	bottom: 100px; */
+/* 	right: 30px; */
+/* 	width: 96%; */
+/* 	height: 88%; */
 	position: fixed;
-	bottom: 100px;
-	right: 30px;
-	width: 96%;
-	height: 88%;
+	top: 50%;
+	left: 50%;
+	right: auto;
+	bottom: auto;
+	width: min(1100px, calc(100% - 48px));
+	height: min(760px, calc(100vh - 80px));
+/* 	여기위까지 추가함  */
 	background-color: #2f7d62;
 	border-radius: 16px;
 	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
@@ -87,7 +96,9 @@
 	z-index: 1000;
 	/* 시작할 때 숨김 및 올라오는 애니메이션 설정 */
 	opacity: 0;
-	transform: translateY(20px) scale(0.95);
+/* 	transform: translateY(20px) scale(0.95); */
+/* 위에꺼 주석하고 아래 코드로 변경함 */
+	transform: translate(-50%, -48%) scale(0.95);
 	pointer-events: none;
 	transition: all 0.3s ease;
 }
@@ -95,7 +106,7 @@
 /* 활성화 되었을 때 클래스 */
 #chatbot-container.active {
 	opacity: 1;
-	transform: translateY(0) scale(1);
+	transform: translate(-50%, -50%) scale(1);
 	pointer-events: auto;
 }
 
