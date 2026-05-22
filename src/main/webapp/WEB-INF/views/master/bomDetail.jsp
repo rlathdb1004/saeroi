@@ -10,17 +10,17 @@
 	기준:
 	- 품목관리 itemDetail.jsp 구조 기준
 	- 공용 detail.css 사용
-	- 수정 클릭 전: 상세 텍스트 표시
-	- 수정 클릭 후: input/select/autocomplete 전환
-	- BOM 기본정보 + BOM 구성품을 한 번에 수정
-	- 자재/부자재는 자동완성 목록에서 선택
-	- 저장 시 detailItemIds, detailQtys, detailRemarks 배열로 Controller에 전달
+	- 보기/수정 전환 방식
+	- 수정모드의 BOM 구성 자재는 등록모달과 같은 카드형 row 사용
+	- 소요량 input은 천단위 콤마 표시
+	- 서버 전송용 소요량은 hidden detailQtys로 숫자만 전송
+	- 자재 선택 시 소요량 옆 단위 자동 변경
+	- 모바일 대응 CSS는 공통 CSS 기준 사용
 --%>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
-<link rel="stylesheet"
-	href="${contextPath}/resources/css/common/detail.css">
+<link rel="stylesheet" href="${contextPath}/resources/css/common/detail.css">
 
 <div class="detail_page">
 
@@ -36,7 +36,6 @@
 
 				<button type="button" id="editBtn" class="detail_btn_green"
 					onclick="changeEditMode(true);">
-
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 						stroke="currentColor" stroke-width="2" stroke-linecap="round"
 						stroke-linejoin="round"
@@ -45,30 +44,25 @@
 						<path d="M12 20h9"></path>
 						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
 					</svg>
-
 					수정
 				</button>
 
 				<button type="submit" id="saveBtn" class="detail_btn_green"
 					form="bomDetailModifyForm" style="display: none;">
-
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 						stroke="currentColor" stroke-width="2" stroke-linecap="round"
 						stroke-linejoin="round"
 						style="vertical-align: -3px; margin-right: 6px;"
 						aria-hidden="true">
-						<path
-							d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+						<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
 						<path d="M17 21v-8H7v8"></path>
 						<path d="M7 3v5h8"></path>
 					</svg>
-
 					저장
 				</button>
 
 				<button type="button" id="cancelBtn" class="detail_btn_line"
 					onclick="changeEditMode(false);" style="display: none;">
-
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 						stroke="currentColor" stroke-width="2" stroke-linecap="round"
 						stroke-linejoin="round"
@@ -77,7 +71,6 @@
 						<path d="M18 6L6 18"></path>
 						<path d="M6 6l12 12"></path>
 					</svg>
-
 					취소
 				</button>
 
@@ -85,11 +78,11 @@
 
 			<button type="button" class="detail_btn_line"
 				onclick="location.href='${contextPath}/master/bom'">
-
 				<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 					stroke="currentColor" stroke-width="2" stroke-linecap="round"
 					stroke-linejoin="round"
-					style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+					style="vertical-align: -3px; margin-right: 6px;"
+					aria-hidden="true">
 					<path d="M8 6h13"></path>
 					<path d="M8 12h13"></path>
 					<path d="M8 18h13"></path>
@@ -97,7 +90,6 @@
 					<path d="M3 12h.01"></path>
 					<path d="M3 18h.01"></path>
 				</svg>
-
 				목록
 			</button>
 
@@ -117,12 +109,13 @@
 		<c:when test="${not empty bomDetail}">
 
 			<form id="bomDetailModifyForm"
-				action="${contextPath}/master/bom/detail/modify" method="post"
+				action="${contextPath}/master/bom/detail/modify"
+				method="post"
 				accept-charset="UTF-8"
 				onsubmit="return submitBomDetailModifyForm();">
 
-				<input type="hidden" name="bomId" value="${bomDetail.bomId}" /> <input
-					type="hidden" name="itemId" value="${bomDetail.itemId}" />
+				<input type="hidden" name="bomId" value="${bomDetail.bomId}" />
+				<input type="hidden" name="itemId" value="${bomDetail.itemId}" />
 
 				<%-- =====================================================
 				     1. BOM 기본 정보
@@ -133,12 +126,12 @@
 
 					<table class="detail_info_table">
 						<colgroup>
-							<col style="width: 10%;">
-							<col style="width: 23%;">
-							<col style="width: 10%;">
-							<col style="width: 23%;">
-							<col style="width: 10%;">
-							<col style="width: 24%;">
+							<col style="width: 12%;">
+							<col style="width: 22%;">
+							<col style="width: 12%;">
+							<col style="width: 22%;">
+							<col style="width: 12%;">
+							<col style="width: 20%;">
 						</colgroup>
 
 						<tbody>
@@ -147,116 +140,105 @@
 								<td>${bomDetail.bomId}</td>
 
 								<th>BOM코드</th>
-								<td><span data-view-value title="${bomDetail.bomCode}">
-										${bomDetail.bomCode} </span>
+								<td>
+									<span data-view-value title="${bomDetail.bomCode}">
+										${bomDetail.bomCode}
+									</span>
 
 									<div data-edit-box style="display: none;">
-										<input type="text" name="bomCode" value="${bomDetail.bomCode}"
-											readonly
-											style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-									</div></td>
+										<input type="text" name="bomCode"
+											value="${bomDetail.bomCode}" readonly
+											style="width: 100%; box-sizing: border-box;" />
+									</div>
+								</td>
 
 								<th>버전</th>
-								<td><span data-view-value> <c:choose>
+								<td>
+									<span data-view-value>
+										<c:choose>
 											<c:when test="${not empty bomDetail.version}">
 												V${bomDetail.version}
 											</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose>
-								</span>
+									</span>
 
 									<div data-edit-box style="display: none;">
 										<input type="number" name="version" id="version"
 											value="${bomDetail.version}" min="1" required
-											style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-									</div></td>
+											style="width: 100%; box-sizing: border-box;" />
+									</div>
+								</td>
 							</tr>
 
 							<tr>
 								<th>완제품코드</th>
-								<td><span data-view-value title="${bomDetail.itemCode}">
-										<c:choose>
-											<c:when test="${not empty bomDetail.itemCode}">
-												${bomDetail.itemCode}
-											</c:when>
-											<c:otherwise>-</c:otherwise>
-										</c:choose>
-								</span>
-
-									<div data-edit-box style="display: none;">
-										<input type="text" value="${bomDetail.itemCode}" readonly
-											style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-									</div></td>
+								<td>
+									<c:choose>
+										<c:when test="${not empty bomDetail.itemCode}">
+											${bomDetail.itemCode}
+										</c:when>
+										<c:otherwise>-</c:otherwise>
+									</c:choose>
+								</td>
 
 								<th>완제품명</th>
-								<td><span data-view-value title="${bomDetail.itemName}">
-										<c:choose>
-											<c:when test="${not empty bomDetail.itemName}">
-												${bomDetail.itemName}
-											</c:when>
-											<c:otherwise>-</c:otherwise>
-										</c:choose>
-								</span>
-
-									<div data-edit-box style="display: none;">
-										<input type="text" value="${bomDetail.itemName}" readonly
-											style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-									</div></td>
+								<td title="${bomDetail.itemName}">
+									<c:choose>
+										<c:when test="${not empty bomDetail.itemName}">
+											${bomDetail.itemName}
+										</c:when>
+										<c:otherwise>-</c:otherwise>
+									</c:choose>
+								</td>
 
 								<th>사용여부</th>
-								<td><span data-view-value> <c:choose>
+								<td>
+									<span data-view-value>
+										<c:choose>
 											<c:when test="${bomDetail.useYn == 'Y'}">
-												<span class="detail_status_badge detail_status_pass">
-													<c:choose>
-														<c:when test="${not empty bomDetail.useYnName}">
-															${bomDetail.useYnName}
-														</c:when>
-														<c:otherwise>사용</c:otherwise>
-													</c:choose>
-												</span>
+												<span class="detail_status_badge detail_status_pass">사용</span>
 											</c:when>
 											<c:otherwise>
-												<span class="detail_status_badge detail_status_fail">
-													<c:choose>
-														<c:when test="${not empty bomDetail.useYnName}">
-															${bomDetail.useYnName}
-														</c:when>
-														<c:otherwise>미사용</c:otherwise>
-													</c:choose>
-												</span>
+												<span class="detail_status_badge detail_status_fail">미사용</span>
 											</c:otherwise>
 										</c:choose>
-								</span>
+									</span>
 
 									<div data-edit-box style="display: none;">
 										<select name="useYn" data-edit-select-control disabled
-											style="width: 100%; max-width: 100%; box-sizing: border-box;">
+											style="width: 100%; box-sizing: border-box;">
 											<option value="Y"
 												<c:if test="${bomDetail.useYn == 'Y'}">selected</c:if>>
-												사용</option>
+												사용
+											</option>
 											<option value="N"
 												<c:if test="${bomDetail.useYn == 'N'}">selected</c:if>>
-												미사용</option>
+												미사용
+											</option>
 										</select>
-									</div></td>
+									</div>
+								</td>
 							</tr>
 
 							<tr>
 								<th>비고</th>
-								<td colspan="5"><span data-view-value
-									title="${bomDetail.remark}"> <c:choose>
+								<td colspan="5">
+									<span data-view-value title="${bomDetail.remark}">
+										<c:choose>
 											<c:when test="${not empty bomDetail.remark}">
 												${bomDetail.remark}
 											</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose>
-								</span>
+									</span>
 
 									<div data-edit-box style="display: none;">
-										<input type="text" name="remark" value="${bomDetail.remark}"
-											maxlength="30"
-											style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-									</div></td>
+										<input type="text" name="remark"
+											value="${bomDetail.remark}" maxlength="30"
+											style="width: 100%; box-sizing: border-box;" />
+									</div>
+								</td>
 							</tr>
 						</tbody>
 					</table>
@@ -268,154 +250,168 @@
 				     ===================================================== --%>
 				<div class="detail_card">
 
-					<div class="bom_detail_title_row">
+					<div class="bom-detail-title-row">
 						<div class="detail_card_title">BOM 구성 자재</div>
 
 						<div data-edit-box style="display: none;">
 							<button type="button" class="detail_btn_green"
-								onclick="addBomDetailRow();">구성 자재 추가</button>
+								onclick="addBomDetailRow();">
+								구성 자재 추가
+							</button>
 						</div>
 					</div>
 
-					<table class="detail_info_table" id="bomDetailMaterialTable">
-						<thead>
-							<tr>
-								<th>상세ID</th>
-								<th>자재코드</th>
-								<th>자재명</th>
-								<th>소요량</th>
-								<th>단위</th>
-								<th>비고</th>
-								<th><span data-edit-box style="display: none;">삭제</span></th>
-							</tr>
-						</thead>
+					<%-- 보기 모드 --%>
+					<div data-view-value>
+						<table class="detail_info_table" id="bomDetailMaterialTable">
+							<thead>
+								<tr>
+									<th>상세ID</th>
+									<th>자재코드</th>
+									<th>자재명</th>
+									<th>소요량</th>
+									<th>비고</th>
+								</tr>
+							</thead>
 
-						<tbody id="bomDetailTbody">
-							<c:choose>
-								<c:when test="${not empty bomDetailList}">
-									<c:forEach var="detail" items="${bomDetailList}">
-										<tr>
-											<td title="${detail.bomDetailId}"><c:choose>
-													<c:when test="${not empty detail.bomDetailId}">
-														${detail.bomDetailId}
-													</c:when>
-													<c:otherwise>-</c:otherwise>
-												</c:choose></td>
+							<tbody>
+								<c:choose>
+									<c:when test="${not empty bomDetailList}">
+										<c:forEach var="detail" items="${bomDetailList}">
+											<tr>
+												<td>${detail.bomDetailId}</td>
 
-											<td title="${detail.itemCode}"><span data-view-value>
+												<td title="${detail.itemCode}">
 													<c:choose>
 														<c:when test="${not empty detail.itemCode}">
 															${detail.itemCode}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
 													</c:choose>
-											</span>
+												</td>
 
-												<div data-edit-box style="display: none;">
-													<input type="text" class="materialCodeInput"
-														value="${detail.itemCode}" readonly
-														style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-												</div></td>
-
-											<td title="${detail.itemName}"
-												class="autocomplete-wrap bomMaterialAutoCell"><span
-												data-view-value> <c:choose>
+												<td title="${detail.itemName}">
+													<c:choose>
 														<c:when test="${not empty detail.itemName}">
 															${detail.itemName}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
 													</c:choose>
-											</span>
+												</td>
 
-												<div data-edit-box style="display: none;">
-													<input type="hidden" name="detailItemIds"
-														class="materialItemIdInput" value="${detail.itemId}" /> <input
-														type="text" class="materialNameInput"
-														value="${detail.itemName}" placeholder="자재/부자재명을 입력하세요."
-														autocomplete="off" required
-														oninput="searchMaterialAutoComplete(this);"
-														style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-
-													<div class="autocomplete-list materialAutoCompleteBox"></div>
-
-													<p class="autocomplete-id-text materialSelectedText">
-														<c:choose>
-															<c:when test="${not empty detail.itemId}">
-																선택된 구성품 ID: ${detail.itemId}
-															</c:when>
-															<c:otherwise>
-																자동완성 목록에서 구성품을 선택하세요.
-															</c:otherwise>
-														</c:choose>
-													</p>
-												</div></td>
-
-											<td><span data-view-value> <c:choose>
-														<c:when test="${not empty detail.qty}">
-															<fmt:formatNumber value="${detail.qty}"
-																pattern="#,##0.###" />
-														</c:when>
-														<c:otherwise>-</c:otherwise>
-													</c:choose>
-											</span>
-
-												<div data-edit-box style="display: none;">
-													<input type="number" name="detailQtys"
-														value="${detail.qty}" min="0.001" step="0.001" required
-														style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-												</div></td>
-
-											<td title="${detail.itemUnit}"><span data-view-value>
+												<td>
 													<c:choose>
-														<c:when test="${not empty detail.itemUnit}">
-															${detail.itemUnit}
+														<c:when test="${not empty detail.qty}">
+															<fmt:formatNumber value="${detail.qty}" pattern="#,##0.###" />
+															<c:if test="${not empty detail.itemUnit}">
+																&nbsp;${detail.itemUnit}
+															</c:if>
 														</c:when>
 														<c:otherwise>-</c:otherwise>
 													</c:choose>
-											</span>
+												</td>
 
-												<div data-edit-box style="display: none;">
-													<input type="text" class="materialUnitInput"
-														value="${detail.itemUnit}" readonly
-														style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-												</div></td>
-
-											<td title="${detail.remark}"><span data-view-value>
+												<td title="${detail.remark}">
 													<c:choose>
 														<c:when test="${not empty detail.remark}">
 															${detail.remark}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
 													</c:choose>
-											</span>
+												</td>
+											</tr>
+										</c:forEach>
+									</c:when>
 
-												<div data-edit-box style="display: none;">
-													<input type="text" name="detailRemarks"
-														value="${detail.remark}" maxlength="30"
-														style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-												</div></td>
-
-											<td>
-												<div data-edit-box style="display: none;">
-													<a href="javascript:void(0);" class="coDetailBtn"
-														onclick="removeBomDetailRow(this);"> 삭제 </a>
-												</div>
+									<c:otherwise>
+										<tr>
+											<td colspan="5" style="text-align: center;">
+												조회된 BOM 구성 자재가 없습니다.
 											</td>
 										</tr>
-									</c:forEach>
-								</c:when>
+									</c:otherwise>
+								</c:choose>
+							</tbody>
+						</table>
+					</div>
 
-								<c:otherwise>
-									<tr id="emptyBomDetailRow">
-										<td colspan="7" style="text-align: center;">조회된 BOM 구성
-											자재가 없습니다.</td>
-									</tr>
-								</c:otherwise>
-							</c:choose>
-						</tbody>
-					</table>
+					<%-- 수정 모드 --%>
+					<div data-edit-box style="display: none;">
+						<div id="bomDetailRowArea" class="bom-detail-row-area">
 
-					
+							<c:forEach var="detail" items="${bomDetailList}">
+
+								<fmt:formatNumber var="formattedQty"
+									value="${detail.qty}"
+									pattern="#,##0.###" />
+
+								<div class="bom-detail-row">
+									<div class="bom-detail-row-grid">
+
+										<div class="autocomplete-wrap">
+											<input type="text"
+												class="modal_input materialNameInput"
+												value="${detail.itemName} (${detail.itemCode})"
+												placeholder="자재/부자재명 또는 코드를 입력하세요."
+												autocomplete="off"
+												oninput="searchMaterialAutoComplete(this);"
+												required />
+
+											<input type="hidden" name="detailItemIds"
+												class="materialItemIdInput"
+												value="${detail.itemId}" />
+
+											<div class="autocomplete-list materialAutoCompleteBox"></div>
+										</div>
+
+										<div class="bom-detail-qty-box">
+											<input type="text"
+												class="modal_input qtyDisplayInput"
+												value="${formattedQty}"
+												placeholder="소요량"
+												inputmode="decimal"
+												autocomplete="off"
+												oninput="handleQtyInput(this);"
+												required />
+
+											<input type="hidden"
+												name="detailQtys"
+												class="qtyValueInput"
+												value="${detail.qty}" />
+
+											<span class="bom-detail-unit-text">
+												<c:choose>
+													<c:when test="${not empty detail.itemUnit}">
+														${detail.itemUnit}
+													</c:when>
+													<c:otherwise>단위</c:otherwise>
+												</c:choose>
+											</span>
+										</div>
+
+										<div>
+											<input type="text" name="detailRemarks"
+												class="modal_input"
+												value="${detail.remark}"
+												placeholder="비고 30자 이내"
+												maxlength="30" />
+										</div>
+
+										<div>
+											<button type="button"
+												class="search-btn search-btn-sub bom-detail-remove-btn"
+												onclick="removeBomDetailRow(this);">
+												삭제
+											</button>
+										</div>
+
+									</div>
+								</div>
+							</c:forEach>
+
+						</div>
+					</div>
+
 				</div>
 
 
@@ -428,107 +424,64 @@
 
 					<table class="detail_info_table">
 						<colgroup>
-							<col style="width: 10%;">
-							<col style="width: 23%;">
-							<col style="width: 10%;">
-							<col style="width: 23%;">
-							<col style="width: 10%;">
-							<col style="width: 24%;">
+							<col style="width: 12%;">
+							<col style="width: 22%;">
+							<col style="width: 12%;">
+							<col style="width: 22%;">
+							<col style="width: 12%;">
+							<col style="width: 20%;">
 						</colgroup>
 
 						<tbody>
 							<tr>
 								<th>등록일</th>
-								<td><c:choose>
+								<td>
+									<c:choose>
 										<c:when test="${not empty bomDetail.createdDate}">
-											<fmt:formatDate value="${bomDetail.createdDate}"
-												pattern="yyyy-MM-dd" />
+											<fmt:formatDate value="${bomDetail.createdDate}" pattern="yyyy-MM-dd" />
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose></td>
+									</c:choose>
+								</td>
 
 								<th>수정일</th>
-								<td><c:choose>
+								<td>
+									<c:choose>
 										<c:when test="${not empty bomDetail.updatedDate}">
-											<fmt:formatDate value="${bomDetail.updatedDate}"
-												pattern="yyyy-MM-dd" />
+											<fmt:formatDate value="${bomDetail.updatedDate}" pattern="yyyy-MM-dd" />
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose></td>
+									</c:choose>
+								</td>
 
 								<th>상태</th>
-								<td><c:choose>
+								<td>
+									<c:choose>
 										<c:when test="${bomDetail.useYn == 'Y'}">
 											<span class="detail_status_badge detail_status_pass">정상</span>
 										</c:when>
 										<c:otherwise>
 											<span class="detail_status_badge detail_status_fail">중지</span>
 										</c:otherwise>
-									</c:choose></td>
+									</c:choose>
+								</td>
 							</tr>
 						</tbody>
 					</table>
+
 				</div>
 
 			</form>
 
-
-			<%-- 신규 구성품 행 템플릿 --%>
-			<table style="display: none;">
-				<tbody>
-					<tr id="bomDetailTemplateRow">
-						<td>신규</td>
-
-						<td><input type="text" class="materialCodeInput" readonly
-							style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-						</td>
-
-						<td class="autocomplete-wrap bomMaterialAutoCell"><input
-							type="hidden" name="detailItemIds" class="materialItemIdInput" />
-
-							<input type="text" class="materialNameInput"
-							placeholder="자재/부자재명을 입력하세요." autocomplete="off" required
-							oninput="searchMaterialAutoComplete(this);"
-							style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-
-							<div class="autocomplete-list materialAutoCompleteBox"></div>
-
-							<p class="autocomplete-id-text materialSelectedText">자동완성
-								목록에서 구성품을 선택하세요.</p></td>
-
-						<td><input type="number" name="detailQtys" min="0.001"
-							step="0.001" required
-							style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-						</td>
-
-						<td><input type="text" class="materialUnitInput" readonly
-							style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-						</td>
-
-						<td><input type="text" name="detailRemarks" maxlength="30"
-							value="소요량 기준"
-							style="width: 100%; max-width: 100%; box-sizing: border-box;" />
-						</td>
-
-						<td><a href="javascript:void(0);" class="coDetailBtn"
-							onclick="removeBomDetailRow(this);"> 삭제 </a></td>
-					</tr>
-				</tbody>
-			</table>
-
 		</c:when>
 
-
 		<c:otherwise>
-
 			<div class="detail_card">
 				<div class="detail_card_title">조회 결과</div>
-
 				<div class="detail_content_area">
 					<div class="detail_empty_box">조회된 BOM 상세정보가 없습니다.</div>
 				</div>
 			</div>
-
 		</c:otherwise>
 
 	</c:choose>
@@ -537,30 +490,41 @@
 
 
 <style>
+.bom-detail-title-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 12px;
+	white-space: nowrap;
+}
+
+.bom-detail-title-row .detail_card_title {
+	margin-bottom: 0;
+	white-space: nowrap;
+	flex: 0 0 auto;
+}
+
+.bom-detail-title-row [data-edit-box] {
+	flex: 0 0 auto;
+	margin: 0;
+}
+
 #bomDetailMaterialTable thead th {
 	text-align: center;
 }
 
-#bomDetailMaterialTable th, #bomDetailMaterialTable td {
+#bomDetailMaterialTable th,
+#bomDetailMaterialTable td {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	vertical-align: middle;
 }
 
-#bomDetailMaterialTable .bomMaterialAutoCell {
-	overflow: visible;
-}
-
 .autocomplete-wrap {
 	position: relative;
-}
-
-.autocomplete-id-text {
-	margin: 4px 0 0 2px;
-	color: #6B7280;
-	font-size: 12px;
-	line-height: 1.4;
+	min-width: 0;
 }
 
 .autocomplete-list {
@@ -569,7 +533,7 @@
 	left: 0;
 	right: 0;
 	top: 100%;
-	z-index: 50;
+	z-index: 3000;
 	max-height: 180px;
 	overflow-y: auto;
 	margin-top: 4px;
@@ -600,28 +564,78 @@
 	color: #2F7D62;
 }
 
-.bom_detail_title_row {
+.bom-detail-row-area {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.bom-detail-row {
+	width: 100%;
+	padding: 10px;
+	border: 1px solid #E5E7EB;
+	border-radius: 10px;
+	background-color: #F9FAFB;
+	box-sizing: border-box;
+}
+
+.bom-detail-row-grid {
+	display: grid;
+	grid-template-columns: minmax(0, 2fr) 160px minmax(0, 1.5fr) 92px;
+	gap: 8px;
+	align-items: start;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.bom-detail-row-grid > div {
+	min-width: 0;
+	box-sizing: border-box;
+}
+
+.bom-detail-row-grid input {
+	width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
+}
+
+.bom-detail-qty-box {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	margin-bottom: 12px;
+	gap: 6px;
+	width: 100%;
+	min-width: 0;
+	box-sizing: border-box;
 }
 
-.bom_detail_title_row .detail_card_title {
-	margin-bottom: 0;
+.bom-detail-qty-box .qtyDisplayInput {
+	flex: 1 1 auto;
+	min-width: 0;
 }
 
-.bom_detail_title_row [data-edit-box] {
-	margin: 0;
+.bom-detail-unit-text {
+	flex: 0 0 auto;
+	min-width: 28px;
+	color: #4B5563;
+	font-size: 13px;
+	font-weight: 700;
+	white-space: nowrap;
 }
 
+.bom-detail-remove-btn {
+	width: 100%;
+	min-width: 0;
+	padding-left: 0;
+	padding-right: 0;
+	box-sizing: border-box;
+	white-space: nowrap;
+}
 </style>
 
 
 <script>
-	var contextPath = "${contextPath}";
-
 	var materialItemList = [
 		<c:forEach var="item" items="${materialItemList}" varStatus="status">
 			{
@@ -645,9 +659,17 @@
 		var selectList = document.querySelectorAll("[data-edit-select-control]");
 
 		if (isEdit) {
-			editBtn.style.display = "none";
-			saveBtn.style.display = "inline-flex";
-			cancelBtn.style.display = "inline-flex";
+			if (editBtn != null) {
+				editBtn.style.display = "none";
+			}
+
+			if (saveBtn != null) {
+				saveBtn.style.display = "inline-flex";
+			}
+
+			if (cancelBtn != null) {
+				cancelBtn.style.display = "inline-flex";
+			}
 
 			for (var i = 0; i < viewValueList.length; i++) {
 				viewValueList[i].style.display = "none";
@@ -659,6 +681,12 @@
 
 			for (var k = 0; k < selectList.length; k++) {
 				selectList[k].disabled = false;
+			}
+
+			var rowArea = document.getElementById("bomDetailRowArea");
+
+			if (rowArea != null && rowArea.children.length === 0) {
+				addBomDetailRow();
 			}
 
 			var version = document.getElementById("version");
@@ -673,100 +701,82 @@
 
 
 	function addBomDetailRow() {
-		var tbody = document.getElementById("bomDetailTbody");
-		var templateRow = document.getElementById("bomDetailTemplateRow");
+		var rowArea = document.getElementById("bomDetailRowArea");
 
-		if (tbody == null || templateRow == null) {
+		if (rowArea == null) {
 			return;
 		}
 
-		var emptyRow = document.getElementById("emptyBomDetailRow");
+		var row = document.createElement("div");
+		row.className = "bom-detail-row";
 
-		if (emptyRow != null) {
-			emptyRow.remove();
-		}
+		row.innerHTML =
+			'<div class="bom-detail-row-grid">' +
 
-		var newRow = templateRow.cloneNode(true);
+				'<div class="autocomplete-wrap">' +
+					'<input type="text" class="modal_input materialNameInput" ' +
+						'placeholder="자재/부자재명 또는 코드를 입력하세요." autocomplete="off" required />' +
+					'<input type="hidden" name="detailItemIds" class="materialItemIdInput" />' +
+					'<div class="autocomplete-list materialAutoCompleteBox"></div>' +
+				'</div>' +
 
-		newRow.removeAttribute("id");
+				'<div class="bom-detail-qty-box">' +
+					'<input type="text" class="modal_input qtyDisplayInput" ' +
+						'placeholder="소요량" inputmode="decimal" autocomplete="off" ' +
+						'oninput="handleQtyInput(this);" required />' +
+					'<input type="hidden" name="detailQtys" class="qtyValueInput" />' +
+					'<span class="bom-detail-unit-text">단위</span>' +
+				'</div>' +
 
-		clearBomDetailRow(newRow);
+				'<div>' +
+					'<input type="text" name="detailRemarks" class="modal_input" ' +
+						'placeholder="비고 30자 이내" maxlength="30" />' +
+				'</div>' +
 
-		tbody.appendChild(newRow);
+				'<div>' +
+					'<button type="button" class="search-btn search-btn-sub bom-detail-remove-btn" ' +
+						'onclick="removeBomDetailRow(this);">삭제</button>' +
+				'</div>' +
 
-		var nameInput = newRow.querySelector(".materialNameInput");
+			'</div>';
+
+		rowArea.appendChild(row);
+
+		var nameInput = row.querySelector(".materialNameInput");
 
 		if (nameInput != null) {
+			nameInput.addEventListener("input", function() {
+				searchMaterialAutoComplete(this);
+			});
+
 			nameInput.focus();
 		}
 	}
 
 
-	function clearBomDetailRow(row) {
+	function removeBomDetailRow(target) {
+		var rowArea = document.getElementById("bomDetailRowArea");
+
+		if (rowArea == null) {
+			return;
+		}
+
+		var row = null;
+
+		if (target != null) {
+			row = target.closest(".bom-detail-row");
+		}
+
 		if (row == null) {
 			return;
 		}
 
-		var itemIdInput = row.querySelector(".materialItemIdInput");
-		var codeInput = row.querySelector(".materialCodeInput");
-		var nameInput = row.querySelector(".materialNameInput");
-		var unitInput = row.querySelector(".materialUnitInput");
-		var qtyInput = row.querySelector("input[name='detailQtys']");
-		var remarkInput = row.querySelector("input[name='detailRemarks']");
-		var selectedText = row.querySelector(".materialSelectedText");
-		var autoBox = row.querySelector(".materialAutoCompleteBox");
-
-		if (itemIdInput != null) {
-			itemIdInput.value = "";
-		}
-
-		if (codeInput != null) {
-			codeInput.value = "";
-		}
-
-		if (nameInput != null) {
-			nameInput.value = "";
-		}
-
-		if (unitInput != null) {
-			unitInput.value = "";
-		}
-
-		if (qtyInput != null) {
-			qtyInput.value = "";
-		}
-
-		if (remarkInput != null) {
-			remarkInput.value = "소요량 기준";
-		}
-
-		if (selectedText != null) {
-			selectedText.innerText = "자동완성 목록에서 구성품을 선택하세요.";
-		}
-
-		clearAutoCompleteBox(autoBox);
-	}
-
-
-	function removeBomDetailRow(element) {
-		var tbody = document.getElementById("bomDetailTbody");
-
-		if (tbody == null) {
-			return;
-		}
-
-		var rowList = tbody.querySelectorAll("tr");
-
-		if (rowList.length <= 1) {
+		if (rowArea.children.length <= 1) {
 			alert("BOM 구성 자재는 최소 1개 이상 필요합니다.");
 			return;
 		}
 
-		var row = element.closest("tr");
-
-		if (row != null) {
-			row.remove();
-		}
+		rowArea.removeChild(row);
 	}
 
 
@@ -775,76 +785,49 @@
 			return;
 		}
 
-		var row = input.closest("tr");
+		var row = input.closest(".bom-detail-row");
 
 		if (row == null) {
 			return;
 		}
 
 		var itemIdInput = row.querySelector(".materialItemIdInput");
-		var codeInput = row.querySelector(".materialCodeInput");
-		var unitInput = row.querySelector(".materialUnitInput");
-		var selectedText = row.querySelector(".materialSelectedText");
 		var autoBox = row.querySelector(".materialAutoCompleteBox");
-
-		var keyword = input.value.trim();
+		var unitText = row.querySelector(".bom-detail-unit-text");
 
 		if (itemIdInput != null) {
 			itemIdInput.value = "";
 		}
 
-		if (codeInput != null) {
-			codeInput.value = "";
+		if (unitText != null) {
+			unitText.innerText = "단위";
 		}
-
-		if (unitInput != null) {
-			unitInput.value = "";
-		}
-
-		if (selectedText != null) {
-			selectedText.innerText = "자동완성 목록에서 구성품을 선택하세요.";
-		}
-
-		clearAutoCompleteBox(autoBox);
-
-		if (keyword.length < 1) {
-			if (autoBox != null) {
-				autoBox.style.display = "none";
-			}
-
-			return;
-		}
-
-		var resultList = filterItemList(materialItemList, keyword);
-
-		renderMaterialAutoCompleteList(resultList, input, autoBox);
-	}
-
-
-	function renderMaterialAutoCompleteList(itemList, input, autoBox) {
-		clearAutoCompleteBox(autoBox);
 
 		if (autoBox == null) {
 			return;
 		}
 
-		if (itemList == null || itemList.length === 0) {
-			autoBox.style.display = "none";
+		autoBox.innerHTML = "";
+		autoBox.style.display = "none";
+
+		var keyword = input.value.trim();
+
+		if (keyword.length < 1) {
 			return;
 		}
 
-		for (var i = 0; i < itemList.length; i++) {
+		var resultList = filterItemList(materialItemList, keyword);
+
+		if (resultList == null || resultList.length === 0) {
+			return;
+		}
+
+		for (var i = 0; i < resultList.length; i++) {
 			(function(itemData) {
 				var item = document.createElement("div");
 				item.className = "autocomplete-item";
 
-				var label = "";
-
-				if (itemData.itemCode != null && itemData.itemCode !== "") {
-					label += "[" + itemData.itemCode + "] ";
-				}
-
-				label += itemData.itemName;
+				var label = "[" + itemData.itemCode + "] " + itemData.itemName;
 
 				if (itemData.itemType != null && itemData.itemType !== "") {
 					label += " / " + itemData.itemType;
@@ -858,54 +841,102 @@
 
 				item.innerText = label;
 
-				item.addEventListener("click", function() {
-					selectMaterialItem(input, itemData);
-				});
+				item.onclick = function() {
+					input.value = itemData.itemName + " (" + itemData.itemCode + ")";
+
+					if (itemIdInput != null) {
+						itemIdInput.value = itemData.itemId;
+					}
+
+					if (unitText != null) {
+						if (itemData.itemUnit != null && itemData.itemUnit !== "") {
+							unitText.innerText = itemData.itemUnit;
+						} else {
+							unitText.innerText = "단위";
+						}
+					}
+
+					autoBox.innerHTML = "";
+					autoBox.style.display = "none";
+				};
 
 				autoBox.appendChild(item);
-			})(itemList[i]);
+			})(resultList[i]);
 		}
 
 		autoBox.style.display = "block";
 	}
 
 
-	function selectMaterialItem(input, itemData) {
-		var row = input.closest("tr");
+	function handleQtyInput(input) {
+		if (input == null) {
+			return;
+		}
+
+		var rawValue = normalizeQtyValue(input.value);
+		var formattedValue = formatQtyWithComma(rawValue);
+
+		input.value = formattedValue;
+
+		var row = input.closest(".bom-detail-row");
 
 		if (row == null) {
 			return;
 		}
 
-		var itemIdInput = row.querySelector(".materialItemIdInput");
-		var codeInput = row.querySelector(".materialCodeInput");
-		var unitInput = row.querySelector(".materialUnitInput");
-		var selectedText = row.querySelector(".materialSelectedText");
-		var autoBox = row.querySelector(".materialAutoCompleteBox");
+		var hiddenInput = row.querySelector(".qtyValueInput");
 
-		input.value = itemData.itemName;
+		if (hiddenInput != null) {
+			hiddenInput.value = rawValue;
+		}
+	}
 
-		if (itemIdInput != null) {
-			itemIdInput.value = itemData.itemId;
+
+	function normalizeQtyValue(value) {
+		if (value == null) {
+			return "";
 		}
 
-		if (codeInput != null) {
-			codeInput.value = itemData.itemCode;
+		var rawValue = value.replace(/,/g, "");
+		rawValue = rawValue.replace(/[^\d.]/g, "");
+
+		var parts = rawValue.split(".");
+
+		if (parts.length > 1) {
+			rawValue = parts[0] + "." + parts.slice(1).join("");
 		}
 
-		if (unitInput != null) {
-			unitInput.value = itemData.itemUnit;
+		return rawValue;
+	}
+
+
+	function formatQtyWithComma(rawValue) {
+		if (rawValue == null || rawValue === "") {
+			return "";
 		}
 
-		if (selectedText != null) {
-			selectedText.innerText = "선택된 구성품 ID: " + itemData.itemId;
+		var hasDot = rawValue.indexOf(".") > -1;
+		var parts = rawValue.split(".");
+		var intPart = parts[0];
+		var decimalPart = "";
+
+		if (parts.length > 1) {
+			decimalPart = parts[1];
 		}
 
-		clearAutoCompleteBox(autoBox);
+		intPart = intPart.replace(/^0+(?=\d)/, "");
 
-		if (autoBox != null) {
-			autoBox.style.display = "none";
+		if (intPart === "") {
+			intPart = "0";
 		}
+
+		var formattedInt = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+		if (hasDot) {
+			return formattedInt + "." + decimalPart;
+		}
+
+		return formattedInt;
 	}
 
 
@@ -937,26 +968,10 @@
 		}
 
 		resultList.sort(function(a, b) {
-			var aName = "";
-			var bName = "";
-			var aCode = "";
-			var bCode = "";
-
-			if (a.itemName != null) {
-				aName = a.itemName.toLowerCase();
-			}
-
-			if (b.itemName != null) {
-				bName = b.itemName.toLowerCase();
-			}
-
-			if (a.itemCode != null) {
-				aCode = a.itemCode.toLowerCase();
-			}
-
-			if (b.itemCode != null) {
-				bCode = b.itemCode.toLowerCase();
-			}
+			var aName = a.itemName == null ? "" : a.itemName.toLowerCase();
+			var bName = b.itemName == null ? "" : b.itemName.toLowerCase();
+			var aCode = a.itemCode == null ? "" : a.itemCode.toLowerCase();
+			var bCode = b.itemCode == null ? "" : b.itemCode.toLowerCase();
 
 			var aScore = getAutoCompleteScore(aName, aCode, lowerKeyword);
 			var bScore = getAutoCompleteScore(bName, bCode, lowerKeyword);
@@ -1005,22 +1020,11 @@
 	}
 
 
-	function clearAutoCompleteBox(autoBox) {
-		if (autoBox == null) {
-			return;
-		}
-
-		while (autoBox.firstChild) {
-			autoBox.removeChild(autoBox.firstChild);
-		}
-	}
-
-
 	function hideAllAutoCompleteBox() {
 		var boxList = document.querySelectorAll(".autocomplete-list");
 
 		for (var i = 0; i < boxList.length; i++) {
-			clearAutoCompleteBox(boxList[i]);
+			boxList[i].innerHTML = "";
 			boxList[i].style.display = "none";
 		}
 	}
@@ -1067,21 +1071,14 @@
 
 
 	function validateBomDetailRows() {
-		var tbody = document.getElementById("bomDetailTbody");
+		var rowArea = document.getElementById("bomDetailRowArea");
 
-		if (tbody == null) {
+		if (rowArea == null) {
 			alert("BOM 구성 자재 영역을 찾을 수 없습니다.");
 			return false;
 		}
 
-		var emptyRow = document.getElementById("emptyBomDetailRow");
-
-		if (emptyRow != null) {
-			alert("BOM 구성 자재를 1개 이상 입력하세요.");
-			return false;
-		}
-
-		var rowList = tbody.querySelectorAll("tr");
+		var rowList = rowArea.querySelectorAll(".bom-detail-row");
 
 		if (rowList.length === 0) {
 			alert("BOM 구성 자재를 1개 이상 입력하세요.");
@@ -1093,7 +1090,8 @@
 		for (var i = 0; i < rowList.length; i++) {
 			var itemIdInput = rowList[i].querySelector(".materialItemIdInput");
 			var nameInput = rowList[i].querySelector(".materialNameInput");
-			var qtyInput = rowList[i].querySelector("input[name='detailQtys']");
+			var qtyDisplayInput = rowList[i].querySelector(".qtyDisplayInput");
+			var qtyInput = rowList[i].querySelector(".qtyValueInput");
 
 			if (nameInput == null || nameInput.value.trim() === "") {
 				alert("자재/부자재명을 입력하세요.");
@@ -1127,19 +1125,27 @@
 
 			selectedItemMap[itemIdInput.value] = true;
 
+			if (qtyDisplayInput != null) {
+				handleQtyInput(qtyDisplayInput);
+			}
+
 			if (qtyInput == null || qtyInput.value.trim() === "") {
 				alert("소요량을 입력하세요.");
 
-				if (qtyInput != null) {
-					qtyInput.focus();
+				if (qtyDisplayInput != null) {
+					qtyDisplayInput.focus();
 				}
 
 				return false;
 			}
 
-			if (Number(qtyInput.value) <= 0) {
+			if (Number(qtyInput.value) <= 0 || isNaN(Number(qtyInput.value))) {
 				alert("소요량은 0보다 커야 합니다.");
-				qtyInput.focus();
+
+				if (qtyDisplayInput != null) {
+					qtyDisplayInput.focus();
+				}
+
 				return false;
 			}
 		}
