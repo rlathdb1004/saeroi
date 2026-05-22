@@ -28,8 +28,16 @@ public class EquipmentService {
 	}
 	
 	public int delete_equipment(List<Integer> eqpIds) {
-
 	    return equipmentDAO.delete_equipment(eqpIds);
+	}
+	
+	public EquipmentDTO get_equipment_detail(String equip_id) {
+	    return equipmentDAO.get_equipment_detail(equip_id);
+	}
+	
+	public int update_equipment(EquipmentDTO dto) {		
+		 
+	    return equipmentDAO.update_equipment(dto);
 	}
 	
 }
