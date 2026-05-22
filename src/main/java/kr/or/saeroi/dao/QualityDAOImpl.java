@@ -185,6 +185,7 @@ public class QualityDAOImpl implements QualityDAO {
 		return delete_result;
 	}
 
+	// 불량 상세 목록
 	@Override
 	public DefectDTO _dao_select_Defect_detail(String defect_list_id) {
 
@@ -194,5 +195,22 @@ public class QualityDAOImpl implements QualityDAO {
 		DefectDTO defect_detail = sqlSession.selectOne("mapper.quality._select_Defect_detail", param);
 
 		return defect_detail;
+	}
+
+	//불량 업데이트
+	@Override
+	public int _dao_update_Defect(String defect_list_id, String defect_date, String defect_id, String defect_qty,
+			String remark) {
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("defect_list_id", defect_list_id);
+		param.put("defect_date", defect_date);
+		param.put("defect_id", defect_id);
+		param.put("defect_qty", defect_qty);
+		param.put("remark", remark);
+
+		int update_result = sqlSession.update("mapper.quality._update_Defect", param);
+
+		return update_result;
 	}
 }

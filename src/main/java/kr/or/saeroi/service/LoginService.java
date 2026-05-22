@@ -25,6 +25,10 @@ public class LoginService {
 
     @Autowired
     private BCryptPasswordEncoder passwordEncoder;
+    
+    public LoginDTO find_empno(String empno) {
+        return loginDAO.find_empno(empno);
+    }
 
     public LoginDTO login(String empno, String pw) {
 
@@ -53,23 +57,21 @@ public class LoginService {
     }
 
     public String reset_pw(String empno) {
-        String temp_pw =
-                UUID.randomUUID().toString().substring(0, 8);
+        String temp_pw = UUID.randomUUID().toString().substring(0, 8);
 
-        String hash_pw =
-                passwordEncoder.encode(temp_pw);
+        String hash_pw = passwordEncoder.encode(temp_pw);
         loginDAO.update_pw(empno, hash_pw);
 
         return temp_pw;
     }
 
-    public void send_temp_pw(String email, String tempPw) {
+    public void send_temp_pw(String email, String temp_pw) {
 
         SimpleMailMessage msg = new SimpleMailMessage();
 
         msg.setTo(email);
         msg.setSubject("임시 비밀번호 안내");
-        msg.setText("임시 비밀번호는 " + tempPw + " 입니다.");
+        msg.setText("임시 비밀번호는 " + temp_pw + " 입니다.");
 
         mailSender.send(msg);
     }

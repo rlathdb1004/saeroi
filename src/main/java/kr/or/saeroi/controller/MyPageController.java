@@ -3,6 +3,7 @@ package kr.or.saeroi.controller;
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -38,6 +39,8 @@ public class MyPageController {
 	public String updateMyPage(
 	        @RequestParam("email") String email,
 	        @RequestParam("emp_tel") String emp_tel,
+	        @RequestParam("emp_pw") String emp_pw,
+	        @RequestParam("emp_pw_confirm") String emp_pw_confirm,	        
 	        HttpSession session,
 	        RedirectAttributes redirectAttributes) {
 
@@ -47,32 +50,34 @@ public class MyPageController {
 	    if (loginUser == null) {
 	        return "redirect:/login";
 	    }
-
+	    
 	    LoginDTO dto = new LoginDTO();
+	    
+	    if (emp_pw != null && !emp_pw.trim().isEmpty()) {
+	        if (!emp_pw.equals(emp_pw_confirm)) {
+	            redirectAttributes.addFlashAttribute("errorMsg", "비밀번호가 일치하지 않습니다.");	
+	            return "redirect:/mypage";
+	        }
+	        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+	        String hash_pw =encoder.encode(emp_pw);
+	        dto.setEmp_pw(hash_pw);
+	    }
+	    
 	    dto.setEmpno(loginUser.getEmpno());
 	    dto.setEmail(email);
-	    dto.setEmp_tel(emp_tel);
+	    dto.setEmp_tel(emp_tel);	   
 	    
 	    int result = loginService.update_my_page(dto);
 
 	    if (result > 0) {
 
-	        loginUser.setEmail(email);
-	        loginUser.setEmp_tel(emp_tel);
-
-	        session.setAttribute("loginUser", loginUser);
-
-	        redirectAttributes.addFlashAttribute(
-	                "successMsg",
-	                "회원정보가 수정되었습니다."
-	        );
-
+	    	LoginDTO updatedUser = loginService.find_empno(loginUser.getEmpno());
+	        session.setAttribute("loginUser", updatedUser);
+	        
+	        redirectAttributes.addFlashAttribute("successMsg","회원정보가 수정되었습니다.");
+	        
 	    } else {
-
-	        redirectAttributes.addFlashAttribute(
-	                "errorMsg",
-	                "회원정보 수정에 실패했습니다."
-	        );
+	        redirectAttributes.addFlashAttribute("errorMsg","회원정보 수정에 실패했습니다.");
 	    }
 
 	    return "redirect:/mypage";

@@ -231,10 +231,11 @@
 		(SELECT NVL(MAX(doc_seq), 0) + 1
 		FROM inspection
 		WHERE TRUNC(insp_date) = TRUNC(TO_DATE(#{insp_date}, 'YYYY-MM-DD'))),
-		TO_NUMBER(#{emp_id}),
+		(SELECT e.emp_id FROM emp e WHERE e.empno = #{emp_id}),
 		TO_NUMBER(#{prod_id}),
 		#{insp_type},
-		TO_DATE(#{insp_date}, 'YYYY-MM-DD'),
+		TO_DATE(#{insp_date},
+		'YYYY-MM-DD'),
 		UNISTR('\C644\B8CC'),
 		#{result},
 		TO_NUMBER(#{inspection_qty}),
@@ -477,4 +478,19 @@
 		AND
 		dl.defect_list_id = TO_NUMBER(#{defect_list_id})
 	</select>
+
+	<!-- 불량 업데이트 -->
+	<update id="_update_Defect" parameterType="map">
+		UPDATE defect_list
+		SET
+		defect_date = TO_DATE(#{defect_date}, 'YYYY-MM-DD'),
+		defect_id =
+		TO_NUMBER(#{defect_id}),
+		defect_qty = TO_NUMBER(#{defect_qty}),
+		remark =
+		#{remark},
+		updated_date = SYSDATE
+		WHERE defect_list_id =
+		TO_NUMBER(#{defect_list_id})
+	</update>
 </mapper>

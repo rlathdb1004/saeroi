@@ -12,8 +12,74 @@
 	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
 <style>
 #chart {
-	max-width: 850px;
+	max-width: 100%;
 	margin: 40px auto;
+}
+/* 대시보드 전체 레이아웃 (가로 배열) */
+.dashboard-container {
+    display: flex;
+    gap: 20px;
+    max-width: 1400px; /* 화면에 맞춰 최대 폭 확장 */
+    margin: 20px auto;
+    padding: 0 20px;
+}
+
+.left-panel {
+    flex: 7; /* 좌측 70% 비율 */
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.right-panel {
+    flex: 3; /* 우측 30% 비율 */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.chart-box, .table-box {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.box-title {
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    border-left: 4px solid #008FFB;
+    padding-left: 8px;
+}
+
+/* 데이터 테이블 스타일 */
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: center;
+}
+
+.report-table th {
+    background-color: #f8f9fa;
+    color: #495057;
+    font-weight: 600;
+    padding: 8px;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.report-table td {
+    padding: 8px;
+    border-bottom: 1px solid #dee2e6;
+    color: #333;
+}
+
+.report-table tr:hover {
+    background-color: #f1f3f5;
 }
 </style>
 </head>
@@ -21,7 +87,7 @@
 	<!-- 라이브러리 -->
 	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 	
-	<form class="search-form" method="get">
+	<form class="search-form search-no-default-date" method="get">
 		<div class="search-box">
 			<div class="search-row">
 				<!-- 구분 -->
@@ -58,11 +124,40 @@
 			</div>
 		</div>
 	</form>
-	<div id="chart"></div>
+	
+	<div class="dashboard-container">
+    <div class="left-panel">
+        <div id="chart"></div>
+    </div>
+    
+    <div class="right-panel">
+        <div class="chart-box">
+            <h4 class="box-title">불량 원인 TOP 3</h4>
+            <div id="oChart"></div>
+        </div>
+        
+        <div class="table-box">
+            <h4 class="box-title">상세 데이터 내역</h4>
+            <table class="report-table" id="reportTable">
+                <thead>
+                    <tr>
+                        <th>일자/기간</th>
+                        <th>계획량</th>
+                        <th>작업량</th>
+                        <th>불량</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 
 	<script>
 	let chart = null;
+	let ochart = null;
 	document.addEventListener('DOMContentLoaded', function(){
 		loadChartData('month','all');
 		
@@ -139,13 +234,57 @@
         	})
         }
         
+        let tableBody = document.querySelector('#tableBody')
+        tableBody.innerHTML = '';
+        let totalPlan = 0, totalOrder = 0, totalDefect = 0;
+        
         
         let dates = chartList.map(item => item.계획일자);
       	let planValues = chartList.map(item => item.생산계획량);
       	let orderValues = chartList.map(item => item.작업량);
       	let defectValues = chartList.map(item => item.불량수량);
       	
+      	chartList.forEach(item => {
+      		let row = document.createElement('tr');
+      		row.innerHTML = `
+      			<td>\${item.계획일자}</td>
+                <td>\${Number(item.생산계획량).toLocaleString()}</td>
+                <td>\${Number(item.작업량).toLocaleString()}</td>
+                <td style="color: #FF4560; font-weight: bold;">\${Number(item.불량수량).toLocaleString()}</td>
+      		`;
+      		tableBody.appendChild(row);
+      		
+      		totalPlan += Number(item.생산계획량 || 0);
+            totalOrder += Number(item.작업량 || 0);
+            totalDefect += Number(item.불량수량 || 0);
+      	});
       	
+      	let defectOptions = {
+      		series: [],
+      		chart:{
+      			type: 'donut',
+      			height:230
+      		},
+      		labels: [],
+            colors: ['#00E396', '#FF4560', '#FEB019'],
+            legend: {
+                position: 'bottom'
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: { width: 200 },
+                    legend: { position: 'bottom' }
+                }
+            }]
+      	};
+      	
+      	if(ochart !== null){
+      		ochart.destroy();
+        }
+        oChart = new ApexCharts(document.querySelector('#oChart'), defectOptions);
+        oChart.render();
+        
       	let title_text = '월별 생산계획 대비 작업 실적 및 불량 현황';
  		if(searchType == 'day') title_text = '일별 생산계획 대비 작업 실적 및 불량 현황'
  		if(searchType == 'week') title_text = '주간별 생산계획 대비 작업 실적 및 불량 현황'
@@ -169,7 +308,7 @@
       			}],
       	
       	chart: {
-      		height: 450,
+      		height: 480,
       		type: 'line',
       		toolbar: {show:true},
       	events: {
@@ -215,7 +354,9 @@
       	},
       	title: {
       		text: title_text,
-      		align: 'center'
+      		align: 'center',
+      		offsetX: -10,
+      		offsety: 0
       	},
       	dataLabels: {
       		enabled: false
@@ -243,7 +384,7 @@
       		horizontalAlign: 'left',
       		floating: true,
       		fontSize:'14px',
-      		offsetY: -30,
+      		offsetY: -55,
       		offsetX: 10,
       		itemMargin:{
       			horizontal:8,

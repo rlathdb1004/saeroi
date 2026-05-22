@@ -44,6 +44,10 @@ public interface QualityService {
 	// 불랑 삭제
 	int _ser_delete_defect(String[] defect_list_id);
 
-	//불량 상세
+	// 불량 상세
 	DefectDTO _ser_select_Defect_detail(String defect_list_id);
+
+	//불량 업데이트
+	int _ser_update_Defect(String defect_list_id, String defect_date, String defect_id, String defect_qty,
+			String remark);
 }

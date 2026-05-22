@@ -183,19 +183,44 @@ public class LoginDAO {
 
 	    int result = 0;
 
-	    String sql =
-	        "UPDATE EMP " +
-	        "SET EMAIL = ?, " +
-	        "EMP_TEL = ?, " +
-	        "UPDATED_DATE = SYSTIMESTAMP " +
-	        "WHERE EMPNO = ?";
+	    String sql;
+
+	    if(dto.getEmp_pw() != null && !dto.getEmp_pw().isEmpty()) {
+
+	        sql =
+	            "UPDATE EMP " +
+	            "SET EMAIL = ?, " +
+	            "    EMP_TEL = ?, " +
+	            "    EMP_PW = ?, " +
+	            "    UPDATED_DATE = SYSTIMESTAMP " +
+	            "WHERE EMPNO = ?";
+
+	    } else {
+
+	        sql =
+	            "UPDATE EMP " +
+	            "SET EMAIL = ?, " +
+	            "    EMP_TEL = ?, " +
+	            "    UPDATED_DATE = SYSTIMESTAMP " +
+	            "WHERE EMPNO = ?";
+	    }
 
 	    try (Connection conn = dataSource.getConnection();
 	         PreparedStatement ps = conn.prepareStatement(sql)) {
 
-	        ps.setString(1, dto.getEmail());
-	        ps.setString(2, dto.getEmp_tel());
-	        ps.setString(3, dto.getEmpno());
+	        if(dto.getEmp_pw() != null && !dto.getEmp_pw().isEmpty()) {
+
+	            ps.setString(1, dto.getEmail());
+	            ps.setString(2, dto.getEmp_tel());
+	            ps.setString(3, dto.getEmp_pw());
+	            ps.setString(4, dto.getEmpno());
+
+	        } else {
+
+	            ps.setString(1, dto.getEmail());
+	            ps.setString(2, dto.getEmp_tel());
+	            ps.setString(3, dto.getEmpno());
+	        }
 
 	        result = ps.executeUpdate();
 
@@ -205,4 +230,44 @@ public class LoginDAO {
 
 	    return result;
 	}
+	
+	public LoginDTO find_emp_name(String emp_name) {
+
+        LoginDTO login = null;
+
+        String sql =
+            "SELECT EMPNO, EMP_PW, ENAME, DEPT, JOB, HIRE_DATE, " +
+            "EMP_TEL, EMAIL, STATUS, ROLE, CREATED_DATE, UPDATED_DATE " +
+            "FROM EMP WHERE EMPNAME = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, emp_name);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+
+                    login = new LoginDTO();
+                    login.setEmpno(rs.getString("EMPNO"));
+                    login.setEname(rs.getString("ENAME"));
+                    login.setEmp_pw(rs.getString("EMP_PW"));
+                    login.setDept(rs.getString("DEPT"));
+                    login.setJob(rs.getString("JOB"));
+                    login.setEmail(rs.getString("EMAIL"));
+                    login.setEmp_tel(rs.getString("EMP_TEL"));
+                    login.setStatus(rs.getString("STATUS"));
+                    login.setRole(rs.getString("ROLE"));
+                    login.setHire_date(rs.getTimestamp("HIRE_DATE"));
+                    login.setCreated_date(rs.getTimestamp("CREATED_DATE"));
+                    login.setUpdated_date(rs.getTimestamp("UPDATED_DATE"));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("사번 조회 실패", e);
+        }
+
+        return login;
+    }    
 }
