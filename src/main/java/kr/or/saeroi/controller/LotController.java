@@ -58,6 +58,7 @@ public class LotController {
 
 		// 검색 조건 유지용 값이다.
 		model.addAttribute("progressStatus", lotDTO.getProgressStatus());
+		model.addAttribute("searchType", lotDTO.getSearchType());
 		model.addAttribute("keyword", lotDTO.getKeyword());
 		model.addAttribute("startDate", lotDTO.getStartDate());
 		model.addAttribute("endDate", lotDTO.getEndDate());

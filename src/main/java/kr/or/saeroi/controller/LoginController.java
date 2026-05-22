@@ -25,102 +25,198 @@ import kr.or.saeroi.service.LoginService;
 
 @Controller
 public class LoginController {
-	 @Autowired
-	    private LoginService loginService;	
 
-	 @RequestMapping(value="/login", method=RequestMethod.GET)
-	 public String login(HttpSession session) {
+	@Autowired
+	private LoginService loginService;
 
-	     if(session.getAttribute("loginUser") != null) {
-	         return "redirect:/";
-	     }
+	// =====================================================
+	// 로그인 페이지 이동
+	// =====================================================
+	@RequestMapping(value="/login", method=RequestMethod.GET)
+	public String login(HttpSession session) {
 
-	     return "login";
-	 }
-    
-    @RequestMapping(value="/login", method=RequestMethod.POST)
-    public String login_proc(
-            @RequestParam("empno") String empno,
-            @RequestParam("pw") String pw,
-            @RequestParam(value="autoLogin", required=false) String autoLogin,
-            HttpSession session,
-            HttpServletResponse response,
-            Model model) {
+		if(session.getAttribute("loginUser") != null) {
 
-        LoginDTO login = loginService.login(empno, pw);
+			return "redirect:/";
+		}
 
-        if(login != null) {
+		return "login";
+	}
 
-            session.setAttribute("loginUser", login);
+	// =====================================================
+	// 로그인 처리
+	// =====================================================
+	@RequestMapping(value="/login", method=RequestMethod.POST)
+	public String login_proc(
+			@RequestParam("empno") String empno,
+			@RequestParam("pw") String pw,
+			@RequestParam(value="autoLogin", required=false) String autoLogin,
+			HttpSession session,
+			HttpServletResponse response,
+			Model model) {
 
-            if("Y".equals(autoLogin)) {
+		// =================================================
+		// 로그인 확인
+		// =================================================
+		LoginDTO login =
+			loginService.login(empno, pw);
 
-                String token = UUID.randomUUID().toString();
-                loginService.update_auto_login_token(login.getEmpno(), token);
-                Cookie cookie = new Cookie("autoLogin", token);
-                cookie.setMaxAge(60 * 60 * 24 * 30);
-                cookie.setPath("/");
-                response.addCookie(cookie);
-            }
-            return "redirect:/";
-        }
+		// =================================================
+		// 로그인 성공
+		// =================================================
+		if(login != null) {
 
-        model.addAttribute("errorMsg", "사번 또는 비밀번호가 올바르지 않습니다.");
-        return "login";
-    }
-    
-    @ResponseBody
-    @RequestMapping(value="/find_pw", method=RequestMethod.POST)
-    public Map<String, Object> find_pw(@RequestBody FindPwDTO dto) {
+			// =============================================
+			// 세션 저장
+			// =============================================
+			session.setAttribute(
+				"loginUser",
+				login);
 
-        Map<String, Object> result = new HashMap<>();
+			// =============================================
+			// 자동 로그인 처리
+			// =============================================
+			if("Y".equals(autoLogin)) {
 
-        try {
+				String token =
+					UUID.randomUUID().toString();
 
-            boolean exists = loginService.check_user(dto.getEmpno(), dto.getEmail());
+				loginService.update_auto_login_token(
+					login.getEmpno(),
+					token);
 
-            if (!exists) {
-                result.put("success", false);
-                result.put("message", "일치하는 정보가 없습니다.");
-                return result;
-            }
+				Cookie cookie =
+					new Cookie("autoLogin", token);
 
-            String tempPw = loginService.reset_pw(dto.getEmpno());
+				cookie.setMaxAge(
+					60 * 60 * 24 * 30);
 
-            loginService.send_temp_pw(dto.getEmail(), tempPw);
+				cookie.setPath("/");
 
-            result.put("success", true);
-            result.put("message", "임시 비밀번호가 이메일로 발송되었습니다.");
+				response.addCookie(cookie);
+			}
 
-        } catch (Exception e) {
+			// =============================================
+			// ★ 추가된 부분 ★
+			// 작업자 로그인 시
+			// 작업자 메인 화면 이동
+			// =============================================
+			if("WORKER".equals(
+					login.getRole())) {
 
-            e.printStackTrace();
+				return "redirect:/worker/main";
+			}
 
-            result.put("success", false);
-            result.put("message", "서버 오류가 발생했습니다.");
-        }
+			// =============================================
+			// 관리자 / 매니저 메인 이동
+			// =============================================
+			return "redirect:/";
+		}
 
-        return result;
-    }
-    
-    @RequestMapping("/logout")
-    public String logout(HttpSession session,
-                          HttpServletResponse response) {
+		// =================================================
+		// 로그인 실패
+		// =================================================
+		model.addAttribute(
+			"errorMsg",
+			"사번 또는 비밀번호가 올바르지 않습니다.");
 
-       
-        LoginDTO login = (LoginDTO) session.getAttribute("loginUser");
-        if(login != null) {
-            loginService.clear_auto_login_token(login.getEmpno());
-        }
+		return "login";
+	}
 
-        session.invalidate();
-        Cookie cookie = new Cookie("autoLogin", "");
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        response.addCookie(cookie);
+	// =====================================================
+	// 비밀번호 찾기
+	// =====================================================
+	@ResponseBody
+	@RequestMapping(value="/find_pw",
+		method=RequestMethod.POST)
 
-        return "redirect:/login";
-    }
+	public Map<String, Object> find_pw(
+			@RequestBody FindPwDTO dto) {
 
+		Map<String, Object> result =
+			new HashMap<>();
+
+		try {
+
+			boolean exists =
+				loginService.check_user(
+					dto.getEmpno(),
+					dto.getEmail());
+
+			if (!exists) {
+
+				result.put("success", false);
+
+				result.put(
+					"message",
+					"일치하는 정보가 없습니다.");
+
+				return result;
+			}
+
+			String tempPw =
+				loginService.reset_pw(
+					dto.getEmpno());
+
+			loginService.send_temp_pw(
+				dto.getEmail(),
+				tempPw);
+
+			result.put("success", true);
+
+			result.put(
+				"message",
+				"임시 비밀번호가 이메일로 발송되었습니다.");
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+
+			result.put("success", false);
+
+			result.put(
+				"message",
+				"서버 오류가 발생했습니다.");
+		}
+
+		return result;
+	}
+
+	// =====================================================
+	// 로그아웃
+	// =====================================================
+	@RequestMapping("/logout")
+	public String logout(
+			HttpSession session,
+			HttpServletResponse response) {
+
+		LoginDTO login =
+			(LoginDTO) session.getAttribute(
+				"loginUser");
+
+		if(login != null) {
+
+			loginService.clear_auto_login_token(
+				login.getEmpno());
+		}
+
+		// =================================================
+		// 세션 삭제
+		// =================================================
+		session.invalidate();
+
+		// =================================================
+		// 자동 로그인 쿠키 삭제
+		// =================================================
+		Cookie cookie =
+			new Cookie("autoLogin", "");
+
+		cookie.setMaxAge(0);
+
+		cookie.setPath("/");
+
+		response.addCookie(cookie);
+
+		return "redirect:/login";
+	}
 }
-    

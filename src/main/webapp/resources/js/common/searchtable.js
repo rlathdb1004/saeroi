@@ -1,6 +1,9 @@
 // 화면 로딩 후 실행
 document.addEventListener("DOMContentLoaded", function () {
 
+    // 검색 시작일 달력에 오늘 날짜를 세팅한다.
+    initSearchStartDateDefaultToday();
+
     // 검색 초기화 버튼 기능을 실행한다.
     initSearchResetButtons();
 
@@ -29,6 +32,71 @@ window.addEventListener("resize", function () {
     refreshCommonTableTooltip();
 
 });
+
+/**
+ * 검색 시작일 기본값 오늘 날짜 세팅
+ */
+function initSearchStartDateDefaultToday() {
+
+    // 검색 form 전체를 찾는다.
+    var searchFormList = document.querySelectorAll(".search-form");
+
+    // 검색 form이 없으면 종료한다.
+    if (searchFormList.length === 0) {
+        return;
+    }
+
+    // 오늘 날짜를 yyyy-MM-dd 형식으로 만든다.
+    var todayValue = getSearchTodayDateValue();
+
+    for (var i = 0; i < searchFormList.length; i++) {
+        setSearchStartDateDefaultToday(searchFormList[i], todayValue);
+    }
+
+}
+
+
+/**
+ * 오늘 날짜를 input type="date"에 맞는 yyyy-MM-dd 형식으로 만든다.
+ */
+function getSearchTodayDateValue() {
+
+    var today = new Date();
+
+    var year = today.getFullYear();
+    var month = String(today.getMonth() + 1).padStart(2, "0");
+    var date = String(today.getDate()).padStart(2, "0");
+
+    return year + "-" + month + "-" + date;
+
+}
+
+
+/**
+ * 검색 form 안에 있는 비어있는 시작일 달력에만 오늘 날짜를 넣는다.
+ */
+function setSearchStartDateDefaultToday(searchForm, todayValue) {
+
+    // 검색 영역 안의 시작일 달력만 찾는다.
+    var startDateList = searchForm.querySelectorAll("input[type='date'][name='startDate'].search-date");
+
+    for (var i = 0; i < startDateList.length; i++) {
+
+        // 이미 값이 있으면 검색 유지값이므로 건드리지 않는다.
+        if (startDateList[i].value !== "") {
+            continue;
+        }
+
+        // readonly 또는 disabled 상태면 건드리지 않는다.
+        if (startDateList[i].readOnly || startDateList[i].disabled) {
+            continue;
+        }
+
+        // 비어있는 시작일 달력에만 오늘 날짜를 넣는다.
+        startDateList[i].value = todayValue;
+    }
+
+}
 
 
 /**
@@ -65,6 +133,9 @@ function initSearchResetButtons() {
             for (var k = 0; k < selectList.length; k++) {
                 selectList[k].selectedIndex = 0;
             }
+
+            // 초기화 후 시작일 달력만 다시 오늘 날짜로 세팅한다.
+            setSearchStartDateDefaultToday(searchForm, getSearchTodayDateValue());
 
         });
 
@@ -296,8 +367,8 @@ function addCommonColumnResizeHandle(table, colList, th, index) {
         document.removeEventListener("mousemove", resizeCommonColumnPair);
         document.removeEventListener("mouseup", stopResizeCommonColumnPair);
 
-		// 컬럼 조절 후 툴팁 필요 여부를 다시 검사한다.
-		refreshCommonTableTooltip();
+        // 컬럼 조절 후 툴팁 필요 여부를 다시 검사한다.
+        refreshCommonTableTooltip();
     }
 
 
@@ -425,6 +496,7 @@ function getCommonColumnMinWidth(index, colCount) {
 
 }
 
+
 /**
  * 공통 목록 테이블 행 클릭 상세 이동 기능
  */
@@ -497,9 +569,9 @@ function initCommonTableTooltip() {
     window.coActiveTooltipCell = null;
 
     // 공통 테이블의 제목 칸과 내용 칸을 찾는다.
-	var tdList = document.querySelectorAll(".coTable thead th, .coTable tbody td");
+    var tdList = document.querySelectorAll(".coTable thead th, .coTable tbody td");
 
-	for (var i = 0; i < tdList.length; i++) {
+    for (var i = 0; i < tdList.length; i++) {
 
         // 이미 이벤트가 연결된 칸은 다시 연결하지 않는다.
         if (tdList[i].getAttribute("data-tooltip-ready") === "Y") {

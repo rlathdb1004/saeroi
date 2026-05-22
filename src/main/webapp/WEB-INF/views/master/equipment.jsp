@@ -1,6 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
-
 	<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 
 		<c:set var="isAdmin" value="${
 		sessionScope.loginUser.role eq 'ADMIN'
@@ -229,12 +229,12 @@
 									</label>
 
 									<select name="line_id" class="modal_select" required>
-
-										<option value="1">1라인</option>
-										<option value="2">2라인</option>
-										<option value="3">3라인</option>
-										<option value="4">4라인</option>
-
+										<option value="">선택</option>
+										<c:forEach var="line" items="${lineList}">
+											<option value="${line.line_id}">
+												${line.line_name}
+											</option>
+										</c:forEach>
 									</select>
 								</div>
 

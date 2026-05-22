@@ -130,3 +130,90 @@ function changeEditMode(isEdit) {
 		saveBtn.style.display = isEdit ? 'inline-block' : 'none';
 		cancelBtn.style.display = isEdit ? 'inline-block' : 'none';
 	}
+
+//--불량 관리--
+// 불량명 select
+const defectId = document.querySelector('.modal_form [name="defect_id"]');
+
+let defectNameLoaded = false;
+
+// 불량명 목록 DB에서 불러오기
+function loadDefectNameOptions() {
+    if (!defectId || defectNameLoaded) {
+        return;
+    }
+
+    fetch(contextPath + '/quality/defect/option')
+        .then(response => response.json())
+        .then(data => {
+            console.log('defect option data:', data);
+
+            addDefaultOption(defectId);
+
+            data.forEach(defect => {
+                defectId.innerHTML += `<option value="${defect.defect_id}">${defect.defect_name}</option>`;
+            });
+
+            defectNameLoaded = true;
+        });
+}
+
+if (defectId) {
+    defectId.addEventListener('focus', loadDefectNameOptions);
+    defectId.addEventListener('click', loadDefectNameOptions);
+}
+
+//검사번호 DB에서 불러오기(불량 등록 모달)
+const defectInspId = document.querySelector('.modal_form [name="insp_id"]');
+
+let defectInspLoaded = false;
+
+function loadDefectInspOptions() {
+    if (!defectInspId || defectInspLoaded) {
+        return;
+    }
+
+    fetch(contextPath + '/quality/inspection/option?searchType=docNo')
+        .then(response => response.json())
+        .then(data => {
+            console.log('inspection docNo option data:', data);
+
+            addDefaultOption(defectInspId);
+
+            data.forEach(inspection => {
+                defectInspId.innerHTML += `<option value="${inspection.insp_id}">${inspection.doc_no}</option>`;
+            });
+
+            defectInspLoaded = true;
+        });
+}
+
+if (defectInspId) {
+    defectInspId.addEventListener('focus', loadDefectInspOptions);
+    defectInspId.addEventListener('click', loadDefectInspOptions);
+}
+
+// 테이블 컬럼에서 선택 클릭 시 전체 체크 / 전체 해제
+const checkAllHeaders = document.querySelectorAll('.checkAllHeader');
+
+checkAllHeaders.forEach(header => {
+    header.addEventListener('click', function () {
+        const table = header.closest('table');
+
+        if (!table) {
+            return;
+        }
+
+        const checkboxes = table.querySelectorAll('tbody input[type="checkbox"]');
+
+        if (checkboxes.length === 0) {
+            return;
+        }
+
+        const allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
+
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = !allChecked;
+        });
+    });
+});

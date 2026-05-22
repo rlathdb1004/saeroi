@@ -4,7 +4,36 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
+
+/* 령 - 챗봇위치 자유자재로 이동하고자 주석처리함  */
 /* 1. 챗봇 플로팅 버튼 (화면 우측 하단 고정) */
+/* #chatbot-launcher { */
+/* 	position: fixed; */
+/* 	bottom: 30px; */
+/* 	left: 30px; */
+/* 	width: 60px; */
+/* 	height: 60px; */
+/* 	background-color: #2f7d62; */
+/* 	color: white; */
+/* 	border-radius: 50%; */
+/* 	display: flex; */
+/* 	align-items: center; */
+/* 	justify-content: center; */
+/* 	font-size: 26px; */
+/* 	cursor: pointer; */
+/* 	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); */
+/* 	transition: transform 0.3s ease, background-color 0.3s ease; */
+/* 	z-index: 1000; */
+/* } */
+
+/* #chatbot-launcher:hover { */
+/* 	transform: scale(1.1); */
+/* 	background-color: #357ABD; */
+/* } */
+
+
+/* 령 - 챗봇위치 자유자재로 이동하고자 코드 추가함  */
+/* 챗봇 플로팅 버튼이다. 마우스로 드래그해서 위치를 이동할 수 있다. */
 #chatbot-launcher {
 	position: fixed;
 	bottom: 30px;
@@ -18,24 +47,46 @@
 	align-items: center;
 	justify-content: center;
 	font-size: 26px;
-	cursor: pointer;
+	cursor: grab;
 	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-	transition: transform 0.3s ease, background-color 0.3s ease;
+	transition: background-color 0.3s ease, box-shadow 0.3s ease;
 	z-index: 1000;
+	user-select: none;
+	touch-action: none;
 }
 
-#chatbot-launcher:hover {
-	transform: scale(1.1);
+/* 드래그 중일 때 마우스 모양을 변경한다. */
+#chatbot-launcher.dragging {
+	cursor: grabbing;
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+}
+
+/* 드래그 중이 아닐 때만 hover 효과를 준다. */
+#chatbot-launcher:not(.dragging):hover {
 	background-color: #357ABD;
 }
 
+
+/* ----------------------------위에 코드까지 추가함 */
+
+
+
 /* 2. 챗봇 채팅창 전체 컨테이너 */
 #chatbot-container {
+/* PC화면에서 정중앙으로 오게 수정  */
+/* 	position: fixed; */
+/* 	bottom: 100px; */
+/* 	right: 30px; */
+/* 	width: 96%; */
+/* 	height: 88%; */
 	position: fixed;
-	bottom: 100px;
-	right: 30px;
-	width: 96%;
-	height: 88%;
+	top: 50%;
+	left: 50%;
+	right: auto;
+	bottom: auto;
+	width: min(1100px, calc(100% - 48px));
+	height: min(760px, calc(100vh - 80px));
+/* 	여기위까지 추가함  */
 	background-color: #2f7d62;
 	border-radius: 16px;
 	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
@@ -45,7 +96,9 @@
 	z-index: 1000;
 	/* 시작할 때 숨김 및 올라오는 애니메이션 설정 */
 	opacity: 0;
-	transform: translateY(20px) scale(0.95);
+/* 	transform: translateY(20px) scale(0.95); */
+/* 위에꺼 주석하고 아래 코드로 변경함 */
+	transform: translate(-50%, -48%) scale(0.95);
 	pointer-events: none;
 	transition: all 0.3s ease;
 }
@@ -53,7 +106,7 @@
 /* 활성화 되었을 때 클래스 */
 #chatbot-container.active {
 	opacity: 1;
-	transform: translateY(0) scale(1);
+	transform: translate(-50%, -50%) scale(1);
 	pointer-events: auto;
 }
 
@@ -195,11 +248,88 @@
     const promptInput = document.querySelector('#prompt');
     const chat = document.querySelector('#chat-content');
 
-    launcher.addEventListener('click', () => {
-        container.classList.add('active');
-        launcher.style.display = 'none'; // 창이 열리면 아이콘은 잠시 숨김
-        promptInput.focus();
-    });
+    
+//     령 - 아이콘 이동을 위해 코드를 추가하기 위해 주석처리함 
+//     launcher.addEventListener('click', () => {
+//         container.classList.add('active');
+//         launcher.style.display = 'none'; // 창이 열리면 아이콘은 잠시 숨김
+//         promptInput.focus();
+//     });
+
+// 령 - 아이콘 이동을 위해 코드를 추가함 
+
+let isDragging = false;
+let isMoved = false;
+
+let startMouseX = 0;
+let startMouseY = 0;
+let startLeft = 0;
+let startTop = 0;
+
+/* 챗봇 아이콘을 클릭했을 때 채팅창을 여는 함수이다. */
+function openChatbot() {
+    container.classList.add('active');
+    launcher.style.display = 'none';
+    promptInput.focus();
+}
+
+/* 챗봇 아이콘을 누르기 시작했을 때 드래그 준비를 한다. */
+launcher.addEventListener('pointerdown', function (e) {
+    isDragging = true;
+    isMoved = false;
+
+    startMouseX = e.clientX;
+    startMouseY = e.clientY;
+
+    const rect = launcher.getBoundingClientRect();
+
+    startLeft = rect.left;
+    startTop = rect.top;
+
+    launcher.setPointerCapture(e.pointerId);
+
+    e.preventDefault();
+});
+
+/* 마우스를 움직이면 챗봇 아이콘 위치를 이동한다. */
+launcher.addEventListener('pointermove', function (e) {
+    if (!isDragging) {
+        return;
+    }
+
+    const moveX = e.clientX - startMouseX;
+    const moveY = e.clientY - startMouseY;
+
+    if (Math.abs(moveX) > 5 || Math.abs(moveY) > 5) {
+        isMoved = true;
+    }
+
+    launcher.style.left = startLeft + moveX + 'px';
+    launcher.style.top = startTop + moveY + 'px';
+
+    /* top으로 위치를 잡기 때문에 기존 bottom 고정값은 제거한다. */
+    launcher.style.bottom = 'auto';
+});
+
+/* 마우스를 떼면 드래그를 끝내고, 움직이지 않았다면 채팅창을 연다. */
+launcher.addEventListener('pointerup', function (e) {
+    if (!isDragging) {
+        return;
+    }
+
+    isDragging = false;
+
+    launcher.releasePointerCapture(e.pointerId);
+
+    if (isMoved) {
+        return;
+    }
+
+    openChatbot();
+});
+
+
+// 령 - 위 부분까지 코드 추가함 
 
     closeBtn.addEventListener('click', () => {
         container.classList.remove('active');

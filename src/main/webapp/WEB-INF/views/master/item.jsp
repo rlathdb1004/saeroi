@@ -220,16 +220,16 @@
 									--%>
 									<td class="mobile_show"><c:choose>
 											<c:when test="${item.itemType == 'FG'}">
-												<span class="coStatus coStatusUse">완제품</span>
+												<span>완제품</span>
 											</c:when>
 											<c:when test="${item.itemType == 'RM'}">
-												<span class="coStatus coStatusUse">원자재</span>
+												<span>원자재</span>
 											</c:when>
 											<c:when test="${item.itemType == 'SM'}">
-												<span class="coStatus coStatusUse">부자재</span>
+												<span>부자재</span>
 											</c:when>
 											<c:otherwise>
-												<span class="coStatus">${item.itemType}</span>
+												<span>${item.itemType}</span>
 											</c:otherwise>
 										</c:choose></td>
 
