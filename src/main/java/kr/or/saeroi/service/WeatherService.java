@@ -17,7 +17,6 @@ public class WeatherService {
 
     private static final String API_KEY = "zpka_00804de33ec54b85a0947feaae49b196_f27063a4";
     // AccuWeather에서 발급받은 API Key를 넣는다.
-    // 기존 OpenWeatherMap API Key를 넣으면 안 된다.
 
     private static final String LOCATION_KEY = "226081";
     // 서울 AccuWeather locationKey이다.
