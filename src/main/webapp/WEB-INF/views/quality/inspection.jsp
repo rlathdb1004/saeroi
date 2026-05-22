@@ -148,7 +148,7 @@
 
 				<thead>
 					<tr>
-						<th class="mobile_show">선택</th>
+						<th class="mobile_show checkAllHeader" style="cursor: pointer;">선택</th>
 						<th class="mobile_show">검사번호</th>
 						<th class="mobile_hidden">검사일시</th>
 						<th class="mobile_show">품목명</th>
@@ -236,29 +236,27 @@
 
 				<div class="modal_item">
 					<label class="modal_label"> 검사일시<span
-						class="modal_required"></span>
+						class="modal_required">*</span>
 					</label> <input type="date" name="insp_date"
 						class="modal_input modal_today" required>
 				</div>
 
 				<div class="modal_item">
-					<label class="modal_label"> 품목명<span class="modal_required"></span>
+					<label class="modal_label"> 품목명<span class="modal_required">*</span>
 					</label> <select name="prod_id" class="modal_select" required>
 						<option value="">선택</option>
 					</select>
 				</div>
 
 				<div class="modal_item">
-					<label class="modal_label">검사자<span class="modal_required">*</span></label>
-
-					<input type="text" class="modal_input"
-						value="${sessionScope.loginUser.ename}" readonly> <input
-						type="hidden" name="emp_id"
+					<label class="modal_label">검사자</label> <input type="text"
+						class="modal_input" value="${sessionScope.loginUser.ename}"
+						readonly> <input type="hidden" name="emp_id"
 						value="${sessionScope.loginUser.empno}">
 				</div>
 				<div class="modal_item">
 					<label class="modal_label"> 검사구분<span
-						class="modal_required"></span>
+						class="modal_required">*</span>
 					</label> <select name="insp_type" class="modal_select" required>
 						<option value="">선택</option>
 					</select>
@@ -266,7 +264,7 @@
 
 				<div class="modal_item">
 					<label class="modal_label"> 검사결과<span
-						class="modal_required"></span>
+						class="modal_required">*</span>
 					</label> <select name="result" class="modal_select" required>
 						<option value="">선택</option>
 					</select>
@@ -274,14 +272,14 @@
 
 				<div class="modal_item">
 					<label class="modal_label"> 검사수량<span
-						class="modal_required"></span>
+						class="modal_required">*</span>
 					</label> <input type="number" name="inspection_qty" class="modal_input"
 						min="0" required>
 				</div>
 
 				<div class="modal_item">
 					<label class="modal_label"> 양품수량<span
-						class="modal_required"></span>
+						class="modal_required">*</span>
 					</label> <input type="number" name="good_qty" class="modal_input" min="0"
 						required>
 				</div>

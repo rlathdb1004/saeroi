@@ -29,6 +29,17 @@ public interface QualityDAO {
 	int _dao_update_Inspection(String insp_id, String insp_date, String insp_type, String result, String inspection_qty,
 			String good_qty, String remark);
 
-	//불량 목록
+	// 불량 목록
 	List<DefectDTO> _dao_select_Defect(String startDate, String endDate, String searchType, String keyword);
+
+	// 불량 등록
+	int _dao_insert_defect(String defect_date, String insp_id, String defect_id, String defect_qty, String remark);
+
+	// 불량 모달 옵션
+	List<DefectDTO> _dao_select_Defect_option();
+
+	// 불량 삭제
+	int _dao_delete_defect(String[] defect_list_id);
+
+	DefectDTO _dao_select_Defect_detail(String defect_list_id);
 }

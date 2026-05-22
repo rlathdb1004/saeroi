@@ -39,7 +39,7 @@ public class QualityController {
 		System.out.println("keyword: " + keyword);
 
 		// 페이징 기능
-		//DB에서 전체목록을 가져온 다음 컨트롤러에서 보여줄 것만 잘라서 JSP로 보냄
+		// DB에서 전체목록을 가져온 다음 컨트롤러에서 보여줄 것만 잘라서 JSP로 보냄
 		int totalCount = list.size();
 		int startIndex = (page - 1) * size;
 		int endIndex = startIndex + size;
@@ -237,4 +237,53 @@ public class QualityController {
 
 		return "quality/defect.tiles";
 	}
+
+	// 불량 관리 모달 옵션
+	@ResponseBody
+	@RequestMapping("/defect/option")
+	public List<DefectDTO> defect_option() {
+
+		List<DefectDTO> defect_option_list = qualityService._ser_select_Defect_option();
+
+		return defect_option_list;
+	}
+
+//	//불량관리 등록 메서드
+	@RequestMapping(value = "/defect/add", method = RequestMethod.POST)
+	public String defect_add(Model model, @RequestParam(required = false) String defect_date,
+			@RequestParam(required = false) String insp_id, @RequestParam(required = false) String defect_id,
+			@RequestParam(required = false) String defect_qty, @RequestParam(required = false) String remark) {
+
+		int defect_add_result = qualityService._ser_add_defect(defect_date, insp_id, defect_id, defect_qty, remark);
+
+		System.out.println("defect_add_result 결과: " + defect_add_result);
+
+		return "redirect:/quality/defect";
+	}
+
+	// 불량관리 삭제 메서드
+	@RequestMapping(value = "/defect/delete", method = RequestMethod.POST)
+	public String defect_delete(Model model,
+			@RequestParam(value = "defect_list_id", required = false) String[] defect_list_id) {
+
+		if (defect_list_id != null && defect_list_id.length > 0) {
+			int defect_delete_result = qualityService._ser_delete_defect(defect_list_id);
+			System.out.println("defect_delete_result: " + defect_delete_result);
+		}
+
+		return "redirect:/quality/defect";
+
+	}
+
+	//불량 관리 상세
+	@RequestMapping("/defect_detail")
+	public String defect_detail(Model model, @RequestParam(required = false) String defect_list_id) {
+
+		DefectDTO defect = qualityService._ser_select_Defect_detail(defect_list_id);
+
+		model.addAttribute("defect", defect);
+
+		return "quality/defect_detail.tiles";
+	}
+
 }
