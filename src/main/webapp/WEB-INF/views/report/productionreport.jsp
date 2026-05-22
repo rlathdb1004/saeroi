@@ -260,16 +260,12 @@
       	});
       	
       	let defectOptions = {
-      		series: [
-      			Math.round(totalDefect * 0.45),
-      			Math.round(totalDefect * 0.30),
-      			Math.round(totalDefect * 0.25)
-      		],
+      		series: [],
       		chart:{
       			type: 'donut',
       			height:230
       		},
-      		labels: ['치수 불량', '스크래치', '기타 이물질'],
+      		labels: [],
             colors: ['#00E396', '#FF4560', '#FEB019'],
             legend: {
                 position: 'bottom'
