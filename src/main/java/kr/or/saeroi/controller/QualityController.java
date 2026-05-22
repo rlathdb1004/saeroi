@@ -275,7 +275,7 @@ public class QualityController {
 
 	}
 
-	//불량 관리 상세
+	// 불량 관리 상세
 	@RequestMapping("/defect_detail")
 	public String defect_detail(Model model, @RequestParam(required = false) String defect_list_id) {
 
@@ -284,6 +284,20 @@ public class QualityController {
 		model.addAttribute("defect", defect);
 
 		return "quality/defect_detail.tiles";
+	}
+
+	//불량관리 업데이트 메서드
+	@RequestMapping(value = "/defect/update", method = RequestMethod.POST)
+	public String defect_update(Model model, @RequestParam(required = false) String defect_list_id,
+			@RequestParam(required = false) String defect_date, @RequestParam(required = false) String defect_id,
+			@RequestParam(required = false) String defect_qty, @RequestParam(required = false) String remark) {
+
+		int defect_update_result = qualityService._ser_update_Defect(defect_list_id, defect_date, defect_id, defect_qty,
+				remark);
+
+		System.out.println("defect_update_result: " + defect_update_result);
+
+		return "redirect:/quality/defect_detail?defect_list_id=" + defect_list_id;
 	}
 
 }

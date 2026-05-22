@@ -114,12 +114,22 @@ public class QualityServiceImpl implements QualityService {
 
 		return delete_result;
 	}
-
+	//불량 상세 목록
 	@Override
 	public DefectDTO _ser_select_Defect_detail(String defect_list_id) {
 
 		DefectDTO defect_detail = qualityDAO._dao_select_Defect_detail(defect_list_id);
 
 		return defect_detail;
+	}
+	
+	//불량 업데이트
+	@Override
+	public int _ser_update_Defect(String defect_list_id, String defect_date, String defect_id, String defect_qty,
+			String remark) {
+
+		int defect_update = qualityDAO._dao_update_Defect(defect_list_id, defect_date, defect_id, defect_qty, remark);
+
+		return defect_update;
 	}
 }
