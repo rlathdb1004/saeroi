@@ -61,7 +61,7 @@ public class ProcessDAO {
      * 공정 목록 총 건수 조회
      *
      * 사용 위치:
-     * - 목록 상단의 총 건수
+     * - 목록 상단 총 건수 표시
      * - Controller 페이징 계산
      *
      * 호출 Mapper:
@@ -145,12 +145,11 @@ public class ProcessDAO {
 
 
     /**
-     * 공정 중복 확인
+     * 공정코드 중복 확인
      *
      * 기준:
-     * - proc_code는 품목별로 반복될 수 있다.
-     * - proc_code 단독 중복검사는 하지 않는다.
-     * - item_id + equip_id + proc_code 조합 기준으로 중복 여부를 확인한다.
+     * - proc_code 단독 중복검사
+     * - 수정 시에는 현재 proc_id를 제외한다.
      *
      * 호출 Mapper:
      * - process.selectProcessDuplicateCount
@@ -160,8 +159,31 @@ public class ProcessDAO {
     }
 
 
+    /**
+     * 공정코드 자동완성 조회
+     *
+     * 사용 위치:
+     * - 공정 등록 모달
+     * - 공정 상세 수정 화면
+     *
+     * 기준:
+     * - 기존 process.proc_code, process.proc_name 기준 조회
+     *
+     * 호출 Mapper:
+     * - process.selectProcCodeAutoComplete
+     */
+    public List<ProcessDTO> selectProcCodeAutoComplete(String keyword) {
+
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+
+        paramMap.put("keyword", keyword);
+
+        return sqlSession.selectList("process.selectProcCodeAutoComplete", paramMap);
+    }
+
+
     // =========================================================
-    // 3. 공정상세 이미지 / 작업표준서 관리
+    // 3. 공정 이미지 / 공정상세 관리
     // =========================================================
 
     /**
@@ -169,7 +191,7 @@ public class ProcessDAO {
      *
      * 사용 위치:
      * - 공정 상세보기 페이지 하단
-     * - 작업표준서 이미지 목록
+     * - 공정 이미지 목록
      *
      * 조건:
      * - process_detail.proc_id2 = process.proc_id
@@ -186,8 +208,8 @@ public class ProcessDAO {
      * 공정상세 단건 조회
      *
      * 사용 위치:
-     * - 공정상세 수정 전 기존 이미지 경로 확인
      * - 공정상세 삭제 전 기존 이미지 경로 확인
+     * - 공정상세 수정 전 기존 이미지 경로 확인
      *
      * 조건:
      * - process_detail.proc_id 기준 조회
@@ -204,7 +226,7 @@ public class ProcessDAO {
      * 공정상세 등록
      *
      * 사용 위치:
-     * - 공정 상세보기 페이지에서 작업표준서 이미지/설명 등록
+     * - 공정 상세보기 페이지에서 이미지/설명 등록
      *
      * 저장 대상:
      * - proc_id2
@@ -224,11 +246,11 @@ public class ProcessDAO {
      * 공정상세 수정
      *
      * 사용 위치:
-     * - 작업표준서 이미지/설명 수정
+     * - 공정 이미지/설명 수정
      *
      * 설명:
-     * - 이미지가 새로 업로드되면 proc_picture까지 수정한다.
-     * - 이미지가 없으면 기존 proc_picture는 유지한다.
+     * - 새 이미지가 있으면 proc_picture까지 수정한다.
+     * - 새 이미지가 없으면 기존 proc_picture는 유지한다.
      *
      * 호출 Mapper:
      * - process.updateProcessDetail
@@ -242,7 +264,7 @@ public class ProcessDAO {
      * 공정상세 선택 삭제
      *
      * 사용 위치:
-     * - 공정 상세보기 페이지의 작업표준서 선택 삭제
+     * - 공정 상세보기 페이지의 공정 이미지 선택 삭제
      *
      * 조건:
      * - process_detail.proc_id 목록 기준 삭제
@@ -259,7 +281,7 @@ public class ProcessDAO {
      * 공정상세 단건 삭제
      *
      * 사용 위치:
-     * - 수정/삭제 흐름에서 필요할 수 있는 단건 삭제용
+     * - 필요 시 단건 삭제용
      *
      * 호출 Mapper:
      * - process.deleteProcessDetailOne
@@ -270,15 +292,15 @@ public class ProcessDAO {
 
 
     // =========================================================
-    // 4. 자동완성 / 선택 데이터
+    // 4. 완제품 / 설비 선택 데이터
     // =========================================================
 
     /**
      * 완제품 자동완성 조회
      *
      * 사용 위치:
-     * - 공정 등록 모달의 품목 검색
-     * - 공정 수정 화면의 품목 검색
+     * - 현재는 selectbox 사용 기준이라 필수 기능은 아님
+     * - 추후 자동완성 전환 시 사용 가능
      *
      * 대상:
      * - item_type = 'FG'
@@ -300,8 +322,8 @@ public class ProcessDAO {
      * 완제품 선택 목록 조회
      *
      * 사용 위치:
-     * - 공정 등록 모달 초기 데이터
-     * - 공정 수정 화면 selectbox 구성
+     * - 공정 등록 모달
+     * - 공정 상세 수정 화면
      *
      * 대상:
      * - item_type = 'FG'
@@ -318,8 +340,8 @@ public class ProcessDAO {
      * 설비 자동완성 조회
      *
      * 사용 위치:
-     * - 공정 등록 모달의 설비 검색
-     * - 공정 수정 화면의 설비 검색
+     * - 현재는 selectbox 사용 기준이라 필수 기능은 아님
+     * - 추후 자동완성 전환 시 사용 가능
      *
      * 호출 Mapper:
      * - process.selectEquipmentAutoComplete
@@ -338,31 +360,13 @@ public class ProcessDAO {
      * 설비 선택 목록 조회
      *
      * 사용 위치:
-     * - 공정 등록 모달 초기 데이터
-     * - 공정 수정 화면 selectbox 구성
+     * - 공정 등록 모달
+     * - 공정 상세 수정 화면
      *
      * 호출 Mapper:
      * - process.selectEquipmentList
      */
     public List<ProcessDTO> selectEquipmentList() {
         return sqlSession.selectList("process.selectEquipmentList");
-    }
-    
-    /**
-     * 공정코드 자동완성 조회
-     *
-     * 사용 위치:
-     * - 공정 등록/수정 화면의 공정코드 입력창
-     *
-     * 기준:
-     * - 기존 process.proc_code, process.proc_name 기준으로 조회
-     */
-    public List<ProcessDTO> selectProcCodeAutoComplete(String keyword) {
-
-        Map<String, Object> paramMap = new HashMap<String, Object>();
-
-        paramMap.put("keyword", keyword);
-
-        return sqlSession.selectList("process.selectProcCodeAutoComplete", paramMap);
     }
 }

@@ -3,6 +3,7 @@ package kr.or.saeroi.controller;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,10 +32,10 @@ import kr.or.saeroi.service.ProcessService;
  * 공정관리 Controller
  *
  * 역할:
- * - 기준정보관리 > 공정관리 화면의 요청을 처리한다.
- * - 공정 목록 조회, 상세 조회, 등록, 수정, 선택삭제를 담당한다.
- * - 공정상세 이미지/작업표준서 등록, 수정, 삭제를 담당한다.
- * - 완제품/설비 자동완성 Ajax 요청을 처리한다.
+ * - 기준정보관리 > 공정관리 화면 요청을 처리한다.
+ * - 공정 목록 조회, 상세 조회, 등록, 수정, 선택삭제를 처리한다.
+ * - 공정코드 자동완성, 공정코드 중복확인 Ajax 요청을 처리한다.
+ * - 공정 이미지 등록, 조회, 삭제를 처리한다.
  *
  * 기준:
  * - 품목관리 ItemController 구조 기준
@@ -70,47 +71,36 @@ public class ProcessController {
             @RequestParam(value = "size", defaultValue = "5") int size,
             Model model) {
 
-        // 허용하지 않는 size 값이 들어오면 기본값으로 보정
         if (size != 5 && size != 10 && size != 20 && size != 30) {
             size = 5;
         }
 
-        // 1보다 작은 페이지가 들어오면 1페이지로 보정
         if (page < 1) {
             page = 1;
         }
 
-        /*
-         * 품목관리/BOM관리 기준:
-         * 현재 Service/DAO는 page, size를 받지 않으므로
-         * 전체 목록 조회 후 Controller에서 현재 페이지 목록만 잘라낸다.
-         */
         List<ProcessDTO> allProcessList = processService.getProcessList(processDTO);
 
         if (allProcessList == null) {
             allProcessList = Collections.emptyList();
         }
 
-        // 검색조건에 맞는 공정 총 건수 조회
         int processCount = processService.getProcessCount(processDTO);
 
         if (processCount < 0) {
             processCount = 0;
         }
 
-        // 전체 페이지 수 계산
         int totalPage = (int) Math.ceil((double) processCount / size);
 
         if (totalPage < 1) {
             totalPage = 1;
         }
 
-        // 마지막 페이지보다 큰 값이 들어오면 마지막 페이지로 보정
         if (page > totalPage) {
             page = totalPage;
         }
 
-        // 현재 페이지에 보여줄 목록만 추출
         int fromIndex = (page - 1) * size;
         int toIndex = Math.min(fromIndex + size, allProcessList.size());
 
@@ -120,7 +110,6 @@ public class ProcessController {
             processList = allProcessList.subList(fromIndex, toIndex);
         }
 
-        // 페이지 번호 블록 계산
         int blockSize = 5;
         int startPage = ((page - 1) / blockSize) * blockSize + 1;
         int endPage = Math.min(startPage + blockSize - 1, totalPage);
@@ -137,7 +126,6 @@ public class ProcessController {
         pageInfo.put("prevPage", page - 1);
         pageInfo.put("nextPage", page + 1);
 
-        // 등록 모달에서 사용할 완제품/설비 후보 목록
         List<ItemDTO> productItemList = processService.getProductItemList();
         List<ProcessDTO> equipmentList = processService.getEquipmentList();
 
@@ -149,7 +137,6 @@ public class ProcessController {
             equipmentList = Collections.emptyList();
         }
 
-        // JSP 전달값
         model.addAttribute("processList", processList);
         model.addAttribute("processCount", processCount);
         model.addAttribute("processDTO", processDTO);
@@ -227,7 +214,7 @@ public class ProcessController {
         if (result == -2) {
             rttr.addFlashAttribute("msg", "필수 입력값을 확인하세요.");
         } else if (result == -1) {
-            rttr.addFlashAttribute("msg", "이미 등록된 공정입니다.");
+            rttr.addFlashAttribute("msg", "이미 존재하는 공정코드입니다.");
         } else if (result > 0) {
             rttr.addFlashAttribute("msg", "공정이 등록되었습니다.");
         } else {
@@ -254,7 +241,7 @@ public class ProcessController {
         if (result == -2) {
             rttr.addFlashAttribute("msg", "필수 입력값을 확인하세요.");
         } else if (result == -1) {
-            rttr.addFlashAttribute("msg", "이미 등록된 공정입니다.");
+            rttr.addFlashAttribute("msg", "이미 존재하는 공정코드입니다.");
         } else if (result > 0) {
             rttr.addFlashAttribute("msg", "공정 정보가 수정되었습니다.");
         } else {
@@ -276,8 +263,9 @@ public class ProcessController {
      * - POST /master/process/delete
      *
      * 처리:
-     * - process_detail 먼저 삭제
-     * - process 삭제
+     * - 연결된 공정 이미지 경로를 먼저 조회한다.
+     * - process_detail 삭제 후 process 삭제한다.
+     * - DB 삭제 성공 후 실제 이미지 파일을 삭제한다.
      */
     @RequestMapping(value = "/process/delete", method = RequestMethod.POST)
     public String deleteProcessList(
@@ -290,10 +278,8 @@ public class ProcessController {
             return "redirect:/master/process";
         }
 
-        /*
-         * 공정 삭제 전에 연결된 공정상세 이미지 파일 경로를 먼저 조회한다.
-         * DB 삭제 성공 후 실제 이미지 파일을 삭제한다.
-         */
+        List<String> imagePathList = new ArrayList<String>();
+
         for (Integer procId : procIdList) {
 
             if (procId == null) {
@@ -302,27 +288,40 @@ public class ProcessController {
 
             List<ProcessDetailDTO> detailList = processService.getProcessDetailList(procId);
 
-            int result = processService.removeProcessList(Collections.singletonList(procId));
+            if (detailList == null) {
+                continue;
+            }
 
-            if (result > 0 && detailList != null) {
-                for (ProcessDetailDTO detail : detailList) {
-                    deleteUploadFile(detail.getProcPicture(), request);
+            for (ProcessDetailDTO detail : detailList) {
+                if (detail != null && detail.getProcPicture() != null) {
+                    imagePathList.add(detail.getProcPicture());
                 }
             }
         }
 
-        rttr.addFlashAttribute("msg", "선택한 공정이 삭제되었습니다.");
+        int result = processService.removeProcessList(procIdList);
+
+        if (result > 0) {
+
+            for (String imagePath : imagePathList) {
+                deleteUploadFile(imagePath, request);
+            }
+
+            rttr.addFlashAttribute("msg", "선택한 공정이 삭제되었습니다.");
+        } else {
+            rttr.addFlashAttribute("msg", "공정 삭제에 실패했습니다.");
+        }
 
         return "redirect:/master/process";
     }
 
 
     // =========================================================
-    // 3. 공정상세 이미지 / 작업표준서 등록 / 수정 / 삭제
+    // 3. 공정 이미지 / 공정상세 등록 / 수정 / 삭제
     // =========================================================
 
     /**
-     * 공정상세 이미지/작업표준서 등록
+     * 공정 이미지 등록
      *
      * 요청 주소:
      * - POST /master/process/detail/add
@@ -360,15 +359,13 @@ public class ProcessController {
         int result = processService.addProcessDetail(processDetailDTO);
 
         if (result == -2) {
-            // DB 등록 실패 시 방금 저장한 파일 제거
             deleteUploadFile(savedImagePath, request);
             rttr.addFlashAttribute("msg", "이미지, 설명, 비고 중 하나 이상 입력하세요.");
         } else if (result > 0) {
-            rttr.addFlashAttribute("msg", "공정상세 정보가 등록되었습니다.");
+            rttr.addFlashAttribute("msg", "공정 이미지가 등록되었습니다.");
         } else {
-            // DB 등록 실패 시 방금 저장한 파일 제거
             deleteUploadFile(savedImagePath, request);
-            rttr.addFlashAttribute("msg", "공정상세 등록에 실패했습니다.");
+            rttr.addFlashAttribute("msg", "공정 이미지 등록에 실패했습니다.");
         }
 
         return "redirect:/master/process/detail?procId=" + processDetailDTO.getProcId();
@@ -376,16 +373,13 @@ public class ProcessController {
 
 
     /**
-     * 공정상세 이미지/작업표준서 수정
+     * 공정 이미지 수정
      *
      * 요청 주소:
      * - POST /master/process/detail/modify
      *
-     * 처리:
-     * - 기존 공정상세 조회
-     * - 새 이미지가 있으면 저장
-     * - DB 수정 성공 시 기존 이미지 삭제
-     * - DB 수정 실패 시 새 이미지 삭제
+     * 현재 화면에서는 아직 사용하지 않아도 되지만,
+     * 공정 이미지 교체 기능 확장을 위해 준비해둔다.
      */
     @RequestMapping(value = "/process/detail/modify", method = RequestMethod.POST)
     public String modifyProcessDetail(
@@ -400,7 +394,7 @@ public class ProcessController {
         }
 
         if (processDetailDTO.getProcDetailId() == null) {
-            rttr.addFlashAttribute("msg", "수정할 공정상세 정보가 없습니다.");
+            rttr.addFlashAttribute("msg", "수정할 공정 이미지 정보가 없습니다.");
             return "redirect:/master/process/detail?procId=" + processDetailDTO.getProcId();
         }
 
@@ -408,7 +402,7 @@ public class ProcessController {
                 processService.getProcessDetailOne(processDetailDTO.getProcDetailId());
 
         if (oldDetail == null) {
-            rttr.addFlashAttribute("msg", "기존 공정상세 정보를 찾을 수 없습니다.");
+            rttr.addFlashAttribute("msg", "기존 공정 이미지 정보를 찾을 수 없습니다.");
             return "redirect:/master/process/detail?procId=" + processDetailDTO.getProcId();
         }
 
@@ -425,10 +419,6 @@ public class ProcessController {
             return "redirect:/master/process/detail?procId=" + processDetailDTO.getProcId();
         }
 
-        /*
-         * 새 이미지가 있으면 새 경로를 DTO에 담는다.
-         * 새 이미지가 없으면 null 상태로 Mapper에 전달하여 기존 이미지를 유지한다.
-         */
         processDetailDTO.setProcPicture(newImagePath);
 
         int result = processService.modifyProcessDetail(processDetailDTO);
@@ -438,18 +428,14 @@ public class ProcessController {
             rttr.addFlashAttribute("msg", "이미지, 설명, 비고 중 하나 이상 입력하세요.");
         } else if (result > 0) {
 
-            /*
-             * 새 이미지로 교체된 경우에만 기존 이미지 파일 삭제
-             */
             if (newImagePath != null && !newImagePath.trim().isEmpty()) {
                 deleteUploadFile(oldImagePath, request);
             }
 
-            rttr.addFlashAttribute("msg", "공정상세 정보가 수정되었습니다.");
-
+            rttr.addFlashAttribute("msg", "공정 이미지 정보가 수정되었습니다.");
         } else {
             deleteUploadFile(newImagePath, request);
-            rttr.addFlashAttribute("msg", "공정상세 수정에 실패했습니다.");
+            rttr.addFlashAttribute("msg", "공정 이미지 수정에 실패했습니다.");
         }
 
         return "redirect:/master/process/detail?procId=" + processDetailDTO.getProcId();
@@ -457,7 +443,7 @@ public class ProcessController {
 
 
     /**
-     * 공정상세 선택 삭제
+     * 공정 이미지 선택 삭제
      *
      * 요청 주소:
      * - POST /master/process/detail/delete
@@ -470,14 +456,11 @@ public class ProcessController {
             RedirectAttributes rttr) {
 
         if (procDetailIdList == null || procDetailIdList.isEmpty()) {
-            rttr.addFlashAttribute("msg", "삭제할 공정상세 정보를 선택하세요.");
+            rttr.addFlashAttribute("msg", "삭제할 공정 이미지를 선택하세요.");
             return "redirect:/master/process/detail?procId=" + procId;
         }
 
-        /*
-         * 삭제 전 파일 경로 확보
-         */
-        Map<Integer, String> imagePathMap = new HashMap<Integer, String>();
+        List<String> imagePathList = new ArrayList<String>();
 
         for (Integer procDetailId : procDetailIdList) {
 
@@ -487,8 +470,8 @@ public class ProcessController {
 
             ProcessDetailDTO detail = processService.getProcessDetailOne(procDetailId);
 
-            if (detail != null) {
-                imagePathMap.put(procDetailId, detail.getProcPicture());
+            if (detail != null && detail.getProcPicture() != null) {
+                imagePathList.add(detail.getProcPicture());
             }
         }
 
@@ -496,14 +479,13 @@ public class ProcessController {
 
         if (result > 0) {
 
-            for (String imagePath : imagePathMap.values()) {
+            for (String imagePath : imagePathList) {
                 deleteUploadFile(imagePath, request);
             }
 
-            rttr.addFlashAttribute("msg", "선택한 공정상세 정보가 삭제되었습니다.");
-
+            rttr.addFlashAttribute("msg", "선택한 공정 이미지가 삭제되었습니다.");
         } else {
-            rttr.addFlashAttribute("msg", "공정상세 삭제에 실패했습니다.");
+            rttr.addFlashAttribute("msg", "공정 이미지 삭제에 실패했습니다.");
         }
 
         return "redirect:/master/process/detail?procId=" + procId;
@@ -511,41 +493,9 @@ public class ProcessController {
 
 
     // =========================================================
-    // 4. Ajax / 자동완성
+    // 4. Ajax
     // =========================================================
 
-    /**
-     * 완제품 자동완성 조회
-     *
-     * 요청 주소:
-     * - GET /master/process/productAutoComplete
-     *
-     * 대상:
-     * - item_type = 'FG'
-     */
-    @ResponseBody
-    @RequestMapping(value = "/process/productAutoComplete", method = RequestMethod.GET)
-    public List<ItemDTO> productAutoComplete(
-            @RequestParam("keyword") String keyword) {
-
-        return processService.getProductItemAutoComplete(keyword);
-    }
-
-
-    /**
-     * 설비 자동완성 조회
-     *
-     * 요청 주소:
-     * - GET /master/process/equipmentAutoComplete
-     */
-    @ResponseBody
-    @RequestMapping(value = "/process/equipmentAutoComplete", method = RequestMethod.GET)
-    public List<ProcessDTO> equipmentAutoComplete(
-            @RequestParam("keyword") String keyword) {
-
-        return processService.getEquipmentAutoComplete(keyword);
-    }
-    
     /**
      * 공정코드 자동완성 조회
      *
@@ -559,7 +509,8 @@ public class ProcessController {
 
         return processService.getProcCodeAutoComplete(keyword);
     }
-    
+
+
     /**
      * 공정코드 중복 확인
      *
@@ -588,6 +539,36 @@ public class ProcessController {
         }
 
         return resultMap;
+    }
+
+
+    /**
+     * 완제품 자동완성 조회
+     *
+     * 현재 화면에서는 완제품을 selectbox로 사용한다.
+     * 추후 자동완성 전환 시 사용할 수 있도록 유지한다.
+     */
+    @ResponseBody
+    @RequestMapping(value = "/process/productAutoComplete", method = RequestMethod.GET)
+    public List<ItemDTO> productAutoComplete(
+            @RequestParam("keyword") String keyword) {
+
+        return processService.getProductItemAutoComplete(keyword);
+    }
+
+
+    /**
+     * 설비 자동완성 조회
+     *
+     * 현재 화면에서는 설비를 selectbox로 사용한다.
+     * 추후 자동완성 전환 시 사용할 수 있도록 유지한다.
+     */
+    @ResponseBody
+    @RequestMapping(value = "/process/equipmentAutoComplete", method = RequestMethod.GET)
+    public List<ProcessDTO> equipmentAutoComplete(
+            @RequestParam("keyword") String keyword) {
+
+        return processService.getEquipmentAutoComplete(keyword);
     }
 
 
@@ -628,6 +609,10 @@ public class ProcessController {
             return null;
         }
 
+        if (multipartFile.getSize() > 10 * 1024 * 1024) {
+            throw new IllegalArgumentException("이미지 파일은 10MB 이하만 업로드할 수 있습니다.");
+        }
+
         String extension = getFileExtension(originalFilename);
 
         if (!isAllowedImageExtension(extension)) {
@@ -642,6 +627,10 @@ public class ProcessController {
 
         String uploadRelativePath = "/resources/upload/process/";
         String uploadRealPath = request.getServletContext().getRealPath(uploadRelativePath);
+
+        if (uploadRealPath == null || uploadRealPath.trim().isEmpty()) {
+            throw new IOException("업로드 경로를 찾을 수 없습니다.");
+        }
 
         File uploadDir = new File(uploadRealPath);
 

@@ -2,6 +2,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <%--
 	파일명 : processDetail.jsp
@@ -12,7 +13,8 @@
 	- BOM관리 상세 화면 구조 기준
 	- 공용 detail.css 사용
 	- 공용 modal.css 사용
-	- 별도 CSS 파일 추가 없음
+	- 공용 searchtable/coTable 사용
+	- 별도 style 태그 추가 없음
 
 	기능:
 	- 공정 상세 조회
@@ -20,8 +22,13 @@
 	- 공정코드 직접 입력
 	- 공정코드 자동완성
 	- 공정코드 중복확인
-	- 필수입력 안내문 input/select 하단 표시
 	- 완제품/설비 select 변경 시 세부 표시정보 즉시 갱신
+	- 수정 버튼 클릭 시 공정 이미지 등록 영역 표시
+	- 파일 선택 버튼 공용 버튼 CSS 적용
+	- 공정 이미지 등록 버튼 제목 우측 표시
+	- 공정 이미지 미리보기
+	- 공정 이미지 목록 조회
+	- 공정 이미지 선택 삭제
 --%>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -42,7 +49,7 @@
 			<c:if test="${not empty processDetail}">
 
 				<button type="button" id="editBtn" class="detail_btn_green"
-					onclick="changeEditMode(true);">
+					onclick="changeEditMode(true);" style="white-space: nowrap;">
 
 					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M12 20h9"></path>
@@ -53,7 +60,7 @@
 				</button>
 
 				<button type="submit" id="saveBtn" class="detail_btn_green"
-					form="processModifyForm" style="display: none;">
+					form="processModifyForm" style="display: none; white-space: nowrap;">
 
 					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
@@ -65,7 +72,8 @@
 				</button>
 
 				<button type="button" id="cancelBtn" class="detail_btn_line"
-					onclick="changeEditMode(false);" style="display: none;">
+					onclick="changeEditMode(false);"
+					style="display: none; white-space: nowrap;">
 
 					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M18 6L6 18"></path>
@@ -78,7 +86,8 @@
 			</c:if>
 
 			<button type="button" class="detail_btn_line"
-				onclick="location.href='${contextPath}/master/process'">
+				onclick="location.href='${contextPath}/master/process'"
+				style="white-space: nowrap;">
 
 				<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
 					<path d="M8 6h13"></path>
@@ -576,6 +585,248 @@
 
 			</form>
 
+
+			<%-- =====================================================
+			     5. 공정 이미지 등록
+			     ===================================================== --%>
+			<div class="detail_card">
+
+				<div class="detail_card_title"
+					style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+
+					<span>공정 이미지 등록</span>
+
+					<button type="submit"
+						form="processImageAddForm"
+						class="detail_btn_green"
+						data-image-edit-button
+						style="display: none; white-space: nowrap;">
+
+						<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+							<path d="M17 8l-5-5-5 5"></path>
+							<path d="M12 3v12"></path>
+						</svg>
+
+						이미지 등록
+					</button>
+
+				</div>
+
+				<form id="processImageAddForm"
+					action="${contextPath}/master/process/detail/add"
+					method="post"
+					enctype="multipart/form-data"
+					accept-charset="UTF-8"
+					onsubmit="return submitProcessImageAddForm();"
+					data-image-edit-box
+					style="display: none;">
+
+					<input type="hidden" name="procId" value="${processDetail.procId}" />
+
+					<table class="detail_info_table">
+						<colgroup>
+							<col style="width: 12%;">
+							<col style="width: 38%;">
+							<col style="width: 12%;">
+							<col style="width: 38%;">
+						</colgroup>
+
+						<tbody>
+							<tr>
+								<th>이미지</th>
+								<td>
+									<input type="file"
+										name="procImageFile"
+										id="procImageFile"
+										accept="image/*"
+										onchange="selectProcessImageFile();"
+										data-image-edit-control
+										disabled
+										style="display: none;" />
+
+									<label for="procImageFile"
+										class="detail_btn_line"
+										style="display: inline-flex; white-space: nowrap; cursor: pointer;">
+										파일 선택
+									</label>
+
+									<span id="procImageFileName"
+										style="margin-left: 10px; font-size: 13px; color: #6b7280;">
+										선택된 파일 없음
+									</span>
+
+									<div id="procImageFileMsg"
+										style="display: none; color: #d93025; font-size: 12px; margin-top: 6px;"></div>
+								</td>
+
+								<th>비고</th>
+								<td>
+									<input type="text"
+										name="remark"
+										id="processImageRemark"
+										class="modal_input"
+										maxlength="30"
+										placeholder="비고 30자 이내"
+										data-image-edit-control
+										disabled />
+								</td>
+							</tr>
+
+							<tr>
+								<th>상세설명</th>
+								<td colspan="3">
+									<textarea name="procContent"
+										id="processImageContent"
+										class="modal_textarea"
+										maxlength="1000"
+										placeholder="공정 이미지 설명, 작업표준서 내용, 주의사항 등을 입력하세요."
+										data-image-edit-control
+										disabled></textarea>
+								</td>
+							</tr>
+
+							<tr id="processImagePreviewRow" style="display: none;">
+								<th>미리보기</th>
+								<td colspan="3">
+									<img id="processImagePreview"
+										src=""
+										alt="공정 이미지 미리보기"
+										style="max-width: 240px; max-height: 160px; object-fit: cover; border-radius: 8px;">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+
+				</form>
+			</div>
+
+
+			<%-- =====================================================
+			     6. 공정 이미지 목록
+			     ===================================================== --%>
+			<div class="detail_card">
+
+				<div class="detail_card_title">공정 이미지 목록</div>
+
+				<form id="processImageDeleteForm"
+					action="${contextPath}/master/process/detail/delete"
+					method="post"
+					accept-charset="UTF-8">
+
+					<input type="hidden" name="procId" value="${processDetail.procId}" />
+
+					<div class="search-table-top">
+						<div class="search-total-area">
+							총 <strong>${fn:length(processDetailList)}</strong>건
+						</div>
+
+						<div class="search-btn-right">
+							<button type="button"
+								class="search-btn search-btn-sub"
+								onclick="submitProcessImageDeleteForm();"
+								style="white-space: nowrap;">
+								선택 삭제
+							</button>
+						</div>
+					</div>
+
+					<div class="coTableWrap">
+						<table class="coTable">
+							<thead>
+								<tr>
+									<th onclick="toggleAllProcessImageCheck();"
+										title="전체 선택/해제">선택</th>
+									<th>이미지</th>
+									<th>상세설명</th>
+									<th>비고</th>
+									<th>등록일</th>
+									<th>수정일</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<c:choose>
+
+									<c:when test="${not empty processDetailList}">
+										<c:forEach var="img" items="${processDetailList}">
+											<tr>
+												<td>
+													<input type="checkbox"
+														name="procDetailIdList"
+														value="${img.procDetailId}">
+												</td>
+
+												<td>
+													<c:choose>
+														<c:when test="${not empty img.procPicture}">
+															<a href="${contextPath}${img.procPicture}" target="_blank">
+																<img src="${contextPath}${img.procPicture}"
+																	alt="공정 이미지"
+																	style="width: 90px; height: 60px; object-fit: cover; border-radius: 8px;">
+															</a>
+														</c:when>
+														<c:otherwise>-</c:otherwise>
+													</c:choose>
+												</td>
+
+												<td title="${img.procContent}">
+													<c:choose>
+														<c:when test="${not empty img.procContent}">
+															${img.procContent}
+														</c:when>
+														<c:otherwise>-</c:otherwise>
+													</c:choose>
+												</td>
+
+												<td title="${img.remark}">
+													<c:choose>
+														<c:when test="${not empty img.remark}">
+															${img.remark}
+														</c:when>
+														<c:otherwise>-</c:otherwise>
+													</c:choose>
+												</td>
+
+												<td>
+													<c:choose>
+														<c:when test="${not empty img.createdDate}">
+															<fmt:formatDate value="${img.createdDate}"
+																pattern="yyyy-MM-dd" />
+														</c:when>
+														<c:otherwise>-</c:otherwise>
+													</c:choose>
+												</td>
+
+												<td>
+													<c:choose>
+														<c:when test="${not empty img.updatedDate}">
+															<fmt:formatDate value="${img.updatedDate}"
+																pattern="yyyy-MM-dd" />
+														</c:when>
+														<c:otherwise>-</c:otherwise>
+													</c:choose>
+												</td>
+											</tr>
+										</c:forEach>
+									</c:when>
+
+									<c:otherwise>
+										<tr>
+											<td colspan="6" style="text-align: center;">
+												등록된 공정 이미지가 없습니다.
+											</td>
+										</tr>
+									</c:otherwise>
+
+								</c:choose>
+							</tbody>
+						</table>
+					</div>
+
+				</form>
+			</div>
+
 		</c:when>
 
 
@@ -611,6 +862,10 @@
 		var editBoxList = document.querySelectorAll("[data-edit-box]");
 		var controlList = document.querySelectorAll("[data-edit-control]");
 
+		var imageEditBoxList = document.querySelectorAll("[data-image-edit-box]");
+		var imageEditButtonList = document.querySelectorAll("[data-image-edit-button]");
+		var imageControlList = document.querySelectorAll("[data-image-edit-control]");
+
 		if (isEdit) {
 			if (editBtn != null) {
 				editBtn.style.display = "none";
@@ -618,10 +873,12 @@
 
 			if (saveBtn != null) {
 				saveBtn.style.display = "inline-flex";
+				saveBtn.style.whiteSpace = "nowrap";
 			}
 
 			if (cancelBtn != null) {
 				cancelBtn.style.display = "inline-flex";
+				cancelBtn.style.whiteSpace = "nowrap";
 			}
 
 			for (var i = 0; i < viewValueList.length; i++) {
@@ -634,6 +891,19 @@
 
 			for (var k = 0; k < controlList.length; k++) {
 				controlList[k].disabled = false;
+			}
+
+			for (var a = 0; a < imageEditBoxList.length; a++) {
+				imageEditBoxList[a].style.display = "block";
+			}
+
+			for (var b = 0; b < imageEditButtonList.length; b++) {
+				imageEditButtonList[b].style.display = "inline-flex";
+				imageEditButtonList[b].style.whiteSpace = "nowrap";
+			}
+
+			for (var c = 0; c < imageControlList.length; c++) {
+				imageControlList[c].disabled = false;
 			}
 
 			applySelectedItemInfo();
@@ -1016,5 +1286,152 @@
 		});
 
 		return false;
+	}
+
+
+	function submitProcessImageAddForm() {
+		var fileInput = document.getElementById("procImageFile");
+		var contentInput = document.getElementById("processImageContent");
+		var remarkInput = document.getElementById("processImageRemark");
+
+		var hasFile = fileInput != null && fileInput.value !== "";
+		var hasContent = contentInput != null && contentInput.value.trim() !== "";
+		var hasRemark = remarkInput != null && remarkInput.value.trim() !== "";
+
+		if (!hasFile && !hasContent && !hasRemark) {
+			showFieldMsg("procImageFileMsg", "이미지, 상세설명, 비고 중 하나 이상 입력하세요.");
+			return false;
+		}
+
+		if (hasFile && !isImageFile(fileInput.value)) {
+			showFieldMsg("procImageFileMsg", "이미지 파일만 업로드할 수 있습니다.");
+			return false;
+		}
+
+		showFieldMsg("procImageFileMsg", "");
+		return true;
+	}
+
+
+	function isImageFile(fileName) {
+		if (fileName == null || fileName === "") {
+			return false;
+		}
+
+		var lowerName = fileName.toLowerCase();
+
+		return lowerName.endsWith(".jpg")
+			|| lowerName.endsWith(".jpeg")
+			|| lowerName.endsWith(".png")
+			|| lowerName.endsWith(".gif")
+			|| lowerName.endsWith(".webp");
+	}
+
+
+	function selectProcessImageFile() {
+		var fileInput = document.getElementById("procImageFile");
+		var fileNameBox = document.getElementById("procImageFileName");
+
+		if (fileInput == null) {
+			return;
+		}
+
+		if (fileInput.files == null || fileInput.files.length === 0) {
+			if (fileNameBox != null) {
+				fileNameBox.innerHTML = "선택된 파일 없음";
+			}
+
+			previewProcessImage();
+			return;
+		}
+
+		if (fileNameBox != null) {
+			fileNameBox.innerHTML = fileInput.files[0].name;
+		}
+
+		previewProcessImage();
+	}
+
+
+	function previewProcessImage() {
+		var fileInput = document.getElementById("procImageFile");
+		var previewRow = document.getElementById("processImagePreviewRow");
+		var previewImage = document.getElementById("processImagePreview");
+
+		if (fileInput == null || previewRow == null || previewImage == null) {
+			return;
+		}
+
+		if (fileInput.files == null || fileInput.files.length === 0) {
+			previewRow.style.display = "none";
+			previewImage.src = "";
+			return;
+		}
+
+		var file = fileInput.files[0];
+
+		if (file.type == null || !file.type.startsWith("image/")) {
+			showFieldMsg("procImageFileMsg", "이미지 파일만 업로드할 수 있습니다.");
+			fileInput.value = "";
+			previewRow.style.display = "none";
+			previewImage.src = "";
+
+			var fileNameBox = document.getElementById("procImageFileName");
+
+			if (fileNameBox != null) {
+				fileNameBox.innerHTML = "선택된 파일 없음";
+			}
+
+			return;
+		}
+
+		showFieldMsg("procImageFileMsg", "");
+
+		var reader = new FileReader();
+
+		reader.onload = function(e) {
+			previewImage.src = e.target.result;
+			previewRow.style.display = "";
+		};
+
+		reader.readAsDataURL(file);
+	}
+
+
+	function toggleAllProcessImageCheck() {
+		var checkboxList = document.querySelectorAll("#processImageDeleteForm input[name='procDetailIdList']");
+
+		if (checkboxList.length === 0) {
+			return;
+		}
+
+		var allChecked = true;
+
+		for (var i = 0; i < checkboxList.length; i++) {
+			if (!checkboxList[i].checked) {
+				allChecked = false;
+				break;
+			}
+		}
+
+		var nextChecked = !allChecked;
+
+		for (var j = 0; j < checkboxList.length; j++) {
+			checkboxList[j].checked = nextChecked;
+		}
+	}
+
+
+	function submitProcessImageDeleteForm() {
+		var checkedList = document.querySelectorAll("#processImageDeleteForm input[name='procDetailIdList']:checked");
+
+		if (checkedList.length === 0) {
+			alert("삭제할 공정 이미지를 선택하세요.");
+			return;
+		}
+
+		if (confirm("선택한 공정 이미지를 삭제하시겠습니까?")) {
+			document.getElementById("processImageDeleteForm").submit();
+		}
 	}
 </script>
