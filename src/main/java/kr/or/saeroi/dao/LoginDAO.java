@@ -183,19 +183,44 @@ public class LoginDAO {
 
 	    int result = 0;
 
-	    String sql =
-	        "UPDATE EMP " +
-	        "SET EMAIL = ?, " +
-	        "EMP_TEL = ?, " +
-	        "UPDATED_DATE = SYSTIMESTAMP " +
-	        "WHERE EMPNO = ?";
+	    String sql;
+
+	    if(dto.getEmp_pw() != null && !dto.getEmp_pw().isEmpty()) {
+
+	        sql =
+	            "UPDATE EMP " +
+	            "SET EMAIL = ?, " +
+	            "    EMP_TEL = ?, " +
+	            "    EMP_PW = ?, " +
+	            "    UPDATED_DATE = SYSTIMESTAMP " +
+	            "WHERE EMPNO = ?";
+
+	    } else {
+
+	        sql =
+	            "UPDATE EMP " +
+	            "SET EMAIL = ?, " +
+	            "    EMP_TEL = ?, " +
+	            "    UPDATED_DATE = SYSTIMESTAMP " +
+	            "WHERE EMPNO = ?";
+	    }
 
 	    try (Connection conn = dataSource.getConnection();
 	         PreparedStatement ps = conn.prepareStatement(sql)) {
 
-	        ps.setString(1, dto.getEmail());
-	        ps.setString(2, dto.getEmp_tel());
-	        ps.setString(3, dto.getEmpno());
+	        if(dto.getEmp_pw() != null && !dto.getEmp_pw().isEmpty()) {
+
+	            ps.setString(1, dto.getEmail());
+	            ps.setString(2, dto.getEmp_tel());
+	            ps.setString(3, dto.getEmp_pw());
+	            ps.setString(4, dto.getEmpno());
+
+	        } else {
+
+	            ps.setString(1, dto.getEmail());
+	            ps.setString(2, dto.getEmp_tel());
+	            ps.setString(3, dto.getEmpno());
+	        }
 
 	        result = ps.executeUpdate();
 
