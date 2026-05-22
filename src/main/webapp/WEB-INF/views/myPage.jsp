@@ -45,11 +45,11 @@
 
 						<button type="button" class="detail_btn_green" id="editBtn">
 							<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-									stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-									style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
-									<path d="M12 20h9"></path>
-									<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-								</svg>
+								stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+								style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+								<path d="M12 20h9"></path>
+								<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+							</svg>
 							수정</button>
 
 						<button type="submit" form="myPageForm" class="detail_btn_green" id="saveBtn"
@@ -150,6 +150,21 @@
 									</td>
 								</tr>
 
+								<tr>
+									<th>새 비밀번호</th>
+									<td>
+										<input type="password" name="emp_pw" class="pw mypage_input editable_field"
+											readonly>
+									</td>
+
+									<th>비밀번호 확인</th>
+									<td>
+										<input type="password" name="emp_pw_confirm" class="pw_confirm mypage_input editable_field"
+											readonly>
+									</td>
+
+								</tr>
+
 							</tbody>
 						</table>
 
@@ -219,6 +234,21 @@
 
 					saveOriginalValues();
 					setEditMode(false);
+
+					document.getElementById('myPageForm')
+						.addEventListener('submit', e=> {
+
+							const pw = document.querySelector('.pw').value;
+							const pwConfirm = document.querySelector('.pw_confirm').value;
+
+							if (pw !== '' && pw !== pwConfirm) {
+
+								alert('비밀번호가 일치하지 않습니다.');
+
+								e.preventDefault();
+								return false;
+							}
+						});
 
 				})();
 			</script>

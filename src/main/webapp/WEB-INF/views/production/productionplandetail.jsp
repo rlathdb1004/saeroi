@@ -110,13 +110,31 @@
 						<th>생산계획번호</th>
 						<td>${production.docNo}</td>
 
-						<th>품목코드</th>
-						<td>${production.itemCode}</td>
+						<th>계획수량</th>
+						<td><c:choose>
+								<c:when test="${mode eq 'edit'}">
+									<input type="number" name="prodPlanQty" class="search-input"
+										min="0" value="${production.prodPlanQty}">
+								</c:when>
 
-						<th>품목명</th>
-						<td>${production.itemName}</td>
+								<c:otherwise>
+					${production.prodPlanQty}
+				</c:otherwise>
+							</c:choose></td>
+
+						<th>단위</th>
+						<td>${production.itemUnit}</td>
 					</tr>
 
+					<%-- 품목코드는 값이 길 수 있어서 한 줄 전체를 사용하게 한다. --%>
+					<tr>
+						<th>품목코드</th>
+						<td>${production.itemCode}</td>
+				
+						<th>품목명</th>
+						<td colspan="3">${production.itemName}</td>
+					</tr>
+					
 					<tr>
 						<th>품목구분</th>
 						<td><c:choose>
@@ -126,23 +144,6 @@
 								<c:otherwise>${production.itemType}</c:otherwise>
 							</c:choose></td>
 
-						<th>계획수량</th>
-						<td><c:choose>
-								<c:when test="${mode eq 'edit'}">
-									<input type="number" name="prodPlanQty" class="search-input"
-										min="0" value="${production.prodPlanQty}">
-								</c:when>
-
-								<c:otherwise>
-									${production.prodPlanQty}
-								</c:otherwise>
-							</c:choose></td>
-
-						<th>단위</th>
-						<td>${production.itemUnit}</td>
-					</tr>
-
-					<tr>
 						<th>계획일자</th>
 						<td><c:choose>
 								<c:when test="${mode eq 'edit'}">
@@ -151,8 +152,8 @@
 								</c:when>
 
 								<c:otherwise>
-									${production.prodPlanDate}
-								</c:otherwise>
+					${production.prodPlanDate}
+				</c:otherwise>
 							</c:choose></td>
 
 						<th>납기일</th>
@@ -163,28 +164,32 @@
 								</c:when>
 
 								<c:otherwise>
-									${production.dueDate}
-								</c:otherwise>
+					${production.dueDate}
+				</c:otherwise>
 							</c:choose></td>
-
-						<th>생성일</th>
-						<td>${production.createdDate}</td>
 					</tr>
 
 					<tr>
-						<th>수정일</th>
-						<td>${production.updatedDate}</td>
+						<th>생성일</th>
+						<td>${production.createdDate}</td>
 
+						<th>수정일</th>
+						<td colspan="3">${production.updatedDate}</td>
+					</tr>
+
+
+					<%-- 비고는 내용이 길어질 수 있어서 한 줄 전체를 사용하게 한다. --%>
+					<tr>
 						<th>비고</th>
-						<td colspan="3"><c:choose>
+						<td colspan="5"><c:choose>
 								<c:when test="${mode eq 'edit'}">
 									<input type="text" name="remark" class="search-input"
 										value="${production.remark}">
 								</c:when>
 
 								<c:otherwise>
-									${production.remark}
-								</c:otherwise>
+					${production.remark}
+				</c:otherwise>
 							</c:choose></td>
 					</tr>
 				</tbody>
