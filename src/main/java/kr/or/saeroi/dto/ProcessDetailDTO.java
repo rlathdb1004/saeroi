@@ -12,23 +12,23 @@ import java.sql.Date;
  * - process_detail
  *
  * 역할:
+ * - 공정별 이미지 관리
  * - 공정별 작업표준서 이미지 관리
  * - 공정별 상세 설명 관리
- * - 하나의 공정에 여러 개의 상세 이미지/설명을 연결
+ * - 하나의 공정에 여러 개의 이미지/설명을 연결
  *
- * DB 컬럼 매핑 기준:
- * - process_detail.proc_id      : 공정상세 ID
- * - process_detail.proc_id2     : 공정 ID(process.proc_id)
- * - process_detail.proc_picture : 공정 이미지 경로
- * - process_detail.proc_content : 공정상세 설명
- * - process_detail.created_date : 등록일
- * - process_detail.updated_date : 수정일
- * - process_detail.remark       : 비고
+ * DB 컬럼 매핑:
+ * - process_detail.proc_id      -> procDetailId
+ * - process_detail.proc_id2     -> procId
+ * - process_detail.proc_picture -> procPicture
+ * - process_detail.proc_content -> procContent
+ * - process_detail.created_date -> createdDate
+ * - process_detail.updated_date -> updatedDate
+ * - process_detail.remark       -> remark
  *
  * 주의:
- * - process_detail의 proc_id는 process.proc_id가 아니라 공정상세 PK이다.
- * - 그래서 DTO에서는 procDetailId로 구분한다.
- * - process_detail.proc_id2가 실제 process 테이블의 proc_id를 참조한다.
+ * - process_detail.proc_id는 공정 ID가 아니라 공정상세 ID이다.
+ * - process_detail.proc_id2가 process.proc_id를 참조한다.
  */
 public class ProcessDetailDTO {
 
@@ -37,10 +37,6 @@ public class ProcessDetailDTO {
      *
      * DB 컬럼:
      * - process_detail.proc_id
-     *
-     * 설명:
-     * - process_detail 테이블의 PK 역할
-     * - 공정상세 1건을 구분하는 번호
      */
     private Integer procDetailId;
 
@@ -52,7 +48,6 @@ public class ProcessDetailDTO {
      *
      * 설명:
      * - process 테이블의 proc_id를 참조한다.
-     * - 어떤 공정에 속한 상세 이미지/설명인지 연결한다.
      */
     private Integer procId;
 
@@ -63,11 +58,7 @@ public class ProcessDetailDTO {
      * - process_detail.proc_picture
      *
      * 예시:
-     * - /resources/upload/process/process_1_20260602103000.png
-     *
-     * 설명:
-     * - 실제 파일은 서버 업로드 폴더에 저장한다.
-     * - DB에는 브라우저에서 접근 가능한 상대 경로를 저장한다.
+     * - /resources/upload/process/process_1_20260602103000123.png
      */
     private String procPicture;
 
@@ -76,12 +67,6 @@ public class ProcessDetailDTO {
      *
      * DB 컬럼:
      * - process_detail.proc_content
-     *
-     * 설명:
-     * - 작업표준서 설명
-     * - 공정 주의사항
-     * - 검사 기준
-     * - 설비 세팅 조건 등을 입력할 수 있다.
      */
     private String procContent;
 
@@ -106,9 +91,6 @@ public class ProcessDetailDTO {
      *
      * DB 컬럼:
      * - process_detail.remark
-     *
-     * 설명:
-     * - 화면에서는 30자 이내 기준으로 사용한다.
      */
     private String remark;
 
@@ -120,7 +102,7 @@ public class ProcessDetailDTO {
     /**
      * 공정코드
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - process.proc_code
      */
     private String procCode;
@@ -128,7 +110,7 @@ public class ProcessDetailDTO {
     /**
      * 공정명
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - process.proc_name
      */
     private String procName;
@@ -136,7 +118,7 @@ public class ProcessDetailDTO {
     /**
      * 품목 ID
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - process.item_id
      */
     private Integer itemId;
@@ -144,7 +126,7 @@ public class ProcessDetailDTO {
     /**
      * 품목코드
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - item.item_code
      */
     private String itemCode;
@@ -152,7 +134,7 @@ public class ProcessDetailDTO {
     /**
      * 품목명
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - item.item_name
      */
     private String itemName;
@@ -160,7 +142,7 @@ public class ProcessDetailDTO {
     /**
      * 설비 ID
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - process.equip_id
      */
     private Integer equipId;
@@ -168,7 +150,7 @@ public class ProcessDetailDTO {
     /**
      * 설비코드
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - equipment.equip_code
      */
     private String equipCode;
@@ -176,7 +158,7 @@ public class ProcessDetailDTO {
     /**
      * 설비명
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - equipment.equip_name
      */
     private String equipName;
@@ -184,7 +166,7 @@ public class ProcessDetailDTO {
     /**
      * 라인 ID
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - equipment.line_id
      */
     private Integer lineId;
@@ -192,7 +174,7 @@ public class ProcessDetailDTO {
     /**
      * 라인코드
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - line.line_code
      */
     private String lineCode;
@@ -200,31 +182,10 @@ public class ProcessDetailDTO {
     /**
      * 라인명
      *
-     * JOIN 컬럼:
+     * JOIN:
      * - line.line_name
      */
     private String lineName;
-
-
-    // =========================================================
-    // 검색 / 화면 제어용 필드
-    // =========================================================
-
-    /**
-     * 검색 구분
-     *
-     * 예시:
-     * - procName
-     * - itemName
-     * - equipName
-     * - lineName
-     */
-    private String searchType;
-
-    /**
-     * 검색어
-     */
-    private String searchKeyword;
 
 
     // =========================================================
@@ -373,21 +334,5 @@ public class ProcessDetailDTO {
 
     public void setLineName(String lineName) {
         this.lineName = lineName;
-    }
-
-    public String getSearchType() {
-        return searchType;
-    }
-
-    public void setSearchType(String searchType) {
-        this.searchType = searchType;
-    }
-
-    public String getSearchKeyword() {
-        return searchKeyword;
-    }
-
-    public void setSearchKeyword(String searchKeyword) {
-        this.searchKeyword = searchKeyword;
     }
 }

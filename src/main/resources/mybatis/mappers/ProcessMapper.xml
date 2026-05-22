@@ -10,17 +10,16 @@
     역할:
     - 기준정보관리 > 공정관리에서 사용하는 SQL을 관리한다.
     - process 테이블 기준 공정 목록/상세/등록/수정/삭제를 처리한다.
-    - process_detail 테이블 기준 공정별 이미지/작업표준서/상세설명을 관리한다.
+    - process_detail 테이블 기준 공정 이미지/상세설명을 관리한다.
     - item, equipment, line 테이블을 JOIN하여 화면 표시용 정보를 함께 조회한다.
 
     주의:
     - process 테이블에는 use_yn 컬럼이 없다.
     - process_detail.proc_id  = 공정상세 ID
     - process_detail.proc_id2 = process.proc_id 참조값
-    - proc_code는 품목별로 반복될 수 있으므로 proc_code 단독 UNIQUE로 보면 안 된다.
+    - 공정코드는 기준정보 코드로 관리하므로 proc_code 단독 중복검사를 한다.
 -->
 <mapper namespace="process">
-
 
     <!-- =========================================================
          1. ResultMap
@@ -313,7 +312,7 @@
 
 
     <!-- =========================================================
-         4. 공정 등록 / 수정 / 삭제
+         4. 공정 등록 / 수정 / 삭제 / 중복확인
          ========================================================= -->
 
     <insert id="insertProcess"
@@ -399,25 +398,57 @@
 
 
     <select id="selectProcessDuplicateCount"
-        parameterType="kr.or.saeroi.dto.ProcessDTO"
-        resultType="int">
+            parameterType="kr.or.saeroi.dto.ProcessDTO"
+            resultType="int">
 
-	    SELECT
-	        COUNT(*)
-	
-	    FROM process
-	
-	    WHERE UPPER(proc_code) = UPPER(#{procCode})
-	
-	    <if test="procId != null">
-	        AND proc_id != #{procId}
-	    </if>
-	
-	</select>
+        SELECT
+            COUNT(*)
+
+        FROM process
+
+        WHERE UPPER(proc_code) = UPPER(#{procCode})
+
+        <if test="procId != null">
+            AND proc_id != #{procId}
+        </if>
+
+    </select>
+
+
+    <select id="selectProcCodeAutoComplete"
+            parameterType="map"
+            resultMap="processResultMap">
+
+        SELECT
+            proc_code,
+            proc_name
+        FROM (
+            SELECT
+                p.proc_code,
+                MAX(p.proc_name) AS proc_name
+            FROM process p
+            WHERE p.proc_code IS NOT NULL
+              AND (
+                    UPPER(p.proc_code) LIKE '%' || UPPER(#{keyword}) || '%'
+                    OR UPPER(p.proc_name) LIKE '%' || UPPER(#{keyword}) || '%'
+              )
+            GROUP BY
+                p.proc_code
+            ORDER BY
+                CASE
+                    WHEN UPPER(p.proc_code) = UPPER(#{keyword}) THEN 1
+                    WHEN UPPER(p.proc_code) LIKE UPPER(#{keyword}) || '%' THEN 2
+                    ELSE 3
+                END,
+                p.proc_code
+        )
+        WHERE ROWNUM &lt;= 10
+
+    </select>
 
 
     <!-- =========================================================
-         5. 공정상세 이미지 / 작업표준서 목록 / 단건
+         5. 공정 이미지 / 공정상세 목록 / 단건
          ========================================================= -->
 
     <select id="selectProcessDetailList"
@@ -518,7 +549,7 @@
 
 
     <!-- =========================================================
-         6. 공정상세 이미지 / 작업표준서 등록 / 수정 / 삭제
+         6. 공정 이미지 / 공정상세 등록 / 수정 / 삭제
          ========================================================= -->
 
     <insert id="insertProcessDetail"
@@ -595,7 +626,7 @@
 
 
     <!-- =========================================================
-         7. 완제품 자동완성 / 선택 목록
+         7. 완제품 선택 목록 / 자동완성
          ========================================================= -->
 
     <select id="selectProductItemAutoComplete"
@@ -707,7 +738,7 @@
 
 
     <!-- =========================================================
-         8. 설비 자동완성 / 선택 목록
+         8. 설비 선택 목록 / 자동완성
          ========================================================= -->
 
     <select id="selectEquipmentAutoComplete"
@@ -800,36 +831,5 @@
             e.equip_code
 
     </select>
-    
-    <select id="selectProcCodeAutoComplete"
-        parameterType="map"
-        resultMap="processResultMap">
-
-	    SELECT
-	        proc_code,
-	        proc_name
-	    FROM (
-	        SELECT
-	            p.proc_code,
-	            MAX(p.proc_name) AS proc_name
-	        FROM process p
-	        WHERE p.proc_code IS NOT NULL
-	          AND (
-	                UPPER(p.proc_code) LIKE '%' || UPPER(#{keyword}) || '%'
-	                OR UPPER(p.proc_name) LIKE '%' || UPPER(#{keyword}) || '%'
-	          )
-	        GROUP BY
-	            p.proc_code
-	        ORDER BY
-	            CASE
-	                WHEN UPPER(p.proc_code) = UPPER(#{keyword}) THEN 1
-	                WHEN UPPER(p.proc_code) LIKE UPPER(#{keyword}) || '%' THEN 2
-	                ELSE 3
-	            END,
-	            p.proc_code
-	    )
-	    WHERE ROWNUM &lt;= 10
-	
-	</select>
 
 </mapper>

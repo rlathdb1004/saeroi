@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import kr.or.saeroi.dao.ProcessDAO;
 import kr.or.saeroi.dto.ItemDTO;
@@ -18,9 +17,9 @@ import kr.or.saeroi.dto.ProcessDetailDTO;
  * 역할:
  * - Controller와 DAO 사이에서 공정관리 업무 로직을 처리한다.
  * - 공정 목록/상세 조회, 등록, 수정, 선택삭제를 처리한다.
- * - 공정상세 이미지/작업표준서 목록, 등록, 수정, 삭제를 처리한다.
- * - 등록/수정 전 필수값 검증과 공정 중복검사를 수행한다.
- * - 완제품/설비 자동완성 기능을 처리한다.
+ * - 공정코드 자동완성/중복확인을 처리한다.
+ * - 공정 이미지/공정상세 설명 목록, 등록, 수정, 삭제를 처리한다.
+ * - 완제품/설비 선택 목록을 처리한다.
  *
  * 메뉴:
  * - 기준정보관리 > 공정관리
@@ -35,7 +34,6 @@ public class ProcessService {
 
     /**
      * 공정관리 DAO
-     * - 실제 DB 접근은 DAO에서 처리한다.
      */
     @Autowired
     private ProcessDAO processDAO;
@@ -52,7 +50,14 @@ public class ProcessService {
      * @return 공정 목록
      */
     public List<ProcessDTO> getProcessList(ProcessDTO processDTO) {
-        return processDAO.selectProcessList(processDTO);
+
+        List<ProcessDTO> processList = processDAO.selectProcessList(processDTO);
+
+        if (processList == null) {
+            return Collections.emptyList();
+        }
+
+        return processList;
     }
 
 
@@ -74,6 +79,11 @@ public class ProcessService {
      * @return 공정 상세 정보
      */
     public ProcessDTO getProcessDetail(int procId) {
+
+        if (procId <= 0) {
+            return null;
+        }
+
         return processDAO.selectProcessDetail(procId);
     }
 
@@ -87,13 +97,13 @@ public class ProcessService {
      *
      * 처리 흐름:
      * 1. 필수값 검증
-     * 2. 공정 중복검사
+     * 2. 공정코드 중복검사
      * 3. 공정 등록
      *
      * 반환값:
      * - 1 이상: 등록 성공
      * - 0: 등록 실패
-     * - -1: 공정 중복
+     * - -1: 공정코드 중복
      * - -2: 필수값 누락 또는 입력값 오류
      *
      * @param processDTO 등록할 공정 정보
@@ -123,13 +133,13 @@ public class ProcessService {
      * 처리 흐름:
      * 1. 공정 ID 확인
      * 2. 필수값 검증
-     * 3. 공정 중복검사
+     * 3. 공정코드 중복검사
      * 4. 공정 수정
      *
      * 반환값:
      * - 1 이상: 수정 성공
      * - 0: 수정 실패
-     * - -1: 공정 중복
+     * - -1: 공정코드 중복
      * - -2: 필수값 누락 또는 입력값 오류
      *
      * @param processDTO 수정할 공정 정보
@@ -171,7 +181,6 @@ public class ProcessService {
      * @param procIdList 선택한 공정 ID 목록
      * @return 삭제된 공정 건수
      */
-    @Transactional
     public int removeProcessList(List<Integer> procIdList) {
 
         if (procIdList == null || procIdList.isEmpty()) {
@@ -187,7 +196,7 @@ public class ProcessService {
      *
      * 기준:
      * - proc_code 단독 중복검사
-     * - 수정 시에는 현재 proc_id를 제외하고 검사한다.
+     * - 수정 시에는 현재 proc_id를 제외한다.
      *
      * @param processDTO 공정코드, procId를 담은 DTO
      * @return true: 중복 있음 / false: 중복 없음
@@ -206,8 +215,35 @@ public class ProcessService {
     }
 
 
+    /**
+     * 공정코드 자동완성 조회
+     *
+     * 사용 위치:
+     * - 공정 등록 모달
+     * - 공정 상세 수정 화면
+     *
+     * @param keyword 검색어
+     * @return 기존 공정코드 후보 목록
+     */
+    public List<ProcessDTO> getProcCodeAutoComplete(String keyword) {
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<ProcessDTO> procCodeList =
+                processDAO.selectProcCodeAutoComplete(keyword.trim());
+
+        if (procCodeList == null) {
+            return Collections.emptyList();
+        }
+
+        return procCodeList;
+    }
+
+
     // =========================================================
-    // 3. 공정상세 이미지 / 작업표준서 조회
+    // 3. 공정 이미지 / 공정상세 조회
     // =========================================================
 
     /**
@@ -215,13 +251,13 @@ public class ProcessService {
      *
      * 사용 위치:
      * - 공정 상세보기 페이지 하단
-     * - 작업표준서 이미지 목록
+     * - 공정 이미지 목록
      *
      * 조건:
      * - process_detail.proc_id2 = process.proc_id
      *
      * @param procId 공정 ID
-     * @return 공정상세 이미지/설명 목록
+     * @return 공정 이미지/상세설명 목록
      */
     public List<ProcessDetailDTO> getProcessDetailList(int procId) {
 
@@ -229,7 +265,8 @@ public class ProcessService {
             return Collections.emptyList();
         }
 
-        List<ProcessDetailDTO> processDetailList = processDAO.selectProcessDetailList(procId);
+        List<ProcessDetailDTO> processDetailList =
+                processDAO.selectProcessDetailList(procId);
 
         if (processDetailList == null) {
             return Collections.emptyList();
@@ -243,8 +280,8 @@ public class ProcessService {
      * 공정상세 단건 조회
      *
      * 사용 위치:
-     * - 공정상세 수정 전 기존 이미지 경로 확인
-     * - 공정상세 삭제 전 기존 이미지 경로 확인
+     * - 공정 이미지 삭제 전 기존 이미지 경로 확인
+     * - 공정 이미지 수정 전 기존 이미지 경로 확인
      *
      * @param procDetailId 공정상세 ID
      * @return 공정상세 1건
@@ -260,7 +297,7 @@ public class ProcessService {
 
 
     // =========================================================
-    // 4. 공정상세 이미지 / 작업표준서 등록 / 수정 / 삭제
+    // 4. 공정 이미지 / 공정상세 등록 / 수정 / 삭제
     // =========================================================
 
     /**
@@ -332,7 +369,7 @@ public class ProcessService {
      * 공정상세 선택 삭제
      *
      * 사용 위치:
-     * - 공정 상세보기 페이지의 작업표준서 선택 삭제
+     * - 공정 상세보기 페이지의 공정 이미지 선택 삭제
      *
      * @param procDetailIdList 선택한 공정상세 ID 목록
      * @return 삭제된 건수
@@ -367,19 +404,14 @@ public class ProcessService {
 
 
     // =========================================================
-    // 5. 자동완성 / 선택 목록
+    // 5. 완제품 / 설비 선택 목록
     // =========================================================
 
     /**
      * 완제품 자동완성 조회
      *
-     * 사용 위치:
-     * - 공정 등록 모달의 품목 자동완성
-     * - 공정 수정 화면의 품목 자동완성
-     *
-     * 대상:
-     * - item_type = 'FG'
-     * - use_yn = 'Y'
+     * 현재 공정관리 화면은 완제품을 selectbox로 사용한다.
+     * 추후 자동완성 전환 시 사용할 수 있도록 유지한다.
      *
      * @param keyword 검색어
      * @return 완제품 후보 목록
@@ -390,7 +422,14 @@ public class ProcessService {
             return Collections.emptyList();
         }
 
-        return processDAO.selectProductItemAutoComplete(keyword.trim());
+        List<ItemDTO> itemList =
+                processDAO.selectProductItemAutoComplete(keyword.trim());
+
+        if (itemList == null) {
+            return Collections.emptyList();
+        }
+
+        return itemList;
     }
 
 
@@ -398,8 +437,8 @@ public class ProcessService {
      * 완제품 선택 목록 조회
      *
      * 사용 위치:
-     * - 공정 등록 모달 초기 데이터
-     * - 공정 수정 화면 selectbox 구성
+     * - 공정 등록 모달
+     * - 공정 상세 수정 화면
      *
      * 대상:
      * - item_type = 'FG'
@@ -421,9 +460,8 @@ public class ProcessService {
     /**
      * 설비 자동완성 조회
      *
-     * 사용 위치:
-     * - 공정 등록 모달의 설비 자동완성
-     * - 공정 수정 화면의 설비 자동완성
+     * 현재 공정관리 화면은 설비를 selectbox로 사용한다.
+     * 추후 자동완성 전환 시 사용할 수 있도록 유지한다.
      *
      * @param keyword 검색어
      * @return 설비 후보 목록
@@ -434,7 +472,14 @@ public class ProcessService {
             return Collections.emptyList();
         }
 
-        return processDAO.selectEquipmentAutoComplete(keyword.trim());
+        List<ProcessDTO> equipmentList =
+                processDAO.selectEquipmentAutoComplete(keyword.trim());
+
+        if (equipmentList == null) {
+            return Collections.emptyList();
+        }
+
+        return equipmentList;
     }
 
 
@@ -442,8 +487,8 @@ public class ProcessService {
      * 설비 선택 목록 조회
      *
      * 사용 위치:
-     * - 공정 등록 모달 초기 데이터
-     * - 공정 수정 화면 selectbox 구성
+     * - 공정 등록 모달
+     * - 공정 상세 수정 화면
      *
      * @return 설비 목록
      */
@@ -466,11 +511,11 @@ public class ProcessService {
     /**
      * 공정 등록/수정 전 필수값 검증
      *
-     * 현재 공정관리 필수 기준:
+     * 필수 기준:
      * - 완제품 item_id
      * - 설비 equip_id
-     * - 공정코드
-     * - 공정명
+     * - 공정코드 proc_code
+     * - 공정명 proc_name
      *
      * @param processDTO 공정 정보
      * @return 오류 메시지. 문제가 없으면 null
@@ -509,14 +554,14 @@ public class ProcessService {
     /**
      * 공정상세 등록/수정 전 필수값 검증
      *
-     * 현재 공정상세 필수 기준:
+     * 필수 기준:
      * - 공정 ID
      * - 이미지, 설명, 비고 중 하나 이상
      *
      * 설명:
-     * - 공정상세는 작업표준서 이미지 관리 용도이지만,
-     *   설명만 별도 등록할 수도 있으므로 이미지를 무조건 필수로 두지 않는다.
-     * - 이미지 확장자/파일 크기 검증은 Controller에서 업로드 파일을 받을 때 처리한다.
+     * - 이미지만 등록 가능
+     * - 설명만 등록 가능
+     * - 이미지 + 설명 같이 등록 가능
      *
      * @param processDetailDTO 공정상세 정보
      * @return 오류 메시지. 문제가 없으면 null
@@ -550,24 +595,5 @@ public class ProcessService {
         }
 
         return null;
-    }
-    
-    /**
-     * 공정코드 자동완성 조회
-     *
-     * 사용 위치:
-     * - 공정 등록 모달
-     * - 공정 수정 화면
-     *
-     * @param keyword 검색어
-     * @return 기존 공정코드 후보 목록
-     */
-    public List<ProcessDTO> getProcCodeAutoComplete(String keyword) {
-
-        if (keyword == null || keyword.trim().isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        return processDAO.selectProcCodeAutoComplete(keyword.trim());
     }
 }
