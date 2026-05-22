@@ -58,6 +58,21 @@
 				취소
 			</button>
 
+			<%-- 수정 버튼은 현재 페이지에서 입력창으로 변경한다. --%>
+			<button type="button" id="editBtn" class="detail_btn_green"
+				onclick="changeEditMode(true);">
+
+				<%-- 수정 아이콘 SVG이다. --%>
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round"
+					stroke-linejoin="round"
+					style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+					<path d="M12 20h9"></path>
+					<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+				</svg>
+
+				수정
+			</button>
 			<%-- 목록으로 버튼은 새 창이 아니라 현재 페이지에서 목록 화면으로 이동한다. --%>
 			<button type="button" class="detail_btn_line"
 				onclick="location.href='${pageContext.request.contextPath}/quality/inspection'">
@@ -78,21 +93,6 @@
 				목록
 			</button>
 
-			<%-- 수정 버튼은 현재 페이지에서 입력창으로 변경한다. --%>
-			<button type="button" id="editBtn" class="detail_btn_green"
-				onclick="changeEditMode(true);">
-
-				<%-- 수정 아이콘 SVG이다. --%>
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-					stroke="currentColor" stroke-width="2" stroke-linecap="round"
-					stroke-linejoin="round"
-					style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
-					<path d="M12 20h9"></path>
-					<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
-				</svg>
-
-				수정
-			</button>
 		</div>
 	</div>
 
