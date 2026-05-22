@@ -95,10 +95,15 @@ public class LotDTO {
 
 	// 검색키워드이다.
 	private String keyword;
+	
+	// 검색 구분이다.
+	private String searchType;
 
 	// Oracle ROWNUM 페이징 시작 행 번호이다.
 	private Integer startRow;
 
 	// Oracle ROWNUM 페이징 마지막 행 번호이다.
 	private Integer endRow;
+	
+	
 }

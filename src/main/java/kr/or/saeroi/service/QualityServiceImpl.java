@@ -88,4 +88,38 @@ public class QualityServiceImpl implements QualityService {
 
 		return defect_list;
 	}
+
+	// 불량 등록
+	@Override
+	public int _ser_add_defect(String defect_date, String insp_id, String defect_id, String defect_qty, String remark) {
+
+		int defect_insert = qualityDAO._dao_insert_defect(defect_date, insp_id, defect_id, defect_qty, remark);
+
+		return defect_insert;
+	}
+
+	// 불량 모달 옵션
+	@Override
+	public List<DefectDTO> _ser_select_Defect_option() {
+
+		List<DefectDTO> defect_option_list = qualityDAO._dao_select_Defect_option();
+
+		return defect_option_list;
+	}
+
+	@Override
+	public int _ser_delete_defect(String[] defect_list_id) {
+
+		int delete_result = qualityDAO._dao_delete_defect(defect_list_id);
+
+		return delete_result;
+	}
+
+	@Override
+	public DefectDTO _ser_select_Defect_detail(String defect_list_id) {
+
+		DefectDTO defect_detail = qualityDAO._dao_select_Defect_detail(defect_list_id);
+
+		return defect_detail;
+	}
 }

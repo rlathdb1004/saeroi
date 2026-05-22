@@ -244,3 +244,10 @@ document.addEventListener("DOMContentLoaded", function () {
         mobileMenuBtn.setAttribute("aria-label", isOpen ? "메뉴 닫기" : "메뉴 열기");
     });
 });
+
+heShowTodayWeather();
+// 페이지가 열리자마자 오늘 온도와 날씨 아이콘을 한 번 가져온다.
+
+setInterval(heShowTodayWeather, 30 * 60 * 1000);
+// 30분마다 서버에 날씨를 다시 요청한다.
+// 서버에서는 30분 캐시를 사용하기 때문에 AccuWeather API가 불필요하게 계속 호출되지 않는다.

@@ -2,6 +2,7 @@
 
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <%--
 	파일명 : processDetail.jsp
@@ -12,8 +13,8 @@
 	- BOM관리 상세 화면 구조 기준
 	- 공용 detail.css 사용
 	- 공용 modal.css 사용
-	- 공용 searchtable.css/coTable 사용
-	- 별도 CSS 파일 추가 없음
+	- 공용 searchtable/coTable 사용
+	- 별도 style 태그 추가 없음
 
 	기능:
 	- 공정 상세 조회
@@ -22,7 +23,9 @@
 	- 공정코드 자동완성
 	- 공정코드 중복확인
 	- 완제품/설비 select 변경 시 세부 표시정보 즉시 갱신
-	- 공정 이미지 등록
+	- 수정 버튼 클릭 시 공정 이미지 등록 영역 표시
+	- 파일 선택 버튼 공용 버튼 CSS 적용
+	- 공정 이미지 등록 버튼 제목 우측 표시
 	- 공정 이미지 미리보기
 	- 공정 이미지 목록 조회
 	- 공정 이미지 선택 삭제
@@ -46,23 +49,21 @@
 			<c:if test="${not empty processDetail}">
 
 				<button type="button" id="editBtn" class="detail_btn_green"
-					onclick="changeEditMode(true);">
+					onclick="changeEditMode(true);" style="white-space: nowrap;">
 
 					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M12 20h9"></path>
-						<path
-							d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
 					</svg>
 
 					수정
 				</button>
 
 				<button type="submit" id="saveBtn" class="detail_btn_green"
-					form="processModifyForm" style="display: none;">
+					form="processModifyForm" style="display: none; white-space: nowrap;">
 
 					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
-						<path
-							d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+						<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
 						<path d="M17 21v-8H7v8"></path>
 						<path d="M7 3v5h8"></path>
 					</svg>
@@ -71,7 +72,8 @@
 				</button>
 
 				<button type="button" id="cancelBtn" class="detail_btn_line"
-					onclick="changeEditMode(false);" style="display: none;">
+					onclick="changeEditMode(false);"
+					style="display: none; white-space: nowrap;">
 
 					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M18 6L6 18"></path>
@@ -84,7 +86,8 @@
 			</c:if>
 
 			<button type="button" class="detail_btn_line"
-				onclick="location.href='${contextPath}/master/process'">
+				onclick="location.href='${contextPath}/master/process'"
+				style="white-space: nowrap;">
 
 				<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
 					<path d="M8 6h13"></path>
@@ -588,14 +591,36 @@
 			     ===================================================== --%>
 			<div class="detail_card">
 
-				<div class="detail_card_title">공정 이미지 등록</div>
+				<div class="detail_card_title"
+					style="display: flex; justify-content: space-between; align-items: center; gap: 12px;">
+
+					<span>공정 이미지 등록</span>
+
+					<button type="submit"
+						form="processImageAddForm"
+						class="detail_btn_green"
+						data-image-edit-button
+						style="display: none; white-space: nowrap;">
+
+						<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+							<path d="M17 8l-5-5-5 5"></path>
+							<path d="M12 3v12"></path>
+						</svg>
+
+						이미지 등록
+					</button>
+
+				</div>
 
 				<form id="processImageAddForm"
 					action="${contextPath}/master/process/detail/add"
 					method="post"
 					enctype="multipart/form-data"
 					accept-charset="UTF-8"
-					onsubmit="return submitProcessImageAddForm();">
+					onsubmit="return submitProcessImageAddForm();"
+					data-image-edit-box
+					style="display: none;">
 
 					<input type="hidden" name="procId" value="${processDetail.procId}" />
 
@@ -614,9 +639,22 @@
 									<input type="file"
 										name="procImageFile"
 										id="procImageFile"
-										class="modal_input"
 										accept="image/*"
-										onchange="previewProcessImage();" />
+										onchange="selectProcessImageFile();"
+										data-image-edit-control
+										disabled
+										style="display: none;" />
+
+									<label for="procImageFile"
+										class="detail_btn_line"
+										style="display: inline-flex; white-space: nowrap; cursor: pointer;">
+										파일 선택
+									</label>
+
+									<span id="procImageFileName"
+										style="margin-left: 10px; font-size: 13px; color: #6b7280;">
+										선택된 파일 없음
+									</span>
 
 									<div id="procImageFileMsg"
 										style="display: none; color: #d93025; font-size: 12px; margin-top: 6px;"></div>
@@ -629,7 +667,9 @@
 										id="processImageRemark"
 										class="modal_input"
 										maxlength="30"
-										placeholder="비고 30자 이내" />
+										placeholder="비고 30자 이내"
+										data-image-edit-control
+										disabled />
 								</td>
 							</tr>
 
@@ -640,7 +680,9 @@
 										id="processImageContent"
 										class="modal_textarea"
 										maxlength="1000"
-										placeholder="공정 이미지 설명, 작업표준서 내용, 주의사항 등을 입력하세요."></textarea>
+										placeholder="공정 이미지 설명, 작업표준서 내용, 주의사항 등을 입력하세요."
+										data-image-edit-control
+										disabled></textarea>
 								</td>
 							</tr>
 
@@ -655,12 +697,6 @@
 							</tr>
 						</tbody>
 					</table>
-
-					<div class="detail_btn_area">
-						<button type="submit" class="detail_btn_green">
-							공정 이미지 등록
-						</button>
-					</div>
 
 				</form>
 			</div>
@@ -682,13 +718,14 @@
 
 					<div class="search-table-top">
 						<div class="search-total-area">
-							총 <strong>${processDetailList.size()}</strong>건
+							총 <strong>${fn:length(processDetailList)}</strong>건
 						</div>
 
 						<div class="search-btn-right">
 							<button type="button"
 								class="search-btn search-btn-sub"
-								onclick="submitProcessImageDeleteForm();">
+								onclick="submitProcessImageDeleteForm();"
+								style="white-space: nowrap;">
 								선택 삭제
 							</button>
 						</div>
@@ -825,6 +862,10 @@
 		var editBoxList = document.querySelectorAll("[data-edit-box]");
 		var controlList = document.querySelectorAll("[data-edit-control]");
 
+		var imageEditBoxList = document.querySelectorAll("[data-image-edit-box]");
+		var imageEditButtonList = document.querySelectorAll("[data-image-edit-button]");
+		var imageControlList = document.querySelectorAll("[data-image-edit-control]");
+
 		if (isEdit) {
 			if (editBtn != null) {
 				editBtn.style.display = "none";
@@ -832,10 +873,12 @@
 
 			if (saveBtn != null) {
 				saveBtn.style.display = "inline-flex";
+				saveBtn.style.whiteSpace = "nowrap";
 			}
 
 			if (cancelBtn != null) {
 				cancelBtn.style.display = "inline-flex";
+				cancelBtn.style.whiteSpace = "nowrap";
 			}
 
 			for (var i = 0; i < viewValueList.length; i++) {
@@ -848,6 +891,19 @@
 
 			for (var k = 0; k < controlList.length; k++) {
 				controlList[k].disabled = false;
+			}
+
+			for (var a = 0; a < imageEditBoxList.length; a++) {
+				imageEditBoxList[a].style.display = "block";
+			}
+
+			for (var b = 0; b < imageEditButtonList.length; b++) {
+				imageEditButtonList[b].style.display = "inline-flex";
+				imageEditButtonList[b].style.whiteSpace = "nowrap";
+			}
+
+			for (var c = 0; c < imageControlList.length; c++) {
+				imageControlList[c].disabled = false;
 			}
 
 			applySelectedItemInfo();
@@ -1272,6 +1328,31 @@
 	}
 
 
+	function selectProcessImageFile() {
+		var fileInput = document.getElementById("procImageFile");
+		var fileNameBox = document.getElementById("procImageFileName");
+
+		if (fileInput == null) {
+			return;
+		}
+
+		if (fileInput.files == null || fileInput.files.length === 0) {
+			if (fileNameBox != null) {
+				fileNameBox.innerHTML = "선택된 파일 없음";
+			}
+
+			previewProcessImage();
+			return;
+		}
+
+		if (fileNameBox != null) {
+			fileNameBox.innerHTML = fileInput.files[0].name;
+		}
+
+		previewProcessImage();
+	}
+
+
 	function previewProcessImage() {
 		var fileInput = document.getElementById("procImageFile");
 		var previewRow = document.getElementById("processImagePreviewRow");
@@ -1294,6 +1375,13 @@
 			fileInput.value = "";
 			previewRow.style.display = "none";
 			previewImage.src = "";
+
+			var fileNameBox = document.getElementById("procImageFileName");
+
+			if (fileNameBox != null) {
+				fileNameBox.innerHTML = "선택된 파일 없음";
+			}
+
 			return;
 		}
 

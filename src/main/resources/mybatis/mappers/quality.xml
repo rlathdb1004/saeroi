@@ -77,7 +77,9 @@
 	<select id="_select_Inspection_option"
 		resultType="kr.or.saeroi.dto.InspectionDTO">
 		SELECT
+		insp_id,
 		prod_id,
+		doc_no,
 		item_name,
 		product_lot,
 		emp_id,
@@ -86,74 +88,101 @@
 		FROM (
 		SELECT
 		option_data.*,
-		ROW_NUMBER() OVER (ORDER BY option_data.option_name) AS
-		rn
+		ROW_NUMBER() OVER (ORDER BY
+		option_data.option_name) AS rn
 		FROM (
 		<choose>
 			<when test="searchType == 'itemName'">
 				SELECT
+				NULL AS insp_id,
 				MIN(p.prod_id) AS prod_id,
-				it.item_name AS
-				item_name,
+				NULL
+				AS doc_no,
+				it.item_name AS item_name,
 				NULL AS product_lot,
-				NULL AS emp_id,
-				NULL AS ename,
 				NULL AS
-				result,
+				emp_id,
+				NULL AS ename,
+				NULL AS result,
 				it.item_name AS option_name
-				FROM production p,
+				FROM
+				production p,
 				work_order w,
 				production_plan pr,
 				item it
-				WHERE p.order_id = w.order_id
-				AND
-				w.prod_plan_id = pr.prod_plan_id
-				AND pr.item_id = it.item_id
-				GROUP BY
-				it.item_name
+				WHERE p.order_id
+				= w.order_id
+				AND w.prod_plan_id = pr.prod_plan_id
+				AND pr.item_id =
+				it.item_id
+				GROUP BY it.item_name
 			</when>
 
 			<when test="searchType == 'ename'">
 				SELECT
+				NULL AS insp_id,
 				NULL AS prod_id,
+				NULL AS doc_no,
 				NULL AS item_name,
-				NULL AS
-				product_lot,
+				NULL AS product_lot,
 				e.emp_id AS emp_id,
-				e.ename AS ename,
+				e.ename AS
+				ename,
 				NULL AS result,
 				e.ename AS option_name
 				FROM emp e
-				WHERE e.dept = UNISTR('\D488\C9C8')
+				WHERE e.dept =
+				UNISTR('\D488\C9C8')
 				AND e.ename IS NOT NULL
 			</when>
 
 			<when test="searchType == 'result'">
 				SELECT
+				NULL AS insp_id,
 				NULL AS prod_id,
+				NULL AS doc_no,
 				NULL AS item_name,
-				NULL AS
-				product_lot,
+				NULL AS product_lot,
 				NULL AS emp_id,
 				NULL AS ename,
 				i.result AS result,
 				i.result AS option_name
 				FROM inspection i
-				WHERE i.result IS NOT NULL
+				WHERE
+				i.result IS NOT NULL
 				GROUP BY i.result
+			</when>
+
+			<when test="searchType == 'docNo'">
+				SELECT
+				i.insp_id AS insp_id,
+				NULL AS prod_id,
+				i.doc_no
+				AS doc_no,
+				NULL AS item_name,
+				NULL AS product_lot,
+				NULL AS emp_id,
+				NULL
+				AS ename,
+				NULL AS result,
+				i.doc_no AS option_name
+				FROM inspection i
+				WHERE i.doc_no IS NOT NULL
 			</when>
 
 			<otherwise>
 				SELECT
+				NULL AS insp_id,
 				NULL AS prod_id,
-				NULL AS item_name,
-				NULL AS
-				product_lot,
+				NULL AS doc_no,
+				NULL
+				AS item_name,
+				NULL AS product_lot,
 				NULL AS emp_id,
 				NULL AS ename,
-				NULL AS result,
-				NULL AS
-				option_name
+				NULL
+				AS result,
+				NULL AS option_name
 				FROM dual
 			</otherwise>
 		</choose>
@@ -161,8 +190,7 @@
 		WHERE option_data.option_name IS NOT NULL
 		)
 		WHERE rn
-		BETWEEN ((#{optionPage}
-		- 1) * #{optionSize} + 1)
+		BETWEEN ((#{optionPage} - 1) * #{optionSize} + 1)
 		AND (#{optionPage} *
 		#{optionSize})
 	</select>
@@ -288,14 +316,15 @@
 		d.defect_id,
 		dl.insp_id,
 		d.defect_code,
-		dl.defect_date,
+		TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS defect_date,
 		it.item_name,
 		w.product_lot,
 		d.defect_name,
 		e.ename,
 		dl.defect_qty,
 		dl.remark
-		FROM defect_list dl,
+		FROM
+		defect_list dl,
 		defect d,
 		inspection i,
 		production p,
@@ -304,15 +333,19 @@
 		item it,
 		emp e
 		WHERE dl.defect_id = d.defect_id
-		AND dl.insp_id = i.insp_id
+		AND
+		dl.insp_id = i.insp_id
 		AND i.prod_id = p.prod_id
-		AND p.order_id = w.order_id
+		AND p.order_id =
+		w.order_id
 		AND w.prod_plan_id = pr.prod_plan_id
-		AND pr.item_id = it.item_id
+		AND pr.item_id =
+		it.item_id
 		AND i.emp_id = e.emp_id
 
 		<if test="startDate != null and startDate != ''">
-			AND dl.defect_date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+			AND dl.defect_date &gt;= TO_DATE(#{startDate},
+			'YYYY-MM-DD')
 		</if>
 
 		<if test="endDate != null and endDate != ''">
@@ -344,8 +377,10 @@
 				<otherwise>
 					AND (
 					d.defect_code LIKE '%' || #{keyword} || '%'
-					OR it.item_name LIKE '%' || #{keyword} || '%'
-					OR w.product_lot LIKE '%' || #{keyword} || '%'
+					OR
+					it.item_name LIKE '%' || #{keyword} || '%'
+					OR w.product_lot LIKE '%'
+					|| #{keyword} || '%'
 					OR d.defect_name LIKE '%' || #{keyword} || '%'
 					OR e.ename LIKE '%' || #{keyword} || '%'
 					)
@@ -354,5 +389,92 @@
 		</if>
 
 		ORDER BY dl.defect_list_id DESC
+	</select>
+	<!-- 불량 등록 -->
+	<insert id="_insert_defect" parameterType="map">
+		INSERT INTO
+		defect_list (
+		defect_list_id,
+		defect_id,
+		insp_id,
+		defect_date,
+		defect_qty,
+		remark,
+		created_date,
+		updated_date
+		)
+		VALUES (
+		(SELECT
+		NVL(MAX(defect_list_id), 0) + 1 FROM defect_list),
+		TO_NUMBER(#{defect_id}),
+		TO_NUMBER(#{insp_id}),
+		TO_DATE(#{defect_date},
+		'YYYY-MM-DD'),
+		TO_NUMBER(#{defect_qty}),
+		#{remark},
+		SYSDATE,
+		SYSDATE
+		)
+	</insert>
+
+	<!-- 불량명 옵션 -->
+	<select id="_select_Defect_option"
+		resultType="kr.or.saeroi.dto.DefectDTO">
+		SELECT
+		defect_id,
+		defect_name
+		FROM defect
+		WHERE defect_name IS
+		NOT NULL
+		ORDER BY defect_name
+	</select>
+
+	<delete id="_delete_Defect" parameterType="map">
+		DELETE FROM defect_list
+		WHERE defect_list_id IN
+		<foreach collection="defect_list_id" item="id" open="("
+			separator="," close=")">
+			TO_NUMBER(#{id})
+		</foreach>
+	</delete>
+
+	<select id="_select_Defect_detail"
+		resultType="kr.or.saeroi.dto.DefectDTO">
+		SELECT
+		dl.defect_list_id,
+		d.defect_id,
+		dl.insp_id,
+		i.doc_no AS
+		insp_doc_no,
+		d.defect_code,
+		TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS
+		defect_date,
+		it.item_name,
+		w.product_lot,
+		d.defect_name,
+		e.ename,
+		dl.defect_qty,
+		dl.remark
+		FROM
+		defect_list dl,
+		defect d,
+		inspection i,
+		production p,
+		work_order w,
+		production_plan pr,
+		item it,
+		emp e
+		WHERE
+		dl.defect_id = d.defect_id
+		AND dl.insp_id = i.insp_id
+		AND i.prod_id =
+		p.prod_id
+		AND p.order_id = w.order_id
+		AND w.prod_plan_id =
+		pr.prod_plan_id
+		AND pr.item_id = it.item_id
+		AND i.emp_id = e.emp_id
+		AND
+		dl.defect_list_id = TO_NUMBER(#{defect_list_id})
 	</select>
 </mapper>

@@ -8,6 +8,7 @@ import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -29,7 +30,7 @@ public class EquipmentController {
     @RequestMapping(value = "/equipment/equipment", method = RequestMethod.GET)
     public String eqp(
             @RequestParam(value = "page", defaultValue = "1") int page,
-            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "size", defaultValue = "5") int size,
             @RequestParam(value = "searchType", defaultValue = "all") String searchType,
             @RequestParam(value = "keyword", defaultValue = "") String keyword,
             HttpSession session,
@@ -40,7 +41,8 @@ public class EquipmentController {
         }
 
         List<EquipmentDTO> list;
-        model.addAttribute("clientList",equipmentDAO.getClientList());
+        model.addAttribute("clientList",equipmentDAO.get_client_list());
+        model.addAttribute("lineList", equipmentDAO.get_line_list());
         
         if (keyword == null || keyword.trim().isEmpty()) {
             list = equipmentService.eqp_list();
@@ -102,4 +104,33 @@ public class EquipmentController {
 
         return "redirect:/equipment/equipment";
     }
+    
+    @GetMapping("/equipment/detail")
+    public String equipmentDetail(
+    		@RequestParam("equip_id") String equip_id, 
+    		 @RequestParam(required = false) String mode,
+    		Model model) {
+
+        EquipmentDTO dto = equipmentService.get_equipment_detail(equip_id);
+        
+        
+        model.addAttribute("clientList",equipmentDAO.get_client_list());
+        model.addAttribute("lineList", equipmentDAO.get_line_list());
+
+        model.addAttribute("eqp", dto);
+        model.addAttribute("mode", mode);
+
+        return "master/equipmentDetail.tiles"; 
+    }
+    
+    
+    @PostMapping("/equipment/update")
+    public String updateEquipment(EquipmentDTO dto) {
+
+    	dto.setEquip_loc(dto.getLine_id() + "라인");
+        equipmentService.update_equipment(dto);
+
+        return "redirect:/equipment/detail?equip_id=" + dto.getEquip_id();
+    }
+   
 }

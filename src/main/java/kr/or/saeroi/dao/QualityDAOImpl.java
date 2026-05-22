@@ -145,4 +145,54 @@ public class QualityDAOImpl implements QualityDAO {
 
 		return defect_list;
 	}
+
+	// 불량 등록
+	@Override
+	public int _dao_insert_defect(String defect_date, String insp_id, String defect_id, String defect_qty,
+			String remark) {
+
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("defect_date", defect_date);
+		param.put("insp_id", insp_id);
+		param.put("defect_id", defect_id);
+		param.put("defect_qty", defect_qty);
+		param.put("remark", remark);
+
+		int insert_result = sqlSession.insert("mapper.quality._insert_defect", param);
+
+		return insert_result;
+	}
+
+	// 불량 모달 옵션
+	@Override
+	public List<DefectDTO> _dao_select_Defect_option() {
+
+		List<DefectDTO> defect_option_list = sqlSession.selectList("mapper.quality._select_Defect_option");
+
+		return defect_option_list;
+	}
+
+	// 불량 삭제
+	@Override
+	public int _dao_delete_defect(String[] defect_list_id) {
+		// 삭제도 2개 필요
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("defect_list_id", defect_list_id);
+
+		int delete_result = sqlSession.delete("mapper.quality._delete_Defect", param);
+
+		return delete_result;
+	}
+
+	@Override
+	public DefectDTO _dao_select_Defect_detail(String defect_list_id) {
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("defect_list_id", defect_list_id);
+
+		DefectDTO defect_detail = sqlSession.selectOne("mapper.quality._select_Defect_detail", param);
+
+		return defect_detail;
+	}
 }
