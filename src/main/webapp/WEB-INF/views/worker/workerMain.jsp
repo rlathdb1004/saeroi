@@ -25,7 +25,7 @@
 
 			</div>
 
-			<div class="workerLogoText">
+			<div class="workerLogoText"> 
 
 				MES 작업자 화면
 
@@ -238,9 +238,10 @@
 
 			<!-- =============================================
 				생산실적 등록 카드
+				작업자 전용 생산실적 페이지 이동
 			============================================= -->
 			<div class="workerCard"
-				onclick="location.href='${pageContext.request.contextPath}/production/productionresult'"
+				onclick="location.href='${pageContext.request.contextPath}/worker/productionresult'"
 				style="cursor:pointer;">
 
 				<div class="workerIconCircle">
@@ -268,9 +269,12 @@
 
 				</p>
 
+				<!-- =========================================
+					버튼 클릭 시 작업자 생산실적 이동
+				========================================= -->
 				<button type="button"
 					class="workerMoveBtn"
-					onclick="location.href='${pageContext.request.contextPath}/production/productionresult'">
+					onclick="location.href='${pageContext.request.contextPath}/worker/productionresult'">
 
 					→
 
