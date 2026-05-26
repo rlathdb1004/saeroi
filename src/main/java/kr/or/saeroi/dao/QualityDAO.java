@@ -47,4 +47,10 @@ public interface QualityDAO {
 	//불량 업데이트
 	int _dao_update_Defect(String defect_list_id, String defect_date, String defect_id, String defect_qty,
 			String remark);
+	
+	// 불량 조치 내역 조회
+	List<DefectDTO> _dao_select_Defect_action(String defect_list_id);
+
+	// 불량 조치 내역 등록
+	int _dao_insert_Defect_action(String defect_list_id, String action_date, String emp_id, String action_content);
 }
