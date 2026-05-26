@@ -469,10 +469,6 @@ public class InoutDAOImpl implements InoutDAO {
 			ResultSet rs =
 					pstmt.executeQuery();
 
-			// =========================================================
-			// 상세 데이터 저장
-			// =========================================================
-
 			if (rs.next()) {
 
 				dto = new InoutDTO();
@@ -545,10 +541,6 @@ public class InoutDAOImpl implements InoutDAO {
 			Connection conn =
 					getConnection();
 
-			// =====================================================
-			// 입출고 수정 SQL
-			// =====================================================
-
 			String sql = "";
 
 			sql += " UPDATE MATERIAL_INOUT ";
@@ -563,10 +555,6 @@ public class InoutDAOImpl implements InoutDAO {
 					conn.prepareStatement(sql);
 
 			int idx = 1;
-
-			// =====================================================
-			// 수정 데이터 바인딩
-			// =====================================================
 
 			pstmt.setString(
 					idx++,
@@ -584,17 +572,9 @@ public class InoutDAOImpl implements InoutDAO {
 					idx++,
 					dto.getRemark());
 
-			// =====================================================
-			// 수정할 입출고번호
-			// =====================================================
-
 			pstmt.setInt(
 					idx++,
 					dto.getInoutId());
-
-			// =====================================================
-			// 수정 실행
-			// =====================================================
 
 			result =
 					pstmt.executeUpdate();
@@ -611,9 +591,178 @@ public class InoutDAOImpl implements InoutDAO {
 	}
 
 	// =============================================================
-	// 이하 기존 코드 그대로 유지
+	// 추가
+	// 등록 모달 품목 목록 조회
+	// 품목명이 안뜨던 문제 해결
 	// =============================================================
+	@Override
+	public List<InoutDTO> selectItemList() {
 
+		List<InoutDTO> list =
+				new ArrayList<InoutDTO>();
+
+		try {
+
+			Connection conn =
+					getConnection();
+
+			// =====================================================
+			// ITEM 테이블 품목 조회
+			// =====================================================
+
+			String sql = "";
+
+			sql += " SELECT ";
+			sql += "     ITEM_ID, ";
+			sql += "     ITEM_NAME ";
+			sql += " FROM ITEM ";
+			sql += " ORDER BY ITEM_NAME ASC ";
+
+			PreparedStatement pstmt =
+					conn.prepareStatement(sql);
+
+			ResultSet rs =
+					pstmt.executeQuery();
+
+			// =====================================================
+			// 품목 DTO 저장
+			// =====================================================
+
+			while (rs.next()) {
+
+				InoutDTO dto =
+						new InoutDTO();
+
+				dto.setItemId(
+						rs.getInt("ITEM_ID"));
+
+				dto.setItemName(
+						rs.getString("ITEM_NAME"));
+
+				list.add(dto);
+			}
+
+			rs.close();
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return list;
+	}
+
+	// =============================================================
+	// 입출고 등록
+	// =============================================================
+	@Override
+	public int insertInout(InoutDTO dto) {
+
+		int result = 0;
+
+		try {
+
+			Connection conn =
+					getConnection();
+
+			String sql = "";
+
+			sql += " INSERT INTO MATERIAL_INOUT ( ";
+			sql += "     INOUT_ID, ";
+			sql += "     ITEM_ID, ";
+			sql += "     INOUT_TYPE, ";
+			sql += "     INOUT_QTY, ";
+			sql += "     INOUT_DATE, ";
+			sql += "     REMARK ";
+			sql += " ) VALUES ( ";
+			sql += "     SEQ_MATERIAL_INOUT.NEXTVAL, ";
+			sql += "     ?, ?, ?, ?, ? ";
+			sql += " ) ";
+
+			PreparedStatement pstmt =
+					conn.prepareStatement(sql);
+
+			pstmt.setInt(
+					1,
+					dto.getItemId());
+
+			pstmt.setString(
+					2,
+					dto.getInoutType());
+
+			pstmt.setInt(
+					3,
+					dto.getInoutQty());
+
+			pstmt.setDate(
+					4,
+					dto.getInoutDate());
+
+			pstmt.setString(
+					5,
+					dto.getRemark());
+
+			result =
+					pstmt.executeUpdate();
+
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	// =============================================================
+	// 선택 삭제
+	// =============================================================
+	@Override
+	public int deleteInout(String[] inoutIds) {
+
+		int result = 0;
+
+		try {
+
+			Connection conn =
+					getConnection();
+
+			String sql = "";
+
+			sql += " DELETE FROM MATERIAL_INOUT ";
+			sql += " WHERE INOUT_ID = ? ";
+
+			PreparedStatement pstmt =
+					conn.prepareStatement(sql);
+
+			for (String id : inoutIds) {
+
+				pstmt.setInt(
+						1,
+						Integer.parseInt(id));
+
+				result +=
+						pstmt.executeUpdate();
+			}
+
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return result;
+	}
+
+	// =============================================================
+	// 입출고 개수 조회
+	// =============================================================
 	@Override
 	public int selectInoutCount(
 			String searchType,
@@ -622,24 +771,11 @@ public class InoutDAOImpl implements InoutDAO {
 			String startDate,
 			String endDate) {
 
-		return 0;
-	}
-
-	@Override
-	public List<InoutDTO> selectItemList() {
-
-		return null;
-	}
-
-	@Override
-	public int insertInout(InoutDTO dto) {
-
-		return 0;
-	}
-
-	@Override
-	public int deleteInout(String[] inoutIds) {
-
-		return 0;
+		return selectInoutList(
+				searchType,
+				inoutType,
+				keyword,
+				startDate,
+				endDate).size();
 	}
 }

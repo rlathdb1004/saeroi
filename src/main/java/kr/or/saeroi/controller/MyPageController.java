@@ -71,18 +71,11 @@ public class MyPageController {
 
 	    if (result > 0) {
 
-	        loginUser.setEmail(email);
-	        loginUser.setEmp_tel(emp_tel);
-	        if (emp_pw != null && !emp_pw.trim().isEmpty()) {
-	        	if (!emp_pw.equals(emp_pw_confirm)) {
-	        		loginUser.setEmp_pw(dto.getEmp_pw());
-	        	}
-	        }
-
-	        session.setAttribute("loginUser", loginUser);
-
+	    	LoginDTO updatedUser = loginService.find_empno(loginUser.getEmpno());
+	        session.setAttribute("loginUser", updatedUser);
+	        
 	        redirectAttributes.addFlashAttribute("successMsg","회원정보가 수정되었습니다.");
-
+	        
 	    } else {
 	        redirectAttributes.addFlashAttribute("errorMsg","회원정보 수정에 실패했습니다.");
 	    }
