@@ -77,6 +77,8 @@
 		<div class="coTableTop">
 			<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
 
+			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
+				or sessionScope.loginUser.role eq 'MANAGER'}">
 			<div class="search-btn-right">
 				<button type="button"
 					class="search-btn search-btn-main modal_open_btn"
@@ -106,6 +108,7 @@
 					선택 삭제
 				</button>
 			</div>
+			</c:if>
 		</div>
 
 		<div class="coTableWrap">
@@ -158,6 +161,8 @@
 
 </div>
 
+<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
+	or sessionScope.loginUser.role eq 'MANAGER'}">
 <div id="modal_insert" class="modal_wrap" aria-hidden="true">
 	<div class="modal_box" role="dialog" aria-modal="true">
 
@@ -220,6 +225,7 @@
 		</form>
 	</div>
 </div>
+</c:if>
 
 <script
 	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script>

@@ -176,8 +176,11 @@
 		
 	});
 	
-	async function loadChartData(searchType,searchItem){
-		let url = "chart_bar?searchType="+searchType+"&searchItem="+searchItem
+	async function loadChartData(searchType, searchItem) {
+		// contextPath를 포함해서 AJAX 요청 주소를 고정한다.
+		let url = "${pageContext.request.contextPath}/report/chart_bar"
+				+ "?searchType=" + encodeURIComponent(searchType)
+				+ "&searchItem=" + encodeURIComponent(searchItem);
 
 		try{
 			
@@ -241,7 +244,7 @@
       		let row = document.createElement('tr');
       		row.innerHTML = `
       			<td>\${item.계획일자}</td>
-      			<td><a href="chart?searchType=\${searchType}&searchItem=\${searchItem}&startDate=\${startDate}&endDate=\${endDate}">\${item.품목명}</a></td>
+      			<td><a href="${pageContext.request.contextPath}/report/chart?searchType=\${searchType}&searchItem=\${searchItem}&startDate=\${startDate}&endDate=\${endDate}">\${item.품목명}</a></td>
                 <td>\${Number(item.생산계획량).toLocaleString()}</td>
                 <td>\${Number(item.작업량).toLocaleString()}</td>
                 <td style="color: #FF4560; font-weight: bold;">\${Number(item.불량수량).toLocaleString()}</td>

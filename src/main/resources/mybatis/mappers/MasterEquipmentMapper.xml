@@ -1,0 +1,557 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    기준관리 > 설비관리 Mapper
+
+    기준:
+    - 사이드바 설비관리 업무 메뉴와 충돌 방지를 위해 MasterEquipment 명칭 사용
+    - DB 테이블은 equipment 사용
+    - 설비구분은 고정값이 아니라 equip_code의 prefix로 관리
+    - 신규 설비구분 prefix 직접 입력 가능
+    - 실제 DELETE 대신 use_yn = 'N' 미사용 처리
+    - 목록 컬럼 기준: PC 체크박스 포함 8개, 모바일 체크박스 포함 5개
+-->
+<mapper namespace="masterEquipment">
+
+    <!-- =========================================================
+         1. ResultMap
+         ========================================================= -->
+
+    <resultMap id="masterEquipmentResultMap"
+               type="kr.or.saeroi.dto.MasterEquipmentDTO">
+
+        <!-- equipment 기본 컬럼 -->
+        <id property="equipId" column="equip_id" />
+
+        <result property="lineId" column="line_id" />
+        <result property="clientId" column="client_id" />
+
+        <result property="equipCode" column="equip_code" />
+        <result property="equipName" column="equip_name" />
+        <result property="equipStatus" column="equip_status" />
+        <result property="equipLoc" column="equip_loc" />
+        <result property="equipPrice" column="equip_price" />
+        <result property="buyDate" column="buy_date" />
+        <result property="createdDate" column="created_date" />
+        <result property="updatedDate" column="updated_date" />
+        <result property="useYn" column="use_yn" />
+        <result property="remark" column="remark" />
+
+        <!-- equip_code에서 추출한 설비구분 prefix -->
+        <result property="equipCodePrefix" column="equip_code_prefix" />
+
+        <!-- line 조인 컬럼 -->
+        <result property="lineCode" column="line_code" />
+        <result property="lineName" column="line_name" />
+        <result property="lineStatus" column="line_status" />
+
+        <!-- client 조인 컬럼 -->
+        <result property="clientCode" column="client_code" />
+        <result property="clientName" column="client_name" />
+        <result property="clientType" column="client_type" />
+
+        <!-- 화면 표시용 컬럼 -->
+        <result property="equipStatusName" column="equip_status_name" />
+        <result property="useYnName" column="use_yn_name" />
+
+    </resultMap>
+
+
+    <resultMap id="clientResultMap"
+               type="kr.or.saeroi.dto.ClientDTO">
+
+        <id property="clientId" column="client_id" />
+
+        <result property="clientCode" column="client_code" />
+        <result property="clientName" column="client_name" />
+        <result property="clientType" column="client_type" />
+        <result property="clientAdress" column="client_adress" />
+        <result property="clientMan" column="client_man" />
+        <result property="clientTel" column="client_tel" />
+        <result property="clientDept" column="client_dept" />
+        <result property="remark" column="remark" />
+        <result property="useYn" column="use_yn" />
+
+    </resultMap>
+
+
+    <!--
+        현재 프로젝트 LineDTO는 snake_case 필드 사용:
+        private int line_id;
+        private String line_name;
+    -->
+    <resultMap id="lineResultMap"
+               type="kr.or.saeroi.dto.LineDTO">
+
+        <id property="line_id" column="line_id" />
+        <result property="line_name" column="line_name" />
+
+    </resultMap>
+
+
+    <!-- =========================================================
+         2. 공통 검색조건
+         ========================================================= -->
+
+    <sql id="masterEquipmentSearchWhere">
+
+        <where>
+
+            <if test="searchType != null and searchType != ''
+                      and searchKeyword != null and searchKeyword != ''">
+
+                <choose>
+
+                    <!-- 설비코드 검색 -->
+                    <when test="searchType == 'equipCode'">
+                        AND UPPER(e.equip_code) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 설비명 검색 -->
+                    <when test="searchType == 'equipName'">
+                        AND UPPER(e.equip_name) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 설비구분 prefix 검색 -->
+                    <when test="searchType == 'equipCodePrefix'">
+                        AND UPPER(
+                            REGEXP_REPLACE(e.equip_code, '-[0-9]{3}$', '')
+                        ) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 라인 검색 -->
+                    <when test="searchType == 'lineName'">
+                        AND (
+                            UPPER(l.line_code) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                            OR UPPER(l.line_name) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                        )
+                    </when>
+
+                    <!-- 제조사/거래처 검색 -->
+                    <when test="searchType == 'clientName'">
+                        AND (
+                            UPPER(c.client_code) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                            OR UPPER(c.client_name) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                        )
+                    </when>
+
+                    <!-- 설비상태 검색 -->
+                    <when test="searchType == 'equipStatus'">
+                        AND UPPER(e.equip_status) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 사용여부 검색 -->
+                    <when test="searchType == 'useYn'">
+                        AND (
+                            UPPER(e.use_yn) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                            OR
+                            CASE
+                                WHEN e.use_yn = 'Y' THEN '사용'
+                                WHEN e.use_yn = 'N' THEN '미사용'
+                                ELSE e.use_yn
+                            END LIKE '%' || #{searchKeyword} || '%'
+                        )
+                    </when>
+
+                </choose>
+
+            </if>
+
+        </where>
+
+    </sql>
+
+
+    <!-- =========================================================
+         3. 설비 목록 / 건수 / 상세
+         ========================================================= -->
+
+    <select id="selectMasterEquipmentList"
+            parameterType="kr.or.saeroi.dto.MasterEquipmentDTO"
+            resultMap="masterEquipmentResultMap">
+
+        SELECT
+            e.equip_id,
+            e.line_id,
+            e.client_id,
+            e.equip_code,
+            e.equip_name,
+            e.equip_status,
+            e.equip_loc,
+            e.equip_price,
+            e.buy_date,
+            e.created_date,
+            e.updated_date,
+            e.use_yn,
+            e.remark,
+
+            REGEXP_REPLACE(e.equip_code, '-[0-9]{3}$', '') AS equip_code_prefix,
+
+            l.line_code,
+            l.line_name,
+            l.line_status,
+
+            c.client_code,
+            c.client_name,
+            c.client_type,
+
+            e.equip_status AS equip_status_name,
+
+            CASE
+                WHEN e.use_yn = 'Y' THEN '사용'
+                WHEN e.use_yn = 'N' THEN '미사용'
+                ELSE e.use_yn
+            END AS use_yn_name
+
+        FROM equipment e
+
+        LEFT JOIN line l
+            ON l.line_id = e.line_id
+
+        LEFT JOIN client c
+            ON c.client_id = e.client_id
+
+        <include refid="masterEquipmentSearchWhere" />
+
+        ORDER BY
+            NVL(e.use_yn, 'Y') DESC,
+            e.equip_code
+
+    </select>
+
+
+    <select id="selectMasterEquipmentCount"
+            parameterType="kr.or.saeroi.dto.MasterEquipmentDTO"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+
+        FROM equipment e
+
+        LEFT JOIN line l
+            ON l.line_id = e.line_id
+
+        LEFT JOIN client c
+            ON c.client_id = e.client_id
+
+        <include refid="masterEquipmentSearchWhere" />
+
+    </select>
+
+
+    <select id="selectMasterEquipmentDetail"
+            parameterType="int"
+            resultMap="masterEquipmentResultMap">
+
+        SELECT
+            e.equip_id,
+            e.line_id,
+            e.client_id,
+            e.equip_code,
+            e.equip_name,
+            e.equip_status,
+            e.equip_loc,
+            e.equip_price,
+            e.buy_date,
+            e.created_date,
+            e.updated_date,
+            e.use_yn,
+            e.remark,
+
+            REGEXP_REPLACE(e.equip_code, '-[0-9]{3}$', '') AS equip_code_prefix,
+
+            l.line_code,
+            l.line_name,
+            l.line_status,
+
+            c.client_code,
+            c.client_name,
+            c.client_type,
+
+            e.equip_status AS equip_status_name,
+
+            CASE
+                WHEN e.use_yn = 'Y' THEN '사용'
+                WHEN e.use_yn = 'N' THEN '미사용'
+                ELSE e.use_yn
+            END AS use_yn_name
+
+        FROM equipment e
+
+        LEFT JOIN line l
+            ON l.line_id = e.line_id
+
+        LEFT JOIN client c
+            ON c.client_id = e.client_id
+
+        WHERE e.equip_id = #{equipId}
+
+    </select>
+
+
+    <!-- =========================================================
+         4. 설비 등록 / 수정 / 미사용 처리
+         ========================================================= -->
+
+    <insert id="insertMasterEquipment"
+            parameterType="kr.or.saeroi.dto.MasterEquipmentDTO">
+
+        <selectKey keyProperty="equipId"
+                   resultType="int"
+                   order="BEFORE">
+            SELECT NVL(MAX(equip_id), 0) + 1
+            FROM equipment
+        </selectKey>
+
+        INSERT INTO equipment (
+            equip_id,
+            line_id,
+            equip_code,
+            equip_name,
+            equip_status,
+            created_date,
+            updated_date,
+            use_yn,
+            remark,
+            client_id,
+            equip_price,
+            buy_date,
+            equip_loc
+        ) VALUES (
+            #{equipId},
+            #{lineId},
+            #{equipCode},
+            #{equipName},
+            #{equipStatus},
+            SYSDATE,
+            SYSDATE,
+            NVL(#{useYn}, 'Y'),
+            #{remark},
+            #{clientId},
+            #{equipPrice},
+            #{buyDate},
+            #{equipLoc}
+        )
+
+    </insert>
+
+
+    <update id="updateMasterEquipment"
+            parameterType="kr.or.saeroi.dto.MasterEquipmentDTO">
+
+        UPDATE equipment
+        SET
+            line_id = #{lineId},
+            equip_code = #{equipCode},
+            equip_name = #{equipName},
+            equip_status = #{equipStatus},
+            updated_date = SYSDATE,
+            use_yn = NVL(#{useYn}, 'Y'),
+            remark = #{remark},
+            client_id = #{clientId},
+            equip_price = #{equipPrice},
+            buy_date = #{buyDate},
+            equip_loc = #{equipLoc}
+        WHERE equip_id = #{equipId}
+
+    </update>
+
+
+    <update id="deleteMasterEquipmentList"
+            parameterType="java.util.List">
+
+        UPDATE equipment
+        SET
+            use_yn = 'N',
+            updated_date = SYSDATE
+        WHERE equip_id IN
+
+        <foreach collection="list"
+                 item="equipId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{equipId}
+        </foreach>
+
+    </update>
+
+
+    <select id="selectMasterEquipmentCodeCount"
+            parameterType="kr.or.saeroi.dto.MasterEquipmentDTO"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+        FROM equipment
+        WHERE UPPER(equip_code) = UPPER(#{equipCode})
+
+        <if test="equipId != null">
+            AND equip_id != #{equipId}
+        </if>
+
+    </select>
+
+
+    <!-- =========================================================
+         5. 등록/수정 화면용 기준 데이터
+         ========================================================= -->
+
+    <select id="selectLineList"
+            resultMap="lineResultMap">
+
+        SELECT
+            line_id,
+            line_name
+        FROM line
+        ORDER BY line_code
+
+    </select>
+
+
+    <select id="selectClientList"
+            resultMap="clientResultMap">
+
+        SELECT
+            client_id,
+            client_code,
+            client_name,
+            client_type,
+            client_adress,
+            client_man,
+            client_tel,
+            client_dept,
+            remark,
+            use_yn
+        FROM client
+        WHERE NVL(use_yn, 'Y') = 'Y'
+        ORDER BY
+            client_type,
+            client_code
+
+    </select>
+
+
+    <!--
+        기존 설비구분 prefix 목록 조회
+
+        예:
+        EQ-CUT-001  -> EQ-CUT
+        EQ-LAM-004  -> EQ-LAM
+        EQ-ROBOT-ARM-001 -> EQ-ROBOT-ARM
+
+        신규 prefix는 이 목록에 없어도 등록 화면에서 직접 입력 가능하다.
+    -->
+    <select id="selectEquipCodePrefixList"
+            resultType="string">
+
+        SELECT
+            equip_code_prefix
+        FROM (
+            SELECT DISTINCT
+                REGEXP_REPLACE(equip_code, '-[0-9]{3}$', '') AS equip_code_prefix
+            FROM equipment
+            WHERE equip_code IS NOT NULL
+              AND REGEXP_LIKE(equip_code, '^EQ-[A-Z0-9]+(-[A-Z0-9]+)*-[0-9]{3}$')
+        )
+        ORDER BY equip_code_prefix
+
+    </select>
+
+
+    <!-- =========================================================
+         6. 자동완성
+         ========================================================= -->
+
+    <select id="selectClientAutoComplete"
+            parameterType="map"
+            resultMap="clientResultMap">
+
+        SELECT
+            client_id,
+            client_code,
+            client_name,
+            client_type,
+            client_adress,
+            client_man,
+            client_tel,
+            client_dept,
+            remark,
+            use_yn
+        FROM client
+        WHERE NVL(use_yn, 'Y') = 'Y'
+          AND (
+                UPPER(client_code) LIKE '%' || UPPER(#{keyword}) || '%'
+                OR UPPER(client_name) LIKE '%' || UPPER(#{keyword}) || '%'
+          )
+        ORDER BY
+            client_type,
+            client_code
+
+    </select>
+
+
+    <select id="selectLineAutoComplete"
+            parameterType="map"
+            resultMap="lineResultMap">
+
+        SELECT
+            line_id,
+            line_name
+        FROM line
+        WHERE UPPER(line_name) LIKE '%' || UPPER(#{keyword}) || '%'
+        ORDER BY line_name
+
+    </select>
+
+
+    <!-- =========================================================
+         7. 설비코드 자동생성
+         ========================================================= -->
+
+    <!--
+        다음 설비코드 자동생성
+
+        예:
+        - EQ-CUT       -> EQ-CUT-005
+        - EQ-DRY       -> EQ-DRY-001
+        - EQ-ROBOT-ARM -> EQ-ROBOT-ARM-001
+
+        처리:
+        - 입력 prefix와 정확히 일치하는 기존 코드만 대상으로 한다.
+        - 마지막 3자리 숫자를 MAX + 1 처리한다.
+    -->
+    <select id="selectNextEquipCode"
+            parameterType="map"
+            resultType="string">
+
+        SELECT
+            #{equipCodePrefix}
+            || '-'
+            || LPAD(
+                NVL(
+                    MAX(
+                        TO_NUMBER(
+                            SUBSTR(equip_code, LENGTH(#{equipCodePrefix}) + 2)
+                        )
+                    ),
+                    0
+                ) + 1,
+                3,
+                '0'
+            ) AS next_equip_code
+        FROM equipment
+        WHERE equip_code LIKE #{equipCodePrefix} || '-%'
+          AND REGEXP_LIKE(
+                equip_code,
+                '^' || #{equipCodePrefix} || '-[0-9]{3}$'
+          )
+
+    </select>
+
+</mapper>

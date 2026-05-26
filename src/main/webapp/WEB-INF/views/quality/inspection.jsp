@@ -1,37 +1,29 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
+<c:set var="canManageQuality"
+	value="${sessionScope.loginUser.role eq 'ADMIN'
+		or sessionScope.loginUser.role eq 'MANAGER'}" />
+
 <div class="coPageWrap">
-	<%-- 본문 전체를 감싸는 영역이다. --%>
-
-
-	<!-- 	<link rel="stylesheet" -->
-	<%-- 		href="${pageContext.request.contextPath}/resources/css/inspection.css"> --%>
 
 	<form class="search-form" method="get"
 		action="${pageContext.request.contextPath}/quality/inspection">
-		<%-- 검색 조건들이 들어가는 영역이다. --%>
 
 		<div class="search-box">
 			<div class="search-row">
 
 				<div class="search-item">
-					<%-- 검사일자 검색 영역이다. --%>
-
 					<label class="search-label">시작일</label> <input type="date"
 						name="startDate" class="search-date" value="${startDate}">
 				</div>
 
 				<div class="search-item">
-					<%-- 검사일자 검색 영역이다. --%>
-
 					<label class="search-label">종료일</label> <input type="date"
 						name="endDate" class="search-date" value="${endDate}">
 				</div>
 
 				<div class="search-item">
-					<%-- 검색 구분 선택 영역이다. --%>
-
 					<label class="search-label">구분</label> <select name="searchType"
 						class="search-select">
 						<option value="">전체</option>
@@ -46,22 +38,15 @@
 						<option value="result"
 							<c:if test="${searchType == 'result'}">selected</c:if>>검사결과</option>
 					</select>
-
 				</div>
 
 				<div class="search-item">
-					<%-- 검색어 입력 영역이다. --%>
-
 					<label class="search-label">검색어</label> <input type="text"
 						name="keyword" class="search-input" placeholder="검색키워드"
 						value="${keyword}">
-
 				</div>
 
-				<!-- 검색, 초기화 버튼 -->
 				<div class="search-btn-wrap">
-					<%-- 검색 버튼과 초기화 버튼 영역이다. --%>
-
 					<button type="submit" class="search-btn search-btn-main">
 						<svg viewBox="0 0 24 24" fill="none">
 							<circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor"
@@ -84,68 +69,53 @@
 						</svg>
 						초기화
 					</button>
-
 				</div>
 
 			</div>
 		</div>
-
 	</form>
-	<%-- 검색 영역을 끝낸다. --%>
-
 
 	<form method="post" id="deleteForm" accept-charset="UTF-8"
 		action="${pageContext.request.contextPath}/quality/inspection/delete">
 
 		<div class="coTableTop">
-			<%-- 총 건수와 등록 버튼이 들어가는 영역이다. --%>
-
 			<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
-			<%-- DB에서 조회한 전체 데이터 개수를 보여줌 --%>
 
-			<div class="search-btn-right">
-				<button type="button"
-					class="search-btn search-btn-main modal_open_btn"
-					data_modal_target="#modal_insert">
-					<svg viewBox="0 0 24 24" fill="none">
-        <path d="M12 5V19" stroke="currentColor" stroke-width="2"
-							stroke-linecap="round">
-        </path>
+			<c:if test="${canManageQuality}">
+				<div class="search-btn-right">
+					<button type="button"
+						class="search-btn search-btn-main modal_open_btn"
+						data_modal_target="#modal_insert">
+						<svg viewBox="0 0 24 24" fill="none">
+							<path d="M12 5V19" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round"></path>
+							<path d="M5 12H19" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round"></path>
+						</svg>
+						등록
+					</button>
 
-        <path d="M5 12H19" stroke="currentColor" stroke-width="2"
-							stroke-linecap="round">
-        </path>
-    </svg>
-					등록
-				</button>
-				<!-- 			//삭제 수정 부분 -->
-				<button type="submit" class="search-btn search-btn-sub">
-					<svg viewBox="0 0 24 24" fill="none">
-        <path d="M4 7H20" stroke="currentColor" stroke-width="2"
-							stroke-linecap="round"></path>
-        <path d="M10 11V17" stroke="currentColor" stroke-width="2"
-							stroke-linecap="round"></path>
-        <path d="M14 11V17" stroke="currentColor" stroke-width="2"
-							stroke-linecap="round"></path>
-        <path d="M6 7L7 21H17L18 7" stroke="currentColor"
-							stroke-width="2" stroke-linejoin="round"></path>
-        <path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
-							stroke-linejoin="round"></path>
-    </svg>
-					선택 삭제
-				</button>
-			</div>
-
+					<button type="submit" class="search-btn search-btn-sub">
+						<svg viewBox="0 0 24 24" fill="none">
+							<path d="M4 7H20" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round"></path>
+							<path d="M10 11V17" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round"></path>
+							<path d="M14 11V17" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round"></path>
+							<path d="M6 7L7 21H17L18 7" stroke="currentColor"
+								stroke-width="2" stroke-linejoin="round"></path>
+							<path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
+								stroke-linejoin="round"></path>
+						</svg>
+						선택 삭제
+					</button>
+				</div>
+			</c:if>
 		</div>
-		<%-- 테이블 상단 영역을 끝낸다. --%>
-
 
 		<div class="coTableWrap">
-			<%-- 테이블을 감싸는 영역이다. --%>
-
 			<table class="coTable">
-				<%-- 공통 테이블 디자인을 사용하는 테이블이다. --%>
-
 				<thead>
 					<tr>
 						<th class="mobile_show checkAllHeader" style="cursor: pointer;">선택</th>
@@ -161,16 +131,16 @@
 
 				<tbody>
 					<c:forEach var="inspection" items="${list}">
-						<%-- Controller에서 보낸 검사 목록을 한 줄씩 반복 --%>
-
 						<tr>
 							<td class="mobile_show"><input type="checkbox"
 								name="insp_id" value="${inspection.insp_id}"></td>
+
 							<td class="mobile_show">${inspection.doc_no}</td>
 							<td class="mobile_hidden">${inspection.insp_date}</td>
 							<td class="coTextLeft mobile_show">${inspection.item_name}</td>
 							<td class="mobile_hidden">${inspection.product_lot}</td>
 							<td class="mobile_hidden">${inspection.ename}</td>
+
 							<td class="mobile_show"><c:choose>
 									<c:when test="${inspection.result == '조건부'}">
 										<span class="coStatus coStatusStop">${inspection.result}</span>
@@ -179,131 +149,107 @@
 										<span class="coStatus coStatusUse">${inspection.result}</span>
 									</c:otherwise>
 								</c:choose></td>
+
 							<td class="mobile_show">
 								<button type="button" class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/quality/inspection_detail?insp_id=${inspection.insp_id}'">
 									보기</button>
-
 							</td>
 						</tr>
 					</c:forEach>
 
 					<c:if test="${empty list}">
-						<%-- 조회된 검사 목록이 없을 때 보여주는 줄 --%>
-
 						<tr>
 							<td colspan="8">조회된 검사 내역이 없습니다.</td>
 						</tr>
 					</c:if>
 				</tbody>
-
-
 			</table>
-			<!-- 		//삭제 수정 부분 -->
-			<%-- 공통 테이블을 끝낸다. --%>
-
 		</div>
-		<%-- 테이블 감싸는 영역을 끝낸다. --%>
-
-
 	</form>
 
 	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
-	<%-- 공통 페이징 화면을 불러온다. --%>
 
 </div>
-<%-- 본문 전체 영역을 끝낸다. --%>
 
-<!-- 검사 등록 모달 -->
-<div id="modal_insert" class="modal_wrap" aria-hidden="true">
+<c:if test="${canManageQuality}">
+	<div id="modal_insert" class="modal_wrap" aria-hidden="true">
+		<div class="modal_box" role="dialog" aria-modal="true">
 
-	<%-- 등록 버튼을 눌렀을 때 열리는 공통 모달 배경이다. --%>
+			<div class="modal_header">
+				<h3 class="modal_title">검사 등록</h3>
+			</div>
 
-	<div class="modal_box" role="dialog" aria-modal="true">
-		<%-- 실제 모달 내용이 들어가는 영역이다. --%>
+			<form class="modal_form" method="post" accept-charset="UTF-8"
+				action="${pageContext.request.contextPath}/quality/inspection/add">
 
-		<div class="modal_header">
-			<%-- 모달 상단 제목 영역이다. --%>
+				<div class="modal_body modal_body_2col">
 
-			<h3 class="modal_title">검사 등록</h3>
+					<div class="modal_item">
+						<label class="modal_label">검사일시<span
+							class="modal_required">*</span></label> <input type="date"
+							name="insp_date" class="modal_input modal_today" required>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">품목명<span class="modal_required">*</span></label>
+						<select name="prod_id" class="modal_select" required>
+							<option value="">선택</option>
+						</select>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">검사자</label> <input type="text"
+							class="modal_input" value="${sessionScope.loginUser.ename}"
+							readonly> <input type="hidden" name="emp_id"
+							value="${sessionScope.loginUser.empno}">
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">검사구분<span
+							class="modal_required">*</span></label> <select name="insp_type"
+							class="modal_select" required>
+							<option value="">선택</option>
+						</select>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">검사결과<span
+							class="modal_required">*</span></label> <select name="result"
+							class="modal_select" required>
+							<option value="">선택</option>
+						</select>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">검사수량<span
+							class="modal_required">*</span></label> <input type="number"
+							name="inspection_qty" class="modal_input" min="0" required>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">양품수량<span
+							class="modal_required">*</span></label> <input type="number"
+							name="good_qty" class="modal_input" min="0" required>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">비고</label> <input type="text"
+							name="remark" class="modal_input">
+					</div>
+				</div>
+
+				<div class="modal_footer">
+					<button type="button"
+						class="modal_btn modal_btn_cancel modal_close_btn">취소</button>
+
+					<button type="submit" class="modal_btn modal_btn_submit">등록</button>
+				</div>
+
+			</form>
 		</div>
-
-		<form class="modal_form" method="post" accept-charset="UTF-8"
-			action="${pageContext.request.contextPath}/quality/inspection/add">
-			<%-- 등록 정보를 입력하는 영역이다. --%>
-
-			<div class="modal_body modal_body_2col">
-
-				<div class="modal_item">
-					<label class="modal_label"> 검사일시<span
-						class="modal_required">*</span>
-					</label> <input type="date" name="insp_date"
-						class="modal_input modal_today" required>
-				</div>
-
-				<div class="modal_item">
-					<label class="modal_label"> 품목명<span class="modal_required">*</span>
-					</label> <select name="prod_id" class="modal_select" required>
-						<option value="">선택</option>
-					</select>
-				</div>
-
-				<div class="modal_item">
-					<label class="modal_label">검사자</label> <input type="text"
-						class="modal_input" value="${sessionScope.loginUser.ename}"
-						readonly> <input type="hidden" name="emp_id"
-						value="${sessionScope.loginUser.empno}">
-				</div>
-				<div class="modal_item">
-					<label class="modal_label"> 검사구분<span
-						class="modal_required">*</span>
-					</label> <select name="insp_type" class="modal_select" required>
-						<option value="">선택</option>
-					</select>
-				</div>
-
-				<div class="modal_item">
-					<label class="modal_label"> 검사결과<span
-						class="modal_required">*</span>
-					</label> <select name="result" class="modal_select" required>
-						<option value="">선택</option>
-					</select>
-				</div>
-
-				<div class="modal_item">
-					<label class="modal_label"> 검사수량<span
-						class="modal_required">*</span>
-					</label> <input type="number" name="inspection_qty" class="modal_input"
-						min="0" required>
-				</div>
-
-				<div class="modal_item">
-					<label class="modal_label"> 양품수량<span
-						class="modal_required">*</span>
-					</label> <input type="number" name="good_qty" class="modal_input" min="0"
-						required>
-				</div>
-
-				<div class="modal_item">
-					<label class="modal_label">비고</label> <input name="remark"
-						class="modal_select"> </input>
-				</div>
-			</div>
-
-			<div class="modal_footer">
-				<%-- 취소 버튼은 모달을 닫는 역할을 한다. --%>
-
-				<button type="button"
-					class="modal_btn modal_btn_cancel modal_close_btn">취소</button>
-
-				<button type="submit" class="modal_btn modal_btn_submit">
-					등록</button>
-			</div>
-
-		</form>
 	</div>
-</div>
-
+</c:if>
 
 <script
 	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script>

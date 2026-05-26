@@ -10,6 +10,41 @@
 	white-space: pre-line;
 	line-height: 1.7;
 }
+
+.notice_content_textarea {
+	width: 100%;
+	min-height: 220px;
+	resize: vertical;
+}
+
+.notice_file_area {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	min-height: 42px;
+	padding: 0 12px;
+	border: 1px solid #4f8068;
+	border-radius: 6px;
+	background-color: #f8fffb;
+	box-sizing: border-box;
+}
+
+.notice_file_link {
+	color: #12362b;
+	font-size: 14px;
+	font-weight: 600;
+	text-decoration: none;
+}
+
+.notice_file_link:hover {
+	text-decoration: underline;
+}
+
+.notice_file_empty {
+	color: #6b7280;
+	font-size: 14px;
+}
 </style>
 
 <div class="detail_page">
@@ -23,7 +58,8 @@
 		<div class="detail_btn_area">
 
 			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
-				or sessionScope.loginUser.role eq 'MANAGER'}">
+				or (sessionScope.loginUser.role eq 'MANAGER'
+				and sessionScope.loginUser.empno eq notice.empno)}">
 
 				<button type="button" class="detail_btn_green" id="editBtn">
 					수정
@@ -91,6 +127,7 @@
 						<th>제목</th>
 						<td colspan="3">
 							<span class="viewMode">${notice.title}</span>
+
 							<input type="text" name="title" class="detailInput editMode"
 								value="${notice.title}" style="display: none;" required>
 						</td>
@@ -120,8 +157,29 @@
 							</div>
 
 							<textarea name="content"
-								class="detailInput notice_content_box editMode"
+								class="detailInput notice_content_textarea editMode"
 								style="display: none;" required>${notice.content}</textarea>
+						</td>
+					</tr>
+
+					<tr>
+						<th>첨부파일</th>
+						<td colspan="3">
+							<div class="notice_file_area">
+								<c:choose>
+									<c:when test="${not empty noticeFile.file_path}">
+										<a class="notice_file_link"
+											href="${pageContext.request.contextPath}${noticeFile.file_path}"
+											download="${noticeFile.file_title}">
+											${noticeFile.file_title}
+										</a>
+									</c:when>
+
+									<c:otherwise>
+										<span class="notice_file_empty">첨부파일 없음</span>
+									</c:otherwise>
+								</c:choose>
+							</div>
 						</td>
 					</tr>
 
@@ -129,6 +187,7 @@
 						<th>비고</th>
 						<td colspan="3">
 							<span class="viewMode">${notice.remark}</span>
+
 							<input type="text" name="remark" class="detailInput editMode"
 								value="${notice.remark}" style="display: none;">
 						</td>

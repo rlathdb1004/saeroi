@@ -2,6 +2,8 @@ package kr.or.saeroi.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import kr.or.saeroi.common.PageDTO;
 import kr.or.saeroi.dto.DefectDTO;
 import kr.or.saeroi.dto.InspectionDTO;
+import kr.or.saeroi.dto.LoginDTO;
 import kr.or.saeroi.service.QualityService;
 
 @Controller
@@ -22,6 +25,11 @@ public class QualityController {
 //	컨트롤러에 서비스 파일 주입 받기
 	@Autowired
 	QualityService qualityService;
+
+	// 품질관리 등록, 수정, 삭제 권한 확인
+	private boolean canManageQuality(LoginDTO loginUser) {
+		return loginUser != null && ("ADMIN".equals(loginUser.getRole()) || "MANAGER".equals(loginUser.getRole()));
+	}
 
 	@RequestMapping("/inspection")
 	public String inspection(Model model, @RequestParam(defaultValue = "1") int page,
@@ -103,11 +111,17 @@ public class QualityController {
 	// 등록 메서드(등록 post 방식 추가)
 	// redirect: DB에 저장하고 다시 목록 페이지로 이동시키기 위해서
 	@RequestMapping(value = "/inspection/add", method = RequestMethod.POST)
-	public String inspection_add(Model model, @RequestParam(required = false) String insp_date,
+	public String inspection_add(Model model, HttpSession session, @RequestParam(required = false) String insp_date,
 			@RequestParam(required = false) String prod_id, @RequestParam(required = false) String emp_id,
 			@RequestParam(required = false) String insp_type, @RequestParam(required = false) String result,
 			@RequestParam(required = false) String inspection_qty, @RequestParam(required = false) String good_qty,
 			@RequestParam(required = false) String remark) {
+
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		if (!canManageQuality(loginUser)) {
+			return "redirect:/quality/inspection";
+		}
 
 		int insert_result = qualityService._ser_insert_Inspection(insp_date, prod_id, emp_id, insp_type, result,
 				inspection_qty, good_qty, remark);
@@ -121,7 +135,14 @@ public class QualityController {
 	// 삭제 시 검사 번호만
 	@RequestMapping(value = "/inspection/delete", method = RequestMethod.POST)
 	// 검사번호를 여러 개(선택 시) 받을 수 있으므로 String[] 로 받음
-	public String inspection_delete(Model model, @RequestParam(value = "insp_id", required = false) String[] insp_id) {
+	public String inspection_delete(Model model, HttpSession session,
+			@RequestParam(value = "insp_id", required = false) String[] insp_id) {
+
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		if (!canManageQuality(loginUser)) {
+			return "redirect:/quality/inspection";
+		}
 
 		if (insp_id != null) {
 			// 어떤 행을 지울지만 필요함
@@ -164,10 +185,16 @@ public class QualityController {
 	// 업데이트 메서드
 	// 검사 수정
 	@RequestMapping(value = "/inspection/update", method = RequestMethod.POST)
-	public String inspection_update(Model model, @RequestParam(required = false) String insp_id,
+	public String inspection_update(Model model, HttpSession session, @RequestParam(required = false) String insp_id,
 			@RequestParam(required = false) String insp_date, @RequestParam(required = false) String insp_type,
 			@RequestParam(required = false) String result, @RequestParam(required = false) String inspection_qty,
 			@RequestParam(required = false) String good_qty, @RequestParam(required = false) String remark) {
+
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		if (!canManageQuality(loginUser)) {
+			return "redirect:/quality/inspection_detail?insp_id=" + insp_id;
+		}
 
 		int update_result = qualityService._ser_update_Inspection(insp_id, insp_date, insp_type, result, inspection_qty,
 				good_qty, remark);
@@ -250,9 +277,15 @@ public class QualityController {
 
 //	//불량관리 등록 메서드
 	@RequestMapping(value = "/defect/add", method = RequestMethod.POST)
-	public String defect_add(Model model, @RequestParam(required = false) String defect_date,
+	public String defect_add(Model model, HttpSession session, @RequestParam(required = false) String defect_date,
 			@RequestParam(required = false) String insp_id, @RequestParam(required = false) String defect_id,
 			@RequestParam(required = false) String defect_qty, @RequestParam(required = false) String remark) {
+
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		if (!canManageQuality(loginUser)) {
+			return "redirect:/quality/defect";
+		}
 
 		int defect_add_result = qualityService._ser_add_defect(defect_date, insp_id, defect_id, defect_qty, remark);
 
@@ -263,8 +296,14 @@ public class QualityController {
 
 	// 불량관리 삭제 메서드
 	@RequestMapping(value = "/defect/delete", method = RequestMethod.POST)
-	public String defect_delete(Model model,
+	public String defect_delete(Model model, HttpSession session,
 			@RequestParam(value = "defect_list_id", required = false) String[] defect_list_id) {
+
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		if (!canManageQuality(loginUser)) {
+			return "redirect:/quality/defect";
+		}
 
 		if (defect_list_id != null && defect_list_id.length > 0) {
 			int defect_delete_result = qualityService._ser_delete_defect(defect_list_id);
@@ -281,21 +320,53 @@ public class QualityController {
 
 		DefectDTO defect = qualityService._ser_select_Defect_detail(defect_list_id);
 
+		List<DefectDTO> defectActionList = qualityService._ser_select_Defect_action(defect_list_id);
+
+		System.out.println("defect_detail defect_list_id: " + defect_list_id);
+		System.out.println("defect_detail action 건수: " + defectActionList.size());
+
 		model.addAttribute("defect", defect);
+		model.addAttribute("defectActionList", defectActionList);
 
 		return "quality/defect_detail.tiles";
 	}
 
-	//불량관리 업데이트 메서드
+	// 불량관리 업데이트 메서드
 	@RequestMapping(value = "/defect/update", method = RequestMethod.POST)
-	public String defect_update(Model model, @RequestParam(required = false) String defect_list_id,
+	public String defect_update(Model model, HttpSession session, @RequestParam(required = false) String defect_list_id,
 			@RequestParam(required = false) String defect_date, @RequestParam(required = false) String defect_id,
 			@RequestParam(required = false) String defect_qty, @RequestParam(required = false) String remark) {
+
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		if (!canManageQuality(loginUser)) {
+			return "redirect:/quality/defect_detail?defect_list_id=" + defect_list_id;
+		}
 
 		int defect_update_result = qualityService._ser_update_Defect(defect_list_id, defect_date, defect_id, defect_qty,
 				remark);
 
 		System.out.println("defect_update_result: " + defect_update_result);
+
+		return "redirect:/quality/defect_detail?defect_list_id=" + defect_list_id;
+	}
+
+	// 불량 조치 내역 등록
+	@RequestMapping(value = "/defect/action/add", method = RequestMethod.POST)
+	public String defect_action_add(Model model, HttpSession session,
+			@RequestParam(required = false) String defect_list_id, @RequestParam(required = false) String action_date,
+			@RequestParam(required = false) String emp_id, @RequestParam(required = false) String action_content) {
+
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		if (!canManageQuality(loginUser)) {
+			return "redirect:/quality/defect_detail?defect_list_id=" + defect_list_id;
+		}
+
+		int insert_result = qualityService._ser_insert_Defect_action(defect_list_id, action_date, emp_id,
+				action_content);
+
+		System.out.println("defect_action_insert_result: " + insert_result);
 
 		return "redirect:/quality/defect_detail?defect_list_id=" + defect_list_id;
 	}

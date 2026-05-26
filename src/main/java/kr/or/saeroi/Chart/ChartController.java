@@ -18,7 +18,7 @@ public class ChartController {
 	@Autowired
 	ChartService chartService;
 	
-	@RequestMapping("/productionreport")
+	@RequestMapping({"", "/", "/productionreport"})
 	public String productionreport(Model model) {
 		
 		List<Map<String,Object>> item = chartService.itemList();

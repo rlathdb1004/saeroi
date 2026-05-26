@@ -37,7 +37,7 @@ public class EquipmentController {
             Model model) {
 
         if (session.getAttribute("loginUser") == null) {
-            return "redirect:/";
+            return "redirect:/login";
         }
 
         List<EquipmentDTO> list;

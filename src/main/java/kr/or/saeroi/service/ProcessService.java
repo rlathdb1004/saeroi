@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.or.saeroi.dao.ProcessDAO;
 import kr.or.saeroi.dto.ItemDTO;
@@ -21,9 +22,6 @@ import kr.or.saeroi.dto.ProcessDetailDTO;
  * - 공정 이미지/공정상세 설명 목록, 등록, 수정, 삭제를 처리한다.
  * - 완제품/설비 선택 목록을 처리한다.
  *
- * 메뉴:
- * - 기준정보관리 > 공정관리
- *
  * 기준:
  * - 품목관리 ItemService 구조 기준
  * - BOM관리 BomService 구조 기준
@@ -32,9 +30,6 @@ import kr.or.saeroi.dto.ProcessDetailDTO;
 @Service
 public class ProcessService {
 
-    /**
-     * 공정관리 DAO
-     */
     @Autowired
     private ProcessDAO processDAO;
 
@@ -46,7 +41,7 @@ public class ProcessService {
     /**
      * 공정 목록 조회
      *
-     * @param processDTO 검색조건(searchType, searchKeyword)을 담은 DTO
+     * @param processDTO 검색조건 DTO
      * @return 공정 목록
      */
     public List<ProcessDTO> getProcessList(ProcessDTO processDTO) {
@@ -64,8 +59,8 @@ public class ProcessService {
     /**
      * 공정 목록 총 건수 조회
      *
-     * @param processDTO 검색조건(searchType, searchKeyword)을 담은 DTO
-     * @return 검색조건에 맞는 공정 총 건수
+     * @param processDTO 검색조건 DTO
+     * @return 총 건수
      */
     public int getProcessCount(ProcessDTO processDTO) {
         return processDAO.selectProcessCount(processDTO);
@@ -76,7 +71,7 @@ public class ProcessService {
      * 공정 상세 조회
      *
      * @param procId 공정 ID
-     * @return 공정 상세 정보
+     * @return 공정 상세
      */
     public ProcessDTO getProcessDetail(int procId) {
 
@@ -97,7 +92,7 @@ public class ProcessService {
      *
      * 처리 흐름:
      * 1. 필수값 검증
-     * 2. 공정코드 중복검사
+     * 2. item_id + proc_code 조합 중복검사
      * 3. 공정 등록
      *
      * 반환값:
@@ -109,6 +104,7 @@ public class ProcessService {
      * @param processDTO 등록할 공정 정보
      * @return 등록 처리 결과
      */
+    @Transactional
     public int addProcess(ProcessDTO processDTO) {
 
         String validateMessage = validateProcess(processDTO);
@@ -133,7 +129,7 @@ public class ProcessService {
      * 처리 흐름:
      * 1. 공정 ID 확인
      * 2. 필수값 검증
-     * 3. 공정코드 중복검사
+     * 3. item_id + proc_code 조합 중복검사
      * 4. 공정 수정
      *
      * 반환값:
@@ -145,6 +141,7 @@ public class ProcessService {
      * @param processDTO 수정할 공정 정보
      * @return 수정 처리 결과
      */
+    @Transactional
     public int modifyProcess(ProcessDTO processDTO) {
 
         if (processDTO == null || processDTO.getProcId() == null) {
@@ -174,13 +171,13 @@ public class ProcessService {
      * - process_detail 먼저 삭제
      * - process 삭제
      *
-     * 주의:
-     * - process 테이블에는 use_yn 컬럼이 없다.
-     * - 현재 DB 구조를 바꾸지 않는 기준에서는 DELETE 처리한다.
+     * 트랜잭션 기준:
+     * - process_detail 삭제 후 process 삭제 중 오류가 나면 전체 롤백한다.
      *
      * @param procIdList 선택한 공정 ID 목록
      * @return 삭제된 공정 건수
      */
+    @Transactional
     public int removeProcessList(List<Integer> procIdList) {
 
         if (procIdList == null || procIdList.isEmpty()) {
@@ -195,15 +192,21 @@ public class ProcessService {
      * 공정코드 중복 여부 확인
      *
      * 기준:
-     * - proc_code 단독 중복검사
+     * - item_id + proc_code 조합 중복검사
+     * - 같은 완제품 안에서는 같은 공정코드 중복 불가
+     * - 다른 완제품에서는 같은 공정코드 사용 가능
      * - 수정 시에는 현재 proc_id를 제외한다.
      *
-     * @param processDTO 공정코드, procId를 담은 DTO
+     * @param processDTO itemId, procCode, procId를 담은 DTO
      * @return true: 중복 있음 / false: 중복 없음
      */
     public boolean isDuplicateProcess(ProcessDTO processDTO) {
 
         if (processDTO == null) {
+            return false;
+        }
+
+        if (processDTO.getItemId() == null) {
             return false;
         }
 
@@ -249,10 +252,6 @@ public class ProcessService {
     /**
      * 공정상세 목록 조회
      *
-     * 사용 위치:
-     * - 공정 상세보기 페이지 하단
-     * - 공정 이미지 목록
-     *
      * 조건:
      * - process_detail.proc_id2 = process.proc_id
      *
@@ -279,10 +278,6 @@ public class ProcessService {
     /**
      * 공정상세 단건 조회
      *
-     * 사용 위치:
-     * - 공정 이미지 삭제 전 기존 이미지 경로 확인
-     * - 공정 이미지 수정 전 기존 이미지 경로 확인
-     *
      * @param procDetailId 공정상세 ID
      * @return 공정상세 1건
      */
@@ -303,11 +298,6 @@ public class ProcessService {
     /**
      * 공정상세 등록
      *
-     * 처리 흐름:
-     * 1. 공정 ID 확인
-     * 2. 이미지/설명/비고 중 하나 이상 입력 확인
-     * 3. 공정상세 등록
-     *
      * 반환값:
      * - 1 이상: 등록 성공
      * - 0: 등록 실패
@@ -316,6 +306,7 @@ public class ProcessService {
      * @param processDetailDTO 등록할 공정상세 정보
      * @return 등록 처리 결과
      */
+    @Transactional
     public int addProcessDetail(ProcessDetailDTO processDetailDTO) {
 
         String validateMessage = validateProcessDetail(processDetailDTO);
@@ -331,24 +322,10 @@ public class ProcessService {
     /**
      * 공정상세 수정
      *
-     * 처리 흐름:
-     * 1. 공정상세 ID 확인
-     * 2. 공정 ID 확인
-     * 3. 이미지/설명/비고 중 하나 이상 입력 확인
-     * 4. 공정상세 수정
-     *
-     * 설명:
-     * - 새 이미지가 넘어오면 proc_picture까지 수정한다.
-     * - 새 이미지가 없으면 Mapper에서 기존 proc_picture를 유지한다.
-     *
-     * 반환값:
-     * - 1 이상: 수정 성공
-     * - 0: 수정 실패
-     * - -2: 필수값 누락 또는 입력값 오류
-     *
      * @param processDetailDTO 수정할 공정상세 정보
      * @return 수정 처리 결과
      */
+    @Transactional
     public int modifyProcessDetail(ProcessDetailDTO processDetailDTO) {
 
         if (processDetailDTO == null || processDetailDTO.getProcDetailId() == null) {
@@ -368,12 +345,10 @@ public class ProcessService {
     /**
      * 공정상세 선택 삭제
      *
-     * 사용 위치:
-     * - 공정 상세보기 페이지의 공정 이미지 선택 삭제
-     *
      * @param procDetailIdList 선택한 공정상세 ID 목록
      * @return 삭제된 건수
      */
+    @Transactional
     public int removeProcessDetailList(List<Integer> procDetailIdList) {
 
         if (procDetailIdList == null || procDetailIdList.isEmpty()) {
@@ -387,12 +362,10 @@ public class ProcessService {
     /**
      * 공정상세 단건 삭제
      *
-     * 사용 위치:
-     * - 필요 시 공정상세 1건만 삭제
-     *
      * @param procDetailId 공정상세 ID
      * @return 삭제된 건수
      */
+    @Transactional
     public int removeProcessDetailOne(int procDetailId) {
 
         if (procDetailId <= 0) {
@@ -409,9 +382,6 @@ public class ProcessService {
 
     /**
      * 완제품 자동완성 조회
-     *
-     * 현재 공정관리 화면은 완제품을 selectbox로 사용한다.
-     * 추후 자동완성 전환 시 사용할 수 있도록 유지한다.
      *
      * @param keyword 검색어
      * @return 완제품 후보 목록
@@ -436,10 +406,6 @@ public class ProcessService {
     /**
      * 완제품 선택 목록 조회
      *
-     * 사용 위치:
-     * - 공정 등록 모달
-     * - 공정 상세 수정 화면
-     *
      * 대상:
      * - item_type = 'FG'
      *
@@ -459,9 +425,6 @@ public class ProcessService {
 
     /**
      * 설비 자동완성 조회
-     *
-     * 현재 공정관리 화면은 설비를 selectbox로 사용한다.
-     * 추후 자동완성 전환 시 사용할 수 있도록 유지한다.
      *
      * @param keyword 검색어
      * @return 설비 후보 목록
@@ -485,10 +448,6 @@ public class ProcessService {
 
     /**
      * 설비 선택 목록 조회
-     *
-     * 사용 위치:
-     * - 공정 등록 모달
-     * - 공정 상세 수정 화면
      *
      * @return 설비 목록
      */
@@ -542,10 +501,28 @@ public class ProcessService {
             return "공정명을 입력하세요.";
         }
 
-        /*
-         * proc_content, remark는 설명/비고 성격이므로 필수 검증하지 않는다.
-         * created_date, updated_date는 Mapper에서 SYSDATE로 처리한다.
-         */
+        if (processDTO.getProcCode().trim().length() > 50) {
+            return "공정코드는 50자 이내로 입력하세요.";
+        }
+
+        if (processDTO.getProcName().trim().length() > 100) {
+            return "공정명은 100자 이내로 입력하세요.";
+        }
+
+        if (processDTO.getRemark() != null && processDTO.getRemark().trim().length() > 30) {
+            return "비고는 30자 이내로 입력하세요.";
+        }
+
+        processDTO.setProcCode(processDTO.getProcCode().trim());
+        processDTO.setProcName(processDTO.getProcName().trim());
+
+        if (processDTO.getProcContent() != null) {
+            processDTO.setProcContent(processDTO.getProcContent().trim());
+        }
+
+        if (processDTO.getRemark() != null) {
+            processDTO.setRemark(processDTO.getRemark().trim());
+        }
 
         return null;
     }
@@ -557,11 +534,6 @@ public class ProcessService {
      * 필수 기준:
      * - 공정 ID
      * - 이미지, 설명, 비고 중 하나 이상
-     *
-     * 설명:
-     * - 이미지만 등록 가능
-     * - 설명만 등록 가능
-     * - 이미지 + 설명 같이 등록 가능
      *
      * @param processDetailDTO 공정상세 정보
      * @return 오류 메시지. 문제가 없으면 null
@@ -576,21 +548,33 @@ public class ProcessService {
             return "공정 ID가 없습니다.";
         }
 
+        if (processDetailDTO.getProcContent() != null) {
+            processDetailDTO.setProcContent(processDetailDTO.getProcContent().trim());
+        }
+
+        if (processDetailDTO.getRemark() != null) {
+            processDetailDTO.setRemark(processDetailDTO.getRemark().trim());
+        }
+
+        if (processDetailDTO.getProcPicture() != null) {
+            processDetailDTO.setProcPicture(processDetailDTO.getProcPicture().trim());
+        }
+
         boolean hasPicture = processDetailDTO.getProcPicture() != null
-                && !processDetailDTO.getProcPicture().trim().isEmpty();
+                && !processDetailDTO.getProcPicture().isEmpty();
 
         boolean hasContent = processDetailDTO.getProcContent() != null
-                && !processDetailDTO.getProcContent().trim().isEmpty();
+                && !processDetailDTO.getProcContent().isEmpty();
 
         boolean hasRemark = processDetailDTO.getRemark() != null
-                && !processDetailDTO.getRemark().trim().isEmpty();
+                && !processDetailDTO.getRemark().isEmpty();
 
         if (!hasPicture && !hasContent && !hasRemark) {
             return "이미지, 설명, 비고 중 하나 이상 입력하세요.";
         }
 
         if (processDetailDTO.getRemark() != null
-                && processDetailDTO.getRemark().trim().length() > 30) {
+                && processDetailDTO.getRemark().length() > 30) {
             return "비고는 30자 이내로 입력하세요.";
         }
 

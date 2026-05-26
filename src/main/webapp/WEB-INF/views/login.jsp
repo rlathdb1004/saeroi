@@ -5,7 +5,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>SAEROI - 로그인</title>
+    <title>SAEROI MES</title>
 
     <style>       
         * {
@@ -403,6 +403,18 @@
                 msg.textContent = "서버 오류가 발생했습니다.";
             });
         }
+        
+        document.title = "SAEROI MES";
+        (function () {
+            var favicon = document.querySelector("link[rel='icon']");
+            if (!favicon) {
+                favicon = document.createElement("link");
+                favicon.rel = "icon";
+                document.head.appendChild(favicon);
+            }           
+            favicon.type = "image/x-icon";
+            favicon.href = "${pageContext.request.contextPath}/resources/favicon.ico?v=1";
+        })();
     </script>
 </body>
 

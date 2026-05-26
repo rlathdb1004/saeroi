@@ -6,16 +6,30 @@ import kr.or.saeroi.dto.BoradDTO;
 
 public interface BoardDAO {
 
-	//공지 목록
-	List<BoradDTO> _dao_select_Notice(String startDate, String endDate, String keyword);
-	//공지 등록
-	int _dao_insert_Notice(String title, String content, String empno, String status, String remark);
-	//공지 삭제
+	// 공지 목록
+	List<BoradDTO> _dao_select_Notice(String startDate, String endDate, String keyword, String role);
+
+	// 다음 공지번호 조회
+	int _dao_select_next_Notice_id();
+
+	// 공지 등록
+	int _dao_insert_Notice(int notice_id, String title, String content, String empno, String status, String remark);
+
+	// 공지 첨부파일 등록
+	int _dao_insert_Notice_file(int notice_id, String file_title, String saved_title, String file_path, long file_size);
+
+	// 공지 삭제
 	int _dao_delete_Notice(String[] notice_id, String role, String empno);
-	//공지 상세
-	BoradDTO _dao_select_Notice_detail(String notice_id);
-	//공지 조회수
+
+	// 공지 상세
+	BoradDTO _dao_select_Notice_detail(String notice_id, String role);
+
+	// 공지 첨부파일 조회
+	BoradDTO _dao_select_Notice_file(String notice_id);
+
+	// 공지 조회수
 	int _dao_update_Notice_view_count(String notice_id, String empno);
-	//공지 수정
+
+	// 공지 수정
 	int _dao_update_Notice(String notice_id, String title, String content, String status, String remark);
 }

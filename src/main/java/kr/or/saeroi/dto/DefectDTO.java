@@ -10,9 +10,18 @@ public class DefectDTO {
 	private String item_name;
 	private String product_lot;
 	private String defect_name;
+	private String defect_photo;
 	private String ename;
 	private int defect_qty;
 	private String remark;
+
+	private int defect_action_id;
+	private String action_date;
+	private String dept;
+	private int action_emp_id;
+	private String action_ename;
+	private String action_status;
+	private String action_content;
 
 	public int getDefect_list_id() {
 		return defect_list_id;
@@ -78,6 +87,14 @@ public class DefectDTO {
 		this.defect_name = defect_name;
 	}
 
+	public String getDefect_photo() {
+		return defect_photo;
+	}
+
+	public void setDefect_photo(String defect_photo) {
+		this.defect_photo = defect_photo;
+	}
+
 	public String getEname() {
 		return ename;
 	}
@@ -102,11 +119,70 @@ public class DefectDTO {
 		this.remark = remark;
 	}
 
+	public int getDefect_action_id() {
+		return defect_action_id;
+	}
+
+	public void setDefect_action_id(int defect_action_id) {
+		this.defect_action_id = defect_action_id;
+	}
+
+	public String getAction_date() {
+		return action_date;
+	}
+
+	public void setAction_date(String action_date) {
+		this.action_date = action_date;
+	}
+
+	public String getDept() {
+		return dept;
+	}
+
+	public void setDept(String dept) {
+		this.dept = dept;
+	}
+
+	public int getAction_emp_id() {
+		return action_emp_id;
+	}
+
+	public void setAction_emp_id(int action_emp_id) {
+		this.action_emp_id = action_emp_id;
+	}
+
+	public String getAction_ename() {
+		return action_ename;
+	}
+
+	public void setAction_ename(String action_ename) {
+		this.action_ename = action_ename;
+	}
+
+	public String getAction_status() {
+		return action_status;
+	}
+
+	public void setAction_status(String action_status) {
+		this.action_status = action_status;
+	}
+
+	public String getAction_content() {
+		return action_content;
+	}
+
+	public void setAction_content(String action_content) {
+		this.action_content = action_content;
+	}
+
 	@Override
 	public String toString() {
 		return "DefectDTO [defect_list_id=" + defect_list_id + ", defect_id=" + defect_id + ", insp_id=" + insp_id
 				+ ", defect_code=" + defect_code + ", defect_date=" + defect_date + ", item_name=" + item_name
-				+ ", product_lot=" + product_lot + ", defect_name=" + defect_name + ", ename=" + ename + ", defect_qty="
-				+ defect_qty + ", remark=" + remark + "]";
+				+ ", product_lot=" + product_lot + ", defect_name=" + defect_name + ", defect_photo=" + defect_photo
+				+ ", ename=" + ename + ", defect_qty=" + defect_qty + ", remark=" + remark + ", defect_action_id="
+				+ defect_action_id + ", action_date=" + action_date + ", dept=" + dept + ", action_emp_id="
+				+ action_emp_id + ", action_ename=" + action_ename + ", action_status=" + action_status
+				+ ", action_content=" + action_content + "]";
 	}
 }
