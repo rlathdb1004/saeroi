@@ -1,0 +1,1516 @@
+@charset "UTF-8";
+
+/* 작업자 화면에서 사용하는 공통 색상이다. */
+:root {
+	--mainColor: #2f7d62;
+	--mainHover: #256851;
+	--darkGreen: #0b5a3d;
+	--deepGreen: #03442e;
+	--lightGreen: #eef7f2;
+	--softGreen: #f5fbf8;
+	--borderGreen: rgba(47, 125, 98, 0.22);
+}
+
+/* 기본 여백과 박스 크기 계산 방식을 통일한다. */
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	font-family: 'Pretendard', sans-serif;
+}
+
+/* 작업자 화면 전체 배경이다. */
+body {
+	background: #f6f7f8;
+	color: #111;
+}
+
+/* 버튼에도 동일한 폰트를 적용한다. */
+button {
+	font-family: 'Pretendard', sans-serif;
+}
+
+/* 작업자 전체 페이지 영역이다. */
+.workerPage {
+	width: 100%;
+	min-height: 100vh;
+	background: #f6f7f8;
+}
+
+/* 작업자 상단 헤더 영역이다. */
+.workerHeader {
+	height: 82px;
+	padding: 0 30px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: #fff;
+	border-bottom: 2px solid var(--mainColor);
+}
+
+/* 좌측 로고 묶음이다. */
+.workerLogoBox {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+/* 상단 로고 이미지다. */
+.headerLogoImg {
+	width: 42px;
+	height: 42px;
+	object-fit: contain;
+	display: block;
+}
+
+/* 로고 텍스트 묶음이다. */
+.workerLogoTextBox {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+/* SAEROI MES 텍스트다. */
+.workerLogoText {
+	font-size: 22px;
+	font-weight: 700;
+	letter-spacing: 2px;
+	color: var(--mainColor);
+	line-height: 1.05;
+}
+
+/* 작업자 메인 텍스트다. */
+.workerLogoSubText {
+	font-size: 17px;
+	font-weight: 600;
+	color: #111;
+	line-height: 1.2;
+}
+
+/* 우측 작업자 정보 영역이다. */
+.workerHeaderRight {
+	display: flex;
+	align-items: center;
+	gap: 15px;
+}
+
+/* 작업자 프로필 영역이다. */
+.workerProfileBox {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	font-size: 15px;
+	font-weight: 600;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+/* 작업자 프로필 이미지다. */
+.workerProfileImg {
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	object-fit: cover;
+	display: block;
+}
+
+/* 헤더 정보 텍스트다. */
+.workerInfoItem {
+	font-size: 14px;
+	font-weight: 500;
+	color: #222;
+	white-space: nowrap;
+}
+
+/* 헤더 구분선이다. */
+.workerInfoBar {
+	width: 1px;
+	height: 18px;
+	background: #ddd;
+}
+
+/* 로그아웃 버튼이다. */
+.workerLogoutBtn {
+	border: none;
+	background: transparent;
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 14px;
+	font-weight: 600;
+	cursor: pointer;
+	color: #111;
+	white-space: nowrap;
+}
+
+/* 로그아웃 SVG 아이콘이다. */
+.workerLogoutSvg {
+	width: 18px;
+	height: 18px;
+	color: currentColor;
+	flex-shrink: 0;
+}
+
+/* 로그아웃 버튼 hover다. */
+.workerLogoutBtn:hover {
+	color: var(--mainColor);
+}
+
+/* 작업자 메인 컨텐츠 2단 구조다. */
+.workerKioskContent {
+	padding: 28px 28px 22px;
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 24px;
+	align-items: stretch;
+}
+
+/* 왼쪽 QR 스캔 패널이다. */
+.workerScanPanel {
+	position: relative;
+	min-height: 590px;
+	padding: 34px 36px 28px;
+	border-radius: 20px;
+	background:
+		radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.12), transparent 34%),
+		linear-gradient(145deg, var(--mainColor), var(--deepGreen));
+	box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16);
+	overflow: hidden;
+	cursor: pointer;
+}
+
+/* QR 패널 점 패턴 배경이다. */
+.workerScanPanel::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background-image: radial-gradient(rgba(255, 255, 255, 0.13) 1px, transparent 1px);
+	background-size: 12px 12px;
+	opacity: 0.23;
+	pointer-events: none;
+}
+
+/* QR 상단 안내 배지다. */
+.workerScanTopGuide {
+	position: relative;
+	width: fit-content;
+	margin: 0 auto 22px;
+	padding: 10px 25px;
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	border: 1px solid rgba(255, 255, 255, 0.28);
+	border-radius: 999px;
+	color: rgba(255, 255, 255, 0.94);
+	font-size: 15px;
+	font-weight: 600;
+	background: rgba(0, 0, 0, 0.12);
+	z-index: 2;
+}
+
+/* QR 상단 안내 손모양 SVG 아이콘이다. */
+.workerGuideSvg {
+	width: 23px;
+	height: 23px;
+	color: #fff;
+	flex-shrink: 0;
+	display: block;
+}
+
+/* QR 패널 큰 제목이다. */
+.workerScanTitle {
+	position: relative;
+	font-size: 40px;
+	line-height: 1.28;
+	font-weight: 700;
+	text-align: center;
+	color: #fff;
+	letter-spacing: -1px;
+	margin-bottom: 30px;
+	z-index: 2;
+}
+
+/* QR 스캔 무대 영역이다. */
+.workerQrStage {
+	position: relative;
+	width: 500px;
+	height: 340px;
+	margin: 0 auto 24px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 2;
+}
+
+/* QR 흰 배경 박스다. */
+.workerQrWhiteBox {
+	width: 300px;
+	height: 300px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 18px;
+	background: #fff;
+	box-shadow: 0 13px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* SVG QR 코드다. */
+.realQrImg {
+	width: 270px;
+	height: 270px;
+	object-fit: contain;
+	display: block;
+	position: relative;
+	z-index: 1;
+}
+
+/* QR 스캔 라인이다. */
+.scanLine {
+	position: absolute;
+	left: 18px;
+	right: 18px;
+	height: 5px;
+	top: 50%;
+	background: rgba(121, 255, 184, 0.72);
+	box-shadow: 0 0 20px rgba(91, 255, 161, 0.92);
+	animation: scanMove 2s linear infinite;
+	z-index: 4;
+}
+
+/* QR 스캔 라인 움직임이다. */
+@keyframes scanMove {
+	0% {
+		transform: translateY(-86px);
+	}
+
+	100% {
+		transform: translateY(86px);
+	}
+}
+
+/* QR 모서리 공통 스타일이다. */
+.qrCorner {
+	position: absolute;
+	width: 48px;
+	height: 48px;
+	border-color: rgba(210, 255, 230, 0.95);
+	border-style: solid;
+	z-index: 5;
+}
+
+/* QR 좌측 상단 모서리다. */
+.topLeft {
+	top: 0;
+	left: 0;
+	border-width: 6px 0 0 6px;
+	border-radius: 8px 0 0 0;
+}
+
+/* QR 우측 상단 모서리다. */
+.topRight {
+	top: 0;
+	right: 0;
+	border-width: 6px 6px 0 0;
+	border-radius: 0 8px 0 0;
+}
+
+/* QR 좌측 하단 모서리다. */
+.bottomLeft {
+	bottom: 0;
+	left: 0;
+	border-width: 0 0 6px 6px;
+	border-radius: 0 0 0 8px;
+}
+
+/* QR 우측 하단 모서리다. */
+.bottomRight {
+	bottom: 0;
+	right: 0;
+	border-width: 0 6px 6px 0;
+	border-radius: 0 0 8px 0;
+}
+
+/* QR 스캔 시작 버튼이다. */
+.workerScanStartBtn {
+	position: relative;
+	width: 455px;
+	height: 76px;
+	margin: 0 auto 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 22px;
+	border: 3px solid rgba(117, 255, 176, 0.65);
+	border-radius: 18px;
+	background: #fff;
+	color: var(--mainColor);
+	font-size: 32px;
+	font-weight: 700;
+	cursor: pointer;
+	box-shadow: 0 0 17px rgba(91, 255, 161, 0.38);
+	z-index: 2;
+}
+
+/* QR 스캔 시작 버튼 hover다. */
+.workerScanStartBtn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 0 24px rgba(91, 255, 161, 0.56);
+}
+
+/* QR 스캔 버튼 아이콘이다. */
+.workerScanBtnIcon {
+	width: 38px;
+	height: 38px;
+	color: var(--mainColor);
+	flex-shrink: 0;
+}
+
+/* QR 스캔 버튼 화살표다. */
+.workerScanBtnArrow {
+	font-size: 38px;
+	font-weight: 500;
+	line-height: 1;
+	margin-left: 8px;
+}
+
+/* QR 스캔 안내문이다. */
+.workerScanHelpText {
+	position: relative;
+	text-align: center;
+	font-size: 16px;
+	font-weight: 500;
+	color: rgba(255, 255, 255, 0.9);
+	z-index: 2;
+}
+
+/* 오른쪽 전체 영역이다. */
+.workerRightPanel {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+	min-width: 0;
+}
+
+/* 오른쪽 메뉴 목록이다. */
+.workerMenuList {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+/* 오른쪽 메뉴 카드다. */
+.workerMenuCard {
+	position: relative;
+	min-height: 150px;
+	padding: 24px 112px 24px 30px;
+	display: flex;
+	align-items: center;
+	gap: 28px;
+	border-radius: 18px;
+	background: #fff;
+	box-shadow: 0 5px 16px rgba(0, 0, 0, 0.08);
+	cursor: pointer;
+	overflow: hidden;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 오른쪽 메뉴 카드 hover다. */
+.workerMenuCard:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 21px rgba(0, 0, 0, 0.11);
+}
+
+/* 메뉴 카드 아이콘 원형 배경이다. */
+.workerMenuIconCircle {
+	width: 94px;
+	height: 94px;
+	border-radius: 50%;
+	background: var(--lightGreen);
+	color: var(--mainColor);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+/* 메뉴 SVG 아이콘이다. */
+.menuSvgIcon {
+	width: 54px;
+	height: 54px;
+}
+
+/* 메뉴 텍스트 영역이다. */
+.workerMenuTextBox {
+	position: relative;
+	z-index: 2;
+}
+
+/* 메뉴 제목이다. */
+.workerMenuTextBox h3 {
+	font-size: 31px;
+	font-weight: 700;
+	color: #111;
+	margin-bottom: 12px;
+	letter-spacing: -0.8px;
+}
+
+/* 메뉴 설명이다. */
+.workerMenuTextBox p {
+	font-size: 16px;
+	line-height: 1.6;
+	font-weight: 500;
+	color: #555;
+}
+
+/* 메뉴 번호다. */
+.workerMenuNo {
+	position: absolute;
+	top: 12px;
+	right: 34px;
+	font-size: 32px;
+	font-weight: 700;
+	color: rgba(47, 125, 98, 0.12);
+	z-index: 1;
+	pointer-events: none;
+}
+
+/* 메뉴 이동 버튼이다. */
+.workerMenuArrowBtn {
+	position: absolute;
+	right: 26px;
+	top: 62%;
+	transform: translateY(-50%);
+	width: 54px;
+	height: 54px;
+	border: none;
+	border-radius: 50%;
+	background: var(--mainColor);
+	color: #fff;
+	font-size: 38px;
+	line-height: 48px;
+	font-weight: 500;
+	cursor: pointer;
+	z-index: 3;
+}
+
+/* 메뉴 이동 버튼 hover다. */
+.workerMenuArrowBtn:hover {
+	background: var(--mainHover);
+}
+
+/* 오늘 작업 현황 박스다. */
+.workerTodayBox {
+	flex: 1;
+	min-height: 170px;
+	padding: 22px 28px;
+	border-radius: 18px;
+	background: #fff;
+	box-shadow: 0 5px 16px rgba(0, 0, 0, 0.08);
+	overflow: hidden;
+}
+
+/* 오늘 작업 현황 상단이다. */
+.workerTodayHeader {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 18px;
+}
+
+/* 오늘 작업 현황 제목이다. */
+.workerTodayHeader h3 {
+	font-size: 20px;
+	font-weight: 700;
+	color: #111;
+}
+
+/* 오늘 작업 현황 기준 시간 버튼이다. */
+.workerTodayTimeBtn {
+	border: none;
+	background: transparent;
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #666;
+	cursor: pointer;
+	line-height: 1;
+}
+
+/* 오늘 작업 현황 기준 시간 hover다. */
+.workerTodayTimeBtn:hover {
+	color: var(--mainColor);
+}
+
+/* 오늘 작업 현황 새로고침 SVG다. */
+.workerTodayRefreshSvg {
+	width: 15px;
+	height: 15px;
+	display: block;
+	color: currentColor;
+	flex-shrink: 0;
+}
+
+/* 오늘 작업 현황 3분할 영역이다. */
+.workerTodayGrid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 0;
+	align-items: center;
+}
+
+/* 오늘 작업 현황 항목이다. */
+.workerTodayItem {
+	position: relative;
+	text-align: center;
+	padding: 0 18px;
+}
+
+/* 오늘 작업 현황 항목 구분선이다. */
+.workerTodayItem + .workerTodayItem {
+	border-left: 1px solid #e5e5e5;
+}
+
+/* 오늘 작업 현황 아이콘 원형 배경이다. */
+.workerTodayIcon {
+	position: relative;
+	width: 56px;
+	height: 56px;
+	margin: 0 auto 10px;
+	border-radius: 50%;
+	background: var(--lightGreen);
+	color: var(--mainColor);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 오늘 작업 현황 SVG 아이콘이다. */
+.workerTodayIcon svg,
+.workerTodayItemSvg {
+	width: 30px;
+	height: 30px;
+	display: block;
+	color: currentColor;
+	flex-shrink: 0;
+}
+
+/* 오늘 작업 현황 설명이다. */
+.workerTodayItem p {
+	font-size: 14px;
+	font-weight: 500;
+	color: #444;
+	margin-bottom: 6px;
+}
+
+/* 오늘 작업 현황 강조 텍스트다. */
+.workerTodayItem strong {
+	display: block;
+	font-size: 23px;
+	font-weight: 700;
+	color: var(--mainColor);
+}
+
+/* 진행률 원형 그래프다. */
+.workerProgressCircle {
+	width: 66px;
+	height: 66px;
+	margin: 0 auto 8px;
+	border-radius: 50%;
+	background: conic-gradient(var(--mainColor) 0 72%, #e6efe9 72% 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* 진행률 내부 텍스트다. */
+.workerProgressCircle span {
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	background: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 14px;
+	font-weight: 700;
+	color: #333;
+}
+
+/* 최근 알림 아이콘이다. */
+.workerTodayAlertIcon {
+	position: relative;
+}
+
+/* 최근 알림 빨간 점이다. */
+.workerAlertDot {
+	position: absolute;
+	top: 3px;
+	right: 6px;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: #ff3b30;
+}
+
+/* 하단 안전 안내 한 줄 영역이다. */
+.workerSafetyNotice {
+	width: calc(100% - 56px);
+	height: 58px;
+	margin: 0 28px 22px;
+	padding: 0 36px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	color: #333;
+	font-size: 14px;
+	font-weight: 500;
+	background: #fff;
+	border-top: 1px solid #e5ebe8;
+	box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.03);
+}
+
+/* 하단 안전 SVG 아이콘이다. */
+.workerSafetySvg {
+	width: 27px;
+	height: 27px;
+	color: var(--mainColor);
+	flex-shrink: 0;
+}
+
+/* 작업자 서브 페이지 공통 영역이다. */
+.workerSubPage {
+	padding: 30px;
+	background: #f7f8f9;
+}
+
+/* 생산실적 페이지 제목이다. */
+.workerResultTitle {
+	font-size: 34px;
+	font-weight: 700;
+	color: #111;
+	margin-bottom: 30px;
+}
+
+/* 생산실적 페이지 작업자 정보다. */
+.workerInfoBox {
+	margin-bottom: 20px;
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--mainColor);
+}
+
+/* 생산실적 테이블 박스다. */
+.workerTableWrap {
+	background: #fff;
+	border-radius: 18px;
+	padding: 30px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* 생산실적 테이블이다. */
+.workerTable {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+/* 생산실적 테이블 헤더다. */
+.workerTable thead tr {
+	background: var(--mainColor);
+	color: #fff;
+}
+
+/* 생산실적 테이블 헤더 셀이다. */
+.workerTable th {
+	padding: 16px;
+	font-size: 16px;
+	font-weight: 600;
+}
+
+/* 생산실적 테이블 내용 셀이다. */
+.workerTable td {
+	padding: 16px;
+	border-bottom: 1px solid #eee;
+	text-align: center;
+	font-size: 15px;
+}
+
+/* 생산실적 테이블 hover다. */
+.workerTable tbody tr:hover {
+	background: #f3f8f5;
+}
+
+/* 데이터 없음 표시다. */
+.noData {
+	padding: 60px 0;
+	text-align: center;
+	font-size: 18px;
+	font-weight: 500;
+	color: #888;
+}
+
+/* 메인 이동 버튼 공통이다. */
+.moveMainBtn,
+.moveBtn {
+	margin-top: 25px;
+	width: 180px;
+	height: 52px;
+	border: none;
+	border-radius: 12px;
+	background: var(--mainColor);
+	color: #fff;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+/* 메인 이동 버튼 hover다. */
+.moveMainBtn:hover,
+.moveBtn:hover {
+	background: var(--mainHover);
+}
+
+/* 작업지시 페이지 제목이다. */
+.pageTitle {
+	font-size: 32px;
+	font-weight: 700;
+	margin-bottom: 24px;
+	color: #111;
+}
+
+/* 작업지시 페이지 작업자 정보다. */
+.workerInfo {
+	font-size: 18px;
+	font-weight: 600;
+	color: var(--mainColor);
+	margin-bottom: 20px;
+}
+
+/* 작업지시 테이블 박스다. */
+.tableWrap {
+	background: #fff;
+	border-radius: 18px;
+	padding: 26px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* 작업지시 테이블이다. */
+.workerWorkOrderPage table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+/* 작업지시 테이블 헤더다. */
+.workerWorkOrderPage thead {
+	background: var(--mainColor);
+	color: #fff;
+}
+
+/* 작업지시 테이블 헤더 셀이다. */
+.workerWorkOrderPage th {
+	padding: 16px;
+	font-size: 15px;
+	font-weight: 600;
+}
+
+/* 작업지시 테이블 내용 셀이다. */
+.workerWorkOrderPage td {
+	padding: 16px;
+	text-align: center;
+	border-bottom: 1px solid #eee;
+	font-size: 14px;
+}
+
+/* 작업지시 테이블 hover다. */
+.workerWorkOrderPage tbody tr:hover {
+	background: #f4faf7;
+}
+
+/* 작업지시 DTO 확인용 박스다. */
+.debugBox {
+	background: #fff8dc;
+	color: #111;
+	font-size: 13px;
+	text-align: left;
+	padding: 14px;
+	line-height: 1.6;
+	border-bottom: 1px solid #ddd;
+}
+
+/* 모바일 / 태블릿 반응형 영역이다. */
+@media screen and (max-width: 1024px) {
+
+	/* 작업자 헤더가 좁은 화면에서 줄바꿈되도록 한다. */
+	.workerHeader {
+		height: auto;
+		min-height: 82px;
+		padding: 16px 22px;
+		flex-wrap: wrap;
+		gap: 12px;
+	}
+
+	/* 헤더 우측 정보가 화면 폭에 맞게 내려오도록 한다. */
+	.workerHeaderRight {
+		width: 100%;
+		justify-content: flex-start;
+		flex-wrap: wrap;
+		gap: 10px;
+	}
+
+	/* PC 2단 구조를 모바일 1단 구조로 변경한다. */
+	.workerKioskContent {
+		padding: 22px;
+		grid-template-columns: 1fr;
+		gap: 22px;
+	}
+
+	/* QR 패널이 모바일에서 너무 길어지지 않도록 조정한다. */
+	.workerScanPanel {
+		min-height: auto;
+		padding: 30px 24px;
+	}
+
+	/* QR 무대 영역을 화면 폭 기준으로 조정한다. */
+	.workerQrStage {
+		width: 100%;
+		max-width: 500px;
+		height: 330px;
+	}
+
+	/* QR 스캔 시작 버튼을 화면 폭에 맞춘다. */
+	.workerScanStartBtn {
+		width: 100%;
+		max-width: 455px;
+	}
+
+	/* 오른쪽 메뉴 카드 영역이 모바일에서 전체 폭을 사용하도록 한다. */
+	.workerRightPanel {
+		width: 100%;
+	}
+
+	/* 안전 수칙 영역을 모바일에서도 전체 폭으로 유지한다. */
+	.workerSafetyNotice {
+		width: calc(100% - 44px);
+		margin: 0 22px 22px;
+	}
+}
+
+/* 일반 모바일 화면 대응이다. */
+@media screen and (max-width: 768px) {
+
+	/* 헤더 좌측 로고 크기를 줄인다. */
+	.headerLogoImg {
+		width: 36px;
+		height: 36px;
+	}
+
+	/* SAEROI MES 텍스트 크기를 줄인다. */
+	.workerLogoText {
+		font-size: 19px;
+		letter-spacing: 1.5px;
+	}
+
+	/* 작업자 메인 텍스트 크기를 줄인다. */
+	.workerLogoSubText {
+		font-size: 15px;
+	}
+
+	/* 헤더 우측 정보 텍스트를 모바일 크기로 조정한다. */
+	.workerProfileBox,
+	.workerInfoItem,
+	.workerLogoutBtn {
+		font-size: 13px;
+	}
+
+	/* 프로필 이미지를 줄인다. */
+	.workerProfileImg {
+		width: 30px;
+		height: 30px;
+	}
+
+	/* 모바일 전체 여백을 줄인다. */
+	.workerKioskContent {
+		padding: 18px;
+		gap: 18px;
+	}
+
+	/* QR 패널 내부 여백을 줄인다. */
+	.workerScanPanel {
+		border-radius: 18px;
+		padding: 26px 18px;
+	}
+
+	/* QR 상단 안내 배지를 모바일에 맞춘다. */
+	.workerScanTopGuide {
+		padding: 9px 18px;
+		gap: 8px;
+		font-size: 13px;
+		white-space: nowrap;
+	}
+
+	/* QR 상단 손모양 아이콘 크기를 조정한다. */
+	.workerGuideSvg {
+		width: 20px;
+		height: 20px;
+	}
+
+	/* QR 패널 제목 크기를 줄인다. */
+	.workerScanTitle {
+		font-size: 32px;
+		line-height: 1.3;
+		margin-bottom: 24px;
+	}
+
+	/* QR 스캔 무대 크기를 줄인다. */
+	.workerQrStage {
+		height: 300px;
+		margin-bottom: 22px;
+	}
+
+	/* QR 흰 박스 크기를 줄인다. */
+	.workerQrWhiteBox {
+		width: 270px;
+		height: 270px;
+		border-radius: 16px;
+	}
+
+	/* QR SVG 크기를 줄인다. */
+	.realQrImg {
+		width: 245px;
+		height: 245px;
+	}
+
+	/* QR 스캔 라인을 QR 무대 크기에 맞춘다. */
+	.scanLine {
+		left: 24px;
+		right: 24px;
+	}
+
+	/* QR 모서리 크기를 줄인다. */
+	.qrCorner {
+		width: 42px;
+		height: 42px;
+	}
+
+	/* QR 스캔 시작 버튼 크기를 줄인다. */
+	.workerScanStartBtn {
+		height: 68px;
+		font-size: 27px;
+		gap: 16px;
+		border-radius: 16px;
+	}
+
+	/* QR 스캔 버튼 아이콘을 줄인다. */
+	.workerScanBtnIcon {
+		width: 32px;
+		height: 32px;
+	}
+
+	/* QR 스캔 버튼 화살표를 줄인다. */
+	.workerScanBtnArrow {
+		font-size: 32px;
+	}
+
+	/* QR 하단 안내문 크기를 줄인다. */
+	.workerScanHelpText {
+		font-size: 14px;
+	}
+
+	/* 메뉴 카드 높이와 여백을 모바일에 맞춘다. */
+	.workerMenuCard {
+		min-height: 128px;
+		padding: 20px 92px 20px 22px;
+		gap: 18px;
+		border-radius: 16px;
+	}
+
+	/* 메뉴 아이콘 원형 크기를 줄인다. */
+	.workerMenuIconCircle {
+		width: 76px;
+		height: 76px;
+	}
+
+	/* 메뉴 SVG 아이콘 크기를 줄인다. */
+	.menuSvgIcon {
+		width: 44px;
+		height: 44px;
+	}
+
+	/* 메뉴 제목 크기를 줄인다. */
+	.workerMenuTextBox h3 {
+		font-size: 25px;
+		margin-bottom: 8px;
+	}
+
+	/* 메뉴 설명 크기를 줄인다. */
+	.workerMenuTextBox p {
+		font-size: 14px;
+		line-height: 1.5;
+	}
+
+	/* 메뉴 번호 위치와 크기를 조정한다. */
+	.workerMenuNo {
+		top: 12px;
+		right: 28px;
+		font-size: 28px;
+	}
+
+	/* 메뉴 이동 버튼을 살짝 아래에 배치한다. */
+	.workerMenuArrowBtn {
+		right: 22px;
+		top: 64%;
+		width: 48px;
+		height: 48px;
+		font-size: 34px;
+		line-height: 42px;
+	}
+
+	/* 오늘 작업 현황 박스 여백을 줄인다. */
+	.workerTodayBox {
+		min-height: auto;
+		padding: 20px 18px;
+	}
+
+	/* 오늘 작업 현황 제목 크기를 줄인다. */
+	.workerTodayHeader h3 {
+		font-size: 18px;
+	}
+
+	/* 오늘 작업 현황 시간 버튼 크기를 줄인다. */
+	.workerTodayTimeBtn {
+		font-size: 13px;
+	}
+
+	/* 오늘 작업 현황 항목 여백을 줄인다. */
+	.workerTodayItem {
+		padding: 0 10px;
+	}
+
+	/* 오늘 작업 현황 아이콘 크기를 줄인다. */
+	.workerTodayIcon {
+		width: 50px;
+		height: 50px;
+	}
+
+	/* 오늘 작업 현황 SVG 크기를 줄인다. */
+	.workerTodayIcon svg,
+	.workerTodayItemSvg {
+		width: 27px;
+		height: 27px;
+	}
+
+	/* 오늘 작업 현황 설명 크기를 줄인다. */
+	.workerTodayItem p {
+		font-size: 13px;
+	}
+
+	/* 오늘 작업 현황 강조 텍스트 크기를 줄인다. */
+	.workerTodayItem strong {
+		font-size: 20px;
+	}
+
+	/* 진행률 원형 그래프를 줄인다. */
+	.workerProgressCircle {
+		width: 58px;
+		height: 58px;
+	}
+
+	/* 진행률 내부 원을 줄인다. */
+	.workerProgressCircle span {
+		width: 42px;
+		height: 42px;
+		font-size: 13px;
+	}
+
+	/* 하단 안전수칙 영역을 모바일에 맞춘다. */
+	.workerSafetyNotice {
+		width: calc(100% - 36px);
+		height: 54px;
+		margin: 0 18px 18px;
+		padding: 0 18px;
+		font-size: 13px;
+	}
+}
+
+/* 작은 모바일 화면 대응이다. */
+@media screen and (max-width: 480px) {
+
+	/* 헤더를 모바일에서 더 촘촘하게 정리한다. */
+	.workerHeader {
+		padding: 14px 16px;
+	}
+
+	/* 헤더 우측 정보 간격을 줄인다. */
+	.workerHeaderRight {
+		gap: 8px;
+	}
+
+	/* 구분선은 작은 화면에서 너무 많아 보이지 않게 줄인다. */
+	.workerInfoBar {
+		height: 14px;
+	}
+
+	/* 모바일 전체 여백을 더 줄인다. */
+	.workerKioskContent {
+		padding: 14px;
+		gap: 16px;
+	}
+
+	/* QR 패널을 작은 화면에 맞춘다. */
+	.workerScanPanel {
+		padding: 24px 14px;
+		border-radius: 16px;
+	}
+
+	/* QR 상단 안내 배지가 넘치지 않게 한다. */
+	.workerScanTopGuide {
+		max-width: 100%;
+		padding: 8px 14px;
+		font-size: 12px;
+		white-space: normal;
+		text-align: center;
+	}
+
+	/* QR 제목을 작은 화면에 맞춘다. */
+	.workerScanTitle {
+		font-size: 28px;
+		margin-bottom: 22px;
+	}
+
+	/* QR 무대 크기를 작은 화면에 맞춘다. */
+	.workerQrStage {
+		height: 260px;
+		margin-bottom: 20px;
+	}
+
+	/* QR 흰 박스 크기를 작은 화면에 맞춘다. */
+	.workerQrWhiteBox {
+		width: 230px;
+		height: 230px;
+		border-radius: 15px;
+	}
+
+	/* QR 이미지를 작은 화면에 맞춘다. */
+	.realQrImg {
+		width: 210px;
+		height: 210px;
+	}
+
+	/* QR 스캔 라인 폭을 줄인다. */
+	.scanLine {
+		left: 18px;
+		right: 18px;
+		height: 4px;
+	}
+
+	/* QR 모서리를 작은 화면에 맞춘다. */
+	.qrCorner {
+		width: 36px;
+		height: 36px;
+	}
+
+	/* QR 스캔 버튼을 작은 화면에 맞춘다. */
+	.workerScanStartBtn {
+		height: 62px;
+		font-size: 23px;
+		gap: 12px;
+		border-radius: 15px;
+	}
+
+	/* QR 버튼 아이콘 크기를 줄인다. */
+	.workerScanBtnIcon {
+		width: 28px;
+		height: 28px;
+	}
+
+	/* QR 버튼 화살표 크기를 줄인다. */
+	.workerScanBtnArrow {
+		font-size: 28px;
+	}
+
+	/* 메뉴 카드를 작은 화면에 맞춘다. */
+	.workerMenuCard {
+		min-height: 112px;
+		padding: 18px 76px 18px 18px;
+		gap: 14px;
+	}
+
+	/* 메뉴 아이콘 원형을 줄인다. */
+	.workerMenuIconCircle {
+		width: 64px;
+		height: 64px;
+	}
+
+	/* 메뉴 아이콘을 줄인다. */
+	.menuSvgIcon {
+		width: 38px;
+		height: 38px;
+	}
+
+	/* 메뉴 제목을 줄인다. */
+	.workerMenuTextBox h3 {
+		font-size: 21px;
+		margin-bottom: 6px;
+	}
+
+	/* 메뉴 설명을 줄인다. */
+	.workerMenuTextBox p {
+		font-size: 13px;
+	}
+
+	/* 메뉴 번호를 작게 조정한다. */
+	.workerMenuNo {
+		top: 10px;
+		right: 22px;
+		font-size: 24px;
+	}
+
+	/* 메뉴 이동 버튼을 작게 조정한다. */
+	.workerMenuArrowBtn {
+		right: 18px;
+		top: 66%;
+		width: 42px;
+		height: 42px;
+		font-size: 30px;
+		line-height: 36px;
+	}
+
+	/* 오늘 작업 현황을 작은 화면에 맞춘다. */
+	.workerTodayBox {
+		padding: 18px 12px;
+	}
+
+	/* 오늘 작업 현황 제목과 시간을 줄인다. */
+	.workerTodayHeader h3 {
+		font-size: 17px;
+	}
+
+	.workerTodayTimeBtn {
+		font-size: 12px;
+	}
+
+	/* 오늘 작업 현황 3칸 간격을 줄인다. */
+	.workerTodayItem {
+		padding: 0 6px;
+	}
+
+	/* 오늘 작업 현황 아이콘을 줄인다. */
+	.workerTodayIcon {
+		width: 44px;
+		height: 44px;
+	}
+
+	/* 오늘 작업 현황 SVG를 줄인다. */
+	.workerTodayIcon svg,
+	.workerTodayItemSvg {
+		width: 24px;
+		height: 24px;
+	}
+
+	/* 오늘 작업 현황 설명을 줄인다. */
+	.workerTodayItem p {
+		font-size: 12px;
+	}
+
+	/* 오늘 작업 현황 강조 텍스트를 줄인다. */
+	.workerTodayItem strong {
+		font-size: 18px;
+	}
+
+	/* 진행률 원형 그래프를 줄인다. */
+	.workerProgressCircle {
+		width: 50px;
+		height: 50px;
+	}
+
+	/* 진행률 내부 텍스트를 줄인다. */
+	.workerProgressCircle span {
+		width: 36px;
+		height: 36px;
+		font-size: 12px;
+	}
+
+	/* 안전수칙을 작은 화면에 맞춘다. */
+	.workerSafetyNotice {
+		width: calc(100% - 28px);
+		height: auto;
+		min-height: 50px;
+		margin: 0 14px 14px;
+		padding: 12px 14px;
+		align-items: flex-start;
+		font-size: 12px;
+		line-height: 1.4;
+	}
+
+	/* 안전수칙 아이콘을 줄인다. */
+	.workerSafetySvg {
+		width: 23px;
+		height: 23px;
+		margin-top: 1px;
+	}
+}
+
+/* 중간 해상도 대응 영역이다.
+   2단 구조가 깨지는 구간에서는 1단으로 바꾸되,
+   QR 영역이 너무 커지지 않도록 높이와 요소 크기를 줄인다. */
+@media screen and (max-width: 1180px) {
+
+	/* 작업자 메인 영역을 1단 구조로 변경한다. */
+	.workerKioskContent {
+		padding: 20px 24px 18px;
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 18px;
+	}
+
+	/* QR 패널이 너무 높아지지 않도록 줄인다. */
+	.workerScanPanel {
+		width: 100%;
+		min-height: 560px;
+		padding: 28px 24px 24px;
+	}
+
+	/* QR 상단 안내 배지를 살짝 줄인다. */
+	.workerScanTopGuide {
+		margin-bottom: 18px;
+		padding: 9px 22px;
+		font-size: 14px;
+	}
+
+	/* QR 제목을 중간 해상도에 맞게 줄인다. */
+	.workerScanTitle {
+		font-size: 36px;
+		line-height: 1.28;
+		margin-bottom: 22px;
+	}
+
+	/* QR 무대 영역 높이를 줄여 아래 내용이 올라오게 한다. */
+	.workerQrStage {
+		width: 100%;
+		max-width: 500px;
+		height: 295px;
+		margin: 0 auto 20px;
+	}
+
+	/* QR 흰 박스를 너무 크게 보이지 않게 조정한다. */
+	.workerQrWhiteBox {
+		width: 270px;
+		height: 270px;
+		border-radius: 18px;
+	}
+
+	/* QR 이미지는 박스 안을 꽉 채우되 패널 높이는 줄인다. */
+	.realQrImg {
+		width: 245px;
+		height: 245px;
+	}
+
+	/* QR 스캔 라인 위치를 줄어든 QR 영역에 맞춘다. */
+	.scanLine {
+		left: 70px;
+		right: 70px;
+		height: 5px;
+	}
+
+	/* QR 모서리 크기를 살짝 줄인다. */
+	.qrCorner {
+		width: 44px;
+		height: 44px;
+	}
+
+	/* QR 스캔 버튼 폭과 높이를 줄인다. */
+	.workerScanStartBtn {
+		width: 100%;
+		max-width: 420px;
+		height: 66px;
+		margin-bottom: 18px;
+		font-size: 28px;
+		gap: 16px;
+	}
+
+	/* QR 스캔 버튼 아이콘을 줄인다. */
+	.workerScanBtnIcon {
+		width: 32px;
+		height: 32px;
+	}
+
+	/* QR 스캔 버튼 화살표를 줄인다. */
+	.workerScanBtnArrow {
+		font-size: 32px;
+	}
+
+	/* QR 하단 안내문을 살짝 줄인다. */
+	.workerScanHelpText {
+		font-size: 14px;
+	}
+
+	/* 오른쪽 메뉴 영역도 전체 폭을 사용한다. */
+	.workerRightPanel {
+		width: 100%;
+		gap: 16px;
+	}
+
+	/* 메뉴 카드가 너무 커지지 않게 줄인다. */
+	.workerMenuCard {
+		min-height: 126px;
+		padding: 20px 104px 20px 28px;
+		gap: 22px;
+	}
+
+	/* 메뉴 아이콘 원형을 줄인다. */
+	.workerMenuIconCircle {
+		width: 78px;
+		height: 78px;
+	}
+
+	/* 메뉴 SVG 아이콘을 줄인다. */
+	.menuSvgIcon {
+		width: 46px;
+		height: 46px;
+	}
+
+	/* 메뉴 제목 크기를 중간 해상도에 맞춘다. */
+	.workerMenuTextBox h3 {
+		font-size: 27px;
+		margin-bottom: 8px;
+		white-space: nowrap;
+	}
+
+	/* 메뉴 설명 크기를 줄인다. */
+	.workerMenuTextBox p {
+		font-size: 14px;
+		line-height: 1.5;
+	}
+
+	/* 메뉴 번호는 위쪽에 유지한다. */
+	.workerMenuNo {
+		top: 12px;
+		right: 32px;
+		font-size: 28px;
+	}
+
+	/* 화살표 버튼은 번호보다 아래에 둔다. */
+	.workerMenuArrowBtn {
+		right: 24px;
+		top: 64%;
+		width: 48px;
+		height: 48px;
+		font-size: 34px;
+		line-height: 42px;
+	}
+
+	/* 오늘 작업 현황 박스도 너무 길어지지 않게 한다. */
+	.workerTodayBox {
+		width: 100%;
+		min-height: 160px;
+		padding: 20px 24px;
+	}
+
+	/* 안전수칙 영역이 전체 폭으로 길게 보이도록 한다. */
+	.workerSafetyNotice {
+		width: calc(100% - 48px);
+		height: 56px;
+		margin: 0 24px 20px;
+	}
+}
