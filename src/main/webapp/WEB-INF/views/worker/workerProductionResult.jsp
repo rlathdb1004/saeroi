@@ -11,161 +11,19 @@
 
 <head>
 
+
 <meta charset="UTF-8">
 
 <title>
 	작업자 생산실적
 </title>
-
-<style>
-
-	* {
-
-		margin: 0;
-		padding: 0;
-		box-sizing: border-box;
-		font-family: Pretendard;
-	}
-
-	body {
-
-		background: #f7f8f9;
-		padding: 30px;
-	}
-
-	:root {
-
-		--mainColor: #2f7d62;
-		--mainHover: #256851;
-	}
-
-	/* =====================================================
-		상단 타이틀
-	===================================================== */
-	.workerResultTitle {
-
-		font-size: 34px;
-		font-weight: 800;
-
-		color: #111;
-
-		margin-bottom: 30px;
-	}
-
-	/* =====================================================
-		테이블 박스
-	===================================================== */
-	.workerTableWrap {
-
-		background: #fff;
-
-		border-radius: 18px;
-
-		padding: 30px;
-
-		box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-	}
-
-	/* =====================================================
-		테이블
-	===================================================== */
-	.workerTable {
-
-		width: 100%;
-
-		border-collapse: collapse;
-	}
-
-	.workerTable thead tr {
-
-		background: var(--mainColor);
-		color: #fff;
-	}
-
-	.workerTable th {
-
-		padding: 16px;
-
-		font-size: 16px;
-		font-weight: 700;
-	}
-
-	.workerTable td {
-
-		padding: 16px;
-
-		border-bottom: 1px solid #eee;
-
-		text-align: center;
-
-		font-size: 15px;
-	}
-
-	.workerTable tbody tr:hover {
-
-		background: #f3f8f5;
-	}
-
-	/* =====================================================
-		데이터 없을 때
-	===================================================== */
-	.noData {
-
-		padding: 60px 0;
-
-		text-align: center;
-
-		font-size: 18px;
-		font-weight: 600;
-
-		color: #888;
-	}
-
-	/* =====================================================
-		상단 작업자 정보
-	===================================================== */
-	.workerInfoBox {
-
-		margin-bottom: 20px;
-
-		font-size: 18px;
-		font-weight: 700;
-
-		color: var(--mainColor);
-	}
-
-	/* =====================================================
-		메인 버튼
-	===================================================== */
-	.moveMainBtn {
-
-		margin-top: 25px;
-
-		width: 180px;
-		height: 52px;
-
-		border: none;
-		border-radius: 12px;
-
-		background: var(--mainColor);
-		color: #fff;
-
-		font-size: 16px;
-		font-weight: 700;
-
-		cursor: pointer;
-	}
-
-	.moveMainBtn:hover {
-
-		background: var(--mainHover);
-	}
-
-</style>
+<link rel="icon"
+	href="${pageContext.request.contextPath}/resources/favicon.ico">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/worker.css">
 
 </head>
 
-<body>
+<body class="workerSubPage workerProductionResultPage">
 
 	<!-- =================================================
 		타이틀
