@@ -8,109 +8,228 @@
 
 <div class="workerPage workerKioskPage">
 
-	<!-- 작업자 화면 상단 헤더다. -->
-	<div class="workerHeader">
 
-		<div class="workerLogoBox">
+<!-- 작업자 화면 상단 헤더다. -->
+<div class="workerHeader">
 
-			<img src="${pageContext.request.contextPath}/resources/saeroi_logo.png"
-				class="headerLogoImg"
-				alt="로고">
+	<!-- 왼쪽 브랜드 영역이다. -->
+	<div class="workerLogoBox">
 
-			<div class="workerLogoTextBox">
+		<img src="${pageContext.request.contextPath}/resources/saeroi_logo.png"
+			class="headerLogoImg"
+			alt="SAEROI 로고">
 
-				<div class="workerLogoText">
-					SAEROI MES
-				</div>
+		<div class="workerLogoDivider"></div>
 
-				<div class="workerLogoSubText">
-					작업자 메인
-				</div>
+		<div class="workerLogoTextBox">
 
+			<div class="workerLogoText">
+				SAEROI MES
 			</div>
 
-		</div>
-
-		<div class="workerHeaderRight">
-
-			<div class="workerProfileBox"
-				onclick="location.href='${pageContext.request.contextPath}/mypage'">
-
-				<img src="${pageContext.request.contextPath}/resources/kim.png"
-					class="workerProfileImg"
-					alt="프로필">
-
-				<span>
-					${workerName} 작업자
-				</span>
-
+			<div class="workerLogoSubText">
+				작업자 메인
 			</div>
-
-			<div class="workerInfoBar"></div>
-
-			<div class="workerInfoItem">
-				${workerDept}
-			</div>
-
-			<div class="workerInfoBar"></div>
-
-			<div class="workerInfoItem">
-				☀ 23.8℃
-			</div>
-
-			<div class="workerInfoBar"></div>
-
-			<div class="workerInfoItem">
-
-				🕒
-				<span id="workerClock"></span>
-
-			</div>
-
-			<div class="workerInfoBar"></div>
-
-			<button type="button"
-				class="workerLogoutBtn"
-				onclick="location.href='${pageContext.request.contextPath}/logout'">
-
-				<svg viewBox="0 0 24 24"
-					class="workerLogoutSvg"
-					fill="none"
-					xmlns="http://www.w3.org/2000/svg">
-
-					<path
-						d="M10 7V5C10 3.9 10.9 3 12 3H18C19.1 3 20 3.9 20 5V19C20 20.1 19.1 21 18 21H12C10.9 21 10 20.1 10 19V17"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round" />
-
-					<path
-						d="M15 12H4"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round" />
-
-					<path
-						d="M7 8L3 12L7 16"
-						stroke="currentColor"
-						stroke-width="2"
-						stroke-linecap="round"
-						stroke-linejoin="round" />
-
-				</svg>
-
-				<span>
-					로그아웃
-				</span>
-
-			</button>
 
 		</div>
 
 	</div>
 
+	<!-- 오른쪽 작업자 정보 영역이다. -->
+	<div class="workerHeaderRight">
+
+		<div class="workerHeaderChip workerProfileChip"
+			onclick="location.href='${pageContext.request.contextPath}/mypage'">
+
+			<img src="${pageContext.request.contextPath}/resources/kim.png"
+				class="workerProfileImg"
+				alt="프로필">
+
+			<div class="workerChipTextBox">
+
+				<span class="workerChipLabel">
+					작업자
+				</span>
+
+				<strong>
+					${workerName} 작업자
+				</strong>
+
+			</div>
+
+			<span class="workerOnlineDot"></span>
+
+			<span class="workerOnlineText">
+				온라인
+			</span>
+
+		</div>
+
+		<div class="workerHeaderChip">
+
+			<svg viewBox="0 0 24 24"
+				class="workerHeaderSvg"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg">
+
+				<path
+					d="M12 21C12 21 5 14.7 5 9.5C5 5.9 8.1 3 12 3C15.9 3 19 5.9 19 9.5C19 14.7 12 21 12 21Z"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round" />
+
+				<path
+					d="M12 12C13.4 12 14.5 10.9 14.5 9.5C14.5 8.1 13.4 7 12 7C10.6 7 9.5 8.1 9.5 9.5C9.5 10.9 10.6 12 12 12Z"
+					stroke="currentColor"
+					stroke-width="2" />
+
+			</svg>
+
+			<div class="workerChipTextBox">
+
+				<span class="workerChipLabel">
+					현장
+				</span>
+
+				<strong>
+					${workerDept}
+				</strong>
+
+			</div>
+
+		</div>
+
+		<div class="workerHeaderChip">
+
+			<svg viewBox="0 0 24 24"
+				class="workerHeaderSvg"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg">
+
+				<path
+					d="M14 14.8V5C14 3.3 12.7 2 11 2C9.3 2 8 3.3 8 5V14.8C6.8 15.7 6 17.1 6 18.7C6 21.1 8.1 23 11 23C13.9 23 16 21.1 16 18.7C16 17.1 15.2 15.7 14 14.8Z"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round" />
+
+				<path
+					d="M11 17V8"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round" />
+
+			</svg>
+
+			<div class="workerChipTextBox">
+
+				<span class="workerChipLabel">
+					온도
+				</span>
+
+				<strong>
+					23.8℃
+				</strong>
+
+			</div>
+
+		</div>
+
+		<div class="workerHeaderChip workerTimeChip">
+
+			<svg viewBox="0 0 24 24"
+				class="workerHeaderSvg"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg">
+
+				<path
+					d="M12 22C17.5 22 22 17.5 22 12C22 6.5 17.5 2 12 2C6.5 2 2 6.5 2 12C2 17.5 6.5 22 12 22Z"
+					stroke="currentColor"
+					stroke-width="2" />
+
+				<path
+					d="M12 6.5V12L15.5 14"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round" />
+
+			</svg>
+
+			<div class="workerChipTextBox">
+
+				<span class="workerChipLabel">
+					시간
+				</span>
+
+				<strong id="workerClock"></strong>
+
+			</div>
+
+		</div>
+
+	<button type="button"
+	class="workerLogoutBtn"
+	onclick="location.href='${pageContext.request.contextPath}/logout'">
+
+	<svg viewBox="0 0 24 24"
+		class="workerLogoutSvg"
+		fill="none"
+		xmlns="http://www.w3.org/2000/svg">
+
+		<path
+			d="M14 7V5C14 3.9 13.1 3 12 3H6C4.9 3 4 3.9 4 5V19C4 20.1 4.9 21 6 21H12C13.1 21 14 20.1 14 19V17"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round" />
+
+		<path
+			d="M9 12H20"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round" />
+
+		<path
+			d="M17 8L21 12L17 16"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round" />
+
+	</svg>
+
+	<span>
+		로그아웃
+	</span>
+
+</button>
+
+	</div>
+
+</div>
+
+
+	<!-- 작업자 하단 안전 안내 영역이다. -->
+	<div class="workerSafetyNotice">
+
+		<svg viewBox="0 0 24 24"
+			class="workerSafetySvg">
+
+			<path
+				d="M12 2L20 5V11C20 16.2 16.6 20.8 12 22C7.4 20.8 4 16.2 4 11V5L12 2ZM12 4.2L6 6.45V11C6 15.15 8.55 18.85 12 19.9C15.45 18.85 18 15.15 18 11V6.45L12 4.2ZM15.65 8.7L16.95 10L11.25 15.7L8.05 12.5L9.35 11.2L11.25 13.1L15.65 8.7Z"
+				fill="currentColor" />
+
+		</svg>
+
+		<span>
+			안전 수칙을 준수하여 안전한 작업을 진행해 주세요.
+		</span>
+
+	</div>
+	
 	<!-- 작업자 메인 컨텐츠다. -->
 	<div class="workerKioskContent">
 
@@ -500,24 +619,6 @@
 			</div>
 
 		</div>
-
-	</div>
-
-	<!-- 작업자 하단 안전 안내 영역이다. -->
-	<div class="workerSafetyNotice">
-
-		<svg viewBox="0 0 24 24"
-			class="workerSafetySvg">
-
-			<path
-				d="M12 2L20 5V11C20 16.2 16.6 20.8 12 22C7.4 20.8 4 16.2 4 11V5L12 2ZM12 4.2L6 6.45V11C6 15.15 8.55 18.85 12 19.9C15.45 18.85 18 15.15 18 11V6.45L12 4.2ZM15.65 8.7L16.95 10L11.25 15.7L8.05 12.5L9.35 11.2L11.25 13.1L15.65 8.7Z"
-				fill="currentColor" />
-
-		</svg>
-
-		<span>
-			안전 수칙을 준수하여 안전한 작업을 진행해 주세요.
-		</span>
 
 	</div>
 
