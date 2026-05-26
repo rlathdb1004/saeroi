@@ -261,37 +261,10 @@
 		<%-- 설비관리 메뉴 그룹을 끝낸다. --%>
 
 
-		<div class="siMenuGroup">
-			<%-- 리포트 큰 메뉴와 하위 메뉴를 묶는 영역이다. --%>
-
-			<button type="button" class="siMenuTitle" data-main-menu="리포트">
-				<%-- 리포트 하위 메뉴를 열고 닫는 버튼이다. --%>
-
-				<span class="siMenuName">리포트</span> <span class="siMenuArrow">
-					<svg class="siMenuArrowSvg" viewBox="0 0 24 24">
-																			<path d="M6 9L12 15L18 9"></path>
-																		</svg>
-				</span>
-
-			</button>
-
-			<div class="siSubMenu">
-				<%-- 리포트 하위 메뉴 영역이다. --%>
-
-				<a href="${pageContext.request.contextPath}/report/productionreport"
-					class="siSubMenuLink" data-main-menu="리포트" data-sub-menu="생산 리포트">
-					<%-- 생산 결과를 리포트 형태로 확인하는 메뉴이다. --%> 생산 리포트
-				</a> <a href="${pageContext.request.contextPath}/report/qualityreport"
-					class="siSubMenuLink" data-main-menu="리포트" data-sub-menu="품질 리포트">
-					<%-- 품질 결과를 리포트 형태로 확인하는 메뉴이다. --%> 품질 리포트
-				</a>
-
-			</div>
-
-		</div>
-		<%-- 리포트 메뉴 그룹을 끝낸다. --%>
-
-		<a href="${pageContext.request.contextPath}/lot/lothistory"
+		<a href="${pageContext.request.contextPath}/report"
+			class="siMenuSingle" data-main-menu="리포트" data-sub-menu=""> <%-- 생산 리포트와 품질 리포트를 한 화면에서 확인하는 단독 메뉴이다. --%>
+			리포트
+		</a> <a href="${pageContext.request.contextPath}/lot/lothistory"
 			class="siMenuSingle" data-main-menu="LOT 이력추적" data-sub-menu="">
 			<%-- LOT 번호 기준으로 생산, 공정, 품질 이력을 한 번에 조회하는 단독 메뉴이다. --%> LOT 이력추적
 		</a>

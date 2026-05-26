@@ -94,30 +94,32 @@
 				<div class="search-item">
 					<label class="search-label">차트구분</label> 
 					<select name="searchType" class="search-select" id="select_type">
-						<option value="day">일별</option>
-						<option value="week">주별</option>
-						<option value="month" selected>월별</option>
-						<option value="year_sum">년별(합)</option>
-						<option value="year_avg">년별(평균)</option>
+						<option value="day" ${searchType == 'day' ? 'selected' : ''}>일별</option>
+						<option value="week" ${searchType == 'week' ? 'selected' : ''}>주별</option>
+						<option value="month" ${empty searchType || searchType == 'month' ? 'selected' : ''}>월별</option>
+						<option value="year_sum" ${searchType == 'year_sum' ? 'selected' : ''}>년별(합)</option>
+						<option value="year_avg" ${searchType == 'year_avg' ? 'selected' : ''}>년별(평균)</option>
 					</select>
 				</div>
 				
 				<!-- 시작일 -->
 				<div class="search-item">
 					<label class="search-label">시작일</label> <input type="date"
-						name="startDate" class="search-date" id="startDate">
+						name="startDate" class="search-date" id="startDate"
+						value="${not empty startDate ? startDate : ''}">
 				</div>
 				<!-- 종료일 -->
 				<div class="search-item">
 					<label class="search-label">종료일</label> <input type="date"
-						name="endDate" class="search-date" id="endDate">
+						name="endDate" class="search-date" id="endDate"
+						value="${not empty endDate ? endDate : ''}">
 				</div>
 				<div class="search-item">
 					<label class="search-label">품목구분</label> 
 					<select name="searchItem" class="search-select" id="select_item">
-						<option value="all">전체</option>
+						<option value="all" ${empty searchItem || searchItem == 'all' ? 'selected' : ''}>전체</option>
 						<c:forEach var="i" items="${item }">
-							<option value="${i.ITEM_NAME}">${i.ITEM_NAME}</option>
+							<option value="${i.ITEM_NAME}" ${searchItem == i.ITEM_NAME ? 'selected' : ''}>${i.ITEM_NAME}>${i.ITEM_NAME}</option>
 						</c:forEach>
 					</select>
 				</div>
@@ -125,8 +127,16 @@
 		</div>
 	</form>
 	
+	<div class="dashboard-container">
+    <div class="left-panel">
+        <div id="chart"></div>
+    </div>
     
-  
+    <div class="right-panel">
+        <div class="chart-box">
+            <h4 class="box-title">불량 원인 TOP 3</h4>
+            <div id="oChart"></div>
+        </div>
         
         <div class="table-box">
             <h4 class="box-title">상세 데이터 내역</h4>
@@ -134,7 +144,6 @@
                 <thead>
                     <tr>
                         <th>일자/기간</th>
-                        <th>품목명</th>
                         <th>계획량</th>
                         <th>작업량</th>
                         <th>불량</th>
@@ -152,7 +161,10 @@
 	let chart = null;
 	let ochart = null;
 	document.addEventListener('DOMContentLoaded', function(){
-		loadChartData('month','all');
+		let initialType = document.querySelector('#select_type').value || 'month';
+		let initialItem = document.querySelector('#select_item').value || 'all';
+		
+		loadChartData(initialType,initialItem);
 		
 		document.querySelector('#startDate').addEventListener('change', function(){
 		    let type = document.querySelector('#select_type').value || 'month';
@@ -176,11 +188,8 @@
 		
 	});
 	
-	async function loadChartData(searchType, searchItem) {
-		// contextPath를 포함해서 AJAX 요청 주소를 고정한다.
-		let url = "${pageContext.request.contextPath}/report/chart_bar"
-				+ "?searchType=" + encodeURIComponent(searchType)
-				+ "&searchItem=" + encodeURIComponent(searchItem);
+	async function loadChartData(searchType,searchItem){
+		let url = "chart_bar?searchType="+searchType+"&searchItem="+searchItem
 
 		try{
 			
@@ -244,7 +253,6 @@
       		let row = document.createElement('tr');
       		row.innerHTML = `
       			<td>\${item.계획일자}</td>
-      			<td><a href="${pageContext.request.contextPath}/report/chart?searchType=\${searchType}&searchItem=\${searchItem}&startDate=\${startDate}&endDate=\${endDate}">\${item.품목명}</a></td>
                 <td>\${Number(item.생산계획량).toLocaleString()}</td>
                 <td>\${Number(item.작업량).toLocaleString()}</td>
                 <td style="color: #FF4560; font-weight: bold;">\${Number(item.불량수량).toLocaleString()}</td>
@@ -256,7 +264,173 @@
             totalDefect += Number(item.불량수량 || 0);
       	});
       	
-      
+      	let defectOptions = {
+      		series: [],
+      		chart:{
+      			type: 'donut',
+      			height:230
+      		},
+      		labels: [],
+            colors: ['#00E396', '#FF4560', '#FEB019', '#008FFB', '#775DD0', '#546E7A'],
+            legend: {
+                position: 'bottom'
+            },
+            responsive: [{
+                breakpoint: 480,
+                options: {
+                    chart: { width: 200 },
+                    legend: { position: 'bottom' }
+                }
+            }]
+      	};
+      	
+      	if(ochart !== null){
+      		ochart.destroy();
+        }
+        ochart = new ApexCharts(document.querySelector('#oChart'), defectOptions);
+        ochart.render();
+        
+      	let title_text = '월별 생산계획 대비 작업 실적 및 불량 현황';
+ 		if(searchType == 'day') title_text = '일별 생산계획 대비 작업 실적 및 불량 현황'
+ 		if(searchType == 'week') title_text = '주간별 생산계획 대비 작업 실적 및 불량 현황'
+ 		if(searchType == 'month') title_text = '월별 생산계획 대비 작업 실적 및 불량 현황'
+ 		if(searchType == 'year_sum') title_text = '년별(합) 생산계획 대비 작업 실적 및 불량 현황'
+ 		if(searchType == 'year_avg') title_text = '년별(평균) 생산계획 대비 작업 실적 및 불량 현황'
+      	let options= {
+      			series:[{
+      				name: '생산계획량',
+      				type: 'column',
+      				data: planValues
+      			},
+      			{
+      				name: '작업량',
+      				type: 'column',
+      				data: orderValues
+      			},{
+      				name: '불량수량',
+      				type: 'line',
+      				data: defectValues
+      			}],
+      	
+      	chart: {
+      		height: 480,
+      		type: 'line',
+      		toolbar: {show:true},
+      	events: {
+      		zoomed:function(chartContext,{xaxis,yaxis}){
+      			
+    		if (chartContext.updateTimer) {
+      	        clearTimeout(chartContext.updateTimer);
+      	    }
+      		chartContext.updateTimer = setTimeout(function() {
+      			if(xaxis.min ===undefined && xaxis.max === undefined){
+      				chartContext.updateOptions({
+      					dataLabels:{
+      						enabled:false
+      					}
+      				},false, true);
+      				return;
+      			} 
+      			let min_index = Math.max(0,Math.floor(xaxis.min));
+      			let max_index = Math.min(dates.length - 1, Math.ceil(xaxis.max));
+      			
+      			let visivle_cnt = (max_index-min_index)+1;
+      			
+      			if(visivle_cnt <= 10){
+      				chartContext.updateOptions({
+      					dataLabels:{
+      						enabled: true,
+      						enabledOnSeries: [0,1]
+      					}
+      				},false, true);
+      			} else{
+      				chartContext.updateOptions({
+      					dataLabels:{
+      						enabled: false,
+      					}
+      				},false, true);
+      			}
+      		},50);
+      		}
+      	}
+      },
+      	stroke:{
+      		width:[0,0,4],
+      	},
+      	title: {
+      		text: title_text,
+      		align: 'center',
+      		offsetX: -10,
+      		offsety: 0
+      	},
+      	dataLabels: {
+      		enabled: false
+      	},
+      	xaxis: {
+      		categories: dates
+      	},
+      	yaxis:[{
+      	    seriesName: '생산계획량',
+      	    title: { text: '생산 / 작업 수량 (EA)' }
+      	  },
+      	  {
+      	    seriesName: '생산계획량', 
+      	    show: false
+      	  },
+      	  {
+      	    seriesName: '불량수량',
+      	    opposite: true,
+      	    title: { text: '불량 수량 (EA)' },
+      	    min: 0
+      	  }],
+      	legend:{
+      		show: true,
+      		position: 'top',
+      		horizontalAlign: 'left',
+      		floating: true,
+      		fontSize:'14px',
+      		offsetY: -55,
+      		offsetX: 10,
+      		itemMargin:{
+      			horizontal:8,
+      			vertical: 0
+      		}
+      	},
+      	colors:['#008FFB', '#00E396', '#FF4560'],
+      	markers: {
+      		size: 5
+      	}
+      	};
+      	if(chart!==null){
+      		chart.destroy();
+      	}
+      	chart = new ApexCharts(document.querySelector('#chart'), options)
+      	chart.render();
+      	
+      	let reasonMap={};
+      	
+      	chartList.forEach(item => {
+      		let detailStr = item.불량사유상세;
+      		if(detailStr){
+      			let pieces = detailStr.split(',');
+				pieces.forEach(piece => {
+					let [name, qtyStr] = piece.split(':');
+					let qty = Number(qtyStr) || 0;
+					if(reasonMap[name]){
+						reasonMap[name] += qty;
+						} else {
+							reasonMap[name] = qty;
+						}
+					})
+				}      			
+			});
+      	let finalNames = Object.keys(reasonMap);
+      	let finalValues = Object.values(reasonMap);
+      	
+      	ochart.updateOptions({
+      		series: finalValues,
+      		labels: finalNames
+      	})
 		}catch (error){
 			console.error("데이터 로딩 중 에러 발생:", error);
 		}

@@ -5,35 +5,55 @@
 
 <mapper namespace="mapper.chart">
 	<!-- 일별 합계 -->
-	<select id="sleect_day_data" resultType="map"
-		parameterType="map">
+	<select id="sleect_day_data" resultType="map" parameterType="map">
 		WITH plandata AS (
-		SELECT pp.prod_plan_date, sum(pp.prod_plan_qty) total_plan_qty
+		SELECT pp.prod_plan_date, 
+			<choose>
+				<when test="searchItem != null and searchItem != '' and searchItem != 'all'">i.item_name</when>
+				<otherwise>'전체'</otherwise>
+			</choose> AS item_name,
+			sum(pp.prod_plan_qty) total_plan_qty
 		FROM production_plan pp
 		JOIN item i ON (pp.item_id = i.item_id)
 		<where>
-			<if
-				test="searchItem != null and searchItem != '' and searchItem != 'all'">
+			<if test="searchItem != null and searchItem != '' and searchItem != 'all'">
 				i.item_name = #{searchItem}
 			</if>
 		</where>
-		GROUP BY pp.prod_plan_date
+		GROUP BY pp.prod_plan_date, 
+			<choose>
+				<when test="searchItem != null and searchItem != '' and searchItem != 'all'">i.item_name</when>
+				<otherwise>'전체'</otherwise>
+			</choose>
 		),
 		workdata AS (
-		SELECT pp.prod_plan_date, sum(wo.order_qty) total_order_qty
+		SELECT pp.prod_plan_date, 
+			<choose>
+				<when test="searchItem != null and searchItem != '' and searchItem != 'all'">i.item_name</when>
+				<otherwise>'전체'</otherwise>
+			</choose> AS item_name,
+			sum(wo.order_qty) total_order_qty
 		FROM production_plan pp
 		JOIN WORK_ORDER wo ON (pp.prod_plan_id = wo.prod_plan_id)
 		JOIN item i ON (pp.item_id = i.item_id)
 		<where>
-			<if
-				test="searchItem != null and searchItem != '' and searchItem != 'all'">
+			<if test="searchItem != null and searchItem != '' and searchItem != 'all'">
 				i.item_name = #{searchItem}
 			</if>
 		</where>
-		GROUP BY pp.prod_plan_date
+		GROUP BY pp.prod_plan_date, 
+			<choose>
+				<when test="searchItem != null and searchItem != '' and searchItem != 'all'">i.item_name</when>
+				<otherwise>'전체'</otherwise>
+			</choose>
 		),
 		defectdate AS (
-		SELECT pp.prod_plan_date, sum(dl.defect_qty) total_defect_qty
+		SELECT pp.prod_plan_date, 
+			<choose>
+				<when test="searchItem != null and searchItem != '' and searchItem != 'all'">it.item_name</when>
+				<otherwise>'전체'</otherwise>
+			</choose> AS item_name,
+			sum(dl.defect_qty) total_defect_qty
 		FROM production_plan pp
 		JOIN work_order wo ON (pp.prod_plan_id = wo.prod_plan_id)
 		JOIN production p ON (wo.order_id = p.order_id)
@@ -41,16 +61,23 @@
 		JOIN DEFECT_LIST dl ON (i.insp_id = dl.insp_id)
 		JOIN item it ON (pp.item_id = it.item_id)
 		<where>
-			<if
-				test="searchItem != null and searchItem != '' and searchItem != 'all'">
+			<if test="searchItem != null and searchItem != '' and searchItem != 'all'">
 				it.item_name = #{searchItem}
 			</if>
 		</where>
-		GROUP BY pp.prod_plan_date
+		GROUP BY pp.prod_plan_date, 
+			<choose>
+				<when test="searchItem != null and searchItem != '' and searchItem != 'all'">it.item_name</when>
+				<otherwise>'전체'</otherwise>
+			</choose>
 		),
 		defect_reason AS (
 		SELECT
 		pp.prod_plan_date,
+		<choose>
+			<when test="searchItem != null and searchItem != '' and searchItem != 'all'">it.item_name</when>
+			<otherwise>'전체'</otherwise>
+		</choose> AS item_name,
 		d.defect_name AS defect_name, SUM(dl.defect_qty) AS reason_qty FROM production_plan
 		pp
 		JOIN work_order wo ON (pp.prod_plan_id = wo.prod_plan_id)
@@ -60,104 +87,105 @@
 		JOIN defect d ON (dl.defect_id = d.defect_id)
 		JOIN item it ON (pp.item_id = it.item_id)
 		<where>
-			<if
-				test="searchItem != null and searchItem != '' and searchItem != 'all'">
+			<if test="searchItem != null and searchItem != '' and searchItem != 'all'">
 				it.item_name = #{searchItem}
 			</if>
 		</where>
-		GROUP BY pp.prod_plan_date, d.defect_name
+		GROUP BY pp.prod_plan_date, 
+		<choose>
+			<when test="searchItem != null and searchItem != '' and searchItem != 'all'">it.item_name</when>
+			<otherwise>'전체'</otherwise>
+		</choose>, d.defect_name
 		)
 		<choose>
 			<when test="searchType == 'week'">
 				SELECT
 				to_char(p.prod_plan_date,'YYYY-IW') 계획일자,
+				p.item_name 품목명, 
 				round(avg(total_plan_qty),1) 생산계획량,
 				round(avg(nvl(w.total_order_qty,0)),1) 작업량,
 				round(avg(nvl(d.total_defect_qty,0)),1) 불량수량,
 				(
-				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP
-				(ORDER BY dr.reason_qty DESC)
+				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
 				FROM defect_reason dr
-				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-IW') = TO_CHAR(p.prod_plan_date,
-				'YYYY-IW') ) AS 불량사유상세
+				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-IW') = TO_CHAR(p.prod_plan_date, 'YYYY-IW')
+				  AND dr.item_name = p.item_name ) AS 불량사유상세
 				FROM plandata p
-				LEFT OUTER JOIN workdata w ON p.prod_plan_date = w.PROD_PLAN_DATE
-				LEFT OUTER JOIN defectdate d ON p.prod_plan_date = d.prod_plan_date
-				GROUP BY to_char(p.prod_plan_date, 'YYYY-IW')
-				ORDER BY 계획일자
+				LEFT OUTER JOIN workdata w ON p.prod_plan_date = w.PROD_PLAN_DATE AND p.item_name = w.item_name
+				LEFT OUTER JOIN defectdate d ON p.prod_plan_date = d.prod_plan_date AND p.item_name = d.item_name
+				GROUP BY to_char(p.prod_plan_date, 'YYYY-IW'), p.item_name 
+				ORDER BY 계획일자, 품목명
 			</when>
 			<when test="searchType == 'day'">
 				SELECT
 				to_char(p.prod_plan_date,'YYYY-MM-DD') 계획일자,
+				p.item_name 품목명, 
 				total_plan_qty 생산계획량,
 				nvl(w.total_order_qty,0) 작업량,
 				nvl(d.total_defect_qty,0) 불량수량,
 				(
-				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP
-				(ORDER BY dr.reason_qty DESC)
+				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
 				FROM defect_reason dr
-				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-MM-DD') =
-				TO_CHAR(p.prod_plan_date, 'YYYY-MM-DD') ) AS 불량사유상세
+				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-MM-DD') = TO_CHAR(p.prod_plan_date, 'YYYY-MM-DD')
+				  AND dr.item_name = p.item_name ) AS 불량사유상세
 				FROM plandata p
-				LEFT OUTER JOIN workdata w ON p.prod_plan_date = w.PROD_PLAN_DATE
-				LEFT OUTER JOIN defectdate d ON p.prod_plan_date = d.prod_plan_date
-				ORDER BY p.prod_plan_date
+				LEFT OUTER JOIN workdata w ON p.prod_plan_date = w.PROD_PLAN_DATE AND p.item_name = w.item_name
+				LEFT OUTER JOIN defectdate d ON p.prod_plan_date = d.prod_plan_date AND p.item_name = d.item_name
+				ORDER BY p.prod_plan_date, p.item_name
 			</when>
 			<when test="searchType == 'year_sum'">
 				SELECT
 				to_char(p.prod_plan_date,'YYYY') 계획일자,
+				p.item_name 품목명, 
 				sum(total_plan_qty) 생산계획량,
 				sum(nvl(w.total_order_qty,0)) 작업량,
 				sum(nvl(d.total_defect_qty,0)) 불량수량,
 				(
-				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP
-				(ORDER BY dr.reason_qty DESC)
+				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
 				FROM defect_reason dr
-				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY') = TO_CHAR(p.prod_plan_date,
-				'YYYY') ) AS 불량사유상세
+				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY') = TO_CHAR(p.prod_plan_date, 'YYYY')
+				  AND dr.item_name = p.item_name ) AS 불량사유상세
 				FROM plandata p
-				LEFT OUTER JOIN workdata w ON p.prod_plan_date = w.PROD_PLAN_DATE
-				LEFT OUTER JOIN defectdate d ON p.prod_plan_date = d.prod_plan_date
-				GROUP BY to_char(p.prod_plan_date, 'YYYY')
-				ORDER BY 계획일자
+				LEFT OUTER JOIN workdata w ON p.prod_plan_date = w.PROD_PLAN_DATE AND p.item_name = w.item_name
+				LEFT OUTER JOIN defectdate d ON p.prod_plan_date = d.prod_plan_date AND p.item_name = d.item_name
+				GROUP BY to_char(p.prod_plan_date, 'YYYY'), p.item_name 
+				ORDER BY 계획일자, 품목명
 			</when>
 			<when test="searchType == 'year_avg'">
 				SELECT
 				to_char(p.prod_plan_date,'YYYY') 계획일자,
+				p.item_name 품목명, 
 				round(avg(total_plan_qty),1) 생산계획량,
 				round(avg(nvl(w.total_order_qty,0)),1) 작업량,
 				round(avg(nvl(d.total_defect_qty,0)),1) 불량수량,
 				(
-				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP
-				(ORDER BY dr.reason_qty DESC)
+				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
 				FROM defect_reason dr
-				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY') = TO_CHAR(p.prod_plan_date,
-				'YYYY')
-				) AS 불량사유상세
+				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY') = TO_CHAR(p.prod_plan_date, 'YYYY')
+				  AND dr.item_name = p.item_name ) AS 불량사유상세
 				FROM plandata p
-				LEFT OUTER JOIN workdata w ON p.prod_plan_date = w.PROD_PLAN_DATE
-				LEFT OUTER JOIN defectdate d ON p.prod_plan_date = d.prod_plan_date
-				GROUP BY to_char(p.prod_plan_date, 'YYYY')
-				ORDER BY 계획일자
+				LEFT OUTER JOIN workdata w ON p.prod_plan_date = w.PROD_PLAN_DATE AND p.item_name = w.item_name
+				LEFT OUTER JOIN defectdate d ON p.prod_plan_date = d.prod_plan_date AND p.item_name = d.item_name
+				GROUP BY to_char(p.prod_plan_date, 'YYYY'), p.item_name 
+				ORDER BY 계획일자, 품목명
 			</when>
 			<otherwise>
 				SELECT
 				to_char(p.prod_plan_date,'YYYY-MM') 계획일자,
+				p.item_name 품목명, 
 				round(avg(total_plan_qty),1) 생산계획량,
 				round(avg(nvl(w.total_order_qty,0)),1) 작업량,
 				round(avg(nvl(d.total_defect_qty,0)),1) 불량수량,
 				(
-				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP
-				(ORDER BY dr.reason_qty DESC)
+				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
 				FROM defect_reason dr
-				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-MM') = TO_CHAR(p.prod_plan_date,
-				'YYYY-MM')
-				) AS 불량사유상세
+				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-MM') = TO_CHAR(p.prod_plan_date, 'YYYY-MM')
+				  AND dr.item_name = p.item_name ) AS 불량사유상세
 				FROM plandata p
-				LEFT OUTER JOIN workdata w ON p.prod_plan_date = w.PROD_PLAN_DATE
-				LEFT OUTER JOIN defectdate d ON p.prod_plan_date = d.prod_plan_date
-				GROUP BY to_char(p.prod_plan_date, 'YYYY-MM')
-				ORDER BY 계획일자
+				LEFT OUTER JOIN workdata w ON p.prod_plan_date = w.PROD_PLAN_DATE AND p.item_name = w.item_name
+				LEFT OUTER JOIN defectdate d ON p.prod_plan_date = d.prod_plan_date AND p.item_name = d.item_name
+				GROUP BY to_char(p.prod_plan_date, 'YYYY-MM'), p.item_name 
+				ORDER BY 계획일자, 품목명
 			</otherwise>
 		</choose>
 	</select>

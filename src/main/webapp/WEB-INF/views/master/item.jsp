@@ -125,12 +125,61 @@
 
 			<%-- 등록 모달 열기 --%>
 			<button type="button" class="search-btn search-btn-main"
-				onclick="openItemModal();">등록</button>
+				onclick="openItemModal();">
+				<svg viewBox="0 0 24 24"
+                        fill="none">
+                        <path d="M12 5V19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+
+                        <path d="M5 12H19"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+                    </svg>
+				등록</button>
 
 			<%-- PC 전용 선택삭제 버튼. 모바일에서는 숨김 --%>
 			<button type="button"
 				class="search-btn search-btn-sub pc-only-delete-btn"
-				onclick="submitDeleteForm();">선택 삭제</button>
+				onclick="submitDeleteForm();">
+				<svg viewBox="0 0 24 24"
+                        fill="none">
+                        <path d="M4 7H20"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+
+                        <path d="M10 11V17"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+
+                        <path d="M14 11V17"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round">
+                        </path>
+
+                        <path d="M6 7L7 21H17L18 7"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linejoin="round">
+                        </path>
+
+                        <path d="M9 7V4H15V7"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linejoin="round">
+                        </path>
+                    </svg> 
+				
+				선택 삭제</button>
 		</div>
 	</div>
 
@@ -652,6 +701,28 @@
 .autocomplete-item:hover {
 	background-color: #F7F9F8;
 	color: #2F7D62;
+}
+
+/* 품목코드 자동생성 input + 버튼 한 줄 배치 */
+.item-code-generate-box {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.item-code-generate-box > input {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.item-code-btn {
+	flex: 0 0 88px;
+	min-width: 88px;
+	height: 42px;
+	padding: 0 12px;
+	white-space: nowrap;
 }
 
 </style>

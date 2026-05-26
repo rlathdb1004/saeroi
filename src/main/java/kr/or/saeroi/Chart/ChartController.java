@@ -18,12 +18,32 @@ public class ChartController {
 	@Autowired
 	ChartService chartService;
 	
-	@RequestMapping("/productionreport")
-	public String Chart(Model model) {
+	@RequestMapping({"", "/", "/productionreport"})
+	public String productionreport(Model model) {
 		
 		List<Map<String,Object>> item = chartService.itemList();
 		model.addAttribute("item", item);
 		return "report/productionreport.tiles";
+	}
+
+	@RequestMapping("/chart")
+	public String Chart(
+			@RequestParam(value="searchType", required=false) String searchType,
+			@RequestParam(value="searchItem", required=false) String searchItem,
+			@RequestParam(value="startDate", required=false) String startDate,
+			@RequestParam(value="endDate", required=false) String endDate,
+			Model model) {
+		
+		System.out.println("스타트"+startDate);
+		System.out.println("엔드"+endDate);
+		List<Map<String,Object>> item = chartService.itemList();
+		model.addAttribute("item", item);
+		
+		model.addAttribute("searchType", searchType);
+		model.addAttribute("searchItem", searchItem);
+		model.addAttribute("startDate", startDate);
+		model.addAttribute("endDate", endDate);
+		return "report/chart.tiles";
 	}
 	
 	@RequestMapping("/chart_bar")

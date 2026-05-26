@@ -1,0 +1,1180 @@
+@charset "UTF-8";
+
+/* 작업자 화면에서 사용하는 공통 색상이다. */
+:root {
+	--mainColor: #2f7d62;
+	--mainHover: #256851;
+	--deepGreen: #03442e;
+	--lightGreen: #eef7f2;
+	--dangerColor: #e53935;
+}
+
+/* 기본 여백과 박스 크기 계산 방식을 통일한다. */
+* {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	font-family: 'Pretendard', sans-serif;
+}
+
+/* 작업자 화면 전체 배경과 스크롤바 설정이다. */
+html,
+body {
+	background: #f6f7f8;
+	color: #111;
+	overflow-x: hidden;
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+}
+
+/* 크롬, 엣지, 사파리에서 스크롤바만 숨긴다. */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+	display: none;
+}
+
+/* 버튼에도 동일한 폰트를 적용한다. */
+button {
+	font-family: 'Pretendard', sans-serif;
+}
+
+/* 작업자 페이지 전체 영역이다. */
+.workerPage {
+	width: 100%;
+	min-height: 100vh;
+	background: #f6f7f8;
+	overflow-x: hidden;
+
+	/* 화면 크기별로 바뀌는 메인 영역 값이다. */
+	--contentPadding: 18px 28px 22px;
+	--contentGap: 24px;
+
+	/* 화면 크기별로 바뀌는 QR 영역 값이다. */
+	--scanPadding: 34px 36px 28px;
+	--scanMinHeight: 590px;
+	--scanTitle: 40px;
+	--qrStageH: 340px;
+	--qrBox: 300px;
+	--qrImg: 270px;
+	--scanBtnW: 455px;
+	--scanBtnH: 76px;
+	--scanBtnFont: 32px;
+
+	/* 화면 크기별로 바뀌는 메뉴 카드 값이다. */
+	--menuCardH: 150px;
+	--menuCardPadding: 24px 112px 24px 30px;
+	--menuIcon: 94px;
+	--menuSvg: 54px;
+	--menuTitle: 31px;
+	--menuText: 16px;
+
+	/* 화면 크기별로 바뀌는 오늘 작업 현황 값이다. */
+	--todayPadding: 22px 28px;
+	--todayIcon: 56px;
+	--progressIcon: 66px;
+}
+
+/* 자주 쓰는 flex 중앙 정렬 요소들을 묶어 관리한다. */
+.workerLogoBox,
+.workerHeaderRight,
+.workerHeaderChip,
+.workerLogoutBtn,
+.workerSafetyNotice,
+.workerScanTopGuide,
+.workerQrStage,
+.workerQrWhiteBox,
+.workerScanStartBtn,
+.workerMenuCard,
+.workerMenuIconCircle,
+.workerTodayHeader,
+.workerTodayTimeBtn,
+.workerTodayIcon,
+.workerProgressCircle,
+.workerProgressCircle span {
+	display: flex;
+	align-items: center;
+}
+
+/* 세로 정렬로 사용하는 요소들을 묶어 관리한다. */
+.workerLogoTextBox,
+.workerChipTextBox,
+.workerRightPanel,
+.workerMenuList {
+	display: flex;
+	flex-direction: column;
+}
+
+/* 작업자 화면 상단 헤더 영역이다. */
+.workerHeader {
+	width: calc(100% - 32px);
+	height: 104px;
+	margin: 14px 16px 0;
+	padding: 0 22px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: #fff;
+	border-top: 3px solid var(--mainColor);
+	border-bottom: 1px solid #e3ebe7;
+	border-radius: 12px;
+	box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+/* 헤더 왼쪽 로고 묶음이다. */
+.workerLogoBox {
+	gap: 14px;
+	flex-shrink: 0;
+}
+
+/* 헤더 로고 이미지다. */
+.headerLogoImg {
+	width: 62px;
+	height: 62px;
+	object-fit: contain;
+	display: block;
+}
+
+/* 로고와 텍스트 사이 구분선이다. */
+.workerLogoDivider {
+	width: 1px;
+	height: 48px;
+	background: #d7e3de;
+}
+
+/* 로고 텍스트 묶음이다. */
+.workerLogoTextBox {
+	gap: 6px;
+}
+
+/* SAEROI MES 텍스트다. */
+.workerLogoText {
+	font-size: 23px;
+	font-weight: 700;
+	letter-spacing: 1.2px;
+	color: #111;
+	line-height: 1;
+}
+
+/* 작업자 메인 텍스트다. */
+.workerLogoSubText {
+	font-size: 16px;
+	font-weight: 500;
+	color: #222;
+	line-height: 1.2;
+}
+
+/* 헤더 오른쪽 정보 영역이다. */
+.workerHeaderRight {
+	justify-content: flex-end;
+	gap: 14px;
+	min-width: 0;
+}
+
+/* 헤더 정보 칩 공통이다. */
+.workerHeaderChip {
+	height: 58px;
+	padding: 0 18px;
+	gap: 10px;
+	border: 1px solid #dfe8e3;
+	border-radius: 9px;
+	background: #fff;
+	color: #111;
+	font-size: 14px;
+	font-weight: 600;
+	white-space: nowrap;
+}
+
+/* 작업자 프로필 칩이다. */
+.workerProfileChip {
+	min-width: 246px;
+	cursor: pointer;
+}
+
+/* 작업자 프로필 이미지다. */
+.workerProfileImg {
+	width: 38px;
+	height: 38px;
+	border-radius: 50%;
+	object-fit: cover;
+	display: block;
+	flex-shrink: 0;
+}
+
+/* 작업자 칩 텍스트 묶음이다. */
+.workerChipTextBox {
+	gap: 4px;
+	line-height: 1.1;
+}
+
+/* 칩 상단 라벨이다. */
+.workerChipLabel {
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--mainColor);
+}
+
+/* 칩 주요 텍스트다. */
+.workerChipTextBox strong {
+	font-size: 14px;
+	font-weight: 700;
+	color: #111;
+}
+
+/* 온라인 상태 점이다. */
+.workerOnlineDot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #36c25f;
+	flex-shrink: 0;
+}
+
+/* 온라인 상태 텍스트다. */
+.workerOnlineText {
+	font-size: 12px;
+	font-weight: 600;
+	color: #2ab653;
+}
+
+/* 헤더 SVG 아이콘이다. */
+.workerHeaderSvg {
+	width: 21px;
+	height: 21px;
+	color: var(--mainColor);
+	flex-shrink: 0;
+}
+
+/* 시간 칩이다. */
+.workerTimeChip {
+	min-width: 210px;
+}
+
+/* 로그아웃 버튼이다. */
+.workerLogoutBtn {
+	height: 58px;
+	padding: 0 22px;
+	gap: 8px;
+	border: 1px solid #f1b7b7;
+	border-radius: 9px;
+	background: #fff;
+	color: var(--dangerColor);
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+	white-space: nowrap;
+}
+
+/* 로그아웃 SVG 아이콘이다. */
+.workerLogoutSvg {
+	width: 20px;
+	height: 20px;
+	color: currentColor;
+	flex-shrink: 0;
+}
+
+/* 로그아웃 버튼 hover다. */
+.workerLogoutBtn:hover {
+	background: #fff5f5;
+	border-color: var(--dangerColor);
+	color: #d32f2f;
+}
+
+/* 작업자 안전 안내 영역이다. */
+.workerSafetyNotice {
+	width: calc(100% - 56px);
+	height: 58px;
+	margin: 14px 28px 0;
+	padding: 0 36px;
+	justify-content: center;
+	gap: 12px;
+	color: var(--mainColor);
+	font-size: 17px;
+	font-weight: 700;
+	background: #f7fffb;
+	border: 1px solid rgba(47, 125, 98, 0.45);
+	border-radius: 12px;
+	box-shadow: 0 4px 14px rgba(47, 125, 98, 0.08);
+}
+
+/* 안전 안내 SVG 아이콘이다. */
+.workerSafetySvg {
+	width: 28px;
+	height: 28px;
+	color: var(--mainColor);
+	flex-shrink: 0;
+}
+
+/* 작업자 메인 2단 레이아웃이다. */
+.workerKioskContent {
+	padding: var(--contentPadding);
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--contentGap);
+	align-items: stretch;
+}
+
+/* QR 스캔 패널이다. */
+.workerScanPanel {
+	position: relative;
+	min-height: var(--scanMinHeight);
+	padding: var(--scanPadding);
+	border-radius: 20px;
+	background:
+		radial-gradient(circle at 30% 25%, rgba(255, 255, 255, 0.12), transparent 34%),
+		linear-gradient(145deg, var(--mainColor), var(--deepGreen));
+	box-shadow: 0 7px 18px rgba(0, 0, 0, 0.16);
+	overflow: hidden;
+	cursor: pointer;
+}
+
+/* QR 패널 점 패턴 배경이다. */
+.workerScanPanel::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background-image: radial-gradient(rgba(255, 255, 255, 0.13) 1px, transparent 1px);
+	background-size: 12px 12px;
+	opacity: 0.23;
+	pointer-events: none;
+}
+
+/* QR 상단 안내 배지다. */
+.workerScanTopGuide {
+	position: relative;
+	width: fit-content;
+	margin: 0 auto 22px;
+	padding: 10px 25px;
+	gap: 9px;
+	border: 1px solid rgba(255, 255, 255, 0.28);
+	border-radius: 999px;
+	color: rgba(255, 255, 255, 0.94);
+	font-size: 15px;
+	font-weight: 600;
+	background: rgba(0, 0, 0, 0.12);
+	z-index: 2;
+}
+
+/* QR 상단 안내 SVG 아이콘이다. */
+.workerGuideSvg {
+	width: 23px;
+	height: 23px;
+	color: #fff;
+	flex-shrink: 0;
+	display: block;
+}
+
+/* QR 패널 제목이다. */
+.workerScanTitle {
+	position: relative;
+	margin-bottom: 30px;
+	color: #fff;
+	font-size: var(--scanTitle);
+	line-height: 1.28;
+	font-weight: 700;
+	text-align: center;
+	letter-spacing: -1px;
+	z-index: 2;
+}
+
+/* QR 스캔 무대 영역이다. */
+.workerQrStage {
+	position: relative;
+	width: 100%;
+	max-width: 500px;
+	height: var(--qrStageH);
+	margin: 0 auto 24px;
+	justify-content: center;
+	z-index: 2;
+}
+
+/* QR 흰 배경 박스다. */
+.workerQrWhiteBox {
+	width: var(--qrBox);
+	height: var(--qrBox);
+	justify-content: center;
+	border-radius: 18px;
+	background: #fff;
+	box-shadow: 0 13px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* 실제 QR 이미지다. */
+.realQrImg {
+	position: relative;
+	width: var(--qrImg);
+	height: var(--qrImg);
+	object-fit: contain;
+	display: block;
+	z-index: 1;
+}
+
+/* QR 스캔 라인이다. */
+.scanLine {
+	position: absolute;
+	left: 18px;
+	right: 18px;
+	top: 50%;
+	height: 5px;
+	background: rgba(121, 255, 184, 0.72);
+	box-shadow: 0 0 20px rgba(91, 255, 161, 0.92);
+	animation: scanMove 2s linear infinite;
+	z-index: 4;
+}
+
+/* QR 스캔 라인 애니메이션이다. */
+@keyframes scanMove {
+	0% {
+		transform: translateY(-86px);
+	}
+
+	100% {
+		transform: translateY(86px);
+	}
+}
+
+/* QR 모서리 공통이다. */
+.qrCorner {
+	position: absolute;
+	width: 48px;
+	height: 48px;
+	border-color: rgba(210, 255, 230, 0.95);
+	border-style: solid;
+	z-index: 5;
+}
+
+/* QR 좌측 상단 모서리다. */
+.topLeft {
+	top: 0;
+	left: 0;
+	border-width: 6px 0 0 6px;
+	border-radius: 8px 0 0 0;
+}
+
+/* QR 우측 상단 모서리다. */
+.topRight {
+	top: 0;
+	right: 0;
+	border-width: 6px 6px 0 0;
+	border-radius: 0 8px 0 0;
+}
+
+/* QR 좌측 하단 모서리다. */
+.bottomLeft {
+	left: 0;
+	bottom: 0;
+	border-width: 0 0 6px 6px;
+	border-radius: 0 0 0 8px;
+}
+
+/* QR 우측 하단 모서리다. */
+.bottomRight {
+	right: 0;
+	bottom: 0;
+	border-width: 0 6px 6px 0;
+	border-radius: 0 0 8px 0;
+}
+
+/* QR 스캔 시작 버튼이다. */
+.workerScanStartBtn {
+	position: relative;
+	width: 100%;
+	max-width: var(--scanBtnW);
+	height: var(--scanBtnH);
+	margin: 0 auto 22px;
+	justify-content: center;
+	gap: 22px;
+	border: 3px solid rgba(117, 255, 176, 0.65);
+	border-radius: 18px;
+	background: #fff;
+	color: var(--mainColor);
+	font-size: var(--scanBtnFont);
+	font-weight: 700;
+	cursor: pointer;
+	box-shadow: 0 0 17px rgba(91, 255, 161, 0.38);
+	z-index: 2;
+}
+
+/* QR 스캔 시작 버튼 hover다. */
+.workerScanStartBtn:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 0 24px rgba(91, 255, 161, 0.56);
+}
+
+/* QR 스캔 버튼 아이콘이다. */
+.workerScanBtnIcon {
+	width: 38px;
+	height: 38px;
+	color: var(--mainColor);
+	flex-shrink: 0;
+}
+
+/* QR 스캔 버튼 화살표다. */
+.workerScanBtnArrow {
+	margin-left: 8px;
+	font-size: 38px;
+	font-weight: 500;
+	line-height: 1;
+}
+
+/* QR 스캔 안내문이다. */
+.workerScanHelpText {
+	position: relative;
+	color: rgba(255, 255, 255, 0.9);
+	font-size: 16px;
+	font-weight: 500;
+	text-align: center;
+	z-index: 2;
+}
+
+/* 오른쪽 메뉴 영역이다. */
+.workerRightPanel,
+.workerMenuList {
+	gap: 18px;
+	min-width: 0;
+}
+
+/* 오른쪽 메뉴 카드다. */
+.workerMenuCard {
+	position: relative;
+	min-height: var(--menuCardH);
+	padding: var(--menuCardPadding);
+	gap: 28px;
+	border-radius: 18px;
+	background: #fff;
+	box-shadow: 0 5px 16px rgba(0, 0, 0, 0.08);
+	cursor: pointer;
+	overflow: hidden;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* 오른쪽 메뉴 카드 hover다. */
+.workerMenuCard:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 8px 21px rgba(0, 0, 0, 0.11);
+}
+
+/* 메뉴 아이콘 원형 배경이다. */
+.workerMenuIconCircle {
+	width: var(--menuIcon);
+	height: var(--menuIcon);
+	justify-content: center;
+	border-radius: 50%;
+	background: var(--lightGreen);
+	color: var(--mainColor);
+	flex-shrink: 0;
+}
+
+/* 메뉴 SVG 아이콘이다. */
+.menuSvgIcon {
+	width: var(--menuSvg);
+	height: var(--menuSvg);
+}
+
+/* 메뉴 텍스트 영역이다. */
+.workerMenuTextBox {
+	position: relative;
+	z-index: 2;
+}
+
+/* 메뉴 제목이다. */
+.workerMenuTextBox h3 {
+	margin-bottom: 12px;
+	color: #111;
+	font-size: var(--menuTitle);
+	font-weight: 700;
+	letter-spacing: -0.8px;
+}
+
+/* 메뉴 설명이다. */
+.workerMenuTextBox p {
+	color: #555;
+	font-size: var(--menuText);
+	line-height: 1.6;
+	font-weight: 500;
+}
+
+/* 메뉴 번호다. */
+.workerMenuNo {
+	position: absolute;
+	top: 12px;
+	right: 34px;
+	color: rgba(47, 125, 98, 0.12);
+	font-size: 32px;
+	font-weight: 700;
+	pointer-events: none;
+	z-index: 1;
+}
+
+/* 메뉴 이동 버튼이다. */
+.workerMenuArrowBtn {
+	position: absolute;
+	right: 26px;
+	top: 62%;
+	transform: translateY(-50%);
+	width: 54px;
+	height: 54px;
+	border: none;
+	border-radius: 50%;
+	background: var(--mainColor);
+	color: #fff;
+	font-size: 38px;
+	line-height: 48px;
+	font-weight: 500;
+	cursor: pointer;
+	z-index: 3;
+}
+
+/* 메뉴 이동 버튼 hover다. */
+.workerMenuArrowBtn:hover {
+	background: var(--mainHover);
+}
+
+/* 오늘 작업 현황 박스다. */
+.workerTodayBox {
+	flex: 1;
+	min-height: 170px;
+	padding: var(--todayPadding);
+	border-radius: 18px;
+	background: #fff;
+	box-shadow: 0 5px 16px rgba(0, 0, 0, 0.08);
+	overflow: hidden;
+}
+
+/* 오늘 작업 현황 상단이다. */
+.workerTodayHeader {
+	justify-content: space-between;
+	margin-bottom: 18px;
+}
+
+/* 오늘 작업 현황 제목이다. */
+.workerTodayHeader h3 {
+	color: #111;
+	font-size: 20px;
+	font-weight: 700;
+}
+
+/* 오늘 작업 현황 시간 버튼이다. */
+.workerTodayTimeBtn {
+	gap: 4px;
+	border: none;
+	background: transparent;
+	color: #666;
+	font-size: 14px;
+	font-weight: 500;
+	cursor: pointer;
+	line-height: 1;
+}
+
+/* 오늘 작업 현황 시간 버튼 hover다. */
+.workerTodayTimeBtn:hover {
+	color: var(--mainColor);
+}
+
+/* 오늘 작업 현황 새로고침 SVG다. */
+.workerTodayRefreshSvg {
+	width: 15px;
+	height: 15px;
+	color: currentColor;
+	display: block;
+	flex-shrink: 0;
+}
+
+/* 오늘 작업 현황 3분할 영역이다. */
+.workerTodayGrid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	align-items: center;
+}
+
+/* 오늘 작업 현황 항목이다. */
+.workerTodayItem {
+	position: relative;
+	padding: 0 18px;
+	text-align: center;
+}
+
+/* 오늘 작업 현황 항목 구분선이다. */
+.workerTodayItem + .workerTodayItem {
+	border-left: 1px solid #e5e5e5;
+}
+
+/* 오늘 작업 현황 아이콘과 진행률 원형 공통이다. */
+.workerTodayIcon,
+.workerProgressCircle {
+	width: var(--todayIcon);
+	height: var(--todayIcon);
+	margin: 0 auto 10px;
+	justify-content: center;
+	border-radius: 50%;
+	background: var(--lightGreen);
+	color: var(--mainColor);
+}
+
+/* 진행률 원형 그래프다. */
+.workerProgressCircle {
+	width: var(--progressIcon);
+	height: var(--progressIcon);
+	margin-bottom: 8px;
+	background: conic-gradient(var(--mainColor) 0 72%, #e6efe9 72% 100%);
+}
+
+/* 오늘 작업 현황 SVG 아이콘이다. */
+.workerTodayIcon svg,
+.workerTodayItemSvg {
+	width: 30px;
+	height: 30px;
+	color: currentColor;
+	display: block;
+	flex-shrink: 0;
+}
+
+/* 오늘 작업 현황 설명이다. */
+.workerTodayItem p {
+	margin-bottom: 6px;
+	color: #444;
+	font-size: 14px;
+	font-weight: 500;
+}
+
+/* 오늘 작업 현황 강조 텍스트다. */
+.workerTodayItem strong {
+	display: block;
+	color: var(--mainColor);
+	font-size: 23px;
+	font-weight: 700;
+}
+
+/* 진행률 내부 텍스트다. */
+.workerProgressCircle span {
+	width: 48px;
+	height: 48px;
+	justify-content: center;
+	border-radius: 50%;
+	background: #fff;
+	color: #333;
+	font-size: 14px;
+	font-weight: 700;
+}
+
+/* 최근 알림 아이콘이다. */
+.workerTodayAlertIcon {
+	position: relative;
+}
+
+/* 최근 알림 빨간 점이다. */
+.workerAlertDot {
+	position: absolute;
+	top: 3px;
+	right: 6px;
+	width: 12px;
+	height: 12px;
+	border-radius: 50%;
+	background: #ff3b30;
+}
+
+/* 작업자 서브 페이지 공통 영역이다. */
+.workerSubPage {
+	padding: 30px;
+	background: #f7f8f9;
+}
+
+/* 작업자 서브 페이지 제목이다. */
+.workerResultTitle,
+.pageTitle {
+	margin-bottom: 24px;
+	color: #111;
+	font-size: 32px;
+	font-weight: 700;
+}
+
+/* 작업자 서브 페이지 정보 영역이다. */
+.workerInfoBox,
+.workerInfo {
+	margin-bottom: 20px;
+	color: var(--mainColor);
+	font-size: 18px;
+	font-weight: 600;
+}
+
+/* 작업자 서브 페이지 테이블 박스다. */
+.workerTableWrap,
+.tableWrap {
+	padding: 26px;
+	border-radius: 18px;
+	background: #fff;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* 작업자 서브 페이지 테이블이다. */
+.workerTable,
+.workerWorkOrderPage table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+/* 작업자 서브 페이지 테이블 헤더다. */
+.workerTable thead tr,
+.workerWorkOrderPage thead {
+	background: var(--mainColor);
+	color: #fff;
+}
+
+/* 작업자 서브 페이지 테이블 셀이다. */
+.workerTable th,
+.workerWorkOrderPage th,
+.workerTable td,
+.workerWorkOrderPage td {
+	padding: 16px;
+	font-size: 14px;
+	text-align: center;
+}
+
+/* 작업자 서브 페이지 테이블 헤더 셀이다. */
+.workerTable th,
+.workerWorkOrderPage th {
+	font-weight: 600;
+}
+
+/* 작업자 서브 페이지 테이블 내용 셀이다. */
+.workerTable td,
+.workerWorkOrderPage td {
+	border-bottom: 1px solid #eee;
+}
+
+/* 작업자 서브 페이지 테이블 hover다. */
+.workerTable tbody tr:hover,
+.workerWorkOrderPage tbody tr:hover {
+	background: #f4faf7;
+}
+
+/* 데이터 없음 표시다. */
+.noData {
+	padding: 60px 0;
+	color: #888;
+	font-size: 18px;
+	font-weight: 500;
+	text-align: center;
+}
+
+/* 메인 이동 버튼 공통이다. */
+.moveMainBtn,
+.moveBtn {
+	width: 180px;
+	height: 52px;
+	margin-top: 25px;
+	border: none;
+	border-radius: 12px;
+	background: var(--mainColor);
+	color: #fff;
+	font-size: 16px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+/* 메인 이동 버튼 hover다. */
+.moveMainBtn:hover,
+.moveBtn:hover {
+	background: var(--mainHover);
+}
+
+/* 중간 해상도 대응이다. */
+@media screen and (max-width: 1180px) {
+
+	.workerPage {
+		--contentPadding: 20px 24px 18px;
+		--contentGap: 18px;
+		--scanPadding: 28px 24px 24px;
+		--scanMinHeight: 560px;
+		--scanTitle: 36px;
+		--qrStageH: 295px;
+		--qrBox: 270px;
+		--qrImg: 245px;
+		--scanBtnW: 420px;
+		--scanBtnH: 66px;
+		--scanBtnFont: 28px;
+		--menuCardH: 126px;
+		--menuCardPadding: 20px 104px 20px 28px;
+		--menuIcon: 78px;
+		--menuSvg: 46px;
+		--menuTitle: 27px;
+		--menuText: 14px;
+		--todayPadding: 20px 24px;
+	}
+
+	.workerKioskContent {
+		grid-template-columns: 1fr;
+	}
+
+	.scanLine {
+		left: 70px;
+		right: 70px;
+	}
+
+	.qrCorner {
+		width: 44px;
+		height: 44px;
+	}
+
+	.workerScanBtnIcon,
+	.workerScanBtnArrow {
+		width: 32px;
+		height: 32px;
+		font-size: 32px;
+	}
+
+	.workerMenuNo {
+		right: 32px;
+		font-size: 28px;
+	}
+
+	.workerMenuArrowBtn {
+		right: 24px;
+		top: 64%;
+		width: 48px;
+		height: 48px;
+		font-size: 34px;
+		line-height: 42px;
+	}
+
+	.workerSafetyNotice {
+		width: calc(100% - 48px);
+		height: 56px;
+		margin: 14px 24px 0;
+	}
+}
+
+/* 모바일 화면 대응이다. */
+@media screen and (max-width: 768px) {
+
+	.workerPage {
+		--contentPadding: 14px 12px 18px;
+		--contentGap: 16px;
+		--scanPadding: 24px 14px;
+		--scanMinHeight: auto;
+		--scanTitle: 28px;
+		--qrStageH: 260px;
+		--qrBox: 230px;
+		--qrImg: 210px;
+		--scanBtnH: 62px;
+		--scanBtnFont: 23px;
+		--menuCardH: 112px;
+		--menuCardPadding: 18px 76px 18px 18px;
+		--menuIcon: 64px;
+		--menuSvg: 38px;
+		--menuTitle: 21px;
+		--menuText: 13px;
+		--todayPadding: 18px 12px;
+		--todayIcon: 44px;
+		--progressIcon: 50px;
+	}
+
+	.workerHeader {
+		width: calc(100% - 24px);
+		height: auto;
+		margin: 12px 12px 0;
+		padding: 14px;
+		flex-direction: column;
+		align-items: stretch;
+		justify-content: flex-start;
+		gap: 12px;
+	}
+
+	.workerLogoBox {
+		width: 100%;
+		gap: 12px;
+	}
+
+	.headerLogoImg {
+		width: 44px;
+		height: 44px;
+	}
+
+	.workerLogoDivider {
+		height: 38px;
+	}
+
+	.workerLogoText {
+		font-size: 18px;
+		letter-spacing: 1px;
+	}
+
+	.workerLogoSubText {
+		font-size: 13px;
+	}
+
+	.workerHeaderRight {
+		width: 100%;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+		align-items: stretch;
+	}
+
+	.workerHeaderRight > .workerHeaderChip,
+	.workerHeaderRight > .workerLogoutBtn {
+		width: 100%;
+		min-width: 0;
+		height: 44px;
+		padding: 0 10px;
+		border-radius: 9px;
+		position: static;
+	}
+
+	.workerHeaderRight > .workerHeaderChip:nth-of-type(1) {
+		grid-column: 1 / 2;
+		grid-row: 1;
+	}
+
+	.workerHeaderRight > .workerLogoutBtn {
+		grid-column: 2 / 3;
+		grid-row: 1;
+		justify-content: center;
+	}
+
+	.workerHeaderRight > .workerHeaderChip:nth-of-type(2) {
+		grid-column: 1 / 2;
+		grid-row: 2;
+	}
+
+	.workerHeaderRight > .workerHeaderChip:nth-of-type(3) {
+		grid-column: 2 / 3;
+		grid-row: 2;
+	}
+
+	.workerHeaderRight > .workerHeaderChip:nth-of-type(4) {
+		grid-column: 1 / -1;
+		grid-row: 3;
+	}
+
+	.workerProfileImg {
+		width: 30px;
+		height: 30px;
+	}
+
+	.workerChipLabel {
+		font-size: 11px;
+	}
+
+	.workerChipTextBox strong {
+		font-size: 12px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.workerOnlineText {
+		display: none;
+	}
+
+	.workerOnlineDot {
+		width: 6px;
+		height: 6px;
+		margin-left: auto;
+	}
+
+	.workerHeaderSvg,
+	.workerLogoutSvg {
+		width: 17px;
+		height: 17px;
+	}
+
+	.workerSafetyNotice {
+		width: calc(100% - 24px);
+		height: auto;
+		min-height: 46px;
+		margin: 10px 12px 0;
+		padding: 10px 12px;
+		font-size: 12px;
+		line-height: 1.4;
+		text-align: center;
+	}
+
+	.workerSafetySvg {
+		width: 23px;
+		height: 23px;
+	}
+
+	.workerScanTopGuide {
+		max-width: 100%;
+		padding: 8px 14px;
+		font-size: 12px;
+		white-space: normal;
+		text-align: center;
+	}
+
+	.workerGuideSvg {
+		width: 20px;
+		height: 20px;
+	}
+
+	.scanLine {
+		left: 18px;
+		right: 18px;
+		height: 4px;
+	}
+
+	.qrCorner {
+		width: 36px;
+		height: 36px;
+	}
+
+	.workerScanStartBtn {
+		gap: 12px;
+		border-radius: 15px;
+	}
+
+	.workerScanBtnIcon,
+	.workerScanBtnArrow {
+		width: 28px;
+		height: 28px;
+		font-size: 28px;
+	}
+
+	.workerMenuCard {
+		gap: 14px;
+		border-radius: 16px;
+	}
+
+	.workerMenuNo {
+		top: 10px;
+		right: 22px;
+		font-size: 24px;
+	}
+
+	.workerMenuArrowBtn {
+		right: 18px;
+		top: 66%;
+		width: 42px;
+		height: 42px;
+		font-size: 30px;
+		line-height: 36px;
+	}
+
+	.workerTodayHeader h3 {
+		font-size: 17px;
+	}
+
+	.workerTodayTimeBtn,
+	.workerTodayItem p {
+		font-size: 12px;
+	}
+
+	.workerTodayItem {
+		padding: 0 6px;
+	}
+
+	.workerTodayIcon svg,
+	.workerTodayItemSvg {
+		width: 24px;
+		height: 24px;
+	}
+
+	.workerTodayItem strong {
+		font-size: 18px;
+	}
+
+	.workerProgressCircle span {
+		width: 36px;
+		height: 36px;
+		font-size: 12px;
+	}
+}
