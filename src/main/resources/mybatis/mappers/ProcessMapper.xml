@@ -17,7 +17,7 @@
     - process 테이블에는 use_yn 컬럼이 없다.
     - process_detail.proc_id  = 공정상세 ID
     - process_detail.proc_id2 = process.proc_id 참조값
-    - 공정코드는 기준정보 코드로 관리하므로 proc_code 단독 중복검사를 한다.
+    - 공정코드는 여러 완제품에서 반복 사용되므로 item_id + proc_code 조합으로 중복검사한다.
 -->
 <mapper namespace="process">
 
@@ -27,7 +27,6 @@
 
     <resultMap id="processResultMap" type="kr.or.saeroi.dto.ProcessDTO">
 
-        <!-- process 테이블 기본 컬럼 -->
         <id property="procId" column="proc_id" />
 
         <result property="itemId" column="item_id" />
@@ -39,26 +38,22 @@
         <result property="updatedDate" column="updated_date" />
         <result property="remark" column="remark" />
 
-        <!-- 품목 표시용 컬럼 -->
         <result property="itemCode" column="item_code" />
         <result property="itemName" column="item_name" />
         <result property="itemType" column="item_type" />
         <result property="itemTypeName" column="item_type_name" />
         <result property="itemUnit" column="item_unit" />
 
-        <!-- 설비 표시용 컬럼 -->
         <result property="equipCode" column="equip_code" />
         <result property="equipName" column="equip_name" />
         <result property="equipStatus" column="equip_status" />
         <result property="equipLoc" column="equip_loc" />
 
-        <!-- 라인 표시용 컬럼 -->
         <result property="lineId" column="line_id" />
         <result property="lineCode" column="line_code" />
         <result property="lineName" column="line_name" />
         <result property="lineStatus" column="line_status" />
 
-        <!-- 화면 표시용 컬럼 -->
         <result property="equipDisplayName" column="equip_display_name" />
         <result property="lineDisplayName" column="line_display_name" />
 
@@ -67,7 +62,6 @@
 
     <resultMap id="processDetailResultMap" type="kr.or.saeroi.dto.ProcessDetailDTO">
 
-        <!-- process_detail 테이블 기본 컬럼 -->
         <id property="procDetailId" column="proc_detail_id" />
 
         <result property="procId" column="proc_id" />
@@ -77,21 +71,17 @@
         <result property="updatedDate" column="updated_date" />
         <result property="remark" column="remark" />
 
-        <!-- process JOIN 표시용 -->
         <result property="procCode" column="proc_code" />
         <result property="procName" column="proc_name" />
 
-        <!-- item JOIN 표시용 -->
         <result property="itemId" column="item_id" />
         <result property="itemCode" column="item_code" />
         <result property="itemName" column="item_name" />
 
-        <!-- equipment JOIN 표시용 -->
         <result property="equipId" column="equip_id" />
         <result property="equipCode" column="equip_code" />
         <result property="equipName" column="equip_name" />
 
-        <!-- line JOIN 표시용 -->
         <result property="lineId" column="line_id" />
         <result property="lineCode" column="line_code" />
         <result property="lineName" column="line_name" />
@@ -406,7 +396,8 @@
 
         FROM process
 
-        WHERE UPPER(proc_code) = UPPER(#{procCode})
+        WHERE item_id = #{itemId}
+          AND UPPER(proc_code) = UPPER(#{procCode})
 
         <if test="procId != null">
             AND proc_id != #{procId}
