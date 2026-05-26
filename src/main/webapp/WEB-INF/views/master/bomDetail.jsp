@@ -252,7 +252,7 @@
 											<fmt:formatNumber var="qtyText" value="${detail.qty}"
 												pattern="#,##0.####" />
 
-											<tr class="bom-detail-row" data-item-id="${detail.itemId}"
+											<tr class="bom-click-row" data-item-id="${detail.itemId}"
 												onclick="goBomComponentDetail(this, event);"
 												title="클릭하면 구성품 상세 페이지로 이동합니다.">
 												<td class="mobile_show"><input type="checkbox"
@@ -341,7 +341,7 @@
 														</c:when>
 														<c:otherwise>-</c:otherwise>
 													</c:choose></td>
-											
+
 											</tr>
 										</c:forEach>
 									</c:when>
@@ -440,8 +440,8 @@
 	white-space: nowrap;
 }
 
-.bom-click-row,
-.bom-click-row td {
+#bomDetailTbody tr[data-item-id],
+#bomDetailTbody tr[data-item-id] td {
     cursor: pointer;
 }
 </style>
