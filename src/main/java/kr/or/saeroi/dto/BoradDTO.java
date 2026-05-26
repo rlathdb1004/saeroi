@@ -15,6 +15,13 @@ public class BoradDTO {
 	private String use_yn;
 	private String remark;
 
+	private int file_id;
+	private int board_id;
+	private String file_title;
+	private String saved_title;
+	private String file_path;
+	private long file_size;
+
 	public int getNotice_id() {
 		return notice_id;
 	}
@@ -109,5 +116,53 @@ public class BoradDTO {
 
 	public void setRemark(String remark) {
 		this.remark = remark;
+	}
+
+	public int getFile_id() {
+		return file_id;
+	}
+
+	public void setFile_id(int file_id) {
+		this.file_id = file_id;
+	}
+
+	public int getBoard_id() {
+		return board_id;
+	}
+
+	public void setBoard_id(int board_id) {
+		this.board_id = board_id;
+	}
+
+	public String getFile_title() {
+		return file_title;
+	}
+
+	public void setFile_title(String file_title) {
+		this.file_title = file_title;
+	}
+
+	public String getSaved_title() {
+		return saved_title;
+	}
+
+	public void setSaved_title(String saved_title) {
+		this.saved_title = saved_title;
+	}
+
+	public String getFile_path() {
+		return file_path;
+	}
+
+	public void setFile_path(String file_path) {
+		this.file_path = file_path;
+	}
+
+	public long getFile_size() {
+		return file_size;
+	}
+
+	public void setFile_size(long file_size) {
+		this.file_size = file_size;
 	}
 }
