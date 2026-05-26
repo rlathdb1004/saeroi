@@ -14,15 +14,7 @@
 		n.content,
 		n.emp_id,
 		e.empno AS empno,
-		CASE
-			WHEN n.title LIKE UNISTR('%\D488\C9C8%') THEN UNISTR('\D488\C9C8\BD80\C11C')
-			WHEN n.title LIKE UNISTR('%\C124\BE44%') THEN UNISTR('\C124\BE44\BD80\C11C')
-			WHEN n.title LIKE UNISTR('%\C7AC\ACE0%') OR n.title LIKE UNISTR('%\BB3C\B958%') THEN UNISTR('\BB3C\B958\BD80\C11C')
-			WHEN n.title LIKE UNISTR('%\C0DD\C0B0%') THEN UNISTR('\C0DD\C0B0\BD80\C11C')
-			WHEN n.title LIKE UNISTR('%\C2DC\C5F0%') OR n.title LIKE UNISTR('%\B370\C774\D130%') THEN UNISTR('MES\0020\AD00\B9AC\C790')
-			WHEN e.dept = 'MES' THEN UNISTR('MES\0020\AD00\B9AC\C790')
-			ELSE e.dept || UNISTR('\BD80\C11C')
-		END AS dept,
+		'관리자' AS dept,
 		n.view_count,
 		TO_CHAR(n.created_date, 'YYYY-MM-DD') AS created_date,
 		TO_CHAR(n.updated_date, 'YYYY-MM-DD') AS updated_date,
@@ -32,6 +24,12 @@
 		FROM notice n, emp e
 		WHERE n.emp_id = e.emp_id
 		AND NVL(n.use_yn, 'Y') = 'Y'
+
+		<!-- 비게시 공지는 ADMIN만 목록에서 조회 가능 -->
+		AND (
+			n.status = '게시'
+			OR #{role} = 'ADMIN'
+		)
 
 		<!-- 시작일 검색 조건 -->
 		<if test="startDate != null and startDate != ''">
@@ -48,16 +46,7 @@
 			AND (
 			n.title LIKE '%' || #{keyword} || '%'
 			OR n.content LIKE '%' || #{keyword} || '%'
-			OR e.dept LIKE '%' || #{keyword} || '%'
-			OR CASE
-				WHEN n.title LIKE UNISTR('%\D488\C9C8%') THEN UNISTR('\D488\C9C8\BD80\C11C')
-				WHEN n.title LIKE UNISTR('%\C124\BE44%') THEN UNISTR('\C124\BE44\BD80\C11C')
-				WHEN n.title LIKE UNISTR('%\C7AC\ACE0%') OR n.title LIKE UNISTR('%\BB3C\B958%') THEN UNISTR('\BB3C\B958\BD80\C11C')
-				WHEN n.title LIKE UNISTR('%\C0DD\C0B0%') THEN UNISTR('\C0DD\C0B0\BD80\C11C')
-				WHEN n.title LIKE UNISTR('%\C2DC\C5F0%') OR n.title LIKE UNISTR('%\B370\C774\D130%') THEN UNISTR('MES\0020\AD00\B9AC\C790')
-				WHEN e.dept = 'MES' THEN UNISTR('MES\0020\AD00\B9AC\C790')
-				ELSE e.dept || UNISTR('\BD80\C11C')
-			END LIKE '%' || #{keyword} || '%'
+			OR 'MES 관리자' LIKE '%' || #{keyword} || '%'
 			)
 		</if>
 
@@ -73,15 +62,7 @@
 		n.content,
 		n.emp_id,
 		e.empno AS empno,
-		CASE
-			WHEN n.title LIKE UNISTR('%\D488\C9C8%') THEN UNISTR('\D488\C9C8\BD80\C11C')
-			WHEN n.title LIKE UNISTR('%\C124\BE44%') THEN UNISTR('\C124\BE44\BD80\C11C')
-			WHEN n.title LIKE UNISTR('%\C7AC\ACE0%') OR n.title LIKE UNISTR('%\BB3C\B958%') THEN UNISTR('\BB3C\B958\BD80\C11C')
-			WHEN n.title LIKE UNISTR('%\C0DD\C0B0%') THEN UNISTR('\C0DD\C0B0\BD80\C11C')
-			WHEN n.title LIKE UNISTR('%\C2DC\C5F0%') OR n.title LIKE UNISTR('%\B370\C774\D130%') THEN UNISTR('MES\0020\AD00\B9AC\C790')
-			WHEN e.dept = 'MES' THEN UNISTR('MES\0020\AD00\B9AC\C790')
-			ELSE e.dept || UNISTR('\BD80\C11C')
-		END AS dept,
+		'MES 관리자' AS dept,
 		n.view_count,
 		TO_CHAR(n.created_date, 'YYYY-MM-DD') AS created_date,
 		TO_CHAR(n.updated_date, 'YYYY-MM-DD') AS updated_date,
@@ -91,6 +72,18 @@
 		FROM notice n, emp e
 		WHERE n.emp_id = e.emp_id
 		AND n.notice_id = TO_NUMBER(#{notice_id})
+
+		<!-- 비게시 공지는 ADMIN만 상세 조회 가능 -->
+		AND (
+			n.status = '게시'
+			OR #{role} = 'ADMIN'
+		)
+	</select>
+
+	<!-- 다음 공지번호 조회 -->
+	<select id="_select_next_Notice_id" resultType="int">
+		SELECT NVL(MAX(notice_id), 0) + 1
+		FROM notice
 	</select>
 
 	<!-- 공지사항 등록 -->
@@ -108,7 +101,7 @@
 		remark
 		)
 		VALUES (
-		(SELECT NVL(MAX(notice_id), 0) + 1 FROM notice),
+		TO_NUMBER(#{notice_id}),
 		#{title},
 		#{content},
 		(SELECT e.emp_id FROM emp e WHERE e.empno = #{empno}),
@@ -120,6 +113,50 @@
 		#{remark}
 		)
 	</insert>
+
+	<!-- 공지 첨부파일 등록 -->
+	<insert id="_insert_Notice_file" parameterType="map">
+		INSERT INTO attached_file (
+		file_id,
+		notice_id,
+		board_id,
+		title,
+		saved_title,
+		file_path,
+		file_size,
+		created_date,
+		updated_date
+		)
+		VALUES (
+		(SELECT NVL(MAX(file_id), 0) + 1 FROM attached_file),
+		TO_NUMBER(#{notice_id}),
+		NULL,
+		#{file_title},
+		#{saved_title},
+		#{file_path},
+		TO_NUMBER(#{file_size}),
+		SYSDATE,
+		SYSDATE
+		)
+	</insert>
+
+	<!-- 공지 첨부파일 조회 -->
+	<select id="_select_Notice_file" parameterType="map"
+		resultType="kr.or.saeroi.dto.BoradDTO">
+		SELECT
+		file_id,
+		notice_id,
+		board_id,
+		title AS file_title,
+		saved_title,
+		file_path,
+		file_size,
+		TO_CHAR(created_date, 'YYYY-MM-DD') AS created_date,
+		TO_CHAR(updated_date, 'YYYY-MM-DD') AS updated_date
+		FROM attached_file
+		WHERE notice_id = TO_NUMBER(#{notice_id})
+		ORDER BY file_id DESC
+	</select>
 
 	<!-- 공지사항 수정 -->
 	<update id="_update_Notice" parameterType="map">
@@ -138,7 +175,7 @@
 		SET n.view_count = NVL(n.view_count, 0) + 1
 		WHERE n.notice_id = TO_NUMBER(#{notice_id})
 
-		<!-- 로그인한 작성자 본인이 조회하면 조회수를 증가시키지 않음 -->
+		<!-- 로그인한 작성자 본인이 조회하면 조회수 증가 안 됨 -->
 		<if test="empno != null and empno != ''">
 			AND n.emp_id != (
 				SELECT e.emp_id
@@ -159,7 +196,7 @@
 			TO_NUMBER(#{id})
 		</foreach>
 
-		<!-- ADMIN이 아니면 본인이 작성한 공지만 삭제할 수 있음 -->
+		<!-- ADMIN이 아니면 본인이 작성한 공지만 삭제 가능 -->
 		<if test="role != 'ADMIN'">
 			AND emp_id = (
 				SELECT e.emp_id

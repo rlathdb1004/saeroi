@@ -10,6 +10,49 @@
 	min-height: 180px;
 	resize: vertical;
 }
+
+.notice_file_area {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	height: 42px;
+	padding: 0 12px;
+	border: 1px solid #4f8068;
+	border-radius: 6px;
+	background-color: #f8fffb;
+	box-sizing: border-box;
+}
+
+.notice_file_input {
+	display: none;
+}
+
+.notice_file_btn {
+	height: 28px;
+	padding: 0 12px;
+	border: 1px solid #4f8068;
+	border-radius: 5px;
+	background-color: #ffffff;
+	color: #12362b;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 26px;
+	cursor: pointer;
+	box-sizing: border-box;
+}
+
+.notice_file_btn:hover {
+	background-color: #eaf4ef;
+}
+
+.notice_file_name {
+	color: #111827;
+	font-size: 13px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 </style>
 
 <div class="detail_page">
@@ -35,18 +78,6 @@
 				저장
 			</button>
 
-<!-- 			<button type="button" class="detail_btn_line" -->
-<%-- 				onclick="location.href='${pageContext.request.contextPath}/board/notice'"> --%>
-<!-- 				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" -->
-<!-- 					stroke="currentColor" stroke-width="2" stroke-linecap="round" -->
-<!-- 					stroke-linejoin="round" -->
-<!-- 					style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true"> -->
-<!-- 					<path d="M18 6L6 18"></path> -->
-<!-- 					<path d="M6 6l12 12"></path> -->
-<!-- 				</svg> -->
-<!-- 				취소 -->
-<!-- 			</button> -->
-
 			<button type="button" class="detail_btn_line"
 				onclick="location.href='${pageContext.request.contextPath}/board/notice'">
 				<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -69,7 +100,8 @@
 	<div class="detail_card">
 		<div class="detail_card_title">기본 정보</div>
 
-		<form id="noticeAddForm" method="post" accept-charset="UTF-8"
+		<form id="noticeAddForm" method="post" enctype="multipart/form-data"
+			accept-charset="UTF-8"
 			action="${pageContext.request.contextPath}/board/notice/add">
 
 			<table class="detail_info_table">
@@ -91,16 +123,7 @@
 
 					<tr>
 						<th>작성자</th>
-						<td>
-							<c:choose>
-								<c:when test="${sessionScope.loginUser.dept == 'MES'}">
-									MES 관리자
-								</c:when>
-								<c:otherwise>
-									${sessionScope.loginUser.dept}부서
-								</c:otherwise>
-							</c:choose>
-						</td>
+						<td>MES 관리자</td>
 
 						<th>상태</th>
 						<td>
@@ -117,6 +140,23 @@
 							<textarea name="content"
 								class="detailInput notice_content_textarea"
 								placeholder="공지 내용을 입력하세요." required></textarea>
+						</td>
+					</tr>
+
+					<tr>
+						<th>첨부파일</th>
+						<td colspan="3">
+							<div class="notice_file_area">
+								<label for="noticeFile" class="notice_file_btn">파일 선택</label>
+
+								<span id="noticeFileName" class="notice_file_name">
+									선택된 파일 없음
+								</span>
+
+								<input type="file" id="noticeFile" name="noticeFile"
+									class="notice_file_input"
+									onchange="document.getElementById('noticeFileName').innerText = this.files.length > 0 ? this.files[0].name : '선택된 파일 없음';">
+							</div>
 						</td>
 					</tr>
 
