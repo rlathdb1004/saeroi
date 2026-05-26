@@ -230,4 +230,44 @@ public class LoginDAO {
 
 	    return result;
 	}
+	
+	public LoginDTO find_emp_name(String emp_name) {
+
+        LoginDTO login = null;
+
+        String sql =
+            "SELECT EMPNO, EMP_PW, ENAME, DEPT, JOB, HIRE_DATE, " +
+            "EMP_TEL, EMAIL, STATUS, ROLE, CREATED_DATE, UPDATED_DATE " +
+            "FROM EMP WHERE EMPNAME = ?";
+
+        try (Connection conn = dataSource.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, emp_name);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                if (rs.next()) {
+
+                    login = new LoginDTO();
+                    login.setEmpno(rs.getString("EMPNO"));
+                    login.setEname(rs.getString("ENAME"));
+                    login.setEmp_pw(rs.getString("EMP_PW"));
+                    login.setDept(rs.getString("DEPT"));
+                    login.setJob(rs.getString("JOB"));
+                    login.setEmail(rs.getString("EMAIL"));
+                    login.setEmp_tel(rs.getString("EMP_TEL"));
+                    login.setStatus(rs.getString("STATUS"));
+                    login.setRole(rs.getString("ROLE"));
+                    login.setHire_date(rs.getTimestamp("HIRE_DATE"));
+                    login.setCreated_date(rs.getTimestamp("CREATED_DATE"));
+                    login.setUpdated_date(rs.getTimestamp("UPDATED_DATE"));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("사번 조회 실패", e);
+        }
+
+        return login;
+    }    
 }

@@ -260,17 +260,13 @@
       	});
       	
       	let defectOptions = {
-      		series: [
-      			Math.round(totalDefect * 0.45),
-      			Math.round(totalDefect * 0.30),
-      			Math.round(totalDefect * 0.25)
-      		],
+      		series: [],
       		chart:{
       			type: 'donut',
       			height:230
       		},
-      		labels: ['치수 불량', '스크래치', '기타 이물질'],
-            colors: ['#00E396', '#FF4560', '#FEB019'],
+      		labels: [],
+            colors: ['#00E396', '#FF4560', '#FEB019', '#008FFB', '#775DD0', '#546E7A'],
             legend: {
                 position: 'bottom'
             },
@@ -286,8 +282,8 @@
       	if(ochart !== null){
       		ochart.destroy();
         }
-        oChart = new ApexCharts(document.querySelector('#oChart'), defectOptions);
-        oChart.render();
+        ochart = new ApexCharts(document.querySelector('#oChart'), defectOptions);
+        ochart.render();
         
       	let title_text = '월별 생산계획 대비 작업 실적 및 불량 현황';
  		if(searchType == 'day') title_text = '일별 생산계획 대비 작업 실적 및 불량 현황'
@@ -405,6 +401,31 @@
       	}
       	chart = new ApexCharts(document.querySelector('#chart'), options)
       	chart.render();
+      	
+      	let reasonMap={};
+      	
+      	chartList.forEach(item => {
+      		let detailStr = item.불량사유상세;
+      		if(detailStr){
+      			let pieces = detailStr.split(',');
+				pieces.forEach(piece => {
+					let [name, qtyStr] = piece.split(':');
+					let qty = Number(qtyStr) || 0;
+					if(reasonMap[name]){
+						reasonMap[name] += qty;
+						} else {
+							reasonMap[name] = qty;
+						}
+					})
+				}      			
+			});
+      	let finalNames = Object.keys(reasonMap);
+      	let finalValues = Object.values(reasonMap);
+      	
+      	ochart.updateOptions({
+      		series: finalValues,
+      		labels: finalNames
+      	})
 		}catch (error){
 			console.error("데이터 로딩 중 에러 발생:", error);
 		}

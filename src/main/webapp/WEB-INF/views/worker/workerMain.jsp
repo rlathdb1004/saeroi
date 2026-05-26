@@ -7,30 +7,25 @@
 
 <div class="workerPage">
 
-	<%-- =========================================================
-		상단 헤더
-	========================================================= --%>
+	<!-- =====================================================
+		헤더
+	===================================================== -->
 	<div class="workerHeader">
 
-		<%-- =====================================================
+		<!-- =================================================
 			좌측 로고
-		===================================================== --%>
+		================================================= -->
 		<div class="workerLogoBox">
 
 			<div class="workerLogoIcon">
 
-				<svg viewBox="0 0 64 64"
-					class="headerSvgIcon">
-
-					<path
-						d="M8 10H28V34L42 20H56V54H8Z"
-						fill="#2f7d62"/>
-
-				</svg>
+				<img src="${pageContext.request.contextPath}/resources/saeroi_logo.png"
+					class="headerLogoImg"
+					alt="로고">
 
 			</div>
 
-			<div class="workerLogoText">
+			<div class="workerLogoText"> 
 
 				MES 작업자 화면
 
@@ -38,15 +33,20 @@
 
 		</div>
 
-		<%-- =====================================================
+		<!-- =================================================
 			우측 정보
-		===================================================== --%>
+		================================================= -->
 		<div class="workerHeaderRight">
 
-			<div class="workerProfileBox">
+			<!-- =============================================
+				프로필 클릭 시 마이페이지 이동
+			============================================= -->
+			<div class="workerProfileBox"
+				onclick="location.href='${pageContext.request.contextPath}/mypage'">
 
-				<img src="${pageContext.request.contextPath}/resources/images/common/profile.png"
-					class="workerProfileImg">
+				<img src="${pageContext.request.contextPath}/resources/kim.png"
+					class="workerProfileImg"
+					alt="프로필">
 
 				<span>
 					${workerName} 작업자
@@ -93,14 +93,14 @@
 
 	</div>
 
-	<%-- =========================================================
-		메인 컨텐츠
-	========================================================= --%>
+	<!-- =====================================================
+		컨텐츠
+	===================================================== -->
 	<div class="workerContent">
 
-		<%-- =====================================================
-			타이틀 영역
-		===================================================== --%>
+		<!-- =================================================
+			타이틀
+		================================================= -->
 		<div class="workerTitleArea">
 
 			<div class="workerTitleBar"></div>
@@ -123,9 +123,9 @@
 
 		</div>
 
-		<%-- =====================================================
+		<!-- =================================================
 			QR 영역
-		===================================================== --%>
+		================================================= -->
 		<div class="workerQrSection">
 
 			<div class="workerQrLeft">
@@ -137,7 +137,12 @@
 					<div class="qrCorner bottomLeft"></div>
 					<div class="qrCorner bottomRight"></div>
 
-					<div class="fakeQrPattern"></div>
+					<!-- =========================================
+						실제 QR 이미지
+					========================================= -->
+					<img src="${pageContext.request.contextPath}/resources/real-qr.png"
+						class="realQrImg"
+						alt="QR">
 
 					<div class="scanLine"></div>
 
@@ -184,15 +189,17 @@
 
 		</div>
 
-		<%-- =====================================================
-			메뉴 카드 영역
-		===================================================== --%>
+		<!-- =================================================
+			카드 영역
+		================================================= -->
 		<div class="workerCardWrap">
 
-			<%-- =================================================
-				작업지시 조회
-			================================================= --%>
-			<div class="workerCard">
+			<!-- =============================================
+				작업지시 조회 카드
+			============================================= -->
+			<div class="workerCard"
+				onclick="location.href='${pageContext.request.contextPath}/production/workorder'"
+				style="cursor:pointer;">
 
 				<div class="workerIconCircle">
 
@@ -220,7 +227,8 @@
 				</p>
 
 				<button type="button"
-					class="workerMoveBtn">
+					class="workerMoveBtn"
+					onclick="location.href='${pageContext.request.contextPath}/production/workorder'">
 
 					→
 
@@ -228,10 +236,13 @@
 
 			</div>
 
-			<%-- =================================================
-				생산실적 등록
-			================================================= --%>
-			<div class="workerCard">
+			<!-- =============================================
+				생산실적 등록 카드
+				작업자 전용 생산실적 페이지 이동
+			============================================= -->
+			<div class="workerCard"
+				onclick="location.href='${pageContext.request.contextPath}/worker/productionresult'"
+				style="cursor:pointer;">
 
 				<div class="workerIconCircle">
 
@@ -258,8 +269,12 @@
 
 				</p>
 
+				<!-- =========================================
+					버튼 클릭 시 작업자 생산실적 이동
+				========================================= -->
 				<button type="button"
-					class="workerMoveBtn">
+					class="workerMoveBtn"
+					onclick="location.href='${pageContext.request.contextPath}/worker/productionresult'">
 
 					→
 
@@ -267,10 +282,13 @@
 
 			</div>
 
-			<%-- =================================================
-				공지사항 / 게시판
-			================================================= --%>
-			<div class="workerCard">
+			<!-- =============================================
+				공지사항 / 게시판 카드
+				현재 공지사항 페이지로 이동
+			============================================= -->
+			<div class="workerCard"
+				onclick="location.href='${pageContext.request.contextPath}/notice/list'"
+				style="cursor:pointer;">
 
 				<div class="workerIconCircle">
 
@@ -298,7 +316,8 @@
 				</p>
 
 				<button type="button"
-					class="workerMoveBtn">
+					class="workerMoveBtn"
+					onclick="location.href='${pageContext.request.contextPath}/notice/list'">
 
 					→
 
@@ -358,9 +377,6 @@
 		border-bottom: 2px solid var(--mainColor);
 	}
 
-	/* =====================================================
-		로고
-	===================================================== */
 	.workerLogoBox {
 
 		display: flex;
@@ -369,10 +385,13 @@
 		gap: 14px;
 	}
 
-	.headerSvgIcon {
+	.headerLogoImg {
 
-		width: 32px;
-		height: 32px;
+		width: 34px;
+		height: 34px;
+
+		object-fit: contain;
+		display: block;
 	}
 
 	.workerLogoText {
@@ -381,9 +400,6 @@
 		font-weight: 700;
 	}
 
-	/* =====================================================
-		우측 정보
-	===================================================== */
 	.workerHeaderRight {
 
 		display: flex;
@@ -392,6 +408,9 @@
 		gap: 14px;
 	}
 
+	/* =====================================================
+		프로필
+	===================================================== */
 	.workerProfileBox {
 
 		display: flex;
@@ -400,6 +419,9 @@
 		gap: 8px;
 
 		font-size: 14px;
+		font-weight: 600;
+
+		cursor: pointer;
 	}
 
 	.workerProfileImg {
@@ -408,7 +430,9 @@
 		height: 30px;
 
 		border-radius: 50%;
+
 		object-fit: cover;
+		display: block;
 	}
 
 	.workerInfoItem {
@@ -528,9 +552,6 @@
 		width: 48%;
 	}
 
-	/* =====================================================
-		QR 코드
-	===================================================== */
 	.qrCodeBox {
 
 		position: relative;
@@ -543,16 +564,20 @@
 		justify-content: center;
 	}
 
-	.fakeQrPattern {
+	/* =====================================================
+		실제 QR 이미지
+	===================================================== */
+	.realQrImg {
 
-		width: 180px;
-		height: 180px;
+		width: 170px;
+		height: 170px;
 
-		background-image:
-			linear-gradient(90deg,#000 10%,transparent 10%),
-			linear-gradient(#000 10%,transparent 10%);
+		object-fit: contain;
 
-		background-size: 18px 18px;
+		display: block;
+
+		position: relative;
+		z-index: 1;
 	}
 
 	.scanLine {
@@ -569,6 +594,8 @@
 		box-shadow: 0 0 18px #57ff9f;
 
 		animation: scanMove 2s linear infinite;
+
+		z-index: 2;
 	}
 
 	@keyframes scanMove {
@@ -593,6 +620,8 @@
 
 		border-color: var(--mainColor);
 		border-style: solid;
+
+		z-index: 3;
 	}
 
 	.topLeft {
