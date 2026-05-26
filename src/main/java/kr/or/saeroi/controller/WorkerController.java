@@ -15,7 +15,7 @@ import kr.or.saeroi.dto.ProductionDTO;
 import kr.or.saeroi.service.ProductionService;
 
 // =========================================================
-// 작업자 메인 컨트롤러
+// 작업자 컨트롤러
 // =========================================================
 @Controller
 public class WorkerController {
@@ -27,7 +27,7 @@ public class WorkerController {
 	private ProductionService productionService;
 
 	// =====================================================
-	// 작업자 메인 화면
+	// 작업자 메인 페이지
 	// =====================================================
 	@RequestMapping("/worker/main")
 	public String workerMain(
@@ -35,27 +35,18 @@ public class WorkerController {
 			Model model) {
 
 		// =================================================
-		// 로그인 사용자 정보 가져오기
+		// 로그인 세션 확인
 		// =================================================
 		LoginDTO loginUser =
 			(LoginDTO) session.getAttribute(
 				"loginUser");
 
 		// =================================================
-		// 로그인 안했으면 로그인 이동
+		// 로그인 안했으면 로그인 페이지 이동
 		// =================================================
 		if (loginUser == null) {
 
 			return "redirect:/login";
-		}
-
-		// =================================================
-		// 작업자만 접근 가능
-		// =================================================
-		if (!"WORKER".equals(
-				loginUser.getRole())) {
-
-			return "redirect:/";
 		}
 
 		// =================================================
@@ -70,111 +61,14 @@ public class WorkerController {
 			loginUser.getDept());
 
 		// =================================================
-		// 작업자 메인 이동
+		// 작업자 메인 페이지 이동
 		// =================================================
 		return "worker/workerMain";
 	}
 
 	// =====================================================
-	// 작업자 생산실적 조회
-	// =====================================================
-	@RequestMapping("/worker/productionresult")
-	public String workerProductionResult(
-			HttpSession session,
-			Model model) {
-
-		// =================================================
-		// 로그인 사용자 정보
-		// =================================================
-		LoginDTO loginUser =
-			(LoginDTO) session.getAttribute(
-				"loginUser");
-
-		// =================================================
-		// 로그인 안했으면 로그인 이동
-		// =================================================
-		if (loginUser == null) {
-
-			return "redirect:/login";
-		}
-
-		// =================================================
-		// 생산실적 전체 조회
-		// =================================================
-		List<ProductionDTO> allList =
-			productionService
-				.selectProductionResultList(
-					new ProductionDTO());
-
-		// =================================================
-		// 로그인 작업자 데이터 저장 리스트
-		// =================================================
-		List<ProductionDTO> workerList =
-			new ArrayList<>();
-
-		// =================================================
-		// 로그인 작업자 이름
-		// =================================================
-		String loginName =
-			loginUser.getEname();
-
-		// =================================================
-		// 로그인한 작업자 생산실적만 저장
-		// =================================================
-		for (ProductionDTO dto : allList) {
-
-			// =============================================
-			// DB 작업자 이름
-			// =============================================
-			String dbName =
-				dto.getEname();
-
-			// =============================================
-			// null 체크
-			// =============================================
-			if (dbName == null) {
-
-				continue;
-			}
-
-			// =============================================
-			// 공백 제거
-			// =============================================
-			dbName =
-				dbName.trim();
-
-			// =============================================
-			// 정확히 로그인 사용자만 조회
-			// =============================================
-			if (dbName.equals(loginName)) {
-
-				workerList.add(dto);
-			}
-		}
-
-		// =================================================
-		// JSP 전달
-		// =================================================
-		model.addAttribute(
-			"list",
-			workerList);
-
-		model.addAttribute(
-			"workerName",
-			loginUser.getEname());
-
-		model.addAttribute(
-			"workerDept",
-			loginUser.getDept());
-
-		// =================================================
-		// 작업자 생산실적 화면 이동
-		// =================================================
-		return "worker/workerProductionResult";
-	}
-
-	// =====================================================
-	// 작업자 작업지시 조회
+	// 작업지시 조회
+	// 로그인한 작업자 본인 데이터만 출력
 	// =====================================================
 	@RequestMapping("/worker/workorder")
 	public String workerWorkOrder(
@@ -182,7 +76,7 @@ public class WorkerController {
 			Model model) {
 
 		// =================================================
-		// 로그인 사용자 정보
+		// 로그인 세션 확인
 		// =================================================
 		LoginDTO loginUser =
 			(LoginDTO) session.getAttribute(
@@ -197,56 +91,51 @@ public class WorkerController {
 		}
 
 		// =================================================
-		// 작업지시 전체 조회
+		// 전체 작업지시 조회
 		// =================================================
 		List<ProductionDTO> allList =
-			productionService
-				.selectWorkOrderList(
-					new ProductionDTO());
+			productionService.selectWorkOrderList(
+				new ProductionDTO());
 
 		// =================================================
-		// 로그인 작업자 작업지시 저장 리스트
+		// 로그인 작업자 데이터만 저장할 리스트
 		// =================================================
-		List<ProductionDTO> workerList =
+		List<ProductionDTO> myWorkList =
 			new ArrayList<>();
 
 		// =================================================
-		// 로그인 작업자 이름
+		// 로그인 사용자 이름
 		// =================================================
-		String loginName =
-			loginUser.getEname();
+		String myName = "";
+
+		if (loginUser.getEname() != null) {
+
+			myName =
+				loginUser.getEname().trim();
+		}
 
 		// =================================================
-		// 로그인한 작업자 작업지시만 저장
+		// 로그인한 작업자 데이터만 필터링
 		// =================================================
-		for (ProductionDTO dto : allList) {
+		if (allList != null) {
 
-			// =============================================
-			// DB 작업자 이름
-			// =============================================
-			String dbName =
-				dto.getEname();
+			for (ProductionDTO item : allList) {
 
-			// =============================================
-			// null 체크
-			// =============================================
-			if (dbName == null) {
+				String itemEname = "";
 
-				continue;
-			}
+				if (item.getEname() != null) {
 
-			// =============================================
-			// 공백 제거
-			// =============================================
-			dbName =
-				dbName.trim();
+					itemEname =
+						item.getEname().trim();
+				}
 
-			// =============================================
-			// 정확히 로그인 사용자만 조회
-			// =============================================
-			if (dbName.equals(loginName)) {
+				// =========================================
+				// 이름 비교
+				// =========================================
+				if (itemEname.equals(myName)) {
 
-				workerList.add(dto);
+					myWorkList.add(item);
+				}
 			}
 		}
 
@@ -255,7 +144,7 @@ public class WorkerController {
 		// =================================================
 		model.addAttribute(
 			"list",
-			workerList);
+			myWorkList);
 
 		model.addAttribute(
 			"workerName",
@@ -266,8 +155,63 @@ public class WorkerController {
 			loginUser.getDept());
 
 		// =================================================
-		// 작업자 작업지시 화면 이동
+		// 기존 작업지시 페이지 이동
 		// =================================================
-		return "worker/workerWorkOrder";
+		return "production/workorder";
+	}
+
+	// =====================================================
+	// 생산실적 페이지 이동
+	// 기존 생산실적 Controller 로 redirect
+	// CSS / JS / 데이터 정상 출력
+	// =====================================================
+	@RequestMapping("/worker/productionresult")
+	public String workerProductionResult(
+			HttpSession session,
+			Model model) {
+
+		// =================================================
+		// 로그인 세션 확인
+		// =================================================
+		LoginDTO loginUser =
+			(LoginDTO) session.getAttribute(
+				"loginUser");
+
+		// =================================================
+		// 로그인 안했으면 로그인 이동
+		// =================================================
+		if (loginUser == null) {
+
+			return "redirect:/login";
+		}
+
+		// =================================================
+		// 기존 생산실적 Controller 로 이동
+		// =================================================
+		return "redirect:/production/productionresult";
+	}
+
+	// =====================================================
+	// 공지사항 연결
+	// =====================================================
+	@RequestMapping("/worker/notice")
+	public String workerNotice() {
+
+		// =================================================
+		// 실제 공지사항 Controller 경로로 이동
+		// =================================================
+		return "redirect:/notice/noticelist";
+	}
+
+	// =====================================================
+	// 게시판 연결
+	// =====================================================
+	@RequestMapping("/worker/board")
+	public String workerBoard() {
+
+		// =================================================
+		// 실제 게시판 Controller 경로로 이동
+		// =================================================
+		return "redirect:/board/boardlist";
 	}
 }
