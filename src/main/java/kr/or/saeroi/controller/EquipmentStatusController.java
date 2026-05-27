@@ -66,7 +66,7 @@ public class EquipmentStatusController {
         return "redirect:/equipment/equipmentstatus";
     }
     
-    @GetMapping("/equipment_status/detail")
+    @GetMapping("/equipment/equipmentstatus/detail")
     public String equipment_status_detail(
     		@RequestParam("history_id") int history_id, 
     		@RequestParam(required = false) String mode,
