@@ -371,4 +371,14 @@ public class QualityController {
 		return "redirect:/quality/defect_detail?defect_list_id=" + defect_list_id;
 	}
 
+	//불량관리 상세 모달 emp옵션
+	@ResponseBody
+	@RequestMapping(value = "/defect/action/empOption", method = RequestMethod.GET)
+	public List<DefectDTO> defect_action_emp_option(@RequestParam(required = false) String dept) {
+
+		List<DefectDTO> empList = qualityService._ser_select_Defect_action_emp_option(dept);
+
+		return empList;
+	}
+
 }

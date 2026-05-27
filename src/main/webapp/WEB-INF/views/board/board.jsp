@@ -9,6 +9,11 @@
 	background: #fff4cc;
 	border: 1px solid #f2d27a;
 }
+
+.board_check_col {
+	width: 64px;
+	min-width: 64px;
+}
 </style>
 
 <div class="coPageWrap">
@@ -64,8 +69,9 @@
 		</div>
 	</form>
 
-	<form method="post" id="deleteForm" accept-charset="UTF-8"
-		action="${pageContext.request.contextPath}/board/suggestion/delete">
+	<form method="post" id="boardDeleteForm" accept-charset="UTF-8"
+		action="${pageContext.request.contextPath}/board/suggestion/delete"
+		onsubmit="return checkBoardDelete();">
 
 		<div class="coTableTop">
 			<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
@@ -108,7 +114,8 @@
 			<table class="coTable">
 				<thead>
 					<tr>
-						<th class="mobile_show checkAllHeader" style="cursor: pointer;">선택</th>
+						<th class="mobile_show checkAllHeader board_check_col"
+							style="cursor: pointer;">선택</th>
 						<th class="mobile_show">처리상태</th>
 						<th class="mobile_show">제목</th>
 						<th class="mobile_hidden">작성자</th>
@@ -122,16 +129,21 @@
 				<tbody>
 					<c:forEach var="board" items="${list}">
 						<tr>
-							<td class="mobile_show"><input type="checkbox" name="board_id"
-								value="${board.board_id}"></td>
+							<td class="mobile_show board_check_col"><c:if
+									test="${isLogin}">
+									<input type="checkbox" name="board_id"
+										value="${board.board_id}">
+								</c:if></td>
 
 							<td class="mobile_show"><c:choose>
 									<c:when test="${board.status == '처리완료'}">
 										<span class="coStatus coStatusUse">${board.status}</span>
 									</c:when>
+
 									<c:when test="${board.status == '반려'}">
 										<span class="coStatus coStatusStop">${board.status}</span>
 									</c:when>
+
 									<c:otherwise>
 										<span class="coStatus coStatusWait">${board.status}</span>
 									</c:otherwise>
@@ -165,6 +177,20 @@
 	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 
 </div>
+
+<script>
+	function checkBoardDelete() {
+		const checkedList = document
+				.querySelectorAll('input[name="board_id"]:checked');
+
+		if (checkedList.length === 0) {
+			alert('삭제할 게시사항을 선택해주세요.');
+			return false;
+		}
+
+		return confirm('삭제하시겠습니까?');
+	}
+</script>
 
 <script
 	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script>
