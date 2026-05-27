@@ -163,7 +163,6 @@ public class WorkerController {
 	// =====================================================
 	// 생산실적 페이지 이동
 	// 기존 생산실적 Controller 로 redirect
-	// CSS / JS / 데이터 정상 출력
 	// =====================================================
 	@RequestMapping("/worker/productionresult")
 	public String workerProductionResult(
@@ -192,26 +191,46 @@ public class WorkerController {
 	}
 
 	// =====================================================
-	// 공지사항 연결
+	// 공지사항 페이지 이동
+	// 기존 공지사항 Controller 로 redirect
 	// =====================================================
 	@RequestMapping("/worker/notice")
-	public String workerNotice() {
+	public String workerNotice(
+			HttpSession session,
+			Model model) {
 
 		// =================================================
-		// 실제 공지사항 Controller 경로로 이동
+		// 로그인 세션 확인
 		// =================================================
-		return "redirect:/notice/noticelist";
+		LoginDTO loginUser =
+			(LoginDTO) session.getAttribute(
+				"loginUser");
+
+		// =================================================
+		// 로그인 안했으면 로그인 이동
+		// =================================================
+		if (loginUser == null) {
+
+			return "redirect:/login";
+		}
+
+		// =================================================
+		// 기존 공지사항 Controller 로 이동
+		// =================================================
+		return "redirect:/board/notice";
 	}
 
 	// =====================================================
-	// 게시판 연결
+	// 기존 notice/list 요청 처리
+	// 팀원 JSP 호환용
 	// =====================================================
-	@RequestMapping("/worker/board")
-	public String workerBoard() {
+	@RequestMapping("/notice/list")
+	public String noticeListRedirect() {
 
 		// =================================================
-		// 실제 게시판 Controller 경로로 이동
+		// 실제 공지사항 Controller 로 이동
 		// =================================================
-		return "redirect:/board/boardlist";
+		return "redirect:/board/notice";
 	}
+
 }
