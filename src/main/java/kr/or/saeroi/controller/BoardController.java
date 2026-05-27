@@ -353,7 +353,7 @@ public class BoardController {
 
 		model.addAttribute("list", page_list);
 		model.addAttribute("pageInfo", pageInfo);
-		model.addAttribute("pageUrl", "/board/board");
+		model.addAttribute("pageUrl", "/board/suggestion");
 
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
@@ -376,5 +376,187 @@ public class BoardController {
 		model.addAttribute("searchParam", searchParam);
 
 		return "board/board.tiles";
+	}
+
+	// 게시판 상세
+	@RequestMapping("/suggestion/detail")
+	public String board_detail(Model model, HttpSession session, @RequestParam(required = false) String board_id) {
+
+		// 게시판 번호 없으면 목록으로 이동
+		if (board_id == null || board_id.equals("")) {
+			return "redirect:/board/suggestion";
+		}
+
+		// 로그인한 사용자 정보 가져옴
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		String empno = null;
+		String role = null;
+
+		// 로그인한 사용자 사번과 권한 가져옴
+		if (loginUser != null) {
+			empno = loginUser.getEmpno();
+			role = loginUser.getRole();
+		}
+
+		// 게시판 상세 조회
+		BoradDTO board = boardService._ser_select_Board_detail(board_id, role);
+
+		// 조회 권한 없거나 없는 글이면 목록으로 이동
+		if (board == null) {
+			return "redirect:/board/board_detail";
+		}
+
+		// 작성자 본인이 아니면 조회수 증가
+		boardService._ser_update_Board_view_count(board_id, empno);
+
+		// 조회수 증가 후 최신 상세 정보 다시 조회
+		board = boardService._ser_select_Board_detail(board_id, role);
+
+		// 공지 첨부파일 조회
+		BoradDTO boardFile = boardService._ser_select_Board_file(board_id);
+
+		// JSP로 상세 정보 전달
+		model.addAttribute("board", board);
+		model.addAttribute("boardFile", boardFile);
+
+		return "board/board_detail.tiles";
+	}
+
+	// 게시판 등록 페이지
+	@RequestMapping(value = "/suggestion/add", method = RequestMethod.GET)
+	public String suggestion_add_page(HttpSession session) {
+
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		if (loginUser == null) {
+			return "redirect:/board/suggestion";
+		}
+
+		return "board/board_add.tiles";
+	}
+
+	// 게시판 등록
+	@RequestMapping(value = "/suggestion/add", method = RequestMethod.POST)
+	public String suggestion_add(Model model, HttpSession session, HttpServletRequest request,
+			@RequestParam(required = false) String title, @RequestParam(required = false) String content,
+			@RequestParam(required = false) String status, @RequestParam(required = false) String remark,
+			@RequestParam(value = "boardFile", required = false) MultipartFile boardFile) throws IOException {
+
+		// 로그인한 사용자 정보 가져옴
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		// 로그인 안 했으면 목록으로 이동
+		if (loginUser == null) {
+			return "redirect:/board/suggestion";
+		}
+
+		// 작성자 사번 가져옴
+		String empno = loginUser.getEmpno();
+
+		// 처리상태 값이 없으면 기본값 접수로 등록
+		if (status == null || status.equals("")) {
+			status = "접수";
+		}
+
+		// 첨부파일과 연결할 게시판 번호 먼저 조회
+		int board_id = boardService._ser_select_next_Board_id();
+
+		// 게시판 등록 실행
+		int insert_result = boardService._ser_insert_Board(board_id, title, content, empno, status, remark);
+
+		// 첨부파일 있으면 파일 저장 후 DB 등록
+		if (insert_result > 0 && boardFile != null && !boardFile.isEmpty()) {
+			String originalFilename = boardFile.getOriginalFilename();
+
+			if (originalFilename != null && !originalFilename.trim().equals("")) {
+				String savedFilename = makeBoardSavedFilename(board_id, originalFilename);
+
+				String filePath = saveBoardFile(boardFile, request, savedFilename);
+
+				boardService._ser_insert_Board_file(board_id, originalFilename, savedFilename, filePath,
+						boardFile.getSize());
+			}
+		}
+
+		System.out.println("board_insert_result: " + insert_result);
+
+		return "redirect:/board/suggestion";
+	}
+
+	// 게시판 첨부파일 저장 이름 생성
+	private String makeBoardSavedFilename(int board_id, String originalFilename) {
+		String extension = "";
+
+		int dotIndex = originalFilename.lastIndexOf(".");
+
+		if (dotIndex > -1) {
+			extension = originalFilename.substring(dotIndex);
+		}
+
+		String timestamp = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
+
+		return "board_" + board_id + "_" + timestamp + extension;
+	}
+
+	// 게시판 첨부파일 서버 저장
+	private String saveBoardFile(MultipartFile boardFile, HttpServletRequest request, String savedFilename)
+			throws IOException {
+
+		String uploadRelativePath = "/resources/upload/board/";
+
+		String uploadRealPath = request.getServletContext().getRealPath(uploadRelativePath);
+
+		File uploadDir = new File(uploadRealPath);
+
+		if (!uploadDir.exists()) {
+			uploadDir.mkdirs();
+		}
+
+		File savedFile = new File(uploadDir, savedFilename);
+
+		boardFile.transferTo(savedFile);
+
+		return uploadRelativePath + savedFilename;
+	}
+
+	// 게시판 삭제
+	@RequestMapping(value = "/suggestion/delete", method = RequestMethod.POST)
+	public String suggestion_delete(HttpSession session,
+			@RequestParam(value = "board_id", required = false) String[] board_id) {
+
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		if (loginUser == null) {
+			return "redirect:/board/suggestion";
+		}
+
+		if (board_id != null && board_id.length > 0) {
+			boardService._ser_delete_Board(board_id, loginUser.getRole(), loginUser.getEmpno());
+		}
+
+		return "redirect:/board/suggestion";
+	}
+
+	// 게시판 수정
+	@RequestMapping(value = "/suggestion/update", method = RequestMethod.POST)
+	public String suggestion_update(HttpSession session, @RequestParam(required = false) String board_id,
+			@RequestParam(required = false) String title, @RequestParam(required = false) String content,
+			@RequestParam(required = false) String status, @RequestParam(required = false) String remark) {
+
+		if (board_id == null || board_id.equals("")) {
+			return "redirect:/board/suggestion";
+		}
+
+		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+
+		if (loginUser == null) {
+			return "redirect:/board/suggestion";
+		}
+
+		boardService._ser_update_Board(board_id, title, content, status, remark, loginUser.getRole(),
+				loginUser.getEmpno());
+
+		return "redirect:/board/suggestion/detail?board_id=" + board_id;
 	}
 }
