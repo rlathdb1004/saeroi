@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import kr.or.saeroi.common.PageDTO;
+import kr.or.saeroi.dto.InspectionDTO;
+
 @Controller
 @RequestMapping("/report")
 public class ChartController {
@@ -28,6 +31,8 @@ public class ChartController {
 
 	@RequestMapping("/chart")
 	public String Chart(
+			@RequestParam(defaultValue = "1") int page,
+			@RequestParam(defaultValue = "5") int size,
 			@RequestParam(value="searchType", required=false) String searchType,
 			@RequestParam(value="searchItem", required=false) String searchItem,
 			@RequestParam(value="startDate", required=false) String startDate,
@@ -43,8 +48,12 @@ public class ChartController {
 		model.addAttribute("searchItem", searchItem);
 		model.addAttribute("startDate", startDate);
 		model.addAttribute("endDate", endDate);
+		
 		return "report/chart.tiles";
 	}
+	
+	
+	
 	
 	@RequestMapping("/chart_bar")
 	@ResponseBody

@@ -11,98 +11,42 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
 <style>
-/* #chart { */
-/* 	max-width: 100%; */
-/* 	margin: 40px auto; */
-/* } */
-/* /* 대시보드 전체 레이아웃 (가로 배열) */
-*
-/
-/* .dashboard-container { */
-/* 	display: flex; */
-/* 	gap: 20px; */
-/* 	max-width: 1400px; /* 화면에 맞춰 최대 폭 확장 */
-
- 
-
-*
-/
-/* 	margin: 20px auto; */
-/* 	padding: 0 20px; */
-/* } */
-
-/* .left-panel { */
-/* 	flex: 7; /* 좌측 70% 비율 */
-
- 
-
-*
-/
-/* 	background: #fff; */
-/* 	padding: 15px; */
-/* 	border-radius: 8px; */
-/* 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
-/* } */
-
-/* .right-panel { */
-/* 	flex: 3; /* 우측 30% 비율 */
-
- 
-
-*
-/
-/* 	display: flex; */
-/* 	flex-direction: column; */
-/* 	gap: 20px; */
-/* } */
-
-/* .chart-box, .table-box { */
-/* 	background: #fff; */
-/* 	padding: 15px; */
-/* 	border-radius: 8px; */
-/* 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); */
-/* } */
-
-/* .box-title { */
-/* 	margin-top: 0; */
-/* 	margin-bottom: 15px; */
-/* 	font-size: 16px; */
-/* 	font-weight: bold; */
-/* 	color: #333; */
-/* 	border-left: 4px solid #008FFB; */
-/* 	padding-left: 8px; */
-/* } */
-
-/* /* 데이터 테이블 스타일 */
-
- 
-
-*
-/
-/* .report-table { */
-/* 	width: 100%; */
-/* 	border-collapse: collapse; */
-/* 	font-size: 13px; */
-/* 	text-align: center; */
-/* } */
-
-/* .report-table th { */
-/* 	background-color: #f8f9fa; */
-/* 	color: #495057; */
-/* 	font-weight: 600; */
-/* 	padding: 8px; */
-/* 	border-bottom: 2px solid #dee2e6; */
-/* } */
-
-/* .report-table td { */
-/* 	padding: 8px; */
-/* 	border-bottom: 1px solid #dee2e6; */
-/* 	color: #333; */
-/* } */
-
-/* .report-table tr:hover { */
-/* 	background-color: #f1f3f5; */
-/* } */
+.coPagination {
+		display: flex !important;
+		list-style: none !important;
+		padding: 0 !important;
+		margin: 20px 0 !important;
+		justify-content: center !important;
+		align-items: center !important;
+		gap: 6px !important;
+	}
+	.coPagination li {
+		display: inline-block !important;
+		margin: 0 !important;
+		padding: 0 !important;
+	}
+	.coPagination li a, .coPagination li span {
+		display: block !important;
+		padding: 6px 12px !important;
+		border: 1px solid #dee2e6 !important;
+		color: #007bff !important;
+		text-decoration: none !important;
+		border-radius: 4px !important;
+		font-size: 14px !important;
+		cursor: pointer;
+	}
+	.coPagination li.active strong {
+		display: block !important;
+		padding: 6px 12px !important;
+		background-color: #007bff !important;
+		color: #fff !important;
+		border: 1px solid #007bff !important;
+		border-radius: 4px !important;
+		font-size: 14px !important;
+	}
+	.coPagination li a:hover {
+		background-color: #e9ecef !important;
+	}
 </style>
 </head>
 <body>
@@ -171,7 +115,7 @@
 		</div>
 	</div>
 	</div>
-		<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+	<div id="paginationContainer" class="coPaginationWrap"></div>
 	</div>
 
 	<script>
@@ -181,26 +125,33 @@
 		loadChartData('month','all');
 		
 		document.querySelector('#startDate').addEventListener('change', function(){
+			currentPage = 1;
 		    let type = document.querySelector('#select_type').value || 'month';
 		    let item = document.querySelector('#select_item').value || 'all';
 		    loadChartData(type,item);
 		});
 		
 		document.querySelector('#endDate').addEventListener('change', function(){
-		    let type = document.querySelector('#select_type').value || 'month';
+			currentPage = 1;
+			let type = document.querySelector('#select_type').value || 'month';
 		    let item = document.querySelector('#select_item').value || 'all';
 		    loadChartData(type,item);
 		});
 		document.querySelector('#select_type').addEventListener('change', function(){
-		    let item = document.querySelector('#select_item').value || 'all';
+			currentPage = 1;
+			let item = document.querySelector('#select_item').value || 'all';
 		    loadChartData(this.value,item);
 		});
 		document.querySelector('#select_item').addEventListener('change', function(){
-		    let type = document.querySelector('#select_type').value || 'month';
+			currentPage = 1;
+			let type = document.querySelector('#select_type').value || 'month';
 		    loadChartData(type,this.value);
 		});
 		
 	});
+	
+	let currentPage = 1;
+	const pageSize = 5;
 	
 	async function loadChartData(searchType, searchItem) {
 		// contextPath를 포함해서 AJAX 요청 주소를 고정한다.
@@ -255,7 +206,19 @@
         		return true;
         	})
         }
-        
+        ////////////////////////////////////////////////////////////
+       let totalCount = chartList.length;
+        document.querySelector('.coTotalCount').innerText = `총 ${totalCount}건`;
+
+        // 2. 페이징 계산 (JavaScript 버전)
+        let totalPage = Math.ceil(totalCount / pageSize) || 1;
+        if (currentPage > totalPage) currentPage = totalPage;
+
+        let startIndex = (currentPage - 1) * pageSize;
+        let endIndex = Math.min(startIndex + pageSize, totalCount);
+        let pagedList = chartList.slice(startIndex, endIndex);
+
+        /////////////////////////////////////////////////////////
         let tableBody = document.querySelector('#tableBody')
         tableBody.innerHTML = '';
         let totalPlan = 0, totalOrder = 0, totalDefect = 0;
@@ -266,7 +229,7 @@
       	let orderValues = chartList.map(item => item.작업량);
       	let defectValues = chartList.map(item => item.불량수량);
       	
-      	chartList.forEach(item => {
+      	pagedList.forEach(item => {
       		let row = document.createElement('tr');
       		row.innerHTML = `
       			<td class="mobile_show"><input type="checkbox" name="orderIds"
@@ -285,10 +248,48 @@
             totalDefect += Number(item.불량수량 || 0);
       	});
       	
-      
+		/////////////////////////////////////////////////////
+  		renderPagination(totalPage, searchType, searchItem);
+  		////////////////////////////////////////////////////////
 		}catch (error){
 			console.error("데이터 로딩 중 에러 발생:", error);
 		}
+	}
+	
+	function renderPagination(totalPage, searchType, searchItem) {
+	    let container = document.querySelector('#paginationContainer');
+	    container.innerHTML = '';
+
+	    // 간단한 이전/다음 버튼 예시 (필요시 스타일링에 맞춰 pagination 디자인 수정)
+	    let html = '<ul class="coPagination">';
+	    
+	    // [이전] 버튼
+	    if (currentPage > 1) {
+	        html += `<li><a href="#" onclick="changePage(${currentPage - 1}, '${searchType}', '${searchItem}'); return false;">이전</a></li>`;
+	    }
+
+	    // 숫자 버튼 (최대 5개씩 끊어서 보여주는 등 응용 가능)
+	    for (let i = 1; i <= totalPage; i++) {
+	        if (i === currentPage) {
+	            html += '<li class="active-page"><span>' + i + '</span></li>';
+	        } else {
+	            html += '<li><a href="#" onclick="changePage(' + i + ', \'' + searchType + '\', \'' + searchItem + '\'); return false;">' + i + '</a></li>';
+	        }
+	    }
+
+	    // [다음] 버튼
+	    if (currentPage < totalPage) {
+	        html += `<li><a href="#" onclick="changePage(${currentPage + 1}, '${searchType}', '${searchItem}'); return false;">다음</a></li>`;
+	    }
+	    
+	    html += '</ul>';
+	    container.innerHTML = html;
+	}
+
+	// 페이지 변경 시 호출되는 함수
+	function changePage(page, searchType, searchItem) {
+	    currentPage = page;
+	    loadChartData(searchType, searchItem);
 	}
 </script>
 
