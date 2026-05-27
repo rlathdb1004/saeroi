@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    기준관리 > 불량코드관리 Mapper
+
+    기준:
+    - 기존 DefectDTO / quality.xml과 충돌 방지를 위해 MasterDefectCode 명칭 사용
+    - DB 테이블은 defect 사용
+    - 불량코드는 defect_code의 prefix + 3자리 일련번호로 자동생성
+    - 신규 불량코드 prefix 직접 입력 가능
+    - 실제 DELETE 대신 use_yn = 'N' 미사용 처리
+    - 목록 컬럼 기준: PC 체크박스 포함 8개, 모바일 체크박스 포함 5개
+-->
+<mapper namespace="masterDefectCode">
+
+    <!-- =========================================================
+         1. ResultMap
+         ========================================================= -->
+
+    <resultMap id="masterDefectCodeResultMap"
+               type="kr.or.saeroi.dto.MasterDefectCodeDTO">
+
+        <!-- defect 기본 컬럼 -->
+        <id property="defectId" column="defect_id" />
+
+        <result property="defectCode" column="defect_code" />
+        <result property="defectType" column="defect_type" />
+        <result property="defectName" column="defect_name" />
+        <result property="createdDate" column="created_date" />
+        <result property="updatedDate" column="updated_date" />
+        <result property="remark" column="remark" />
+        <result property="useYn" column="use_yn" />
+
+        <!-- defect_code에서 추출한 불량코드 prefix -->
+        <result property="defectCodePrefix" column="defect_code_prefix" />
+
+        <!-- 화면 표시용 컬럼 -->
+        <result property="useYnName" column="use_yn_name" />
+
+    </resultMap>
+
+
+    <!-- =========================================================
+         2. 공통 검색조건
+         ========================================================= -->
+
+    <sql id="masterDefectCodeSearchWhere">
+
+        <where>
+
+            <if test="searchType != null and searchType != ''
+                      and searchKeyword != null and searchKeyword != ''">
+
+                <choose>
+
+                    <!-- 불량코드 prefix 검색 -->
+                    <when test="searchType == 'defectCodePrefix'">
+                        AND UPPER(
+                            REGEXP_REPLACE(d.defect_code, '-[0-9]{3}$', '')
+                        ) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 불량코드 검색 -->
+                    <when test="searchType == 'defectCode'">
+                        AND UPPER(d.defect_code) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 불량유형 검색 -->
+                    <when test="searchType == 'defectType'">
+                        AND UPPER(d.defect_type) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 불량명 검색 -->
+                    <when test="searchType == 'defectName'">
+                        AND UPPER(d.defect_name) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 비고 검색 -->
+                    <when test="searchType == 'remark'">
+                        AND UPPER(d.remark) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 사용여부 검색 -->
+                    <when test="searchType == 'useYn'">
+                        AND (
+                            UPPER(d.use_yn) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                            OR
+                            CASE
+                                WHEN d.use_yn = 'Y' THEN '사용'
+                                WHEN d.use_yn = 'N' THEN '미사용'
+                                ELSE d.use_yn
+                            END LIKE '%' || #{searchKeyword} || '%'
+                        )
+                    </when>
+
+                </choose>
+
+            </if>
+
+        </where>
+
+    </sql>
+
+
+    <!-- =========================================================
+         3. 불량코드 목록 / 건수 / 상세
+         ========================================================= -->
+
+    <select id="selectMasterDefectCodeList"
+            parameterType="kr.or.saeroi.dto.MasterDefectCodeDTO"
+            resultMap="masterDefectCodeResultMap">
+
+        SELECT
+            d.defect_id,
+            d.defect_code,
+            d.defect_type,
+            d.defect_name,
+            d.created_date,
+            d.updated_date,
+            d.remark,
+            d.use_yn,
+
+            REGEXP_REPLACE(d.defect_code, '-[0-9]{3}$', '') AS defect_code_prefix,
+
+            CASE
+                WHEN d.use_yn = 'Y' THEN '사용'
+                WHEN d.use_yn = 'N' THEN '미사용'
+                ELSE d.use_yn
+            END AS use_yn_name
+
+        FROM defect d
+
+        <include refid="masterDefectCodeSearchWhere" />
+
+        ORDER BY
+            NVL(d.use_yn, 'Y') DESC,
+            d.defect_type,
+            d.defect_code
+
+    </select>
+
+
+    <select id="selectMasterDefectCodeCount"
+            parameterType="kr.or.saeroi.dto.MasterDefectCodeDTO"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+
+        FROM defect d
+
+        <include refid="masterDefectCodeSearchWhere" />
+
+    </select>
+
+
+    <select id="selectMasterDefectCodeDetail"
+            parameterType="int"
+            resultMap="masterDefectCodeResultMap">
+
+        SELECT
+            d.defect_id,
+            d.defect_code,
+            d.defect_type,
+            d.defect_name,
+            d.created_date,
+            d.updated_date,
+            d.remark,
+            d.use_yn,
+
+            REGEXP_REPLACE(d.defect_code, '-[0-9]{3}$', '') AS defect_code_prefix,
+
+            CASE
+                WHEN d.use_yn = 'Y' THEN '사용'
+                WHEN d.use_yn = 'N' THEN '미사용'
+                ELSE d.use_yn
+            END AS use_yn_name
+
+        FROM defect d
+
+        WHERE d.defect_id = #{defectId}
+
+    </select>
+
+
+    <!-- =========================================================
+         4. 불량코드 등록 / 수정 / 미사용 처리
+         ========================================================= -->
+
+    <insert id="insertMasterDefectCode"
+            parameterType="kr.or.saeroi.dto.MasterDefectCodeDTO">
+
+        <selectKey keyProperty="defectId"
+                   resultType="int"
+                   order="BEFORE">
+            SELECT NVL(MAX(defect_id), 0) + 1
+            FROM defect
+        </selectKey>
+
+        INSERT INTO defect (
+            defect_id,
+            defect_code,
+            defect_type,
+            defect_name,
+            created_date,
+            updated_date,
+            remark,
+            use_yn
+        ) VALUES (
+            #{defectId},
+            #{defectCode},
+            #{defectType},
+            #{defectName},
+            SYSDATE,
+            SYSDATE,
+            #{remark},
+            NVL(#{useYn}, 'Y')
+        )
+
+    </insert>
+
+
+    <update id="updateMasterDefectCode"
+            parameterType="kr.or.saeroi.dto.MasterDefectCodeDTO">
+
+        UPDATE defect
+        SET
+            defect_code = #{defectCode},
+            defect_type = #{defectType},
+            defect_name = #{defectName},
+            updated_date = SYSDATE,
+            remark = #{remark},
+            use_yn = NVL(#{useYn}, 'Y')
+        WHERE defect_id = #{defectId}
+
+    </update>
+
+
+    <update id="deleteMasterDefectCodeList"
+            parameterType="java.util.List">
+
+        UPDATE defect
+        SET
+            use_yn = 'N',
+            updated_date = SYSDATE
+        WHERE defect_id IN
+
+        <foreach collection="list"
+                 item="defectId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{defectId}
+        </foreach>
+
+    </update>
+
+
+    <select id="selectMasterDefectCodeCountByCode"
+            parameterType="kr.or.saeroi.dto.MasterDefectCodeDTO"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+        FROM defect
+        WHERE UPPER(defect_code) = UPPER(#{defectCode})
+
+        <if test="defectId != null">
+            AND defect_id != #{defectId}
+        </if>
+
+    </select>
+
+
+    <!-- =========================================================
+         5. 불량코드 prefix / 자동생성
+         ========================================================= -->
+
+    <!--
+        기존 불량코드 prefix 목록 조회
+
+        예:
+        DCD-DIM-001  -> DCD-DIM
+        DCD-CUT-001  -> DCD-CUT
+        DCD-ADH-001  -> DCD-ADH
+        DEF-BAR-001  -> DEF-BAR
+
+        신규 prefix는 이 목록에 없어도 등록 화면에서 직접 입력 가능하다.
+    -->
+    <select id="selectDefectCodePrefixList"
+            resultType="string">
+
+        SELECT
+            defect_code_prefix
+        FROM (
+            SELECT DISTINCT
+                REGEXP_REPLACE(defect_code, '-[0-9]{3}$', '') AS defect_code_prefix
+            FROM defect
+            WHERE defect_code IS NOT NULL
+              AND REGEXP_LIKE(defect_code, '^[A-Z0-9]+(-[A-Z0-9]+)*-[0-9]{3}$')
+        )
+        ORDER BY defect_code_prefix
+
+    </select>
+
+
+    <!--
+        다음 불량코드 자동생성
+
+        예:
+        - DCD-DIM -> DCD-DIM-002
+        - DCD-CUT -> DCD-CUT-002
+        - DEF-BAR -> DEF-BAR-002
+        - DCD-PIN -> DCD-PIN-001
+
+        처리:
+        - 입력 prefix와 정확히 일치하는 기존 코드만 대상으로 한다.
+        - 마지막 3자리 숫자를 MAX + 1 처리한다.
+    -->
+    <select id="selectNextDefectCode"
+            parameterType="map"
+            resultType="string">
+
+        SELECT
+            #{defectCodePrefix}
+            || '-'
+            || LPAD(
+                NVL(
+                    MAX(
+                        TO_NUMBER(
+                            SUBSTR(defect_code, LENGTH(#{defectCodePrefix}) + 2)
+                        )
+                    ),
+                    0
+                ) + 1,
+                3,
+                '0'
+            ) AS next_defect_code
+        FROM defect
+        WHERE defect_code LIKE #{defectCodePrefix} || '-%'
+          AND REGEXP_LIKE(
+                defect_code,
+                '^' || #{defectCodePrefix} || '-[0-9]{3}$'
+          )
+
+    </select>
+
+</mapper>
