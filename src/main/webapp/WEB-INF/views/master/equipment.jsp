@@ -171,7 +171,7 @@
 
 									<td class="mobile_show">
 										<button type="button" class="coDetailBtn"
-											onclick="location.href='${pageContext.request.contextPath}/equipment/detail?equip_id=${eqp.equip_id}'">
+											onclick="location.href='${pageContext.request.contextPath}/equipment/equipment/detail?equip_id=${eqp.equip_id}'">
 											보기</button>
 									</td>
 								</tr>

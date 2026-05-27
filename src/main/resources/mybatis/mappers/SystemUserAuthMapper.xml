@@ -1,0 +1,485 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    시스템관리 > 사용자/권한관리 Mapper
+
+    기준:
+    - emp 테이블 기준
+    - 권한은 emp.role 그대로 사용
+    - role 값: ADMIN, MANAGER, QC, MAINT, WORKER
+    - 숫자 role_level 사용 안 함
+    - 실제 DELETE 없음
+    - 계정 사용 여부는 status로 관리: 재직, 휴직, 퇴사, 잠금
+    - 비밀번호는 Service에서 BCrypt 암호화 후 emp_pw에 저장
+-->
+<mapper namespace="systemUserAuth">
+
+    <!-- =========================================================
+         1. ResultMap
+         ========================================================= -->
+
+    <resultMap id="systemUserAuthResultMap"
+               type="kr.or.saeroi.dto.SystemUserAuthDTO">
+
+        <id property="empId" column="emp_id" />
+
+        <result property="empno" column="empno" />
+        <result property="empPw" column="emp_pw" />
+        <result property="ename" column="ename" />
+        <result property="dept" column="dept" />
+        <result property="job" column="job" />
+        <result property="hireDate" column="hire_date" />
+        <result property="empTel" column="emp_tel" />
+        <result property="email" column="email" />
+        <result property="status" column="status" />
+        <result property="role" column="role" />
+        <result property="createdDate" column="created_date" />
+        <result property="updatedDate" column="updated_date" />
+
+        <!-- 화면 표시용 -->
+        <result property="roleName" column="role_name" />
+        <result property="statusName" column="status_name" />
+
+        <!-- 보호/제어용 -->
+        <result property="lastAdmin" column="last_admin" />
+        <result property="adminAccount" column="admin_account" />
+
+    </resultMap>
+
+
+    <!-- =========================================================
+         2. 공통 SELECT 컬럼
+         ========================================================= -->
+
+    <sql id="systemUserAuthSelectColumns">
+
+        e.emp_id,
+        e.empno,
+        e.emp_pw,
+        e.ename,
+        e.dept,
+        e.job,
+        e.hire_date,
+        e.emp_tel,
+        e.email,
+        e.status,
+        e.role,
+        e.created_date,
+        e.updated_date,
+
+        CASE
+            WHEN e.role = 'ADMIN' THEN 'ADMIN(관리자)'
+            WHEN e.role = 'MANAGER' THEN 'MANAGER(생산관리)'
+            WHEN e.role = 'QC' THEN 'QC(품질관리)'
+            WHEN e.role = 'MAINT' THEN 'MAINT(설비관리)'
+            WHEN e.role = 'WORKER' THEN 'WORKER(작업자)'
+            ELSE NVL(e.role, '-')
+        END AS role_name,
+
+        CASE
+            WHEN e.status = '재직' THEN '재직'
+            WHEN e.status = '휴직' THEN '휴직'
+            WHEN e.status = '퇴사' THEN '퇴사'
+            WHEN e.status = '잠금' THEN '잠금'
+            ELSE NVL(e.status, '-')
+        END AS status_name,
+
+        CASE
+            WHEN e.role = 'ADMIN'
+             AND (
+                    SELECT COUNT(*)
+                    FROM emp admin_emp
+                    WHERE admin_emp.role = 'ADMIN'
+                      AND admin_emp.status = '재직'
+                 ) = 1
+            THEN 1
+            ELSE 0
+        END AS last_admin,
+
+        CASE
+            WHEN e.role = 'ADMIN' THEN 1
+            ELSE 0
+        END AS admin_account
+
+    </sql>
+
+
+    <!-- =========================================================
+         3. 공통 검색조건
+         ========================================================= -->
+
+    <sql id="systemUserAuthSearchWhere">
+
+        <where>
+
+            <if test="searchType != null and searchType != ''
+                      and searchKeyword != null and searchKeyword != ''">
+
+                <choose>
+
+                    <when test="searchType == 'empno'">
+                        AND UPPER(e.empno) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'ename'">
+                        AND UPPER(e.ename) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'dept'">
+                        AND UPPER(e.dept) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'job'">
+                        AND UPPER(e.job) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'role'">
+                        AND (
+                            UPPER(e.role) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                            OR
+                            CASE
+                                WHEN e.role = 'ADMIN' THEN '관리자'
+                                WHEN e.role = 'MANAGER' THEN '생산관리'
+                                WHEN e.role = 'QC' THEN '품질관리'
+                                WHEN e.role = 'MAINT' THEN '설비관리'
+                                WHEN e.role = 'WORKER' THEN '작업자'
+                                ELSE e.role
+                            END LIKE '%' || #{searchKeyword} || '%'
+                        )
+                    </when>
+
+                    <when test="searchType == 'status'">
+                        AND UPPER(e.status) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'email'">
+                        AND UPPER(e.email) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <when test="searchType == 'empTel'">
+                        AND e.emp_tel LIKE '%' || #{searchKeyword} || '%'
+                    </when>
+
+                </choose>
+
+            </if>
+
+        </where>
+
+    </sql>
+
+
+    <!-- =========================================================
+         4. 목록 / 건수 / 상세
+         ========================================================= -->
+
+    <select id="selectSystemUserAuthList"
+            parameterType="kr.or.saeroi.dto.SystemUserAuthDTO"
+            resultMap="systemUserAuthResultMap">
+
+        SELECT
+            <include refid="systemUserAuthSelectColumns" />
+        FROM emp e
+
+        <include refid="systemUserAuthSearchWhere" />
+
+        ORDER BY
+            CASE e.status
+                WHEN '재직' THEN 1
+                WHEN '휴직' THEN 2
+                WHEN '잠금' THEN 3
+                WHEN '퇴사' THEN 4
+                ELSE 5
+            END,
+            CASE e.role
+                WHEN 'ADMIN' THEN 1
+                WHEN 'MANAGER' THEN 2
+                WHEN 'QC' THEN 3
+                WHEN 'MAINT' THEN 4
+                WHEN 'WORKER' THEN 5
+                ELSE 6
+            END,
+            e.empno
+
+    </select>
+
+
+    <select id="selectSystemUserAuthCount"
+            parameterType="kr.or.saeroi.dto.SystemUserAuthDTO"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+        FROM emp e
+
+        <include refid="systemUserAuthSearchWhere" />
+
+    </select>
+
+
+    <select id="selectSystemUserAuthDetail"
+            parameterType="int"
+            resultMap="systemUserAuthResultMap">
+
+        SELECT
+            <include refid="systemUserAuthSelectColumns" />
+        FROM emp e
+        WHERE e.emp_id = #{empId}
+
+    </select>
+
+
+    <!-- =========================================================
+         5. 신규계정 생성 / 계정정보 수정
+         ========================================================= -->
+
+    <insert id="insertSystemUserAuth"
+            parameterType="kr.or.saeroi.dto.SystemUserAuthDTO">
+
+        <selectKey keyProperty="empId"
+                   resultType="int"
+                   order="BEFORE">
+            SELECT NVL(MAX(emp_id), 0) + 1
+            FROM emp
+        </selectKey>
+
+        INSERT INTO emp (
+            emp_id,
+            empno,
+            emp_pw,
+            ename,
+            dept,
+            job,
+            hire_date,
+            emp_tel,
+            email,
+            status,
+            role,
+            created_date,
+            updated_date
+        ) VALUES (
+            #{empId},
+            #{empno},
+            #{empPw},
+            #{ename},
+            #{dept},
+            #{job},
+            #{hireDate},
+            #{empTel},
+            #{email},
+            NVL(#{status}, '재직'),
+            NVL(#{role}, 'WORKER'),
+            SYSDATE,
+            SYSDATE
+        )
+
+    </insert>
+
+
+    <update id="updateSystemUserAuth"
+            parameterType="kr.or.saeroi.dto.SystemUserAuthDTO">
+
+        UPDATE emp
+        SET
+            ename = #{ename},
+            dept = #{dept},
+            job = #{job},
+            hire_date = #{hireDate},
+            emp_tel = #{empTel},
+            email = #{email},
+            status = #{status},
+            role = #{role},
+            updated_date = SYSDATE
+        WHERE emp_id = #{empId}
+
+    </update>
+
+
+    <!-- =========================================================
+         6. 임시비밀번호 발급
+         ========================================================= -->
+
+    <update id="updateSystemUserAuthPassword"
+            parameterType="kr.or.saeroi.dto.SystemUserAuthDTO">
+
+        UPDATE emp
+        SET
+            emp_pw = #{empPw},
+            updated_date = SYSDATE
+        WHERE emp_id = #{empId}
+
+    </update>
+
+
+    <!-- =========================================================
+         7. 상태 일괄 변경
+         ========================================================= -->
+
+    <update id="updateSystemUserAuthStatusList"
+            parameterType="map">
+
+        UPDATE emp
+        SET
+            status = #{status},
+            updated_date = SYSDATE
+        WHERE emp_id IN
+
+        <foreach collection="empIdList"
+                 item="empId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{empId}
+        </foreach>
+
+    </update>
+
+
+    <!-- =========================================================
+         8. 중복 체크
+         ========================================================= -->
+
+    <select id="selectSystemUserAuthCountByEmpno"
+            parameterType="kr.or.saeroi.dto.SystemUserAuthDTO"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+        FROM emp
+        WHERE UPPER(empno) = UPPER(#{empno})
+
+        <if test="empId != null">
+            AND emp_id != #{empId}
+        </if>
+
+    </select>
+
+
+    <select id="selectSystemUserAuthCountByEmail"
+            parameterType="kr.or.saeroi.dto.SystemUserAuthDTO"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+        FROM emp
+        WHERE email IS NOT NULL
+          AND UPPER(email) = UPPER(#{email})
+
+        <if test="empId != null">
+            AND emp_id != #{empId}
+        </if>
+
+    </select>
+
+
+    <!-- =========================================================
+         9. 사번 자동생성
+         ========================================================= -->
+
+    <select id="selectNextEmpno"
+            parameterType="map"
+            resultType="string">
+
+        SELECT
+            #{empnoPrefix}
+            || LPAD(
+                NVL(
+                    MAX(
+                        TO_NUMBER(
+                            SUBSTR(empno, LENGTH(#{empnoPrefix}) + 1)
+                        )
+                    ),
+                    0
+                ) + 1,
+                3,
+                '0'
+            ) AS next_empno
+        FROM emp
+        WHERE empno LIKE #{empnoPrefix} || '%'
+          AND REGEXP_LIKE(
+                empno,
+                '^' || #{empnoPrefix} || '[0-9]{3}$'
+          )
+
+    </select>
+
+
+    <!-- =========================================================
+         10. 관리자 보호용 조회
+         ========================================================= -->
+
+    <select id="selectActiveAdminCount"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+        FROM emp
+        WHERE role = 'ADMIN'
+          AND status = '재직'
+
+    </select>
+
+
+    <select id="selectActiveAdminCountExceptEmp"
+            parameterType="int"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+        FROM emp
+        WHERE role = 'ADMIN'
+          AND status = '재직'
+          AND emp_id != #{empId}
+
+    </select>
+
+
+    <!-- =========================================================
+         11. 권한/상태별 통계
+         ========================================================= -->
+
+    <select id="selectSystemUserAuthRoleCount"
+            resultType="map">
+
+        SELECT
+            role,
+            COUNT(*) AS cnt
+        FROM emp
+        GROUP BY role
+        ORDER BY
+            CASE role
+                WHEN 'ADMIN' THEN 1
+                WHEN 'MANAGER' THEN 2
+                WHEN 'QC' THEN 3
+                WHEN 'MAINT' THEN 4
+                WHEN 'WORKER' THEN 5
+                ELSE 6
+            END
+
+    </select>
+
+
+    <select id="selectSystemUserAuthStatusCount"
+            resultType="map">
+
+        SELECT
+            status,
+            COUNT(*) AS cnt
+        FROM emp
+        GROUP BY status
+        ORDER BY
+            CASE status
+                WHEN '재직' THEN 1
+                WHEN '휴직' THEN 2
+                WHEN '잠금' THEN 3
+                WHEN '퇴사' THEN 4
+                ELSE 5
+            END
+
+    </select>
+
+</mapper>

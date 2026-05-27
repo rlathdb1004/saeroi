@@ -31,9 +31,8 @@ public class EquipmentStatusService {
 	    return dao.get_equipment_status_detail(history_id);
 	}
 
-	public void update(EquipmentStatusDTO dto) {
-		// TODO Auto-generated method stub
-		
+	public int update(EquipmentStatusDTO dto) {
+		return dao.update(dto);		
 	}
 
 	public int delete(List<Integer> ids) {

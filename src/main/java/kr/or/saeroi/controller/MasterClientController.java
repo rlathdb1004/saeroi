@@ -156,7 +156,7 @@ public class MasterClientController {
                     masterClientService.getMasterClientDetail(clientId);
 
             model.addAttribute("masterClientDetail", masterClientDetail);
-
+            System.out.println("masterClientDetail"+masterClientDetail);
             return "master/masterClientDetail.tiles";
 
         } catch (IllegalArgumentException e) {

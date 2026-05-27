@@ -20,7 +20,15 @@
 
 <link rel="stylesheet"
 	href="${contextPath}/resources/css/common/detail.css">
-
+<style>
+	#map{
+		width: 100%;
+        height: 350px; 
+       background-color: #eee;
+	}
+	
+	
+</style>
 <div class="detail_page">
 
 	<div class="detail_header">
@@ -346,35 +354,12 @@
 
 				<div class="detail_card">
 
-					<div class="detail_card_title">운영 참고</div>
+					<div class="detail_card_title" >거래처 장소
+						<div id="map">
+						
+						</div>
+					</div>
 
-					<table class="detail_info_table">
-						<tbody>
-							<tr>
-								<th>거래처구분 기준</th>
-								<td colspan="5">거래처구분은 별도 고정 코드가 아니라 거래처코드의 prefix로 관리합니다.
-									예: BP-SUP, BP-CUS, BP-MAN</td>
-							</tr>
-
-							<tr>
-								<th>신규 구분 추가</th>
-								<td colspan="5">등록 화면에서 기존 거래처구분을 선택하거나 신규 거래처구분을 직접 입력할 수
-									있습니다. 신규 입력 시 BP-는 생략할 수 있으며, 서버에서 BP- prefix를 보정합니다.</td>
-							</tr>
-
-							<tr>
-								<th>거래처코드 규칙</th>
-								<td colspan="5">거래처코드는 거래처구분 prefix + 일련번호 3자리로 생성됩니다. 예:
-									BP-SUP-001, BP-CUS-001</td>
-							</tr>
-
-							<tr>
-								<th>미사용 처리</th>
-								<td colspan="5">거래처는 품목의 공급처/납품처 또는 설비 제조사로 참조될 수 있으므로 실제
-									삭제하지 않고 미사용 처리합니다.</td>
-							</tr>
-						</tbody>
-					</table>
 
 				</div>
 
@@ -394,6 +379,8 @@
 
 </div>
 
+<script type="text/javascript"
+	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8ccacf855dc3394fb0775c66f478f2a5"></script>
 
 <script>
 	/*
@@ -460,4 +447,24 @@
 
 		return element.value.trim();
 	}
+	kakao.maps.load(function() {
+		let latitude = ${masterClientDetail.latitude};
+		let longitude = ${masterClientDetail.longitude};
+		
+		let mapContainer = document.querySelector('#map');
+		
+		let mapOption = {
+			center : new kakao.maps.LatLng(latitude, longitude),
+			level : 3
+		}
+
+		let map = new kakao.maps.Map(mapContainer, mapOption);
+
+		var markerPosition = new kakao.maps.LatLng(latitude, longitude);
+
+		let marker = new kakao.maps.Marker({
+			position : markerPosition
+		})
+		marker.setMap(map);
+	})
 </script>
