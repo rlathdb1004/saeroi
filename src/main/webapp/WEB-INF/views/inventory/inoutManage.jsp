@@ -15,17 +15,9 @@
 		or sessionScope.member.job eq '관리자'
 		or sessionScope.loginUser.job eq '관리자'}" />
 
-<%-- =========================================================
-	추가
-	등록 모달 방어코딩 CSS
-========================================================= --%>
 <style>
 
-	/* =====================================================
-		에러 메시지
-	===================================================== */
 	.input_error_text {
-
 		margin-top: 6px;
 		font-size: 12px;
 		color: #e53935;
@@ -33,11 +25,7 @@
 		display: none;
 	}
 
-	/* =====================================================
-		에러 input 빨간 테두리
-	===================================================== */
 	.input_error {
-
 		border: 1px solid #e53935 !important;
 	}
 
@@ -45,9 +33,6 @@
 
 <div class="coPageWrap">
 
-	<%-- =========================================================
-		검색 영역
-	========================================================= --%>
 	<form class="search-form"
 		method="get"
 		action="${pageContext.request.contextPath}/inventory/materialIn">
@@ -56,103 +41,66 @@
 
 			<div class="search-row">
 
-				<%-- 시작일 --%>
 				<div class="search-item">
-
-					<label class="search-label">
-						시작일
-					</label>
-
+					<label class="search-label">시작일</label>
 					<input type="date"
 						name="startDate"
 						class="search-date"
 						value="${startDate}">
-
 				</div>
 
-				<%-- 종료일 --%>
 				<div class="search-item">
-
-					<label class="search-label">
-						종료일
-					</label>
-
+					<label class="search-label">종료일</label>
 					<input type="date"
 						name="endDate"
 						class="search-date"
 						value="${endDate}">
-
 				</div>
 
-				<%-- 구분 --%>
 				<div class="search-item">
 
-					<label class="search-label">
-						구분
-					</label>
+					<label class="search-label">구분</label>
 
 					<select name="inoutType"
 						class="search-select">
 
-						<option value="">
-							전체
-						</option>
+						<option value="">전체</option>
 
 						<option value="MI"
 							<c:if test="${inoutType eq 'MI'}">selected</c:if>>
-
 							입고
-
 						</option>
 
 						<option value="MO-PROD"
 							<c:if test="${inoutType eq 'MO-PROD'}">selected</c:if>>
-
 							출고
-
 						</option>
 
 					</select>
 
 				</div>
 
-				<%-- 검색어 --%>
 				<div class="search-item">
-
-					<label class="search-label">
-						검색어
-					</label>
-
+					<label class="search-label">검색어</label>
 					<input type="text"
 						name="keyword"
 						class="search-input"
 						placeholder="검색키워드"
 						value="${keyword}">
-
 				</div>
 
-				<%-- 검색 버튼 영역 --%>
 				<div class="search-btn-wrap">
 
 					<button type="submit"
 						class="search-btn search-btn-main">
 
-						<svg viewBox="0 0 24 24"
-							fill="none">
-
-							<circle cx="10.5"
-								cy="10.5"
-								r="7.5"
-								stroke="currentColor"
-								stroke-width="2">
-							</circle>
-
+						<svg viewBox="0 0 24 24" fill="none">
+							<circle cx="10.5" cy="10.5" r="7.5"
+								stroke="currentColor" stroke-width="2"></circle>
 							<path d="M16 16L21 21"
 								stroke="currentColor"
 								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
+								stroke-linecap="round"></path>
 						</svg>
 
 						검색
@@ -163,22 +111,16 @@
 						class="search-btn search-btn-sub search-reset-btn"
 						onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
 
-						<svg viewBox="0 0 24 24"
-							fill="none">
-
+						<svg viewBox="0 0 24 24" fill="none">
 							<path d="M20 12C20 16.4 16.4 20 12 20C7.6 20 4 16.4 4 12C4 7.6 7.6 4 12 4C14.4 4 16.5 5.1 18 6.8"
 								stroke="currentColor"
 								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
+								stroke-linecap="round"></path>
 							<path d="M18 4V7H21"
 								stroke="currentColor"
 								stroke-width="2"
 								stroke-linecap="round"
-								stroke-linejoin="round">
-							</path>
-
+								stroke-linejoin="round"></path>
 						</svg>
 
 						초기화
@@ -200,9 +142,7 @@
 		<div class="coTableTop">
 
 			<p class="coTotalCount">
-
 				총 ${pageInfo.totalCount}건
-
 			</p>
 
 			<c:if test="${isAdmin}">
@@ -213,21 +153,15 @@
 						class="search-btn search-btn-main modal_open_btn"
 						data_modal_target="#modal_insert">
 
-						<svg viewBox="0 0 24 24"
-							fill="none">
-
+						<svg viewBox="0 0 24 24" fill="none">
 							<path d="M12 5V19"
 								stroke="currentColor"
 								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
+								stroke-linecap="round"></path>
 							<path d="M5 12H19"
 								stroke="currentColor"
 								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
+								stroke-linecap="round"></path>
 						</svg>
 
 						등록
@@ -238,39 +172,27 @@
 						class="search-btn search-btn-sub"
 						onclick="deleteCheck()">
 
-						<svg viewBox="0 0 24 24"
-							fill="none">
-
+						<svg viewBox="0 0 24 24" fill="none">
 							<path d="M4 7H20"
 								stroke="currentColor"
 								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
+								stroke-linecap="round"></path>
 							<path d="M10 11V17"
 								stroke="currentColor"
 								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
+								stroke-linecap="round"></path>
 							<path d="M14 11V17"
 								stroke="currentColor"
 								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
+								stroke-linecap="round"></path>
 							<path d="M6 7L7 21H17L18 7"
 								stroke="currentColor"
 								stroke-width="2"
-								stroke-linejoin="round">
-							</path>
-
+								stroke-linejoin="round"></path>
 							<path d="M9 7V4H15V7"
 								stroke="currentColor"
 								stroke-width="2"
-								stroke-linejoin="round">
-							</path>
-
+								stroke-linejoin="round"></path>
 						</svg>
 
 						선택 삭제
@@ -290,47 +212,17 @@
 				<thead>
 
 					<tr>
-
 						<th class="mobile_show">
-
-							<label id="checkAllLabel">
-								선택
-							</label>
-
-							<input type="checkbox"
-								id="checkAll"
-								style="display:none;">
-
+							<label id="checkAllLabel">선택</label>
+							<input type="checkbox" id="checkAll" style="display:none;">
 						</th>
-
-						<th class="mobile_hidden">
-							입출고번호
-						</th>
-
-						<th class="mobile_hidden">
-							입출고구분
-						</th>
-
-						<th class="mobile_show">
-							품목명
-						</th>
-
-						<th class="mobile_hidden">
-							입출고량
-						</th>
-
-						<th class="mobile_hidden">
-							단위
-						</th>
-
-						<th class="mobile_show">
-							일자
-						</th>
-
-						<th class="mobile_show">
-							상세
-						</th>
-
+						<th class="mobile_hidden">입출고번호</th>
+						<th class="mobile_hidden">입출고구분</th>
+						<th class="mobile_show">품목명</th>
+						<th class="mobile_hidden">입출고량</th>
+						<th class="mobile_hidden">단위</th>
+						<th class="mobile_show">일자</th>
+						<th class="mobile_show">상세</th>
 					</tr>
 
 				</thead>
@@ -338,38 +230,37 @@
 				<tbody>
 
 					<c:forEach var="inout"
-						items="${list}">
+						items="${list}"
+						varStatus="status">
 
 						<tr>
 
 							<td class="mobile_show">
-
 								<input type="checkbox"
 									name="inoutIds"
 									value="${inout.inoutId}">
-
 							</td>
 
+							<%-- =====================================================
+								입출고번호
+								화면 순번으로 1번부터 출력
+							===================================================== --%>
 							<td class="mobile_hidden">
-								${inout.docNo}
+								${status.count}
 							</td>
 
 							<td class="mobile_hidden">
 
 								<c:choose>
-
 									<c:when test="${inout.inoutType eq 'MI'}">
 										입고
 									</c:when>
-
 									<c:when test="${inout.inoutType eq 'MO-PROD'}">
 										출고
 									</c:when>
-
 									<c:otherwise>
 										${inout.inoutType}
 									</c:otherwise>
-
 								</c:choose>
 
 							</td>
@@ -436,13 +327,11 @@
 			<form class="modal_form"
 				method="post"
 				action="${pageContext.request.contextPath}/inventory/materialIn/insert"
+				autocomplete="off"
 				onsubmit="return checkInoutInsert();">
 
 				<div class="modal_body modal_body_2col">
 
-					<%-- =====================================================
-						입출고구분
-					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -452,7 +341,8 @@
 
 						<select name="inoutType"
 							id="insertInoutType"
-							class="modal_select">
+							class="modal_select"
+							required>
 
 							<option value="">선택</option>
 							<option value="MI">입고</option>
@@ -460,19 +350,13 @@
 
 						</select>
 
-						<%-- 에러메시지 추가 --%>
 						<div id="inoutTypeError"
 							class="input_error_text">
-
 							입출고구분을 선택해주세요.
-
 						</div>
 
 					</div>
 
-					<%-- =====================================================
-						품목명
-					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -482,7 +366,8 @@
 
 						<select name="itemId"
 							id="insertItemId"
-							class="modal_select">
+							class="modal_select"
+							required>
 
 							<option value="">선택</option>
 
@@ -497,19 +382,13 @@
 
 						</select>
 
-						<%-- 에러메시지 추가 --%>
 						<div id="itemError"
 							class="input_error_text">
-
 							품목명을 선택해주세요.
-
 						</div>
 
 					</div>
 
-					<%-- =====================================================
-						입출고수량
-					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -521,21 +400,16 @@
 							name="inoutQty"
 							id="insertInoutQty"
 							class="modal_input"
-							min="1">
+							min="1"
+							required>
 
-						<%-- 에러메시지 추가 --%>
 						<div id="qtyError"
 							class="input_error_text">
-
 							입출고수량을 입력해주세요.
-
 						</div>
 
 					</div>
 
-					<%-- =====================================================
-						입출고일자
-					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -546,14 +420,12 @@
 						<input type="date"
 							name="inoutDate"
 							id="insertInoutDate"
-							class="modal_input modal_today">
+							class="modal_input modal_today"
+							required>
 
-						<%-- 에러메시지 추가 --%>
 						<div id="dateError"
 							class="input_error_text">
-
 							입출고일자를 선택해주세요.
-
 						</div>
 
 					</div>
@@ -602,10 +474,6 @@
 
 <script>
 
-	// =========================================================
-	// 등록 방어코딩
-	// 회원가입처럼 빨간글씨 출력
-	// =========================================================
 	function checkInoutInsert() {
 
 		var inoutType =
@@ -620,9 +488,6 @@
 		var inoutDate =
 			document.getElementById("insertInoutDate");
 
-		// =====================================================
-		// 에러메시지 영역
-		// =====================================================
 		var inoutTypeError =
 			document.getElementById("inoutTypeError");
 
@@ -635,9 +500,6 @@
 		var dateError =
 			document.getElementById("dateError");
 
-		// =====================================================
-		// 초기화
-		// =====================================================
 		inoutType.classList.remove("input_error");
 		itemId.classList.remove("input_error");
 		inoutQty.classList.remove("input_error");
@@ -650,9 +512,6 @@
 
 		var isValid = true;
 
-		// =====================================================
-		// 입출고구분 체크
-		// =====================================================
 		if (inoutType.value == "") {
 
 			inoutType.classList.add("input_error");
@@ -663,9 +522,6 @@
 			isValid = false;
 		}
 
-		// =====================================================
-		// 품목명 체크
-		// =====================================================
 		if (itemId.value == "") {
 
 			itemId.classList.add("input_error");
@@ -676,9 +532,6 @@
 			isValid = false;
 		}
 
-		// =====================================================
-		// 수량 체크
-		// =====================================================
 		if (inoutQty.value == ""
 			|| Number(inoutQty.value) <= 0) {
 
@@ -690,9 +543,6 @@
 			isValid = false;
 		}
 
-		// =====================================================
-		// 날짜 체크
-		// =====================================================
 		if (inoutDate.value == "") {
 
 			inoutDate.classList.add("input_error");
@@ -705,5 +555,78 @@
 
 		return isValid;
 	}
+
+	function deleteCheck() {
+
+		var checkedList =
+			document.querySelectorAll("input[name='inoutIds']:checked");
+
+		if (checkedList.length == 0) {
+
+			alert("삭제할 항목을 선택해주세요.");
+
+			return;
+		}
+
+		if (confirm("선택한 항목을 삭제하시겠습니까?")) {
+
+			document.getElementById("deleteForm").submit();
+		}
+	}
+
+	window.addEventListener("load", function() {
+
+		var dateInput =
+			document.getElementById("insertInoutDate");
+
+		if (dateInput != null
+			&& dateInput.value == "") {
+
+			var today =
+				new Date();
+
+			var year =
+				today.getFullYear();
+
+			var month =
+				String(today.getMonth() + 1)
+					.padStart(2, "0");
+
+			var day =
+				String(today.getDate())
+					.padStart(2, "0");
+
+			dateInput.value =
+				year + "-" + month + "-" + day;
+		}
+
+		var checkAllLabel =
+			document.getElementById("checkAllLabel");
+
+		if (checkAllLabel != null) {
+
+			checkAllLabel.addEventListener("click", function() {
+
+				var checks =
+					document.querySelectorAll("input[name='inoutIds']");
+
+				var allChecked = true;
+
+				for (var i = 0; i < checks.length; i++) {
+
+					if (!checks[i].checked) {
+
+						allChecked = false;
+					}
+				}
+
+				for (var i = 0; i < checks.length; i++) {
+
+					checks[i].checked =
+						!allChecked;
+				}
+			});
+		}
+	});
 
 </script>
