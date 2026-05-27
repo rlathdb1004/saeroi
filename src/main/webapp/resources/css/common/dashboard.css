@@ -332,13 +332,14 @@
 /* MES 운영 흐름 전체 섹션 */
 .flow-section {
 	padding: 22px 18px 28px;
+	overflow: hidden;
 }
 
 /* MES 운영 흐름 카드들을 한 줄로 배치하는 영역이다. */
 .flow-grid {
 	display: grid;
-	grid-template-columns: repeat(6, 1fr);
-	gap: 34px;
+	grid-template-columns: repeat(6, minmax(0, 1fr));
+	gap: 24px;
 	align-items: stretch;
 }
 
@@ -348,12 +349,13 @@
 	background-color: #FFFFFF;
 	border: 1px solid #DDE5E1;
 	border-radius: 8px;
-	padding: 24px 16px 18px;
+	padding: 24px 14px 18px;
 	text-align: center;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	min-height: 258px;
+	min-width: 0;
 	box-shadow: 0 2px 8px rgba(31, 41, 51, 0.04);
 	box-sizing: border-box;
 }
@@ -362,11 +364,11 @@
 .flow-card:not(:last-child)::after {
 	content: "→";
 	position: absolute;
-	right: -27px;
+	right: -20px;
 	top: 50%;
 	transform: translateY(-50%);
 	color: #0B4FA3;
-	font-size: 30px;
+	font-size: 26px;
 	font-weight: 400;
 	line-height: 1;
 	z-index: 2;
@@ -466,7 +468,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	gap: 8px;
+	gap: 6px;
 	font-size: 13px;
 	color: #4B5563;
 	line-height: 1.3;

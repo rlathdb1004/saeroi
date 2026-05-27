@@ -288,30 +288,34 @@
 				<%-- 기준정보관리 하위 메뉴 영역이다. --%>
 
 				<a href="${pageContext.request.contextPath}/master/item"
-					class="siSubMenuLink" data-main-menu="기준정보관리" data-sub-menu="품목관리">
-					<%-- 제품과 자재 품목의 기준정보를 관리하는 메뉴이다. --%> 품목관리
+					class="siSubMenuLink" data-main-menu="기준정보관리"
+					data-sub-menu="품목 기준관리"> <%-- 제품과 자재 품목의 기준정보를 관리하는 메뉴이다. --%>
+					품목 기준관리
 				</a> <a href="${pageContext.request.contextPath}/master/bom"
 					class="siSubMenuLink" data-main-menu="기준정보관리"
-					data-sub-menu="BOM 관리"> <%-- 제품을 만들 때 필요한 자재
-																				구성 정보를 관리하는 메뉴이다. --%> BOM 관리
+					data-sub-menu="BOM 기준관리"> <%-- 제품을 만들 때 필요한 자재
+																				구성 정보를 관리하는 메뉴이다. --%> BOM 기준관리
 				</a> <a href="${pageContext.request.contextPath}/master/process"
-					class="siSubMenuLink" data-main-menu="기준정보관리" data-sub-menu="공정관리">
-					<%-- 생산 공정의 기준정보를 관리하는 메뉴이다. --%> 공정관리
+					class="siSubMenuLink" data-main-menu="기준정보관리"
+					data-sub-menu="공정 기준관리"> <%-- 생산 공정의 기준정보를 관리하는 메뉴이다. --%> 공정
+					기준관리
 				</a> <a href="${pageContext.request.contextPath}/master/equipment"
-					class="siSubMenuLink" data-main-menu="기준정보관리" data-sub-menu="설비관리">
-					<%-- 설비명, 설비코드 같은 설비 기준정보를 관리하는 메뉴이다. --%> 설비관리
+					class="siSubMenuLink" data-main-menu="기준정보관리"
+					data-sub-menu="설비 기준관리"> <%-- 설비명, 설비코드 같은 설비 기준정보를 관리하는 메뉴이다. --%>
+					설비 기준관리
 				</a> <a href="${pageContext.request.contextPath}/master/client"
-					class="siSubMenuLink" data-main-menu="기준정보관리" data-sub-menu="거래처관리">
-					<%-- 거래처 기준정보를 관리하는 메뉴이다. --%> 거래처관리
+					class="siSubMenuLink" data-main-menu="기준정보관리"
+					data-sub-menu="거래처 기준관리"> <%-- 거래처 기준정보를 관리하는 메뉴이다. --%> 거래처
+					기준관리
 				</a> <a href="${pageContext.request.contextPath}/master/defectcode"
 					class="siSubMenuLink" data-main-menu="기준정보관리"
-					data-sub-menu="불량코드 관리"> <%-- 불량 유형을 코드로
-																				관리하기 위한 메뉴이다. --%> 불량코드 관리
+					data-sub-menu="불량코드 기준관리"> <%-- 불량 유형을 코드로
+																				관리하기 위한 메뉴이다. --%> 불량코드 기준관리
 				</a> <a href="${pageContext.request.contextPath}/system/userauth"
 					class="siSubMenuLink" data-main-menu="기준정보관리"
-					data-sub-menu="사용자/권한 관리"> <%-- 사용자 계정과 권한
+					data-sub-menu="사용자/권한 기준관리"> <%-- 사용자 계정과 권한
 																				정보를 관리하는 메뉴이다. 기존 시스템 관리 대메뉴 대신 기준정보관리
-																				안에 배치한다. --%> 사용자/권한 관리
+																				안에 배치한다. --%> 사용자/권한 기준관리
 				</a>
 
 			</div>

@@ -46,14 +46,14 @@ button {
 	overflow-x: hidden;
 
 	/* 화면 크기별로 바뀌는 메인 영역 값이다. */
-	--contentPadding: 18px 28px 22px;
+	--contentPadding: 10px 28px 22px;
 	--contentGap: 24px;
 
 	/* 화면 크기별로 바뀌는 QR 영역 값이다. */
 	--scanPadding: 34px 36px 28px;
 	--scanMinHeight: 590px;
 	--scanTitle: 40px;
-	--qrStageH: 340px;
+	--qrStageH: 308px;
 	--qrBox: 300px;
 	--qrImg: 270px;
 	--scanBtnW: 455px;
@@ -61,7 +61,7 @@ button {
 	--scanBtnFont: 32px;
 
 	/* 화면 크기별로 바뀌는 메뉴 카드 값이다. */
-	--menuCardH: 150px;
+	--menuCardH: 147px;
 	--menuCardPadding: 24px 112px 24px 30px;
 	--menuIcon: 94px;
 	--menuSvg: 54px;
@@ -107,7 +107,7 @@ button {
 /* 작업자 화면 상단 헤더 영역이다. */
 .workerHeader {
 	width: calc(100% - 32px);
-	height: 104px;
+	height: 95px;
 	margin: 14px 16px 0;
 	padding: 0 22px;
 	display: flex;
@@ -282,7 +282,7 @@ button {
 /* 작업자 안전 안내 영역이다. */
 .workerSafetyNotice {
 	width: calc(100% - 56px);
-	height: 58px;
+	height: 47px;
 	margin: 14px 28px 0;
 	padding: 0 36px;
 	justify-content: center;
@@ -366,7 +366,7 @@ button {
 /* QR 패널 제목이다. */
 .workerScanTitle {
 	position: relative;
-	margin-bottom: 30px;
+	margin-bottom: 22px;
 	color: #fff;
 	font-size: var(--scanTitle);
 	line-height: 1.28;
@@ -382,7 +382,7 @@ button {
 	width: 100%;
 	max-width: 500px;
 	height: var(--qrStageH);
-	margin: 0 auto 24px;
+	margin: 0 auto 18px;
 	justify-content: center;
 	z-index: 2;
 }
@@ -479,7 +479,7 @@ button {
 	width: 100%;
 	max-width: var(--scanBtnW);
 	height: var(--scanBtnH);
-	margin: 0 auto 22px;
+	margin: 0 auto 16px;
 	justify-content: center;
 	gap: 22px;
 	border: 3px solid rgba(117, 255, 176, 0.65);
@@ -630,9 +630,9 @@ button {
 
 /* 오늘 작업 현황 박스다. */
 .workerTodayBox {
-	flex: 1;
-	min-height: 170px;
-	padding: var(--todayPadding);
+	flex: 0 0 145px;
+	min-height: 200px;
+	padding: 18px 28px;
 	border-radius: 18px;
 	background: #fff;
 	box-shadow: 0 5px 16px rgba(0, 0, 0, 0.08);
@@ -642,7 +642,7 @@ button {
 /* 오늘 작업 현황 상단이다. */
 .workerTodayHeader {
 	justify-content: space-between;
-	margin-bottom: 18px;
+	margin-bottom: 12px;
 }
 
 /* 오늘 작업 현황 제목이다. */
@@ -688,8 +688,22 @@ button {
 /* 오늘 작업 현황 항목이다. */
 .workerTodayItem {
 	position: relative;
-	padding: 0 18px;
+	padding: 10px 18px;
 	text-align: center;
+	border-radius: 14px;
+	cursor: pointer;
+	transition: transform 0.2s ease, background 0.2s ease;
+}
+
+/* 오늘 작업 현황 항목 hover다. */
+.workerTodayItem:hover {
+	transform: translateY(-3px);
+	background: #f7fffb;
+}
+
+/* 오늘 작업 현황 항목을 누르는 순간의 반응이다. */
+.workerTodayItem:active {
+	transform: translateY(0);
 }
 
 /* 오늘 작업 현황 항목 구분선이다. */
@@ -882,8 +896,8 @@ button {
 	.workerPage {
 		--contentPadding: 20px 24px 18px;
 		--contentGap: 18px;
-		--scanPadding: 28px 24px 24px;
-		--scanMinHeight: 560px;
+		--scanPadding: 28px 36px 22px;
+		--scanMinHeight: 520px;
 		--scanTitle: 36px;
 		--qrStageH: 295px;
 		--qrBox: 270px;
@@ -891,7 +905,7 @@ button {
 		--scanBtnW: 420px;
 		--scanBtnH: 66px;
 		--scanBtnFont: 28px;
-		--menuCardH: 126px;
+		--menuCardH: 142px;
 		--menuCardPadding: 20px 104px 20px 28px;
 		--menuIcon: 78px;
 		--menuSvg: 46px;
@@ -967,20 +981,25 @@ button {
 		--progressIcon: 50px;
 	}
 
+	/* 모바일에서는 헤더 전체를 2열 구조로 바꾼다. */
 	.workerHeader {
 		width: calc(100% - 24px);
 		height: auto;
 		margin: 12px 12px 0;
 		padding: 14px;
-		flex-direction: column;
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+		gap: 8px;
 		align-items: stretch;
-		justify-content: flex-start;
-		gap: 12px;
 	}
 
+	/* 모바일 1행 왼쪽에는 로고와 작업자 문구를 배치한다. */
 	.workerLogoBox {
+		grid-column: 1 / 2;
+		grid-row: 1;
 		width: 100%;
 		gap: 12px;
+		min-width: 0;
 	}
 
 	.headerLogoImg {
@@ -1001,14 +1020,12 @@ button {
 		font-size: 13px;
 	}
 
+	/* 모바일에서는 오른쪽 정보 묶음을 풀어서 헤더 그리드에 직접 배치한다. */
 	.workerHeaderRight {
-		width: 100%;
-		display: grid;
-		grid-template-columns: 1fr 1fr;
-		gap: 8px;
-		align-items: stretch;
+		display: contents;
 	}
 
+	/* 모바일 헤더 칩과 로그아웃 버튼 공통 크기다. */
 	.workerHeaderRight > .workerHeaderChip,
 	.workerHeaderRight > .workerLogoutBtn {
 		width: 100%;
@@ -1019,30 +1036,45 @@ button {
 		position: static;
 	}
 
-	.workerHeaderRight > .workerHeaderChip:nth-of-type(1) {
-		grid-column: 1 / 2;
-		grid-row: 1;
-	}
-
+	/* 모바일 1행 오른쪽에는 로그아웃 버튼을 배치한다. */
 	.workerHeaderRight > .workerLogoutBtn {
 		grid-column: 2 / 3;
 		grid-row: 1;
 		justify-content: center;
 	}
 
-	.workerHeaderRight > .workerHeaderChip:nth-of-type(2) {
+	/* 모바일 2행 왼쪽에는 작업자 정보를 배치한다. */
+	.workerHeaderRight > .workerHeaderChip:nth-of-type(1) {
 		grid-column: 1 / 2;
 		grid-row: 2;
 	}
 
-	.workerHeaderRight > .workerHeaderChip:nth-of-type(3) {
+	/* 모바일 2행 오른쪽에는 현장 정보를 배치한다. */
+	.workerHeaderRight > .workerHeaderChip:nth-of-type(2) {
 		grid-column: 2 / 3;
 		grid-row: 2;
 	}
 
-	.workerHeaderRight > .workerHeaderChip:nth-of-type(4) {
-		grid-column: 1 / -1;
+	/* 모바일 3행 왼쪽에는 온도 정보를 배치한다. */
+	.workerHeaderRight > .workerHeaderChip:nth-of-type(3) {
+		grid-column: 1 / 2;
 		grid-row: 3;
+	}
+
+	/* 모바일 3행 오른쪽에는 시간 정보를 배치한다. */
+	.workerHeaderRight > .workerHeaderChip:nth-of-type(4) {
+		grid-column: 2 / 3;
+		grid-row: 3;
+	}
+
+	/* 모바일에서 시간 칩이 옆 칸을 밀지 않도록 최소 너비를 없앤다. */
+	.workerTimeChip {
+		min-width: 0;
+	}
+
+	/* 모바일 칩 내부 간격을 줄여 2열 배치가 깨지지 않게 한다. */
+	.workerHeaderChip {
+		gap: 8px;
 	}
 
 	.workerProfileImg {
@@ -1052,6 +1084,10 @@ button {
 
 	.workerChipLabel {
 		font-size: 11px;
+	}
+
+	.workerChipTextBox {
+		min-width: 0;
 	}
 
 	.workerChipTextBox strong {

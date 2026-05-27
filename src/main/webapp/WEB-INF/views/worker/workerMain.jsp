@@ -24,11 +24,7 @@
 		<div class="workerLogoTextBox">
 
 			<div class="workerLogoText">
-				SAEROI MES
-			</div>
-
-			<div class="workerLogoSubText">
-				작업자 메인
+				작업자
 			</div>
 
 		</div>
@@ -128,8 +124,8 @@
 					온도
 				</span>
 
-				<strong>
-					23.8℃
+				<strong id="workerTodayTemp">
+				    불러오는 중
 				</strong>
 
 			</div>
@@ -657,7 +653,7 @@
 
 	}
 
-	// 현재 시간을 작업자 화면 상단에 출력한다.
+	// 메인페이지 header.js와 같은 형식으로 현재 시간을 작업자 화면 상단에 출력한다.
 	function updateClock() {
 
 		var now = new Date();
@@ -668,14 +664,48 @@
 
 		var date = padTwo(now.getDate());
 
+		var dayNumber = now.getDay();
+
+		var dayText = "";
+
+		if (dayNumber == 0) {
+
+			dayText = "일";
+
+		} else if (dayNumber == 1) {
+
+			dayText = "월";
+
+		} else if (dayNumber == 2) {
+
+			dayText = "화";
+
+		} else if (dayNumber == 3) {
+
+			dayText = "수";
+
+		} else if (dayNumber == 4) {
+
+			dayText = "목";
+
+		} else if (dayNumber == 5) {
+
+			dayText = "금";
+
+		} else if (dayNumber == 6) {
+
+			dayText = "토";
+
+		}
+
 		var hour = padTwo(now.getHours());
 
 		var minute = padTwo(now.getMinutes());
 
 		var second = padTwo(now.getSeconds());
 
-		var currentTime = year + "-" + month + "-" + date + " " + hour + ":"
-				+ minute + ":" + second;
+		var currentTime = year + "-" + month + "-" + date + " (" + dayText + ") "
+				+ hour + ":" + minute + ":" + second;
 
 		document.getElementById("workerClock").innerText = currentTime;
 	}
@@ -696,6 +726,41 @@
 		document.getElementById("workerTodayTime").innerText = todayTime;
 	}
 
+	// 메인페이지와 같은 날씨 API를 호출해서 작업자 화면 온도에 출력한다.
+	function updateWorkerWeather() {
+
+	    var tempBox = document.getElementById("workerTodayTemp");
+
+	    if (tempBox == null) {
+
+	        return;
+	    }
+
+	    tempBox.innerHTML = "불러오는 중";
+
+	    fetch("${pageContext.request.contextPath}/weather/current")
+	        .then(function(response) {
+
+	            return response.json();
+	        })
+	        .then(function(data) {
+
+	            if (data.temp == null) {
+
+	                tempBox.innerHTML = "온도 확인 불가";
+
+	                return;
+	            }
+
+	            tempBox.innerHTML = data.temp + "&deg;C";
+	        })
+	        .catch(function(error) {
+
+	            console.error(error);
+
+	            tempBox.innerHTML = "온도 확인 불가";
+	        });
+	}
 	// QR 스캔 기능 연결 전까지 임시 안내를 출력한다.
 	function startWorkerQrScan() {
 
@@ -707,5 +772,10 @@
 
 	updateTodayStandardTime();
 
+	updateWorkerWeather();
+
 	setInterval(updateClock, 1000);
+
+	// 메인페이지와 동일하게 30분마다 온도를 다시 가져온다.
+	setInterval(updateWorkerWeather, 30 * 60 * 1000);
 </script>
