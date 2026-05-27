@@ -84,7 +84,8 @@
 						<form id="updateForm" method="post"
 							action="${pageContext.request.contextPath}/equipment_status/update">
 
-							<input type="hidden" name="equip_id" value="${eqp.equip_id}">							
+							<input type="hidden" name="history_id" value="${eqp.history_id}">
+							<input type="hidden" name="equip_id" value="${eqp.equip_id}">
 
 							<div class="detail_card">
 
@@ -102,43 +103,30 @@
 									</tr>
 
 									<tr>
-										<th>시작일시</th>
-										<td>
-                                            <input type="text" name="time_start" value="${eqp.time_start}">
-                                        </td>
+										<th>계획 가동 시간</th>
+										<td>${eqp.plan_time_min}</td>
 
-										<th>종료일시</th>
+										<th>가동 시간</th>
 										<td>
-                                            <input type="text" name="time_end" value="${eqp.time_end}">
-                                        </td>
+											<input type="number" name="runtime_min" value="${eqp.runtime_min}">
+										</td>
 
-										<th>적용 시간</th>
+										<th>비가동 시간</th>
 										<td>
-                                            <input type="number" name="time_min" readonly>
-                                        </td>
+											<input type="number" name="downtime_min" value="${eqp.downtime_min}">
+										</td>
 									</tr>
 
 									<tr>
-
-                                        <th>설비 상태</th>
-										<td><select name="eqp_status">
-                                            <option> 가동 </option>
-                                            <option> 정비 </option>
-                                            <option> 고장 </option>
-                                        </select>
-                                        </td>
-
 										<th>비가동 이유</th>
 										<td>
 											<input type="text" name="down_reason" value="${eqp.down_reason}">
 										</td>
-										
 
 										<th>비고</th>
 										<td><input type="text" name="remark" value="${eqp.remark}">
 										</td>
 									</tr>
-
 								</table>
 							</div>
 						</form>
@@ -161,22 +149,19 @@
 								</tr>
 
 								<tr>
+									<th>계획 가동 시간</th>
+									<td>${eqp.plan_time_min}</td>
+
 									<th>가동 시간</th>
 									<td>${eqp.runtime_min}</td>
 
 									<th>비가동 시간</th>
 									<td>${eqp.downtime_min}</td>
-
-									<th>비가동 원인</th>
-									<td>${eqp.down_reason}</td>
 								</tr>
 
 								<tr>
-									<th>조치자</th>
-									<td></td>
-
-									<th>조치 내역</th>
-									<td></td>
+									<th>비가동 원인</th>
+									<td>${eqp.down_reason}</td>
 
 									<th>비고</th>
 									<td>${eqp.remark}</td>
@@ -188,3 +173,16 @@
 				</c:choose>
 
 			</div>
+			<script>
+				const planTime = ${ eqp.plan_time_min };
+
+				const downtime = document.querySelector("input[name='downtime_min']");
+				const runtime = document.querySelector("input[name='runtime_min']");
+
+				function calcRuntime() {
+					const d = Number(downtime.value) || 0;
+					runtime.value = Math.max(0, planTime - d);
+				}
+
+				downtime.addEventListener("input", calcRuntime);
+			</script>
