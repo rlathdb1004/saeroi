@@ -49,7 +49,8 @@
         <!-- 화면 참고용 컬럼 -->
         <result property="itemCount" column="item_count" />
         <result property="equipmentCount" column="equipment_count" />
-
+		<result property="latitude" column="latitude" />
+		<result property="longitude" column="longitude" />
     </resultMap>
 
 
@@ -141,7 +142,6 @@
             c.created_date,
             c.updated_date,
             c.use_yn,
-
             REGEXP_REPLACE(c.client_code, '-[0-9]{3}$', '') AS client_code_prefix,
 
             CASE
@@ -212,7 +212,9 @@
             c.created_date,
             c.updated_date,
             c.use_yn,
-
+			c.latitude,
+			c.longitude,
+			
             REGEXP_REPLACE(c.client_code, '-[0-9]{3}$', '') AS client_code_prefix,
 
             CASE

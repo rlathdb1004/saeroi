@@ -66,7 +66,7 @@ public class EquipmentStatusController {
         return "redirect:/equipment/equipmentstatus";
     }
     
-    @GetMapping("/equipment_status/detail")
+    @GetMapping("/equipment/equipmentstatus/detail")
     public String equipment_status_detail(
     		@RequestParam("history_id") int history_id, 
     		@RequestParam(required = false) String mode,
@@ -83,7 +83,7 @@ public class EquipmentStatusController {
     @PostMapping("/equipment_status/update")
     public String update(EquipmentStatusDTO dto) {
         service.update(dto);
-        return "redirect:/equipment/equipmentstatus";
+        return "redirect:/equipment_status/detail?history_id=" + dto.getHistory_id();
     }
 
     @PostMapping("/equipment_status/delete")

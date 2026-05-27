@@ -20,4 +20,12 @@ ADD defect_photo VARCHAR2(500) NULL;
 -- ------------------------------------------------------------
 COMMENT ON COLUMN defect_list.defect_photo IS '불량사진 경로';
 
+-- 3. 사용여부 컬럼 추가 --
+ALTER TABLE defect
+ADD use_yn CHAR(1) DEFAULT 'Y' NULL;
+
+UPDATE defect
+SET use_yn = 'Y'
+WHERE use_yn IS NULL;
+
 COMMIT;

@@ -19,7 +19,8 @@ public class MasterClientDTO {
     // =========================================================
     // client 테이블 기본 컬럼
     // =========================================================
-
+	private double latitude;
+	private double longitude;
     private Integer clientId;       // 거래처 ID
 
     private String clientCode;      // 거래처코드
@@ -95,188 +96,235 @@ public class MasterClientDTO {
     }
 
 
+
+
     // =========================================================
     // Getter / Setter
     // =========================================================
 
+    public double getLatitude() {
+    	return latitude;
+    }
+    
+    
+    public void setLatitude(double latitude) {
+    	this.latitude = latitude;
+    }
+    
+    
+    public double getLongitude() {
+    	return longitude;
+    }
+    
+    
+    public void setLongitude(double longitude) {
+    	this.longitude = longitude;
+    }
+    
+    
     public Integer getClientId() {
-        return clientId;
+    	return clientId;
     }
-
+    
+    
     public void setClientId(Integer clientId) {
-        this.clientId = clientId;
+    	this.clientId = clientId;
     }
-
+    
+    
     public String getClientCode() {
-        return clientCode;
+    	return clientCode;
     }
-
+    
+    
     public void setClientCode(String clientCode) {
-        this.clientCode = clientCode;
+    	this.clientCode = clientCode;
     }
-
+    
+    
     public String getClientName() {
-        return clientName;
+    	return clientName;
     }
-
+    
+    
     public void setClientName(String clientName) {
-        this.clientName = clientName;
+    	this.clientName = clientName;
     }
-
+    
+    
     public String getClientType() {
-        return clientType;
+    	return clientType;
     }
-
+    
+    
     public void setClientType(String clientType) {
-        this.clientType = clientType;
+    	this.clientType = clientType;
     }
-
+    
+    
     public String getClientAdress() {
-        return clientAdress;
+    	return clientAdress;
     }
-
+    
+    
     public void setClientAdress(String clientAdress) {
-        this.clientAdress = clientAdress;
+    	this.clientAdress = clientAdress;
     }
-
+    
+    
     public String getClientMan() {
-        return clientMan;
+    	return clientMan;
     }
-
+    
+    
     public void setClientMan(String clientMan) {
-        this.clientMan = clientMan;
+    	this.clientMan = clientMan;
     }
-
+    
+    
     public String getClientTel() {
-        return clientTel;
+    	return clientTel;
     }
-
+    
+    
     public void setClientTel(String clientTel) {
-        this.clientTel = clientTel;
+    	this.clientTel = clientTel;
     }
-
+    
+    
     public String getClientDept() {
-        return clientDept;
+    	return clientDept;
     }
-
+    
+    
     public void setClientDept(String clientDept) {
-        this.clientDept = clientDept;
+    	this.clientDept = clientDept;
     }
-
+    
+    
     public String getRemark() {
-        return remark;
+    	return remark;
     }
-
+    
+    
     public void setRemark(String remark) {
-        this.remark = remark;
+    	this.remark = remark;
     }
-
+    
+    
     public Date getCreatedDate() {
-        return createdDate;
+    	return createdDate;
     }
-
+    
+    
     public void setCreatedDate(Date createdDate) {
-        this.createdDate = createdDate;
+    	this.createdDate = createdDate;
     }
-
+    
+    
     public Date getUpdatedDate() {
-        return updatedDate;
+    	return updatedDate;
     }
-
+    
+    
     public void setUpdatedDate(Date updatedDate) {
-        this.updatedDate = updatedDate;
+    	this.updatedDate = updatedDate;
     }
-
+    
+    
     public String getUseYn() {
-        return useYn;
+    	return useYn;
     }
-
+    
+    
     public void setUseYn(String useYn) {
-        this.useYn = useYn;
+    	this.useYn = useYn;
     }
-
+    
+    
     public String getClientTypeName() {
-        return clientTypeName;
+    	return clientTypeName;
     }
-
+    
+    
     public void setClientTypeName(String clientTypeName) {
-        this.clientTypeName = clientTypeName;
+    	this.clientTypeName = clientTypeName;
     }
-
+    
+    
     public String getUseYnName() {
-        return useYnName;
+    	return useYnName;
     }
-
+    
+    
     public void setUseYnName(String useYnName) {
-        this.useYnName = useYnName;
+    	this.useYnName = useYnName;
     }
-
+    
+    
     public Integer getItemCount() {
-        return itemCount;
+    	return itemCount;
     }
-
+    
+    
     public void setItemCount(Integer itemCount) {
-        this.itemCount = itemCount;
+    	this.itemCount = itemCount;
     }
-
+    
+    
     public Integer getEquipmentCount() {
-        return equipmentCount;
+    	return equipmentCount;
     }
-
+    
+    
     public void setEquipmentCount(Integer equipmentCount) {
-        this.equipmentCount = equipmentCount;
+    	this.equipmentCount = equipmentCount;
     }
-
+    
+    
     public String getClientCodePrefix() {
-        return clientCodePrefix;
+    	return clientCodePrefix;
     }
-
+    
+    
     public void setClientCodePrefix(String clientCodePrefix) {
-        this.clientCodePrefix = clientCodePrefix;
+    	this.clientCodePrefix = clientCodePrefix;
     }
-
+    
+    
     public String getSearchType() {
-        return searchType;
+    	return searchType;
     }
-
+    
+    
     public void setSearchType(String searchType) {
-        this.searchType = searchType;
+    	this.searchType = searchType;
     }
-
+    
+    
     public String getSearchKeyword() {
-        return searchKeyword;
+    	return searchKeyword;
     }
-
+    
+    
     public void setSearchKeyword(String searchKeyword) {
-        this.searchKeyword = searchKeyword;
+    	this.searchKeyword = searchKeyword;
     }
-
 
     // =========================================================
     // toString
     // =========================================================
-
+    
     @Override
     public String toString() {
-        return "MasterClientDTO [clientId=" + clientId
-                + ", clientCode=" + clientCode
-                + ", clientName=" + clientName
-                + ", clientType=" + clientType
-                + ", clientAdress=" + clientAdress
-                + ", clientMan=" + clientMan
-                + ", clientTel=" + clientTel
-                + ", clientDept=" + clientDept
-                + ", remark=" + remark
-                + ", createdDate=" + createdDate
-                + ", updatedDate=" + updatedDate
-                + ", useYn=" + useYn
-                + ", clientTypeName=" + clientTypeName
-                + ", useYnName=" + useYnName
-                + ", itemCount=" + itemCount
-                + ", equipmentCount=" + equipmentCount
-                + ", clientCodePrefix=" + clientCodePrefix
-                + ", searchType=" + searchType
-                + ", searchKeyword=" + searchKeyword
-                + "]";
+    	return "MasterClientDTO [latitude=" + latitude + ", longitude=" + longitude + ", clientId=" + clientId
+    			+ ", clientCode=" + clientCode + ", clientName=" + clientName + ", clientType=" + clientType
+    			+ ", clientAdress=" + clientAdress + ", clientMan=" + clientMan + ", clientTel=" + clientTel
+    			+ ", clientDept=" + clientDept + ", remark=" + remark + ", createdDate=" + createdDate
+    			+ ", updatedDate=" + updatedDate + ", useYn=" + useYn + ", clientTypeName=" + clientTypeName
+    			+ ", useYnName=" + useYnName + ", itemCount=" + itemCount + ", equipmentCount=" + equipmentCount
+    			+ ", clientCodePrefix=" + clientCodePrefix + ", searchType=" + searchType + ", searchKeyword="
+    			+ searchKeyword + "]";
     }
+
 }

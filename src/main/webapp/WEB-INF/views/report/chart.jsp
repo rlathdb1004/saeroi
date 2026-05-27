@@ -52,9 +52,11 @@
     font-size: 16px;
     font-weight: bold;
     color: #333;
-    border-left: 4px solid #008FFB;
+    border-left: 4px solid #2f7d62;
     padding-left: 8px;
 }
+
+
 
 /* 데이터 테이블 스타일 */
 .report-table {
@@ -80,6 +82,16 @@
 
 .report-table tr:hover {
     background-color: #f1f3f5;
+}
+@media (max-width: 992px) {
+    .dashboard-container {
+        flex-direction: column; /* 가로 배열을 세로 배열로 변경 ✨ */
+    }
+
+    .left-panel, .right-panel {
+        flex: 1;
+        width: 100%; /* 좌우 판넬이 모바일 화면 꽉 차게 조절 */
+    }
 }
 </style>
 </head>
@@ -134,7 +146,7 @@
     
     <div class="right-panel">
         <div class="chart-box">
-            <h4 class="box-title">불량 원인 TOP 3</h4>
+            <h4 class="box-title">불량 원인</h4>
             <div id="oChart"></div>
         </div>
         
@@ -268,8 +280,22 @@
       		series: [],
       		chart:{
       			type: 'donut',
-      			height:230
+      			height:230,
+      			dropShadow: {
+      	            enabled: true,
+      	            top: 2,
+      	            left: 2,
+      	            blur: 4,
+      	            opacity: 0.15
+      	        }
       		},
+      		plotOptions: {
+      	        pie: {
+      	            donut: {
+      	                size: '10%' 
+      	            }
+      	        }
+      	    },
       		labels: [],
             colors: ['#00E396', '#FF4560', '#FEB019', '#008FFB', '#775DD0', '#546E7A'],
             legend: {
@@ -315,7 +341,7 @@
       	chart: {
       		height: 480,
       		type: 'line',
-      		toolbar: {show:true},
+      		toolbar: {show:false},
       	events: {
       		zoomed:function(chartContext,{xaxis,yaxis}){
       			
@@ -361,7 +387,7 @@
       		text: title_text,
       		align: 'center',
       		offsetX: -10,
-      		offsety: 0
+      		offsety: 0,
       	},
       	dataLabels: {
       		enabled: false
@@ -389,12 +415,19 @@
       		horizontalAlign: 'left',
       		floating: true,
       		fontSize:'14px',
-      		offsetY: -55,
-      		offsetX: 10,
+      		offsetY: 0,
+      		offsetX: 0,
+      		width: 600,
+      		containerWidth: 600,
       		itemMargin:{
-      			horizontal:8,
+      			horizontal:20,
       			vertical: 0
       		}
+      	},
+      	grid: {
+      	    padding: {
+      	        top: 50
+      	    }
       	},
       	colors:['#008FFB', '#00E396', '#FF4560'],
       	markers: {

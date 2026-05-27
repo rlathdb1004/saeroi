@@ -18,7 +18,8 @@ import lombok.Data;
  */
 @Data
 public class ClientDTO {
-
+	private double latitude;
+	private double longitude;
     private Integer clientId;
     private String clientCode;
     private String clientName;
@@ -36,6 +37,22 @@ public class ClientDTO {
     // - equipment.jsp: ${client.client_id}, ${client.client_name} 사용
     // =========================================================
 
+    @JsonIgnore
+    public double getLongitude() {
+    	return longitude;
+    }
+    
+    public void setLongitude(double longitude) {
+    	this.longitude = longitude;
+    }
+    @JsonIgnore
+    public double getLatitude() {
+    	return latitude;
+    }
+    
+    public void setLatitude(double latitude) {
+    	this.latitude = latitude;
+    }
     @JsonIgnore
     public Integer getClient_id() {
         return clientId;

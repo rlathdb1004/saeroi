@@ -152,7 +152,7 @@
 
 									<td class="mobile_show">
 										<button type="button" class="coDetailBtn"
-											onclick="location.href='${pageContext.request.contextPath}/equipment_status/detail?history_id=${eqp.history_id}'">
+											onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/detail?history_id=${eqp.history_id}'">
 											보기</button>
 									</td>
 								</tr>
@@ -207,14 +207,21 @@
 
 								<div class="modal_item">
 									<label class="modal_label">
-										설비 가동 시간<span class="modal_required">*</span>
+										설비 계획 가동 시간<span class="modal_required">*</span>
 									</label>
-									<input type="number" name="runtime_min" class="modal_input" required>
+									<input type="number" name="plan_time_min" class="modal_input" required>
 								</div>
 
 								<div class="modal_item">
 									<label class="modal_label">
-										설비 비가동 시간<span class="modal_required">*</span>
+										설비 가동 시간
+									</label>
+									<input type="number" name="runtime_min" class="modal_input">
+								</div>
+
+								<div class="modal_item">
+									<label class="modal_label">
+										설비 비 가동 시간<span class="modal_required">*</span>
 									</label>
 									<input type="number" name="downtime_min" class="modal_input" required>
 								</div>
@@ -300,5 +307,17 @@
 				document.querySelector(".eqp_name").value =
 					equipName || "";
 			});
+
+			const plantime = document.querySelector("input[name='plan_time_min']");
+			const downtime = document.querySelector("input[name='downtime_min']");
+			const runtime = document.querySelector("input[name='runtime_min']");
+
+			function calcRuntime() {
+				const p = Number(plantime.value) || 0;
+				const d = Number(downtime.value) || 0;
+				runtime.value = Math.max(0, p - d);
+			}
+			plantime.addEventListener("input", calcRuntime);
+			downtime.addEventListener("input", calcRuntime);
 
 		</script>
