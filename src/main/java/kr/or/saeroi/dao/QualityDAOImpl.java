@@ -243,4 +243,16 @@ public class QualityDAOImpl implements QualityDAO {
 
 		return insert_result;
 	}
+
+	// 불량관리 모달 emp 옵션
+	@Override
+	public List<DefectDTO> _dao_select_Defect_action_emp_option(String dept) {
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("dept", dept);
+
+		List<DefectDTO> empList = sqlSession.selectList("mapper.quality._select_Defect_action_emp_option", param);
+
+		return empList;
+	}
 }

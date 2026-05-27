@@ -50,8 +50,7 @@
 	border: 1px solid #E1E8E3;
 }
 
-.defect_action_table th,
-.defect_action_table td {
+.defect_action_table th, .defect_action_table td {
 	border: 1px solid #E1E8E3;
 	padding: 12px;
 	text-align: center;
@@ -67,7 +66,7 @@
 	text-align: left;
 }
 
-@media (max-width: 900px) {
+@media ( max-width : 900px) {
 	.defect_detail_bottom {
 		grid-template-columns: 1fr;
 	}
@@ -84,7 +83,8 @@
 
 		<div class="detail_btn_area">
 
-			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
+			<c:if
+				test="${sessionScope.loginUser.role eq 'ADMIN'
 				or sessionScope.loginUser.role eq 'MANAGER'}">
 
 				<button type="submit" id="saveBtn" class="detail_btn_green"
@@ -93,7 +93,8 @@
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 						stroke="currentColor" stroke-width="2" stroke-linecap="round"
 						stroke-linejoin="round"
-						style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+						style="vertical-align: -3px; margin-right: 6px;"
+						aria-hidden="true">
 						<path
 							d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
 						<path d="M17 21v-8H7v8"></path>
@@ -109,7 +110,8 @@
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 						stroke="currentColor" stroke-width="2" stroke-linecap="round"
 						stroke-linejoin="round"
-						style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+						style="vertical-align: -3px; margin-right: 6px;"
+						aria-hidden="true">
 						<path d="M18 6L6 18"></path>
 						<path d="M6 6l12 12"></path>
 					</svg>
@@ -123,10 +125,10 @@
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 						stroke="currentColor" stroke-width="2" stroke-linecap="round"
 						stroke-linejoin="round"
-						style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+						style="vertical-align: -3px; margin-right: 6px;"
+						aria-hidden="true">
 						<path d="M12 20h9"></path>
-						<path
-							d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
 					</svg>
 
 					수정
@@ -179,10 +181,9 @@
 						<td>${defect.defect_code}</td>
 
 						<th>발생일시</th>
-						<td>
-							<span class="detailText">${defect.defect_date}</span>
-							<input type="date" name="defect_date" class="detailInput"
-								value="${defect.defect_date}" style="display: none;" required>
+						<td><span class="detailText">${defect.defect_date}</span> <input
+							type="date" name="defect_date" class="detailInput"
+							value="${defect.defect_date}" style="display: none;" required>
 						</td>
 
 						<th>품목명</th>
@@ -197,14 +198,13 @@
 						<td>${defect.ename}</td>
 
 						<th>불량명</th>
-						<td>
-							<span class="detailText detail_status_badge defect_status_badge">${defect.defect_name}</span>
+						<td><span
+							class="detailText detail_status_badge defect_status_badge">${defect.defect_name}</span>
 							<select name="defect_id" class="detailInput"
-								data-selected="${defect.defect_id}" style="display: none;"
-								required>
+							data-selected="${defect.defect_id}" style="display: none;"
+							required>
 								<option value="${defect.defect_id}" selected>${defect.defect_name}</option>
-							</select>
-						</td>
+						</select></td>
 					</tr>
 
 					<tr>
@@ -212,12 +212,10 @@
 						<td>${defect.insp_id}</td>
 
 						<th>불량수량</th>
-						<td>
-							<span class="detailText">${defect.defect_qty}</span>
-							<input type="number" name="defect_qty" class="detailInput"
-								value="${defect.defect_qty}" style="display: none;" min="0"
-								required>
-						</td>
+						<td><span class="detailText">${defect.defect_qty}</span> <input
+							type="number" name="defect_qty" class="detailInput"
+							value="${defect.defect_qty}" style="display: none;" min="0"
+							required></td>
 
 						<th>불량번호</th>
 						<td>${defect.defect_list_id}</td>
@@ -225,11 +223,9 @@
 
 					<tr>
 						<th>비고</th>
-						<td colspan="5">
-							<span class="detailText">${defect.remark}</span>
+						<td colspan="5"><span class="detailText">${defect.remark}</span>
 							<input type="text" name="remark" class="detailInput"
-								value="${defect.remark}" style="display: none;">
-						</td>
+							value="${defect.remark}" style="display: none;"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -256,14 +252,14 @@
 
 		<div class="detail_card defect_action_card">
 			<div class="defect_action_header">
-				<div class="detail_card_title">조치 및 처리 내역 (${defectActionList.size()}건)</div>
+				<div class="detail_card_title">조치 및 처리 내역
+					(${defectActionList.size()}건)</div>
 
-				<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
+				<c:if
+					test="${sessionScope.loginUser.role eq 'ADMIN'
 					or sessionScope.loginUser.role eq 'MANAGER'}">
 					<button type="button" class="detail_btn_green modal_open_btn"
-						data_modal_target="#modal_action_insert">
-						조치 추가
-					</button>
+						data_modal_target="#modal_action_insert">조치 추가</button>
 				</c:if>
 			</div>
 
@@ -299,7 +295,8 @@
 	</div>
 </div>
 
-<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
+<c:if
+	test="${sessionScope.loginUser.role eq 'ADMIN'
 	or sessionScope.loginUser.role eq 'MANAGER'}">
 
 	<div id="modal_action_insert" class="modal_wrap" aria-hidden="true">
@@ -318,14 +315,22 @@
 				<div class="modal_body modal_body_2col">
 
 					<div class="modal_item">
-						<label class="modal_label">조치일시</label>
-						<input type="date" name="action_date" class="modal_input">
+						<label class="modal_label">조치 일시<span
+							class="modal_required">*</span></label> <input type="date"
+							name="action_date" class="modal_input modal_today" required>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">조치 부서</label> <input type="text"
+							id="actionDept" class="modal_input" value="${defect.dept}"
+							readonly>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">조치 담당자<span
-							class="modal_required">*</span></label>
-						<select name="emp_id" class="modal_select" required>
+							class="modal_required">*</span></label> <select name="emp_id"
+							id="actionEmpId" class="modal_select" data-dept="${defect.dept}"
+							required>
 							<option value="">선택</option>
 						</select>
 					</div>
@@ -333,8 +338,8 @@
 					<div class="modal_item modal_item_full">
 						<label class="modal_label">조치 내역<span
 							class="modal_required">*</span></label>
-						<textarea name="action_content" class="modal_textarea"
-							rows="5" required></textarea>
+						<textarea name="action_content" class="modal_textarea" rows="5"
+							placeholder="조치 내역을 입력하세요." required></textarea>
 					</div>
 
 				</div>
@@ -351,6 +356,5 @@
 	</div>
 
 </c:if>
-
 <script
 	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script>

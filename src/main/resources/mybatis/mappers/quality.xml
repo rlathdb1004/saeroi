@@ -454,11 +454,13 @@
 		dl.defect_photo,
 		w.product_lot,
 		d.defect_name,
+		d.action_dept AS dept,
 		e.ename,
 		dl.defect_qty,
 		dl.remark
 		FROM
-		defect_list dl,
+		defect_list
+		dl,
 		defect d,
 		inspection
 		i,
@@ -473,7 +475,8 @@
 		AND i.prod_id =
 		p.prod_id
 		AND p.order_id = w.order_id
-		AND w.prod_plan_id =
+		AND w.prod_plan_id
+		=
 		pr.prod_plan_id
 		AND pr.item_id = it.item_id
 		AND i.emp_id = e.emp_id
@@ -510,7 +513,8 @@
 		SELECT
 		da.defect_action_id,
 		dl.defect_list_id,
-		TO_CHAR(NVL(da.action_date, dl.defect_date),
+		TO_CHAR(NVL(da.action_date,
+		dl.defect_date),
 		'YYYY-MM-DD') AS action_date,
 		d.action_dept AS dept,
 		da.emp_id AS
@@ -518,17 +522,21 @@
 		NVL(e.ename, '-') AS action_ename,
 		da.action_content,
 		CASE
-		WHEN da.defect_list_id = dl.defect_list_id THEN 2
+		WHEN da.defect_list_id = dl.defect_list_id THEN
+		2
 		ELSE 1
 		END AS sort_group,
 		NVL(da.sort_no, 999) AS sort_no
-		FROM defect_list dl,
+		FROM
+		defect_list dl,
 		defect d,
 		defect_action da,
 		emp e
-		WHERE dl.defect_id = d.defect_id
+		WHERE dl.defect_id =
+		d.defect_id
 		AND da.emp_id = e.emp_id(+)
-		AND dl.defect_list_id = TO_NUMBER(#{defect_list_id})
+		AND dl.defect_list_id =
+		TO_NUMBER(#{defect_list_id})
 		AND (
 		da.defect_list_id = dl.defect_list_id
 		OR
@@ -536,7 +544,8 @@
 		)
 		)
 
-		ORDER BY
+		ORDER
+		BY
 		sort_group ASC,
 		sort_no ASC,
 		defect_action_id ASC
@@ -574,4 +583,23 @@
 		)
 
 	</insert>
+<!-- 	불량관리 모달 emp 옵션 -->
+	<select id="_select_Defect_action_emp_option"
+		resultType="kr.or.saeroi.dto.DefectDTO">
+		SELECT
+		e.emp_id AS action_emp_id,
+		e.ename AS action_ename,
+		e.dept
+		FROM emp e
+		WHERE e.dept = #{dept}
+		AND e.status = '재직'
+		AND e.ename IS NOT NULL
+		ORDER BY
+		CASE
+		WHEN e.role = 'MANAGER' THEN 1
+		WHEN e.role = 'ADMIN' THEN 2
+		ELSE 3
+		END,
+		e.ename
+	</select>
 </mapper>

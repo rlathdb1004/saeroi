@@ -56,4 +56,7 @@ public interface QualityService {
 
 	// 불량 조치 내역 등록
 	int _ser_insert_Defect_action(String defect_list_id, String action_date, String emp_id, String action_content);
+
+	//불량관리 상세 모달 emp옵션
+	List<DefectDTO> _ser_select_Defect_action_emp_option(String dept);
 }
