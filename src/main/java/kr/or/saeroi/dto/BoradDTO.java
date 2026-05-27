@@ -165,4 +165,14 @@ public class BoradDTO {
 	public void setFile_size(long file_size) {
 		this.file_size = file_size;
 	}
+
+	private String ename;
+
+	public String getEname() {
+		return ename;
+	}
+
+	public void setEname(String ename) {
+		this.ename = ename;
+	}
 }

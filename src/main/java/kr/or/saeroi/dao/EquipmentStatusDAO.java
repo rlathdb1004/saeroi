@@ -100,19 +100,15 @@ public class EquipmentStatusDAO {
 	            case "equip_code":
 	                sql.append(" AND e.EQUIP_CODE LIKE ? ");
 	                break;
-
 	            case "equip_name":
 	                sql.append(" AND e.EQUIP_NAME LIKE ? ");
 	                break;
-
 	            case "operation_date":
 	                sql.append(" AND TO_CHAR(h.OPERATION_DATE,'YYYY-MM-DD') LIKE ? ");
 	                break;
-
 	            case "down_reason":
 	                sql.append(" AND h.DOWN_REASON LIKE ? ");
 	                break;
-
 	            case "all":
 	            default:
 	                sql.append(
@@ -126,7 +122,6 @@ public class EquipmentStatusDAO {
 	                break;
 	        }
 	    }
-
 	    sql.append(" ORDER BY h.HISTORY_ID DESC ");
 
 	    try (
@@ -139,14 +134,11 @@ public class EquipmentStatusDAO {
 	            String param = "%" + keyword.trim() + "%";
 
 	            if("all".equals(searchType)) {
-
 	                ps.setString(1, param);
 	                ps.setString(2, param);
 	                ps.setString(3, param);
 	                ps.setString(4, param);
-
 	            } else {
-
 	                ps.setString(1, param);
 	            }
 	        }
@@ -170,11 +162,9 @@ public class EquipmentStatusDAO {
 	                list.add(dto);
 	            }
 	        }
-
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
-
 	    return list;
 	}
 	
@@ -204,7 +194,7 @@ public class EquipmentStatusDAO {
 	        ps.setDate(2, dto.getOperation_date());
 	        ps.setDate(3, dto.getOperation_date());
 	        ps.setDate(4, dto.getOperation_date());
-	        ps.setInt(5, (dto.getRuntime_min()+dto.getDowntime_min()));
+	        ps.setInt(5, dto.getPlan_time_min());
 	        ps.setInt(6, dto.getRuntime_min());
 	        ps.setInt(7, dto.getDowntime_min());
 	        ps.setString(8, dto.getDown_reason());
@@ -241,16 +231,14 @@ public class EquipmentStatusDAO {
 
 	            dto = new EquipmentStatusDTO();
 
-	            dto.setHistory_id(rs.getInt("history_id"));
+	            dto.setHistory_id(rs.getInt("history_id"));	            
 	            dto.setEquip_name(rs.getString("equip_name"));
 	            dto.setDown_reason(rs.getString("down_reason"));
 	            dto.setRemark(rs.getString("remark"));
 	        }
-
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
-
 	    return dto;
 	}
 	
@@ -261,7 +249,7 @@ public class EquipmentStatusDAO {
 	    String sql =
 	        "SELECT " +
 	        "EH.HISTORY_ID, EH.EQUIP_ID, E.EQUIP_CODE, E.EQUIP_NAME, " +
-	        "EH.OPERATION_DATE, EH.RUNTIME_MIN, EH.DOWNTIME_MIN, " +
+	        "EH.OPERATION_DATE, EH.PLAN_TIME_MIN, EH.RUNTIME_MIN, EH.DOWNTIME_MIN, " +
 	        "EH.DOWN_REASON, EH.REMARK " +	        
 	        "FROM EQUIPMENT_HISTORY EH " +
 	        "LEFT JOIN EQUIPMENT E ON EH.EQUIP_ID = E.EQUIP_ID " +	        
@@ -283,6 +271,7 @@ public class EquipmentStatusDAO {
 	        	    dto.setEquip_code(rs.getString("EQUIP_CODE"));
 	        	    dto.setEquip_name(rs.getString("EQUIP_NAME"));
 	        	    dto.setOperation_date(rs.getDate("OPERATION_DATE"));
+	        	    dto.setPlan_time_min(rs.getInt("PLAN_TIME_MIN"));
 	        	    dto.setRuntime_min(rs.getInt("RUNTIME_MIN"));
 	        	    dto.setDowntime_min(rs.getInt("DOWNTIME_MIN"));
 	        	    dto.setDown_reason(rs.getString("DOWN_REASON"));
@@ -301,26 +290,28 @@ public class EquipmentStatusDAO {
 	    int result = 0;
 
 	    String sql =
-	        "UPDATE equipment_history " +
-	        "SET time_end = SYSTIMESTAMP, " +
-	        "    remark = ?, " +
-	        "    updated_date = SYSTIMESTAMP " +
-	        "WHERE history_id = ?";
+	        "UPDATE EQUIPMENT_HISTORY " +
+	        "SET RUNTIME_MIN = ?, " +
+	        "    DOWNTIME_MIN = ?, " +
+	        "    DOWN_REASON = ?, " +
+	        "    REMARK = ? " +	          
+	        "WHERE HISTORY_ID = ?";
 
 	    try (
 	        Connection conn = dataSource.getConnection();
 	        PreparedStatement ps = conn.prepareStatement(sql)
 	    ) {
 
-	        ps.setString(1, dto.getRemark());
-	        ps.setInt(2, dto.getHistory_id());
+	        ps.setInt(1, dto.getRuntime_min());
+	        ps.setInt(2, dto.getDowntime_min());
+	        ps.setString(3, dto.getDown_reason());
+	        ps.setString(4, dto.getRemark());
+	        ps.setInt(5, dto.getHistory_id());
 
 	        result = ps.executeUpdate();
-
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
-
 	    return result;
 	}
 	

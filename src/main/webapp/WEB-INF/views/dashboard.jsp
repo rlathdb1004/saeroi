@@ -1,575 +1,683 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-
-<%-- 
-	대시보드 본문 화면이다.
-	이 파일은 layout.jsp의 <tiles:insertAttribute name="content" /> 위치에 들어간다.
---%>
+<%-- 대시보드 본문 화면이다. --%>
 
 <section class="dashboard-page">
 
-	<%-- 핵심 KPI 전체 영역이다. --%>
-	<div class="dashboard-section">
+	<%-- KPI 핵심 지표 영역이다. --%>
+	<section class="dash-kpi-grid">
 
-		<div class="section-title-box">
-			<h3 class="section-title">핵심 KPI</h3>
-		</div>
-
-		<%-- KPI 카드를 PC 기준 3개씩 2줄로 배치한다. --%>
-		<div class="kpi-grid">
-
-			<div class="kpi-card">
-				<div class="kpi-card-top">
-					<span class="kpi-icon">📊</span> <span class="kpi-name">생산달성률</span>
-				</div>
-
-				<div class="kpi-value-box">
-					<strong class="kpi-value">0.0</strong> <span class="kpi-unit">%</span>
-				</div>
-
-				<div class="kpi-bottom">
-					<span>목표</span> <strong>100.0%</strong>
+		<article class="dash-card dash-kpi-card">
+			<div class="dash-card-head">
+				<div class="dash-title-box">
+					<span class="dash-title-icon">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M4 19V5"></path>
+							<path d="M4 19H20"></path>
+							<path d="M8 16V11"></path>
+							<path d="M12 16V8"></path>
+							<path d="M16 16V13"></path>
+						</svg>
+					</span>
+					<h3 class="dash-card-title">생산달성률</h3>
+					<span class="dash-info-mark">i</span>
 				</div>
 			</div>
 
-			<div class="kpi-card">
-				<div class="kpi-card-top">
-					<span class="kpi-icon">⏱</span> <span class="kpi-name">납기
-						준수율</span>
+			<div class="dash-kpi-split">
+				<div class="dash-donut" style="--rate: 87.6;">
+					<div class="dash-donut-center">
+						<strong>87.6</strong>
+						<span>%</span>
+						<em>목표 100%</em>
+					</div>
 				</div>
 
-				<div class="kpi-value-box">
-					<strong class="kpi-value">0.0</strong> <span class="kpi-unit">%</span>
-				</div>
+				<div class="dash-kpi-detail-list">
+					<div class="dash-kpi-detail-item">
+						<span class="dash-detail-icon">
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<path d="M8 2V5"></path>
+								<path d="M16 2V5"></path>
+								<path d="M4 9H20"></path>
+								<rect x="4" y="4" width="16" height="17" rx="2"></rect>
+							</svg>
+						</span>
+						<div>
+							<span>계획</span>
+							<strong>15,000 EA</strong>
+						</div>
+					</div>
 
-				<div class="kpi-detail-row">
-					<span>전체</span> <strong>0건</strong>
+					<div class="dash-kpi-detail-item">
+						<span class="dash-detail-icon">
+							<svg viewBox="0 0 24 24" aria-hidden="true">
+								<path d="M4 19V5"></path>
+								<path d="M4 19H20"></path>
+								<path d="M8 16V12"></path>
+								<path d="M12 16V8"></path>
+								<path d="M16 16V10"></path>
+							</svg>
+						</span>
+						<div>
+							<span>실적</span>
+							<strong>13,140 EA</strong>
+						</div>
+					</div>
 				</div>
+			</div>
+		</article>
 
-				<div class="kpi-detail-row">
-					<span>지연</span> <strong>0건</strong>
+		<article class="dash-card dash-kpi-card">
+			<div class="dash-card-head">
+				<div class="dash-title-box">
+					<h3 class="dash-card-title">납기 준수율</h3>
+					<span class="dash-info-mark">i</span>
 				</div>
 			</div>
 
-			<div class="kpi-card">
-				<div class="kpi-card-top">
-					<span class="kpi-icon">🛡</span> <span class="kpi-name">OEE</span>
+			<div class="dash-kpi-split">
+				<div class="dash-donut" style="--rate: 95.4;">
+					<div class="dash-donut-center">
+						<strong>95.4</strong>
+						<span>%</span>
+						<em>전주 92.1% ▲</em>
+					</div>
 				</div>
 
-				<div class="kpi-value-box">
-					<strong class="kpi-value">0.0</strong> <span class="kpi-unit">%</span>
-				</div>
+				<div class="dash-progress-list">
+					<div class="dash-progress-row">
+						<span><i class="dash-dot dash-dot-green"></i>준수</span>
+						<div class="dash-progress-track"><em style="width: 95.4%;"></em></div>
+						<strong>95.4%</strong>
+					</div>
 
-				<div class="kpi-detail-row">
-					<span>라인가동률</span> <strong>100.0%</strong>
+					<div class="dash-progress-row">
+						<span><i class="dash-dot dash-dot-gray"></i>미준수</span>
+						<div class="dash-progress-track"><em class="dash-progress-gray" style="width: 4.6%;"></em></div>
+						<strong>4.6%</strong>
+					</div>
 				</div>
+			</div>
+		</article>
 
-				<div class="kpi-detail-row">
-					<span>생산성률</span> <strong>0.0%</strong>
-				</div>
-
-				<div class="kpi-detail-row">
-					<span>품질양품률</span> <strong>0.0%</strong>
+		<article class="dash-card dash-kpi-card">
+			<div class="dash-card-head">
+				<div class="dash-title-box">
+					<h3 class="dash-card-title">OEE</h3>
+					<span class="dash-info-mark">i</span>
 				</div>
 			</div>
 
-			<div class="kpi-card">
-				<div class="kpi-card-top">
-					<span class="kpi-icon">!</span> <span class="kpi-name">불량률</span>
+			<div class="dash-kpi-split">
+				<div class="dash-donut" style="--rate: 82.1;">
+					<div class="dash-donut-center">
+						<strong>82.1</strong>
+						<span>%</span>
+						<em>전주 78.3% ▲</em>
+					</div>
 				</div>
 
-				<div class="kpi-value-box">
-					<strong class="kpi-value">0.00</strong> <span class="kpi-unit">%</span>
-				</div>
+				<div class="dash-progress-list">
+					<div class="dash-progress-row">
+						<span><i class="dash-dot dash-dot-green"></i>가동 효율</span>
+						<div class="dash-progress-track"><em style="width: 82.1%;"></em></div>
+						<strong>82.1%</strong>
+					</div>
 
-				<div class="kpi-detail-row">
-					<span>검사 수량</span> <strong>0 kg</strong>
+					<div class="dash-progress-row">
+						<span><i class="dash-dot dash-dot-gray"></i>손실 효율</span>
+						<div class="dash-progress-track"><em class="dash-progress-gray" style="width: 17.9%;"></em></div>
+						<strong>17.9%</strong>
+					</div>
 				</div>
+			</div>
+		</article>
 
-				<div class="kpi-detail-row">
-					<span>양품</span> <strong>0 kg</strong>
-				</div>
-
-				<div class="kpi-detail-row">
-					<span>불량</span> <strong class="danger-text">0 kg</strong>
+		<article class="dash-card dash-kpi-card dash-kpi-card-defect">
+			<div class="dash-card-head">
+				<div class="dash-title-box">
+					<span class="dash-title-icon">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M12 3L21 20H3L12 3Z"></path>
+							<path d="M12 9V13"></path>
+							<path d="M12 17H12.01"></path>
+						</svg>
+					</span>
+					<h3 class="dash-card-title">불량률</h3>
+					<span class="dash-info-mark">i</span>
 				</div>
 			</div>
 
-			<div class="kpi-card">
-				<div class="kpi-card-top">
-					<span class="kpi-icon">▣</span> <span class="kpi-name">원가
-						편차율</span>
+			<div class="dash-scale-body">
+				<div class="dash-scale-value">
+					<strong>1.8</strong>
+					<span>%</span>
+					<em>전주 2.1% ▼</em>
 				</div>
 
-				<div class="kpi-value-box">
-					<strong class="kpi-value">0.00</strong> <span class="kpi-unit">%</span>
+				<div class="dash-scale-area">
+					<div class="dash-scale-labels">
+						<span>0%</span>
+						<span>목표 2.0%</span>
+						<span>5%</span>
+					</div>
+					<div class="dash-scale-track">
+						<em style="width: 36%;"></em>
+						<i style="left: 40%;"></i>
+					</div>
 				</div>
+			</div>
+		</article>
 
-				<div class="kpi-detail-row">
-					<span>표준단가</span> <strong>0 원/kg</strong>
-				</div>
-
-				<div class="kpi-detail-row">
-					<span>실제단가</span> <strong>0 원/kg</strong>
+		<article class="dash-card dash-kpi-card dash-kpi-card-cost">
+			<div class="dash-card-head">
+				<div class="dash-title-box">
+					<span class="dash-title-icon dash-title-blue">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M12 3A9 9 0 1 0 21 12"></path>
+							<path d="M21 3V9H15"></path>
+							<path d="M21 9L15 3"></path>
+						</svg>
+					</span>
+					<h3 class="dash-card-title">원가 편차율</h3>
+					<span class="dash-info-mark">i</span>
 				</div>
 			</div>
 
-			<div class="kpi-card">
-				<div class="kpi-card-top">
-					<span class="kpi-icon">👤</span> <span class="kpi-name">일일생산평가</span>
+			<div class="dash-scale-body">
+				<div class="dash-scale-value dash-good-value">
+					<strong>-2.4</strong>
+					<span>%</span>
+					<em>전주 -1.1% ▼</em>
 				</div>
 
-				<div class="kpi-empty-box">
-					<span>금일 생산 평가 데이터 준비중</span>
+				<div class="dash-scale-area">
+					<div class="dash-scale-labels">
+						<span>-5%</span>
+						<span>0%</span>
+						<span>+5%</span>
+					</div>
+					<div class="dash-scale-track">
+						<em style="width: 31%;"></em>
+						<i style="left: 50%;"></i>
+					</div>
+				</div>
+			</div>
+		</article>
+
+		<article class="dash-card dash-kpi-card">
+			<div class="dash-card-head">
+				<div class="dash-title-box">
+					<span class="dash-title-icon">
+						<svg viewBox="0 0 24 24" aria-hidden="true">
+							<path d="M12 22S20 18 20 10V5L12 2L4 5V10C4 18 12 22 12 22Z"></path>
+							<path d="M9 12L11 14L15 10"></path>
+						</svg>
+					</span>
+					<h3 class="dash-card-title">금일 생산평가</h3>
+					<span class="dash-info-mark">i</span>
 				</div>
 			</div>
 
-		</div>
-	</div>
+			<div class="dash-eval-body">
+				<div class="dash-eval-text">
+					<strong>정상</strong>
+					<span>이상 없음</span>
+				</div>
 
-	<%-- 최근 7일 추이 그래프 영역이다. 그래프는 한 줄에 하나씩 크게 보여준다. --%>
-	<div class="dashboard-section">
-		<div class="section-title-box">
-			<h3 class="section-title">생산 / 품질 / 출하 / 생산원가 추이</h3>
-			<span class="section-badge">최근 7일 추이도</span>
-		</div>
-
-		<div class="chart-grid">
-
-			<div class="chart-card">
-				<h4>생산 추이</h4>
-				<p>일자별 생산실적 기준</p>
-
-				<div class="chart-placeholder">
-					<svg class="mini-chart" viewBox="0 0 320 180">
-						<line x1="30" y1="30" x2="300" y2="30" />
-						<line x1="30" y1="65" x2="300" y2="65" />
-						<line x1="30" y1="100" x2="300" y2="100" />
-						<line x1="30" y1="135" x2="300" y2="135" />
-
-						<polyline class="chart-line blue-line"
-							points="35,115 78,95 121,86 164,108 207,78 250,92 293,112" />
-
-						<circle class="blue-dot" cx="35" cy="115" r="4" />
-						<circle class="blue-dot" cx="78" cy="95" r="4" />
-						<circle class="blue-dot" cx="121" cy="86" r="4" />
-						<circle class="blue-dot" cx="164" cy="108" r="4" />
-						<circle class="blue-dot" cx="207" cy="78" r="4" />
-						<circle class="blue-dot" cx="250" cy="92" r="4" />
-						<circle class="blue-dot" cx="293" cy="112" r="4" />
-
-						<text class="chart-value" x="35" y="104">320</text>
-						<text class="chart-value" x="78" y="84">410</text>
-						<text class="chart-value" x="121" y="75">460</text>
-						<text class="chart-value" x="164" y="97">350</text>
-						<text class="chart-value" x="207" y="67">520</text>
-						<text class="chart-value" x="250" y="81">430</text>
-						<text class="chart-value" x="293" y="101">330</text>
-
-						<text class="chart-date" x="35" y="165">05-06</text>
-						<text class="chart-date" x="78" y="165">05-07</text>
-						<text class="chart-date" x="121" y="165">05-08</text>
-						<text class="chart-date" x="164" y="165">05-09</text>
-						<text class="chart-date" x="207" y="165">05-10</text>
-						<text class="chart-date" x="250" y="165">05-11</text>
-						<text class="chart-date" x="293" y="165">05-14</text>
+				<div class="dash-eval-icon">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
+						<path d="M20 6L9 17L4 12"></path>
 					</svg>
 				</div>
 			</div>
+		</article>
 
-			<div class="chart-card">
-				<h4>품질 추이</h4>
-				<p>일자별 불량률 기준</p>
+	</section>
 
-				<div class="chart-placeholder">
-					<svg class="mini-chart" viewBox="0 0 320 180">
-						<line x1="30" y1="30" x2="300" y2="30" />
-						<line x1="30" y1="65" x2="300" y2="65" />
-						<line x1="30" y1="100" x2="300" y2="100" />
-						<line x1="30" y1="135" x2="300" y2="135" />
+	<%-- 주요 추이 그래프 영역이다. --%>
+	<section class="dash-chart-grid">
 
-						<polyline class="chart-line green-line"
-							points="35,75 78,82 121,96 164,65 207,52 250,70 293,78" />
+		<article class="dash-card dash-chart-card">
+			<div class="dash-card-head dash-chart-head">
+				<div class="dash-title-box">
+					<h3 class="dash-card-title">생산실적 추이</h3>
+					<span class="dash-unit-text">단위: EA</span>
+				</div>
 
-						<circle class="green-dot" cx="35" cy="75" r="4" />
-						<circle class="green-dot" cx="78" cy="82" r="4" />
-						<circle class="green-dot" cx="121" cy="96" r="4" />
-						<circle class="green-dot" cx="164" cy="65" r="4" />
-						<circle class="green-dot" cx="207" cy="52" r="4" />
-						<circle class="green-dot" cx="250" cy="70" r="4" />
-						<circle class="green-dot" cx="293" cy="78" r="4" />
-
-						<text class="chart-value" x="35" y="64">1.2%</text>
-						<text class="chart-value" x="78" y="71">1.5%</text>
-						<text class="chart-value" x="121" y="85">2.1%</text>
-						<text class="chart-value" x="164" y="54">0.8%</text>
-						<text class="chart-value" x="207" y="41">0.5%</text>
-						<text class="chart-value" x="250" y="59">1.0%</text>
-						<text class="chart-value" x="293" y="67">1.3%</text>
-
-						<text class="chart-date" x="35" y="165">05-06</text>
-						<text class="chart-date" x="78" y="165">05-07</text>
-						<text class="chart-date" x="121" y="165">05-08</text>
-						<text class="chart-date" x="164" y="165">05-09</text>
-						<text class="chart-date" x="207" y="165">05-10</text>
-						<text class="chart-date" x="250" y="165">05-11</text>
-						<text class="chart-date" x="293" y="165">05-14</text>
-					</svg>
+				<div class="dash-chart-value">
+					<strong>13,140</strong>
+					<span>오늘 실적</span>
 				</div>
 			</div>
 
-			<div class="chart-card">
-				<h4>출하 추이</h4>
-				<p>일자별 출하수량 기준</p>
+			<div class="dash-canvas-wrap">
+				<canvas id="productionChart"></canvas>
+			</div>
+		</article>
 
-				<div class="chart-placeholder">
-					<svg class="mini-chart" viewBox="0 0 320 180">
-						<line x1="30" y1="30" x2="300" y2="30" />
-						<line x1="30" y1="65" x2="300" y2="65" />
-						<line x1="30" y1="100" x2="300" y2="100" />
-						<line x1="30" y1="135" x2="300" y2="135" />
+		<article class="dash-card dash-chart-card">
+			<div class="dash-card-head dash-chart-head">
+				<div class="dash-title-box">
+					<h3 class="dash-card-title">불량 추이</h3>
+					<span class="dash-unit-text">단위: %</span>
+				</div>
 
-						<polyline class="chart-line blue-line"
-							points="35,118 78,102 121,92 164,108 207,96 250,88 293,115" />
-
-						<circle class="blue-dot" cx="35" cy="118" r="4" />
-						<circle class="blue-dot" cx="78" cy="102" r="4" />
-						<circle class="blue-dot" cx="121" cy="92" r="4" />
-						<circle class="blue-dot" cx="164" cy="108" r="4" />
-						<circle class="blue-dot" cx="207" cy="96" r="4" />
-						<circle class="blue-dot" cx="250" cy="88" r="4" />
-						<circle class="blue-dot" cx="293" cy="115" r="4" />
-
-						<text class="chart-value" x="35" y="107">180</text>
-						<text class="chart-value" x="78" y="91">240</text>
-						<text class="chart-value" x="121" y="81">300</text>
-						<text class="chart-value" x="164" y="97">220</text>
-						<text class="chart-value" x="207" y="85">270</text>
-						<text class="chart-value" x="250" y="77">320</text>
-						<text class="chart-value" x="293" y="104">190</text>
-
-						<text class="chart-date" x="35" y="165">05-06</text>
-						<text class="chart-date" x="78" y="165">05-07</text>
-						<text class="chart-date" x="121" y="165">05-08</text>
-						<text class="chart-date" x="164" y="165">05-09</text>
-						<text class="chart-date" x="207" y="165">05-10</text>
-						<text class="chart-date" x="250" y="165">05-11</text>
-						<text class="chart-date" x="293" y="165">05-14</text>
-					</svg>
+				<div class="dash-chart-value dash-chart-value-red">
+					<strong>1.8%</strong>
+					<span>목표 2.0%</span>
 				</div>
 			</div>
 
-			<div class="chart-card">
-				<h4>생산원가 추이</h4>
-				<p>일자별 평균 생산단가 기준</p>
+			<div class="dash-canvas-wrap">
+				<canvas id="defectChart"></canvas>
+			</div>
+		</article>
 
-				<div class="chart-placeholder">
-					<svg class="mini-chart" viewBox="0 0 320 180">
-						<line x1="30" y1="30" x2="300" y2="30" />
-						<line x1="30" y1="65" x2="300" y2="65" />
-						<line x1="30" y1="100" x2="300" y2="100" />
-						<line x1="30" y1="135" x2="300" y2="135" />
+		<article class="dash-card dash-chart-card">
+			<div class="dash-card-head dash-chart-head">
+				<div class="dash-title-box">
+					<h3 class="dash-card-title">생산원가 추이</h3>
+					<span class="dash-unit-text">단위: 원/EA</span>
+				</div>
 
-						<polyline class="chart-line orange-line"
-							points="35,78 78,84 121,92 164,100 207,92 250,84 293,76" />
-
-						<circle class="orange-dot" cx="35" cy="78" r="4" />
-						<circle class="orange-dot" cx="78" cy="84" r="4" />
-						<circle class="orange-dot" cx="121" cy="92" r="4" />
-						<circle class="orange-dot" cx="164" cy="100" r="4" />
-						<circle class="orange-dot" cx="207" cy="92" r="4" />
-						<circle class="orange-dot" cx="250" cy="84" r="4" />
-						<circle class="orange-dot" cx="293" cy="76" r="4" />
-
-						<text class="chart-value" x="35" y="67">1,050</text>
-						<text class="chart-value" x="78" y="73">1,080</text>
-						<text class="chart-value" x="121" y="81">1,120</text>
-						<text class="chart-value" x="164" y="89">1,160</text>
-						<text class="chart-value" x="207" y="81">1,120</text>
-						<text class="chart-value" x="250" y="73">1,080</text>
-						<text class="chart-value" x="293" y="65">1,040</text>
-
-						<text class="chart-date" x="35" y="165">05-06</text>
-						<text class="chart-date" x="78" y="165">05-07</text>
-						<text class="chart-date" x="121" y="165">05-08</text>
-						<text class="chart-date" x="164" y="165">05-09</text>
-						<text class="chart-date" x="207" y="165">05-10</text>
-						<text class="chart-date" x="250" y="165">05-11</text>
-						<text class="chart-date" x="293" y="165">05-14</text>
-					</svg>
+				<div class="dash-chart-value">
+					<strong>1,050</strong>
+					<span>목표 1,200</span>
 				</div>
 			</div>
 
-		</div>
-	</div>
+			<div class="dash-canvas-wrap">
+				<canvas id="costChart"></canvas>
+			</div>
+		</article>
+
+		<article class="dash-card dash-chart-card">
+			<div class="dash-card-head dash-chart-head">
+				<div class="dash-title-box">
+					<h3 class="dash-card-title">OEE 추이</h3>
+					<span class="dash-unit-text">단위: %</span>
+				</div>
+
+				<div class="dash-chart-value">
+					<strong>82.1%</strong>
+					<span>전주 78.3% ▲</span>
+				</div>
+			</div>
+
+			<div class="dash-canvas-wrap">
+				<canvas id="oeeChart"></canvas>
+			</div>
+		</article>
+
+	</section>
 
 	<%-- MES 운영 흐름 영역이다. --%>
-	<div class="dashboard-section flow-section">
-
-		<div class="section-title-box">
-			<h3 class="section-title">MES 운영 흐름</h3>
-			<a href="#" class="more-link">더보기 〉</a>
+	<section class="dash-card dash-flow-section">
+		<div class="dash-card-head">
+			<h3 class="dash-card-title">MES 운영 흐름</h3>
+			<a href="${pageContext.request.contextPath}/production/processprogress" class="dash-more-link">더보기</a>
 		</div>
 
-		<div class="flow-grid">
-
-			<div class="flow-card">
-				<div class="flow-icon flow-teal">
-					<svg viewBox="0 0 64 64" aria-hidden="true">
-			<%-- 막대그래프 첫 번째 막대이다. --%>
-			<rect x="13" y="34" width="6" height="18" rx="1" />
-
-			<%-- 막대그래프 두 번째 막대이다. --%>
-			<rect x="25" y="26" width="6" height="26" rx="1" />
-
-			<%-- 막대그래프 세 번째 막대이다. --%>
-			<rect x="37" y="18" width="6" height="34" rx="1" />
-
-			<%-- 하단 기준선이다. --%>
-			<rect x="10" y="52" width="38" height="3" rx="1" />
-
-			<%-- 상승 추이선이다. --%>
-			<path class="icon-stroke" d="M12 31L24 22L35 28L47 14" />
-
-			<%-- 상승 화살표 머리이다. --%>
-			<path class="icon-stroke" d="M42 14H47V19" />
-		</svg>
-				</div>
-
-				<strong>생산실적</strong>
-
-				<div class="flow-info">
-					<span><em>지시량</em><b>12,500 EA</b></span> <span><em>오늘
-							실적</em><b>7,850 EA</b></span>
-				</div>
-
-				<a
-					href="${pageContext.request.contextPath}/production/productionresult"
-					class="flow-more">더보기 〉</a>
-			</div>
-
-			<div class="flow-card">
-				<div class="flow-icon flow-green">
-					<svg viewBox="0 0 64 64">
-		<%-- 클립보드 몸통이다. --%>
-		<path
-							d="M18 13H46C48.2 13 50 14.8 50 17V56H14V17C14 14.8 15.8 13 18 13Z" />
-
-		<%-- 클립보드 상단 집게 부분이다. --%>
-		<path d="M25 7H39C40.1 7 41 7.9 41 9V16H23V9C23 7.9 23.9 7 25 7Z" />
-
-		<%-- 클립보드 안쪽 흰색 줄이다. --%>
-		<rect class="icon-white" x="24" y="25" width="20" height="4" rx="1" />
-		<rect class="icon-white" x="24" y="35" width="20" height="4" rx="1" />
-		<rect class="icon-white" x="24" y="45" width="14" height="4" rx="1" />
-	</svg>
-				</div>
-
-				<strong>생산계획</strong>
-
-				<div class="flow-info">
-					<span><em>계획</em><b>15,000 EA</b></span> <span><em>지시</em><b>12,500
-							EA</b></span>
-				</div>
-
-				<a
-					href="${pageContext.request.contextPath}/production/productionplan"
-					class="flow-more">더보기 〉</a>
-			</div>
-
-			<div class="flow-card">
-				<div class="flow-icon flow-orange">
-					<svg viewBox="0 0 64 64">
-						<path d="M16 6H40L52 18V58H16V6Z" />
-						<path class="icon-white" d="M40 7V19H52Z" />
-						<rect class="icon-white" x="25" y="30" width="22" height="4" />
-						<rect class="icon-white" x="25" y="40" width="18" height="4" />
-					</svg>
-				</div>
-
+		<div class="dash-flow-list">
+			<div class="dash-flow-step">
+				<span class="dash-flow-icon">▤</span>
 				<strong>작업지시</strong>
-
-				<div class="flow-info">
-					<span><em>진행중</em><b>12건</b></span> <span><em>대기</em><b>6건</b></span>
-				</div>
-
-				<a href="${pageContext.request.contextPath}/production/workorder"
-					class="flow-more">더보기 〉</a>
 			</div>
-
-			<div class="flow-card">
-				<div class="flow-icon flow-purple">
-					<svg viewBox="0 0 64 64">
-						<path
-							d="M32 5L54 14V30C54 44 45 55 32 60C19 55 10 44 10 30V14L32 5Z" />
-						<path class="icon-white" d="M23 32L29 38L43 24L47 28L29 46L19 36Z" />
-					</svg>
-				</div>
-
-				<strong>품질관리</strong>
-
-				<div class="flow-info">
-					<span><em>검사 진행</em><b>15건</b></span> <span><em>불량 수량</em><b>123
-							EA</b></span>
-				</div>
-
-				<a href="${pageContext.request.contextPath}/quality/inspection"
-					class="flow-more">더보기 〉</a>
+			<i>→</i>
+			<div class="dash-flow-step">
+				<span class="dash-flow-icon">□</span>
+				<strong>자재투입</strong>
 			</div>
-
-			<div class="flow-card">
-				<div class="flow-icon flow-teal">
-					<svg viewBox="0 0 64 64">
-		<%-- 막대그래프 첫 번째 막대이다. --%>
-		<rect x="13" y="34" width="7" height="20" rx="1" />
-
-		<%-- 막대그래프 두 번째 막대이다. --%>
-		<rect x="27" y="26" width="7" height="28" rx="1" />
-
-		<%-- 막대그래프 세 번째 막대이다. --%>
-		<rect x="41" y="18" width="7" height="36" rx="1" />
-
-		<%-- 하단 기준선이다. --%>
-		<rect x="10" y="54" width="45" height="4" rx="1" />
-
-		<%-- 상승 추이선이다. --%>
-		<path class="icon-line-thick" d="M14 31L28 21L41 27L55 12" />
-
-		<%-- 상승 화살표 머리이다. --%>
-		<path class="icon-line-thick" d="M47 12H55V20" />
-	</svg>
-				</div>
-
-				<strong>생산실적</strong>
-
-				<div class="flow-info">
-					<span><em>지시량</em><b>12,500 EA</b></span> <span><em>오늘
-							실적</em><b>7,850 EA</b></span>
-				</div>
-
-				<a
-					href="${pageContext.request.contextPath}/production/productionresult"
-					class="flow-more">더보기 〉</a>
+			<i>→</i>
+			<div class="dash-flow-step">
+				<span class="dash-flow-icon">⚙</span>
+				<strong>생산진행</strong>
 			</div>
-
-			<div class="flow-card">
-				<div class="flow-icon flow-indigo">
-					<svg viewBox="0 0 64 64">
-		<%-- 트럭 적재함이다. --%>
-		<path d="M8 21H37V44H8V21Z" />
-
-		<%-- 트럭 운전석이다. --%>
-		<path d="M37 29H49L57 37V44H37V29Z" />
-
-		<%-- 운전석 창문이다. --%>
-		<path class="icon-white" d="M43 33H48L52 38H43V33Z" />
-
-		<%-- 왼쪽 바퀴이다. --%>
-		<circle cx="20" cy="48" r="6" />
-
-		<%-- 오른쪽 바퀴이다. --%>
-		<circle cx="48" cy="48" r="6" />
-
-		<%-- 바퀴 안쪽 흰색 원이다. --%>
-		<circle class="icon-white" cx="20" cy="48" r="2.5" />
-		<circle class="icon-white" cx="48" cy="48" r="2.5" />
-	</svg>
-				</div>
-
-				<strong>출하관리</strong>
-
-				<div class="flow-info">
-					<span><em>출하 대기</em><b>5건</b></span> <span><em>금일 출하</em><b>6건</b></span>
-				</div>
-
-				<a href="#" class="flow-more">더보기 〉</a>
+			<i>→</i>
+			<div class="dash-flow-step">
+				<span class="dash-flow-icon">✓</span>
+				<strong>품질검사</strong>
 			</div>
-
+			<i>→</i>
+			<div class="dash-flow-step">
+				<span class="dash-flow-icon">▣</span>
+				<strong>완료 / 출하</strong>
+			</div>
 		</div>
-	</div>
+	</section>
 
-	<%-- 하단 영역이다. --%>
-	<div class="bottom-grid">
+	<%-- 하단 정보 영역이다. --%>
+	<section class="dash-bottom-grid">
 
-		<div class="bottom-left">
-
-			<div class="dashboard-section">
-				<div class="section-title-box">
-					<h3 class="section-title">최근 작업지시</h3>
-				</div>
-
-				<table class="dashboard-table">
-					<thead>
-						<tr>
-							<th>작업지시번호</th>
-							<th>품목명</th>
-							<th>규격</th>
-							<th>수량(EA)</th>
-							<th>지시일</th>
-							<th>상태</th>
-							<th>진행률</th>
-						</tr>
-					</thead>
-
-					<tbody>
-						<tr>
-							<td>WO-250508-006</td>
-							<td>EVG-1001</td>
-							<td>10T</td>
-							<td>2,000</td>
-							<td>2025.05.08</td>
-							<td><span class="status-chip progress">진행중</span></td>
-							<td>60%</td>
-						</tr>
-
-						<tr>
-							<td>WO-250508-005</td>
-							<td>EVG-1002</td>
-							<td>15T</td>
-							<td>1,500</td>
-							<td>2025.05.08</td>
-							<td><span class="status-chip wait">대기</span></td>
-							<td>0%</td>
-						</tr>
-					</tbody>
-				</table>
+		<article class="dash-card dash-bottom-card">
+			<div class="dash-card-head">
+				<h3 class="dash-card-title">최근 작업지시</h3>
+				<a href="${pageContext.request.contextPath}/production/workorder" class="dash-more-link">더보기</a>
 			</div>
 
-		</div>
+			<table class="dash-work-table">
+				<thead>
+					<tr>
+						<th>지시번호</th>
+						<th>품목명</th>
+						<th>진행률</th>
+						<th>상태</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>WO-25-0518-003</td>
+						<td>SA-1000</td>
+						<td>
+							<div class="dash-table-progress"><em style="width: 100%;"></em><span>100%</span></div>
+						</td>
+						<td><span class="dash-status dash-status-green">완료</span></td>
+					</tr>
+					<tr>
+						<td>WO-25-0518-002</td>
+						<td>SA-2000</td>
+						<td>
+							<div class="dash-table-progress"><em style="width: 75%;"></em><span>75%</span></div>
+						</td>
+						<td><span class="dash-status dash-status-blue">진행중</span></td>
+					</tr>
+					<tr>
+						<td>WO-25-0517-003</td>
+						<td>SA-3000</td>
+						<td>
+							<div class="dash-table-progress"><em style="width: 60%;"></em><span>60%</span></div>
+						</td>
+						<td><span class="dash-status dash-status-blue">진행중</span></td>
+					</tr>
+					<tr>
+						<td>WO-25-0517-002</td>
+						<td>SA-4000</td>
+						<td>
+							<div class="dash-table-progress"><em style="width: 20%;"></em><span>20%</span></div>
+						</td>
+						<td><span class="dash-status dash-status-gray">대기</span></td>
+					</tr>
+				</tbody>
+			</table>
+		</article>
 
-		<div class="bottom-right">
-
-			<div class="dashboard-section">
-				<div class="section-title-box">
-					<h3 class="section-title">오늘 알림</h3>
-					<a href="#" class="more-link">더보기</a>
-				</div>
-
-				<ul class="alert-list">
-					<li><strong>설비 점검 예정</strong> <span>MC #03 정기 점검 예정</span> <em>09:00</em>
-					</li>
-
-					<li><strong>자재 부족 알림</strong> <span>EPDM-011 재고 부족</span> <em>08:30</em>
-					</li>
-				</ul>
+		<article class="dash-card dash-bottom-card">
+			<div class="dash-card-head">
+				<h3 class="dash-card-title">공지사항</h3>
+				<a href="${pageContext.request.contextPath}/board/notice" class="dash-more-link">더보기</a>
 			</div>
 
-			<div class="dashboard-section">
-				<div class="section-title-box">
-					<h3 class="section-title">공지사항</h3>
-					<a href="#" class="more-link">더보기</a>
-				</div>
+			<ul class="dash-list">
+				<li><a href="${pageContext.request.contextPath}/board/notice">5월 정기 설비 점검 안내</a><span>2025-05-16</span></li>
+				<li><a href="${pageContext.request.contextPath}/board/notice">MES 시스템 점검 작업 안내</a><span>2025-05-15</span></li>
+				<li><a href="${pageContext.request.contextPath}/board/notice">품질 기준 변경 안내</a><span>2025-05-14</span></li>
+				<li><a href="${pageContext.request.contextPath}/board/notice">안전보건 교육 일정 안내</a><span>2025-05-12</span></li>
+			</ul>
+		</article>
 
-				<ul class="notice-list">
-					<li><span>5월 설비 점검 일정 안내</span> <em>2025.05.07</em></li>
-
-					<li><span>품질 기준 변경 안내</span> <em>2025.05.02</em></li>
-
-					<li><span>근로자의 날 휴무 안내</span> <em>2025.04.29</em></li>
-				</ul>
+		<article class="dash-card dash-bottom-card">
+			<div class="dash-card-head">
+				<h3 class="dash-card-title">오늘 알림</h3>
+				<a href="${pageContext.request.contextPath}/dashboard" class="dash-more-link">더보기</a>
 			</div>
 
-		</div>
+			<ul class="dash-alert-list">
+				<li>
+					<span class="dash-alert-icon dash-alert-green">!</span>
+					<div><strong>설비 경고: MC-03 온도 이상</strong><em>10:08</em></div>
+				</li>
+				<li>
+					<span class="dash-alert-icon dash-alert-orange">!</span>
+					<div><strong>자재 부족: BOLT-M 재고 부족</strong><em>09:42</em></div>
+				</li>
+				<li>
+					<span class="dash-alert-icon dash-alert-blue">i</span>
+					<div><strong>작업지시 WO-25-0518-002 진행 중</strong><em>08:30</em></div>
+				</li>
+				<li>
+					<span class="dash-alert-icon dash-alert-blue">i</span>
+					<div><strong>품질 이슈: QC-02 검사 대기</strong><em>08:15</em></div>
+				</li>
+			</ul>
+		</article>
 
-	</div>
+	</section>
 
 </section>
+
+<%-- Chart.js 그래프 라이브러리이다. --%>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+	// 대시보드 그래프를 생성한다.
+	document.addEventListener("DOMContentLoaded", function () {
+		if (typeof Chart === "undefined") {
+			return;
+		}
+
+		const chartGreen = "#008B4F";
+		const chartGreenLight = "rgba(0, 139, 79, 0.22)";
+		const chartGray = "#CBD5E1";
+		const chartText = "#334155";
+		const chartGrid = "#E5E7EB";
+		const chartRed = "#DC2626";
+
+		Chart.defaults.font.family = "'Pretendard', 'Noto Sans KR', Arial, sans-serif";
+		Chart.defaults.color = chartText;
+		Chart.defaults.plugins.legend.display = false;
+
+		const labels = ["5/12", "5/13", "5/14", "5/15", "5/16", "5/17", "5/18"];
+
+		// 공통 옵션을 반환한다.
+		function getCommonOptions(maxValue, stepSize, unitCallback) {
+			return {
+				responsive: true,
+				maintainAspectRatio: false,
+				interaction: {
+					mode: "index",
+					intersect: false
+				},
+				plugins: {
+					tooltip: {
+						backgroundColor: "rgba(17, 24, 39, 0.9)",
+						padding: 10,
+						titleFont: {
+							size: 12,
+							weight: "700"
+						},
+						bodyFont: {
+							size: 12,
+							weight: "600"
+						},
+						displayColors: true
+					}
+				},
+				scales: {
+					x: {
+						grid: {
+							display: false
+						},
+						ticks: {
+							font: {
+								size: 11,
+								weight: "700"
+							}
+						},
+						border: {
+							display: false
+						}
+					},
+					y: {
+						beginAtZero: true,
+						max: maxValue,
+						ticks: {
+							stepSize: stepSize,
+							font: {
+								size: 11,
+								weight: "700"
+							},
+							callback: unitCallback
+						},
+						grid: {
+							color: chartGrid
+						},
+						border: {
+							display: false
+						}
+					}
+				}
+			};
+		}
+
+		// 생산실적 추이 그래프이다.
+		new Chart(document.getElementById("productionChart"), {
+			type: "bar",
+			data: {
+				labels: labels,
+				datasets: [
+					{
+						type: "bar",
+						label: "실적",
+						data: [11200, 12500, 11800, 12800, 12100, 12700, 13140],
+						backgroundColor: [
+							chartGreenLight,
+							chartGreenLight,
+							chartGreenLight,
+							chartGreenLight,
+							chartGreenLight,
+							chartGreenLight,
+							chartGreen
+						],
+						borderRadius: 7,
+						barThickness: 34
+					},
+					{
+						type: "line",
+						label: "계획",
+						data: [15000, 15000, 15000, 15000, 15000, 15000, 15000],
+						borderColor: "#475569",
+						borderWidth: 2,
+						borderDash: [6, 6],
+						pointRadius: 0,
+						tension: 0
+					}
+				]
+			},
+			options: getCommonOptions(20000, 5000, function (value) {
+				return value === 0 ? "0" : (value / 1000) + "K";
+			})
+		});
+
+		// 불량 추이 그래프이다.
+		new Chart(document.getElementById("defectChart"), {
+			type: "line",
+			data: {
+				labels: labels,
+				datasets: [
+					{
+						label: "불량률",
+						data: [2.2, 2.6, 2.1, 2.7, 2.3, 2.2, 1.8],
+						borderColor: chartRed,
+						backgroundColor: "rgba(220, 38, 38, 0.08)",
+						fill: true,
+						borderWidth: 3,
+						pointRadius: 4,
+						pointHoverRadius: 6,
+						pointBackgroundColor: chartRed,
+						pointBorderColor: "#FFFFFF",
+						pointBorderWidth: 2,
+						tension: 0.35
+					},
+					{
+						label: "목표",
+						data: [2, 2, 2, 2, 2, 2, 2],
+						borderColor: "#475569",
+						borderWidth: 2,
+						borderDash: [6, 6],
+						pointRadius: 0,
+						tension: 0
+					}
+				]
+			},
+			options: getCommonOptions(4, 1, function (value) {
+				return value + "%";
+			})
+		});
+
+		// 생산원가 추이 그래프이다.
+		new Chart(document.getElementById("costChart"), {
+			type: "bar",
+			data: {
+				labels: labels,
+				datasets: [
+					{
+						type: "bar",
+						label: "원가",
+						data: [1180, 1260, 1210, 1270, 1220, 1240, 1050],
+						backgroundColor: [
+							chartGreenLight,
+							chartGreenLight,
+							chartGreenLight,
+							chartGreenLight,
+							chartGreenLight,
+							chartGreenLight,
+							chartGreen
+						],
+						borderRadius: 7,
+						barThickness: 34
+					},
+					{
+						type: "line",
+						label: "목표",
+						data: [1200, 1200, 1200, 1200, 1200, 1200, 1200],
+						borderColor: "#475569",
+						borderWidth: 2,
+						borderDash: [6, 6],
+						pointRadius: 0,
+						tension: 0
+					}
+				]
+			},
+			options: getCommonOptions(1800, 600, function (value) {
+				return value.toLocaleString();
+			})
+		});
+
+		// OEE 추이 그래프이다.
+		new Chart(document.getElementById("oeeChart"), {
+			type: "line",
+			data: {
+				labels: labels,
+				datasets: [
+					{
+						label: "OEE",
+						data: [68.4, 72.1, 70.2, 75.4, 71.8, 78.3, 82.1],
+						borderColor: chartGreen,
+						backgroundColor: "rgba(0, 139, 79, 0.08)",
+						fill: true,
+						borderWidth: 3,
+						pointRadius: 4,
+						pointHoverRadius: 6,
+						pointBackgroundColor: chartGreen,
+						pointBorderColor: "#FFFFFF",
+						pointBorderWidth: 2,
+						tension: 0.35
+					},
+					{
+						label: "목표",
+						data: [80, 80, 80, 80, 80, 80, 80],
+						borderColor: "#475569",
+						borderWidth: 2,
+						borderDash: [6, 6],
+						pointRadius: 0,
+						tension: 0
+					}
+				]
+			},
+			options: getCommonOptions(100, 25, function (value) {
+				return value + "%";
+			})
+		});
+	});
+</script>

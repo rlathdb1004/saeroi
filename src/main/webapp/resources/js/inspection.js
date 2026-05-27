@@ -10,7 +10,7 @@ if (coBtnReset) {
 }
 // 모달 안에 있는 select 태그들 가져오기
 const prodId = document.getElementsByName('prod_id')[0];
-const empId = document.getElementsByName('emp_id')[0];
+const empId = document.querySelector('#modal_insert .modal_form [name="emp_id"]');
 const inspectionType = document.querySelector('.modal_form [name="insp_type"]');
 const result = document.querySelector('.modal_form [name="result"]');
 // 옵션을 이미 불러왔는지 확인하는 변수
@@ -217,3 +217,37 @@ checkAllHeaders.forEach(header => {
         });
     });
 });
+//불량관리 상세 모달 emp 옵션
+const actionEmpId = document.querySelector('#actionEmpId');
+
+let actionEmpLoaded = false;
+
+function loadActionEmpOptions() {
+	if (!actionEmpId || actionEmpLoaded) {
+		return;
+	}
+
+	const dept = actionEmpId.dataset.dept;
+
+	if (!dept) {
+		addDefaultOption(actionEmpId);
+		return;
+	}
+
+	fetch(contextPath + '/quality/defect/action/empOption?dept=' + encodeURIComponent(dept))
+		.then(response => response.json())
+		.then(data => {
+			addDefaultOption(actionEmpId);
+
+			data.forEach(emp => {
+				actionEmpId.innerHTML += `<option value="${emp.action_emp_id}">${emp.action_ename}</option>`;
+			});
+
+			actionEmpLoaded = true;
+		});
+}
+
+if (actionEmpId) {
+	actionEmpId.addEventListener('focus', loadActionEmpOptions);
+	actionEmpId.addEventListener('click', loadActionEmpOptions);
+}

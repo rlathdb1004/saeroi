@@ -1,5 +1,6 @@
 package kr.or.saeroi.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.or.saeroi.common.PageDTO;
 import kr.or.saeroi.dto.ProductionDTO;
@@ -21,11 +23,17 @@ public class ProductionController {
 	@Autowired
 	private ProductionService productionService;
 
+
+	// =========================================================
+	// 1. 생산계획 관리
+	// =========================================================
+
 	// 생산계획관리 목록 화면이다.
 	@RequestMapping("/production/productionplan")
 	public String productionPlan(ProductionDTO productionDTO,
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size, Model model) {
+			@RequestParam(value = "size", defaultValue = "5") int size,
+			Model model) {
 
 		// 검색 조건을 포함한 전체 건수를 DB에서 조회한다.
 		int totalCount = productionService.selectProductionPlanCount(productionDTO);
@@ -83,10 +91,13 @@ public class ProductionController {
 		return "production/productionplan.tiles";
 	}
 
+
 	// 생산계획 상세 화면이다.
 	@RequestMapping("/production/productionplan/detail")
-	public String productionPlanDetail(@RequestParam("prodPlanId") Integer prodPlanId,
-			@RequestParam(value = "mode", required = false) String mode, Model model) {
+	public String productionPlanDetail(
+			@RequestParam("prodPlanId") Integer prodPlanId,
+			@RequestParam(value = "mode", required = false) String mode,
+			Model model) {
 
 		// 생산계획 ID 기준으로 상세 정보를 DB에서 조회한다.
 		ProductionDTO production = productionService.selectProductionPlanDetail(prodPlanId);
@@ -107,32 +118,67 @@ public class ProductionController {
 		return "production/productionplandetail.tiles";
 	}
 
+
 	// 생산계획을 등록한다.
 	@RequestMapping(value = "/production/productionplan/insert", method = RequestMethod.POST)
-	public String insertProductionPlan(ProductionDTO productionDTO) {
+	public String insertProductionPlan(
+			ProductionDTO productionDTO,
+			RedirectAttributes rttr) {
 
-		// 등록 모달에서 입력한 값으로 생산계획을 등록한다.
-		productionService.insertProductionPlan(productionDTO);
+		try {
+			// 등록 모달에서 입력한 값으로 생산계획을 등록한다.
+			productionService.insertProductionPlan(productionDTO);
+
+			rttr.addFlashAttribute("msg", "생산계획이 등록되었습니다.");
+
+		} catch (IllegalArgumentException e) {
+			rttr.addFlashAttribute("msg", e.getMessage());
+
+		} catch (Exception e) {
+			rttr.addFlashAttribute("msg", "생산계획 등록 중 오류가 발생했습니다.");
+		}
 
 		// 등록 후 생산계획 목록으로 이동한다.
 		return "redirect:/production/productionplan";
 	}
 
+
 	// 생산계획 상세 수정 처리이다.
 	@RequestMapping(value = "/production/productionplan/update", method = RequestMethod.POST)
-	public String updateProductionPlan(ProductionDTO productionDTO) {
+	public String updateProductionPlan(
+			ProductionDTO productionDTO,
+			RedirectAttributes rttr) {
 
-		// 생산계획 정보를 수정한다.
-		productionService.updateProductionPlan(productionDTO);
+		try {
+			// 생산계획 정보를 수정한다.
+			productionService.updateProductionPlan(productionDTO);
+
+			rttr.addFlashAttribute("msg", "생산계획이 수정되었습니다.");
+
+		} catch (IllegalArgumentException e) {
+			rttr.addFlashAttribute("msg", e.getMessage());
+
+		} catch (Exception e) {
+			rttr.addFlashAttribute("msg", "생산계획 수정 중 오류가 발생했습니다.");
+		}
 
 		// 수정 후 다시 상세 화면으로 이동한다.
-		return "redirect:/production/productionplan/detail?prodPlanId=" + productionDTO.getProdPlanId();
+		return "redirect:/production/productionplan/detail?prodPlanId="
+				+ productionDTO.getProdPlanId();
 	}
+
+
+	// =========================================================
+	// 2. 작업지시 관리
+	// =========================================================
 
 	// 작업지시 관리 목록 화면이다.
 	@RequestMapping("/production/workorder")
-	public String workOrder(ProductionDTO productionDTO, @RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size, Model model) {
+	public String workOrder(
+			ProductionDTO productionDTO,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "5") int size,
+			Model model) {
 
 		// 검색 조건을 포함한 작업지시 전체 건수를 DB에서 조회한다.
 		int totalCount = productionService.selectWorkOrderCount(productionDTO);
@@ -196,21 +242,46 @@ public class ProductionController {
 		return "production/workorder.tiles";
 	}
 
+
 	// 작업지시를 등록한다.
 	@RequestMapping(value = "/production/workorder/insert", method = RequestMethod.POST)
-	public String insertWorkOrder(ProductionDTO productionDTO) {
+	public String insertWorkOrder(
+			ProductionDTO productionDTO,
+			RedirectAttributes rttr) {
 
-		// 작업지시 등록 시 작업지시번호와 LOT번호는 Mapper에서 자동 생성된다.
-		productionService.insertWorkOrder(productionDTO);
+		try {
+			/*
+			 * 작업지시 등록 처리이다.
+			 *
+			 * Service에서 처리하는 흐름:
+			 * 1. WORK_ORDER 등록
+			 * 2. 생성된 orderId 확보
+			 * 3. 생산계획의 완제품 기준 사용 BOM 조회
+			 * 4. BOM_DETAIL 기준 원자재 필요수량 계산
+			 * 5. MATERIAL_INOUT에 MO-PROD 원자재 투입 이력 자동 생성
+			 */
+			productionService.insertWorkOrder(productionDTO);
+
+			rttr.addFlashAttribute("msg", "작업지시가 등록되었고 BOM 기준 원자재 투입 이력이 생성되었습니다.");
+
+		} catch (IllegalArgumentException e) {
+			rttr.addFlashAttribute("msg", e.getMessage());
+
+		} catch (Exception e) {
+			rttr.addFlashAttribute("msg", "작업지시 등록 중 오류가 발생했습니다.");
+		}
 
 		// 등록 후 작업지시 목록으로 이동한다.
 		return "redirect:/production/workorder";
 	}
 
+
 	// 작업지시 상세 화면이다.
 	@RequestMapping("/production/workorder/detail")
-	public String workOrderDetail(@RequestParam("orderId") Integer orderId,
-			@RequestParam(value = "mode", required = false) String mode, Model model) {
+	public String workOrderDetail(
+			@RequestParam("orderId") Integer orderId,
+			@RequestParam(value = "mode", required = false) String mode,
+			Model model) {
 
 		// 작업지시 ID 기준으로 상세 정보를 DB에서 조회한다.
 		ProductionDTO workOrder = productionService.selectWorkOrderDetail(orderId);
@@ -220,6 +291,42 @@ public class ProductionController {
 
 		// 수정 모드에서 사용할 담당자 목록이다.
 		List<ProductionDTO> empList = productionService.selectWorkOrderEmpList();
+
+		// 작업지시에 적용된 BOM 마스터 정보이다.
+		ProductionDTO appliedBom = null;
+
+		// 작업지시 기준 BOM 상세 원자재 목록이다.
+		List<ProductionDTO> bomMaterialList = Collections.emptyList();
+
+		// 작업지시 등록 시 자동 생성된 원자재 투입 이력 목록이다.
+		List<ProductionDTO> materialInoutList = Collections.emptyList();
+
+		try {
+			appliedBom = productionService.selectWorkOrderAppliedBom(orderId);
+
+			List<ProductionDTO> tempBomMaterialList =
+					productionService.selectWorkOrderBomMaterialList(orderId);
+
+			if (tempBomMaterialList != null) {
+				bomMaterialList = tempBomMaterialList;
+			}
+
+			List<ProductionDTO> tempMaterialInoutList =
+					productionService.selectWorkOrderMaterialInoutList(orderId);
+
+			if (tempMaterialInoutList != null) {
+				materialInoutList = tempMaterialInoutList;
+			}
+
+		} catch (Exception e) {
+			/*
+			 * 기존 작업지시 중 BOM/자재투입 이력이 없는 데이터가 있을 수 있으므로
+			 * 상세 화면 자체는 깨지지 않도록 빈 값으로 전달한다.
+			 */
+			appliedBom = null;
+			bomMaterialList = Collections.emptyList();
+			materialInoutList = Collections.emptyList();
+		}
 
 		// 상세 JSP에서 사용할 작업지시 데이터이다.
 		model.addAttribute("workOrder", workOrder);
@@ -231,6 +338,11 @@ public class ProductionController {
 		model.addAttribute("lineList", lineList);
 		model.addAttribute("empList", empList);
 
+		// BOM/원자재 투입 표시용 데이터이다.
+		model.addAttribute("appliedBom", appliedBom);
+		model.addAttribute("bomMaterialList", bomMaterialList);
+		model.addAttribute("materialInoutList", materialInoutList);
+
 		// 공통 header.jsp에서 사용할 상단 제목이다.
 		model.addAttribute("headerTitle", "생산관리");
 
@@ -241,22 +353,43 @@ public class ProductionController {
 		return "production/workorderdetail.tiles";
 	}
 
+
 	// 작업지시 상세 수정 처리이다.
 	@RequestMapping(value = "/production/workorder/update", method = RequestMethod.POST)
-	public String updateWorkOrder(ProductionDTO productionDTO) {
+	public String updateWorkOrder(
+			ProductionDTO productionDTO,
+			RedirectAttributes rttr) {
 
-		// LOT번호와 작업지시번호는 수정하지 않고 기본 작업지시 정보만 수정한다.
-		productionService.updateWorkOrder(productionDTO);
+		try {
+			// LOT번호와 작업지시번호는 수정하지 않고 기본 작업지시 정보만 수정한다.
+			productionService.updateWorkOrder(productionDTO);
+
+			rttr.addFlashAttribute("msg", "작업지시 정보가 수정되었습니다.");
+
+		} catch (IllegalArgumentException e) {
+			rttr.addFlashAttribute("msg", e.getMessage());
+
+		} catch (Exception e) {
+			rttr.addFlashAttribute("msg", "작업지시 수정 중 오류가 발생했습니다.");
+		}
 
 		// 수정 후 다시 상세 화면으로 이동한다.
-		return "redirect:/production/workorder/detail?orderId=" + productionDTO.getOrderId();
+		return "redirect:/production/workorder/detail?orderId="
+				+ productionDTO.getOrderId();
 	}
+
+
+	// =========================================================
+	// 3. 생산실적 등록
+	// =========================================================
 
 	// 생산실적 등록 목록 화면이다.
 	@RequestMapping("/production/productionresult")
-	public String productionResult(ProductionDTO productionDTO,
+	public String productionResult(
+			ProductionDTO productionDTO,
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size, Model model) {
+			@RequestParam(value = "size", defaultValue = "5") int size,
+			Model model) {
 
 		// 검색 조건을 포함한 생산실적 전체 건수를 DB에서 조회한다.
 		int totalCount = productionService.selectProductionResultCount(productionDTO);
@@ -283,7 +416,7 @@ public class ProductionController {
 		// 등록 모달에서 사용할 작업지시 목록을 DB에서 조회한다.
 		List<ProductionDTO> productionResultOrderList = productionService.selectProductionResultOrderList();
 
-		// 등록 모달에서 사용할 담당자 목록을 DB에서 조회한다.
+		// 등록 모달에서 사용할 담당자 목록이다.
 		List<ProductionDTO> empList = productionService.selectWorkOrderEmpList();
 
 		// 기존 공통 JSP 구조에 맞춘 목록 변수명이다.
@@ -316,21 +449,37 @@ public class ProductionController {
 		return "production/productionresult.tiles";
 	}
 
+
 	// 생산실적을 등록한다.
 	@RequestMapping(value = "/production/productionresult/insert", method = RequestMethod.POST)
-	public String insertProductionResult(ProductionDTO productionDTO) {
+	public String insertProductionResult(
+			ProductionDTO productionDTO,
+			RedirectAttributes rttr) {
 
-		// 생산실적은 기존 작업지시 LOT번호를 기준으로 PRODUCTION 테이블에 등록한다.
-		productionService.insertProductionResult(productionDTO);
+		try {
+			// 생산실적은 기존 작업지시 LOT번호를 기준으로 PRODUCTION 테이블에 등록한다.
+			productionService.insertProductionResult(productionDTO);
+
+			rttr.addFlashAttribute("msg", "생산실적이 등록되었습니다.");
+
+		} catch (IllegalArgumentException e) {
+			rttr.addFlashAttribute("msg", e.getMessage());
+
+		} catch (Exception e) {
+			rttr.addFlashAttribute("msg", "생산실적 등록 중 오류가 발생했습니다.");
+		}
 
 		// 등록 후 생산실적 목록으로 이동한다.
 		return "redirect:/production/productionresult";
 	}
 
+
 	// 생산실적 상세 화면이다.
 	@RequestMapping("/production/productionresult/detail")
-	public String productionResultDetail(@RequestParam("prodId") Integer prodId,
-			@RequestParam(value = "mode", required = false) String mode, Model model) {
+	public String productionResultDetail(
+			@RequestParam("prodId") Integer prodId,
+			@RequestParam(value = "mode", required = false) String mode,
+			Model model) {
 
 		// 생산실적 ID 기준으로 상세 정보를 DB에서 조회한다.
 		ProductionDTO result = productionService.selectProductionResultDetail(prodId);
@@ -357,22 +506,43 @@ public class ProductionController {
 		return "production/productionresultdetail.tiles";
 	}
 
+
 	// 생산실적 상세 수정 처리이다.
 	@RequestMapping(value = "/production/productionresult/update", method = RequestMethod.POST)
-	public String updateProductionResult(ProductionDTO productionDTO) {
+	public String updateProductionResult(
+			ProductionDTO productionDTO,
+			RedirectAttributes rttr) {
 
-		// LOT번호와 실적번호는 수정하지 않고 기본 생산실적 정보만 수정한다.
-		productionService.updateProductionResult(productionDTO);
+		try {
+			// LOT번호와 실적번호는 수정하지 않고 기본 생산실적 정보만 수정한다.
+			productionService.updateProductionResult(productionDTO);
 
-		// 수정 후 다시 상세 화면으로 이동한다.
-		return "redirect:/production/productionresult/detail?prodId=" + productionDTO.getProdId();
+			rttr.addFlashAttribute("msg", "생산실적 정보가 수정되었습니다.");
+
+		} catch (IllegalArgumentException e) {
+			rttr.addFlashAttribute("msg", e.getMessage());
+
+		} catch (Exception e) {
+			rttr.addFlashAttribute("msg", "생산실적 수정 중 오류가 발생했습니다.");
+		}
+
+		// 수정 후 다시 생산실적 상세 화면으로 이동한다.
+		return "redirect:/production/productionresult/detail?prodId="
+				+ productionDTO.getProdId();
 	}
+
+
+	// =========================================================
+	// 4. 공정진행 현황
+	// =========================================================
 
 	// 공정진행 현황 목록 화면이다.
 	@RequestMapping("/production/processprogress")
-	public String processProgress(ProductionDTO productionDTO,
+	public String processProgress(
+			ProductionDTO productionDTO,
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size, Model model) {
+			@RequestParam(value = "size", defaultValue = "5") int size,
+			Model model) {
 
 		// 검색 조건을 포함한 공정진행 현황 전체 건수를 DB에서 조회한다.
 		int totalCount = productionService.selectProcessProgressCount(productionDTO);
@@ -434,21 +604,37 @@ public class ProductionController {
 		return "production/processprogress.tiles";
 	}
 
+
 	// 공정진행을 등록한다.
 	@RequestMapping(value = "/production/processprogress/insert", method = RequestMethod.POST)
-	public String insertProcessProgress(ProductionDTO productionDTO) {
+	public String insertProcessProgress(
+			ProductionDTO productionDTO,
+			RedirectAttributes rttr) {
 
-		// 공정진행 등록은 PRODUCTION 테이블에 생산실적을 등록하는 구조이다.
-		productionService.insertProductionResult(productionDTO);
+		try {
+			// 공정진행 등록은 PRODUCTION 테이블에 생산실적을 등록하는 구조이다.
+			productionService.insertProductionResult(productionDTO);
+
+			rttr.addFlashAttribute("msg", "공정진행 정보가 등록되었습니다.");
+
+		} catch (IllegalArgumentException e) {
+			rttr.addFlashAttribute("msg", e.getMessage());
+
+		} catch (Exception e) {
+			rttr.addFlashAttribute("msg", "공정진행 등록 중 오류가 발생했습니다.");
+		}
 
 		// 등록 후 공정진행 현황으로 이동한다.
 		return "redirect:/production/processprogress";
 	}
 
+
 	// 공정진행 상세 화면이다.
 	@RequestMapping("/production/processprogress/detail")
-	public String processProgressDetail(@RequestParam("orderId") Integer orderId,
-			@RequestParam(value = "mode", required = false) String mode, Model model) {
+	public String processProgressDetail(
+			@RequestParam("orderId") Integer orderId,
+			@RequestParam(value = "mode", required = false) String mode,
+			Model model) {
 
 		// 작업지시 ID 기준으로 공정진행 상세 정보를 조회한다.
 		ProductionDTO progress = productionService.selectProcessProgressDetail(orderId);
@@ -475,14 +661,28 @@ public class ProductionController {
 		return "production/processprogressdetail.tiles";
 	}
 
+
 	// 공정진행 상세 수정 처리이다.
 	@RequestMapping(value = "/production/processprogress/update", method = RequestMethod.POST)
-	public String updateProcessProgress(ProductionDTO productionDTO) {
+	public String updateProcessProgress(
+			ProductionDTO productionDTO,
+			RedirectAttributes rttr) {
 
-		// 공정진행 수정은 최신 생산실적 정보를 수정하는 구조이다.
-		productionService.updateProductionResult(productionDTO);
+		try {
+			// 공정진행 수정은 최신 생산실적 정보를 수정하는 구조이다.
+			productionService.updateProductionResult(productionDTO);
+
+			rttr.addFlashAttribute("msg", "공정진행 정보가 수정되었습니다.");
+
+		} catch (IllegalArgumentException e) {
+			rttr.addFlashAttribute("msg", e.getMessage());
+
+		} catch (Exception e) {
+			rttr.addFlashAttribute("msg", "공정진행 수정 중 오류가 발생했습니다.");
+		}
 
 		// 수정 후 다시 공정진행 상세 화면으로 이동한다.
-		return "redirect:/production/processprogress/detail?orderId=" + productionDTO.getOrderId();
+		return "redirect:/production/processprogress/detail?orderId="
+				+ productionDTO.getOrderId();
 	}
 }

@@ -37,7 +37,8 @@ public class BoardDAOImpl implements BoardDAO {
 
 	// 공지 등록
 	@Override
-	public int _dao_insert_Notice(int notice_id, String title, String content, String empno, String status, String remark) {
+	public int _dao_insert_Notice(int notice_id, String title, String content, String empno, String status,
+			String remark) {
 		Map<String, Object> param = new HashMap<String, Object>();
 
 		param.put("notice_id", notice_id);
@@ -52,7 +53,8 @@ public class BoardDAOImpl implements BoardDAO {
 
 	// 공지 첨부파일 등록
 	@Override
-	public int _dao_insert_Notice_file(int notice_id, String file_title, String saved_title, String file_path, long file_size) {
+	public int _dao_insert_Notice_file(int notice_id, String file_title, String saved_title, String file_path,
+			long file_size) {
 		Map<String, Object> param = new HashMap<String, Object>();
 
 		param.put("notice_id", notice_id);
@@ -120,5 +122,115 @@ public class BoardDAOImpl implements BoardDAO {
 		param.put("remark", remark);
 
 		return sqlSession.update("mapper.board._update_Notice", param);
+	}
+
+	// 게시판 목록
+	@Override
+	public List<BoradDTO> _dao_select_Board(String startDate, String endDate, String keyword) {
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("startDate", startDate);
+		param.put("endDate", endDate);
+		param.put("keyword", keyword);
+
+		return sqlSession.selectList("mapper.board._select_Board", param);
+	}
+
+	// 다음 게시판 번호 조회
+	@Override
+	public int _dao_select_next_Board_id() {
+		return sqlSession.selectOne("mapper.board._select_next_Board_id");
+	}
+
+	// 게시판 등록
+	@Override
+	public int _dao_insert_Board(int board_id, String title, String content, String empno, String status,
+			String remark) {
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("board_id", board_id);
+		param.put("title", title);
+		param.put("content", content);
+		param.put("empno", empno);
+		param.put("status", status);
+		param.put("remark", remark);
+
+		return sqlSession.insert("mapper.board._insert_Board", param);
+	}
+
+	// 게시판 첨부파일 등록
+	@Override
+	public int _dao_insert_Board_file(int board_id, String file_title, String saved_title, String file_path,
+			long file_size) {
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("board_id", board_id);
+		param.put("file_title", file_title);
+		param.put("saved_title", saved_title);
+		param.put("file_path", file_path);
+		param.put("file_size", file_size);
+
+		return sqlSession.insert("mapper.board._insert_Board_file", param);
+	}
+
+	// 게시판 삭제
+	@Override
+	public int _dao_delete_Board(String[] board_id, String role, String empno) {
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("board_id", board_id);
+		param.put("role", role);
+		param.put("empno", empno);
+
+		return sqlSession.delete("mapper.board._delete_Board", param);
+	}
+
+	// 게시판 상세 조회
+	@Override
+	public BoradDTO _dao_select_Board_detail(String board_id, String role) {
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("board_id", board_id);
+		param.put("role", role);
+
+		return sqlSession.selectOne("mapper.board._select_Board_detail", param);
+	}
+
+	// 게시판 첨부파일 조회
+	@Override
+	public BoradDTO _dao_select_Board_file(String board_id) {
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("board_id", board_id);
+
+		return sqlSession.selectOne("mapper.board._select_Board_file", param);
+	}
+
+	// 게시판 조회수 증가
+	@Override
+	public int _dao_update_Board_view_count(String board_id, String empno) {
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("board_id", board_id);
+		param.put("empno", empno);
+
+		return sqlSession.update("mapper.board._update_Board_view_count", param);
+	}
+
+	// 게시판 수정
+	@Override
+	public int _dao_update_Board(String board_id, String title, String content, String status, String remark,
+			String role, String empno) {
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("board_id", board_id);
+		param.put("title", title);
+		param.put("content", content);
+		param.put("status", status);
+		param.put("remark", remark);
+		param.put("role", role);
+		param.put("empno", empno);
+
+		return sqlSession.update("mapper.board._update_Board", param);
 	}
 }

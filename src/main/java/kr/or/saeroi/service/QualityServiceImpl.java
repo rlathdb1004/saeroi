@@ -153,4 +153,13 @@ public class QualityServiceImpl implements QualityService {
 
 		return insert_result;
 	}
+	//불량관리 모달 emp 옵션
+	@Override
+	public List<DefectDTO> _ser_select_Defect_action_emp_option(String dept) {
+
+		List<DefectDTO> empList =
+				qualityDAO._dao_select_Defect_action_emp_option(dept);
+
+		return empList;
+	}
 }

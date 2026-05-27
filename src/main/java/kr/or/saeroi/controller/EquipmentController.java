@@ -105,7 +105,7 @@ public class EquipmentController {
         return "redirect:/equipment/equipment";
     }
     
-    @GetMapping("/equipment/detail")
+    @GetMapping("/equipment/equipment/detail")
     public String equipmentDetail(
     		@RequestParam("equip_id") String equip_id, 
     		 @RequestParam(required = false) String mode,

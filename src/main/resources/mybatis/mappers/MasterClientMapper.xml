@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+    기준관리 > 거래처관리 Mapper
+
+    기준:
+    - 기존 ClientDTO / ClientDAO와 충돌 방지를 위해 MasterClient 명칭 사용
+    - DB 테이블은 client 사용
+    - 거래처구분은 client_code prefix 기준으로 관리
+    - 신규 거래처구분 prefix 직접 입력 가능
+    - 실제 DELETE 대신 use_yn = 'N' 미사용 처리
+    - 목록 컬럼 기준: PC 체크박스 포함 8개, 모바일 체크박스 포함 5개
+-->
+<mapper namespace="masterClient">
+
+    <!-- =========================================================
+         1. ResultMap
+         ========================================================= -->
+
+    <resultMap id="masterClientResultMap"
+               type="kr.or.saeroi.dto.MasterClientDTO">
+
+        <!-- client 기본 컬럼 -->
+        <id property="clientId" column="client_id" />
+
+        <result property="clientCode" column="client_code" />
+        <result property="clientName" column="client_name" />
+        <result property="clientType" column="client_type" />
+        <result property="clientAdress" column="client_adress" />
+        <result property="clientMan" column="client_man" />
+        <result property="clientTel" column="client_tel" />
+        <result property="clientDept" column="client_dept" />
+        <result property="remark" column="remark" />
+        <result property="createdDate" column="created_date" />
+        <result property="updatedDate" column="updated_date" />
+        <result property="useYn" column="use_yn" />
+
+        <!-- client_code에서 추출한 거래처코드 prefix -->
+        <result property="clientCodePrefix" column="client_code_prefix" />
+
+        <!-- 화면 표시용 컬럼 -->
+        <result property="clientTypeName" column="client_type_name" />
+        <result property="useYnName" column="use_yn_name" />
+
+        <!-- 화면 참고용 컬럼 -->
+        <result property="itemCount" column="item_count" />
+        <result property="equipmentCount" column="equipment_count" />
+		<result property="latitude" column="latitude" />
+		<result property="longitude" column="longitude" />
+    </resultMap>
+
+
+    <!-- =========================================================
+         2. 공통 검색조건
+         ========================================================= -->
+
+    <sql id="masterClientSearchWhere">
+
+        <where>
+
+            <if test="searchType != null and searchType != ''
+                      and searchKeyword != null and searchKeyword != ''">
+
+                <choose>
+
+                    <!-- 거래처코드 prefix 검색 -->
+                    <when test="searchType == 'clientCodePrefix'">
+                        AND UPPER(
+                            REGEXP_REPLACE(c.client_code, '-[0-9]{3}$', '')
+                        ) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 거래처코드 검색 -->
+                    <when test="searchType == 'clientCode'">
+                        AND UPPER(c.client_code) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 거래처명 검색 -->
+                    <when test="searchType == 'clientName'">
+                        AND UPPER(c.client_name) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 거래처구분 검색 -->
+                    <when test="searchType == 'clientType'">
+                        AND UPPER(c.client_type) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 담당자 검색 -->
+                    <when test="searchType == 'clientMan'">
+                        AND UPPER(c.client_man) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 연락처 검색 -->
+                    <when test="searchType == 'clientTel'">
+                        AND UPPER(c.client_tel) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                    </when>
+
+                    <!-- 사용여부 검색 -->
+                    <when test="searchType == 'useYn'">
+                        AND (
+                            UPPER(c.use_yn) LIKE '%' || UPPER(#{searchKeyword}) || '%'
+                            OR
+                            CASE
+                                WHEN c.use_yn = 'Y' THEN '사용'
+                                WHEN c.use_yn = 'N' THEN '미사용'
+                                ELSE c.use_yn
+                            END LIKE '%' || #{searchKeyword} || '%'
+                        )
+                    </when>
+
+                </choose>
+
+            </if>
+
+        </where>
+
+    </sql>
+
+
+    <!-- =========================================================
+         3. 거래처 목록 / 건수 / 상세
+         ========================================================= -->
+
+    <select id="selectMasterClientList"
+            parameterType="kr.or.saeroi.dto.MasterClientDTO"
+            resultMap="masterClientResultMap">
+
+        SELECT
+            c.client_id,
+            c.client_code,
+            c.client_name,
+            c.client_type,
+            c.client_adress,
+            c.client_man,
+            c.client_tel,
+            c.client_dept,
+            c.remark,
+            c.created_date,
+            c.updated_date,
+            c.use_yn,
+            REGEXP_REPLACE(c.client_code, '-[0-9]{3}$', '') AS client_code_prefix,
+
+            CASE
+                WHEN c.client_type = 'SUP' THEN '공급처'
+                WHEN c.client_type = 'CUS' THEN '납품처'
+                ELSE c.client_type
+            END AS client_type_name,
+
+            CASE
+                WHEN c.use_yn = 'Y' THEN '사용'
+                WHEN c.use_yn = 'N' THEN '미사용'
+                ELSE c.use_yn
+            END AS use_yn_name,
+
+            (
+                SELECT COUNT(*)
+                FROM item i
+                WHERE i.supplier_id = c.client_id
+                   OR i.client_id = c.client_id
+            ) AS item_count,
+
+            (
+                SELECT COUNT(*)
+                FROM equipment e
+                WHERE e.client_id = c.client_id
+            ) AS equipment_count
+
+        FROM client c
+
+        <include refid="masterClientSearchWhere" />
+
+        ORDER BY
+            NVL(c.use_yn, 'Y') DESC,
+            c.client_type,
+            c.client_code
+
+    </select>
+
+
+    <select id="selectMasterClientCount"
+            parameterType="kr.or.saeroi.dto.MasterClientDTO"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+
+        FROM client c
+
+        <include refid="masterClientSearchWhere" />
+
+    </select>
+
+
+    <select id="selectMasterClientDetail"
+            parameterType="int"
+            resultMap="masterClientResultMap">
+
+        SELECT
+            c.client_id,
+            c.client_code,
+            c.client_name,
+            c.client_type,
+            c.client_adress,
+            c.client_man,
+            c.client_tel,
+            c.client_dept,
+            c.remark,
+            c.created_date,
+            c.updated_date,
+            c.use_yn,
+			c.latitude,
+			c.longitude,
+			
+            REGEXP_REPLACE(c.client_code, '-[0-9]{3}$', '') AS client_code_prefix,
+
+            CASE
+                WHEN c.client_type = 'SUP' THEN '공급처'
+                WHEN c.client_type = 'CUS' THEN '납품처'
+                ELSE c.client_type
+            END AS client_type_name,
+
+            CASE
+                WHEN c.use_yn = 'Y' THEN '사용'
+                WHEN c.use_yn = 'N' THEN '미사용'
+                ELSE c.use_yn
+            END AS use_yn_name,
+
+            (
+                SELECT COUNT(*)
+                FROM item i
+                WHERE i.supplier_id = c.client_id
+                   OR i.client_id = c.client_id
+            ) AS item_count,
+
+            (
+                SELECT COUNT(*)
+                FROM equipment e
+                WHERE e.client_id = c.client_id
+            ) AS equipment_count
+
+        FROM client c
+
+        WHERE c.client_id = #{clientId}
+
+    </select>
+
+
+    <!-- =========================================================
+         4. 거래처 등록 / 수정 / 미사용 처리
+         ========================================================= -->
+
+    <insert id="insertMasterClient"
+            parameterType="kr.or.saeroi.dto.MasterClientDTO">
+
+        <selectKey keyProperty="clientId"
+                   resultType="int"
+                   order="BEFORE">
+            SELECT NVL(MAX(client_id), 0) + 1
+            FROM client
+        </selectKey>
+
+        INSERT INTO client (
+            client_id,
+            client_code,
+            client_name,
+            client_type,
+            client_adress,
+            client_man,
+            client_tel,
+            client_dept,
+            remark,
+            created_date,
+            updated_date,
+            use_yn
+        ) VALUES (
+            #{clientId},
+            #{clientCode},
+            #{clientName},
+            #{clientType},
+            #{clientAdress},
+            #{clientMan},
+            #{clientTel},
+            #{clientDept},
+            #{remark},
+            SYSDATE,
+            SYSDATE,
+            NVL(#{useYn}, 'Y')
+        )
+
+    </insert>
+
+
+    <update id="updateMasterClient"
+            parameterType="kr.or.saeroi.dto.MasterClientDTO">
+
+        UPDATE client
+        SET
+            client_code = #{clientCode},
+            client_name = #{clientName},
+            client_type = #{clientType},
+            client_adress = #{clientAdress},
+            client_man = #{clientMan},
+            client_tel = #{clientTel},
+            client_dept = #{clientDept},
+            remark = #{remark},
+            updated_date = SYSDATE,
+            use_yn = NVL(#{useYn}, 'Y')
+        WHERE client_id = #{clientId}
+
+    </update>
+
+
+    <update id="deleteMasterClientList"
+            parameterType="java.util.List">
+
+        UPDATE client
+        SET
+            use_yn = 'N',
+            updated_date = SYSDATE
+        WHERE client_id IN
+
+        <foreach collection="list"
+                 item="clientId"
+                 open="("
+                 separator=","
+                 close=")">
+            #{clientId}
+        </foreach>
+
+    </update>
+
+
+    <select id="selectMasterClientCodeCount"
+            parameterType="kr.or.saeroi.dto.MasterClientDTO"
+            resultType="int">
+
+        SELECT
+            COUNT(*)
+        FROM client
+        WHERE UPPER(client_code) = UPPER(#{clientCode})
+
+        <if test="clientId != null">
+            AND client_id != #{clientId}
+        </if>
+
+    </select>
+
+
+    <!-- =========================================================
+         5. 거래처코드 prefix / 자동생성
+         ========================================================= -->
+
+    <select id="selectClientCodePrefixList"
+            resultType="string">
+
+        SELECT
+            client_code_prefix
+        FROM (
+            SELECT DISTINCT
+                REGEXP_REPLACE(client_code, '-[0-9]{3}$', '') AS client_code_prefix
+            FROM client
+            WHERE client_code IS NOT NULL
+              AND REGEXP_LIKE(client_code, '^BP-[A-Z0-9]+(-[A-Z0-9]+)*-[0-9]{3}$')
+        )
+        ORDER BY client_code_prefix
+
+    </select>
+
+
+    <select id="selectNextClientCode"
+            parameterType="map"
+            resultType="string">
+
+        SELECT
+            #{clientCodePrefix}
+            || '-'
+            || LPAD(
+                NVL(
+                    MAX(
+                        TO_NUMBER(
+                            SUBSTR(client_code, LENGTH(#{clientCodePrefix}) + 2)
+                        )
+                    ),
+                    0
+                ) + 1,
+                3,
+                '0'
+            ) AS next_client_code
+        FROM client
+        WHERE client_code LIKE #{clientCodePrefix} || '-%'
+          AND REGEXP_LIKE(
+                client_code,
+                '^' || #{clientCodePrefix} || '-[0-9]{3}$'
+          )
+
+    </select>
+
+</mapper>

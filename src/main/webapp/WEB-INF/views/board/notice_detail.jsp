@@ -57,11 +57,23 @@
 
 		<div class="detail_btn_area">
 
-			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
+			<c:if
+				test="${sessionScope.loginUser.role eq 'ADMIN'
 				or (sessionScope.loginUser.role eq 'MANAGER'
 				and sessionScope.loginUser.empno eq notice.empno)}">
 
-				<button type="button" class="detail_btn_green" id="editBtn">
+				<button type="button" id="editBtn" class="detail_btn_green"
+					onclick="changeEditMode(true);">
+
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+						stroke="currentColor" stroke-width="2" stroke-linecap="round"
+						stroke-linejoin="round"
+						style="vertical-align: -3px; margin-right: 6px;"
+						aria-hidden="true">
+						<path d="M12 20h9"></path>
+						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+					</svg>
+
 					수정
 				</button>
 
@@ -69,8 +81,7 @@
 
 			<button type="button" class="detail_btn_line"
 				onclick="location.href='${pageContext.request.contextPath}/board/notice'">
-				목록
-			</button>
+				목록</button>
 
 		</div>
 	</div>
@@ -97,9 +108,7 @@
 						<td>${notice.notice_id}</td>
 
 						<th>상태</th>
-						<td>
-							<span class="viewMode">
-								<c:choose>
+						<td><span class="viewMode"> <c:choose>
 									<c:when test="${notice.status == '게시'}">
 										<span class="coStatus coStatusUse">${notice.status}</span>
 									</c:when>
@@ -107,29 +116,23 @@
 										<span class="coStatus coStatusStop">${notice.status}</span>
 									</c:otherwise>
 								</c:choose>
-							</span>
-
-							<select name="status" class="detailInput editMode"
-								style="display: none;">
+						</span> <select name="status" class="detailInput editMode"
+							style="display: none;">
 								<option value="게시"
 									<c:if test="${notice.status == '게시'}">selected</c:if>>
-									게시
-								</option>
+									게시</option>
 								<option value="비게시"
 									<c:if test="${notice.status == '비게시'}">selected</c:if>>
-									비게시
-								</option>
-							</select>
-						</td>
+									비게시</option>
+						</select></td>
 					</tr>
 
 					<tr>
 						<th>제목</th>
-						<td colspan="3">
-							<span class="viewMode">${notice.title}</span>
+						<td colspan="3"><span class="viewMode">${notice.title}</span>
 
 							<input type="text" name="title" class="detailInput editMode"
-								value="${notice.title}" style="display: none;" required>
+							value="${notice.title}" style="display: none;" required>
 						</td>
 					</tr>
 
@@ -152,11 +155,8 @@
 					<tr>
 						<th>내용</th>
 						<td colspan="3">
-							<div class="notice_content_box viewMode">
-								${notice.content}
-							</div>
-
-							<textarea name="content"
+							<div class="notice_content_box viewMode">${notice.content}
+							</div> <textarea name="content"
 								class="detailInput notice_content_textarea editMode"
 								style="display: none;" required>${notice.content}</textarea>
 						</td>
@@ -171,8 +171,7 @@
 										<a class="notice_file_link"
 											href="${pageContext.request.contextPath}${noticeFile.file_path}"
 											download="${noticeFile.file_title}">
-											${noticeFile.file_title}
-										</a>
+											${noticeFile.file_title} </a>
 									</c:when>
 
 									<c:otherwise>
@@ -185,12 +184,10 @@
 
 					<tr>
 						<th>비고</th>
-						<td colspan="3">
-							<span class="viewMode">${notice.remark}</span>
+						<td colspan="3"><span class="viewMode">${notice.remark}</span>
 
 							<input type="text" name="remark" class="detailInput editMode"
-								value="${notice.remark}" style="display: none;">
-						</td>
+							value="${notice.remark}" style="display: none;"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -201,32 +198,32 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-	const editBtn = document.getElementById('editBtn');
-	const form = document.getElementById('noticeDetailForm');
+	document.addEventListener('DOMContentLoaded', function() {
+		const editBtn = document.getElementById('editBtn');
+		const form = document.getElementById('noticeDetailForm');
 
-	if (!editBtn) {
-		return;
-	}
-
-	editBtn.addEventListener('click', function () {
-		const isEditMode = editBtn.dataset.mode === 'edit';
-
-		if (!isEditMode) {
-			document.querySelectorAll('.viewMode').forEach(function (el) {
-				el.style.display = 'none';
-			});
-
-			document.querySelectorAll('.editMode').forEach(function (el) {
-				el.style.display = '';
-			});
-
-			editBtn.dataset.mode = 'edit';
-			editBtn.textContent = '저장';
+		if (!editBtn) {
 			return;
 		}
 
-		form.submit();
+		editBtn.addEventListener('click', function() {
+			const isEditMode = editBtn.dataset.mode === 'edit';
+
+			if (!isEditMode) {
+				document.querySelectorAll('.viewMode').forEach(function(el) {
+					el.style.display = 'none';
+				});
+
+				document.querySelectorAll('.editMode').forEach(function(el) {
+					el.style.display = '';
+				});
+
+				editBtn.dataset.mode = 'edit';
+				editBtn.textContent = '저장';
+				return;
+			}
+
+			form.submit();
+		});
 	});
-});
 </script>
