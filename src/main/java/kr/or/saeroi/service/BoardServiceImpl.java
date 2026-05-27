@@ -67,4 +67,10 @@ public class BoardServiceImpl implements BoardService {
 	public int _ser_update_Notice(String notice_id, String title, String content, String status, String remark) {
 		return boardDAO._dao_update_Notice(notice_id, title, content, status, remark);
 	}
+
+	//게시판 목록
+	@Override
+	public List<BoradDTO> _ser_select_Board(String startDate, String endDate, String keyword) {
+		return boardDAO._dao_select_Board(startDate, endDate, keyword);
+	}
 }

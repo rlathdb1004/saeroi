@@ -83,7 +83,7 @@ public class EquipmentStatusController {
     @PostMapping("/equipment_status/update")
     public String update(EquipmentStatusDTO dto) {
         service.update(dto);
-        return "redirect:/equipment/equipmentstatus";
+        return "redirect:/equipment_status/detail?history_id=" + dto.getHistory_id();
     }
 
     @PostMapping("/equipment_status/delete")

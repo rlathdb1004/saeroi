@@ -14,39 +14,46 @@
 		n.content,
 		n.emp_id,
 		e.empno AS empno,
-		'관리자' AS dept,
+		'관리자' AS
+		dept,
 		n.view_count,
-		TO_CHAR(n.created_date, 'YYYY-MM-DD') AS created_date,
+		TO_CHAR(n.created_date, 'YYYY-MM-DD') AS
+		created_date,
 		TO_CHAR(n.updated_date, 'YYYY-MM-DD') AS updated_date,
 		n.status,
 		n.use_yn,
 		n.remark
 		FROM notice n, emp e
-		WHERE n.emp_id = e.emp_id
+		WHERE n.emp_id =
+		e.emp_id
 		AND NVL(n.use_yn, 'Y') = 'Y'
 
 		<!-- 비게시 공지는 ADMIN만 목록에서 조회 가능 -->
 		AND (
-			n.status = '게시'
-			OR #{role} = 'ADMIN'
+		n.status = '게시'
+		OR #{role} = 'ADMIN'
 		)
 
 		<!-- 시작일 검색 조건 -->
 		<if test="startDate != null and startDate != ''">
-			AND TRUNC(n.created_date) &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+			AND TRUNC(n.created_date) &gt;= TO_DATE(#{startDate},
+			'YYYY-MM-DD')
 		</if>
 
 		<!-- 종료일 검색 조건 -->
 		<if test="endDate != null and endDate != ''">
-			AND TRUNC(n.created_date) &lt;= TO_DATE(#{endDate}, 'YYYY-MM-DD')
+			AND TRUNC(n.created_date) &lt;= TO_DATE(#{endDate},
+			'YYYY-MM-DD')
 		</if>
 
 		<!-- 검색어 조건 -->
 		<if test="keyword != null and keyword != ''">
 			AND (
 			n.title LIKE '%' || #{keyword} || '%'
-			OR n.content LIKE '%' || #{keyword} || '%'
-			OR 'MES 관리자' LIKE '%' || #{keyword} || '%'
+			OR n.content
+			LIKE '%' || #{keyword} || '%'
+			OR 'MES 관리자' LIKE '%' || #{keyword} ||
+			'%'
 			)
 		</if>
 
@@ -62,27 +69,31 @@
 		n.content,
 		n.emp_id,
 		e.empno AS empno,
-		'MES 관리자' AS dept,
+		'MES
+		관리자' AS dept,
 		n.view_count,
-		TO_CHAR(n.created_date, 'YYYY-MM-DD') AS created_date,
+		TO_CHAR(n.created_date, 'YYYY-MM-DD') AS
+		created_date,
 		TO_CHAR(n.updated_date, 'YYYY-MM-DD') AS updated_date,
 		n.status,
 		n.use_yn,
 		n.remark
 		FROM notice n, emp e
-		WHERE n.emp_id = e.emp_id
+		WHERE n.emp_id =
+		e.emp_id
 		AND n.notice_id = TO_NUMBER(#{notice_id})
 
 		<!-- 비게시 공지는 ADMIN만 상세 조회 가능 -->
 		AND (
-			n.status = '게시'
-			OR #{role} = 'ADMIN'
+		n.status = '게시'
+		OR #{role} = 'ADMIN'
 		)
 	</select>
 
 	<!-- 다음 공지번호 조회 -->
 	<select id="_select_next_Notice_id" resultType="int">
-		SELECT NVL(MAX(notice_id), 0) + 1
+		SELECT
+		NVL(MAX(notice_id), 0) + 1
 		FROM notice
 	</select>
 
@@ -116,7 +127,8 @@
 
 	<!-- 공지 첨부파일 등록 -->
 	<insert id="_insert_Notice_file" parameterType="map">
-		INSERT INTO attached_file (
+		INSERT INTO
+		attached_file (
 		file_id,
 		notice_id,
 		board_id,
@@ -128,7 +140,8 @@
 		updated_date
 		)
 		VALUES (
-		(SELECT NVL(MAX(file_id), 0) + 1 FROM attached_file),
+		(SELECT
+		NVL(MAX(file_id), 0) + 1 FROM attached_file),
 		TO_NUMBER(#{notice_id}),
 		NULL,
 		#{file_title},
@@ -151,17 +164,21 @@
 		saved_title,
 		file_path,
 		file_size,
-		TO_CHAR(created_date, 'YYYY-MM-DD') AS created_date,
+		TO_CHAR(created_date, 'YYYY-MM-DD') AS
+		created_date,
 		TO_CHAR(updated_date, 'YYYY-MM-DD') AS updated_date
-		FROM attached_file
+		FROM
+		attached_file
 		WHERE notice_id = TO_NUMBER(#{notice_id})
-		ORDER BY file_id DESC
+		ORDER BY file_id
+		DESC
 	</select>
 
 	<!-- 공지사항 수정 -->
 	<update id="_update_Notice" parameterType="map">
 		UPDATE notice
-		SET title = #{title},
+		SET title
+		= #{title},
 		content = #{content},
 		status = #{status},
 		remark = #{remark},
@@ -173,14 +190,15 @@
 	<update id="_update_Notice_view_count" parameterType="map">
 		UPDATE notice n
 		SET n.view_count = NVL(n.view_count, 0) + 1
-		WHERE n.notice_id = TO_NUMBER(#{notice_id})
+		WHERE
+		n.notice_id = TO_NUMBER(#{notice_id})
 
 		<!-- 로그인한 작성자 본인이 조회하면 조회수 증가 안 됨 -->
 		<if test="empno != null and empno != ''">
 			AND n.emp_id != (
-				SELECT e.emp_id
-				FROM emp e
-				WHERE e.empno = #{empno}
+			SELECT e.emp_id
+			FROM emp e
+			WHERE e.empno = #{empno}
 			)
 		</if>
 	</update>
@@ -199,11 +217,63 @@
 		<!-- ADMIN이 아니면 본인이 작성한 공지만 삭제 가능 -->
 		<if test="role != 'ADMIN'">
 			AND emp_id = (
-				SELECT e.emp_id
-				FROM emp e
-				WHERE e.empno = #{empno}
+			SELECT e.emp_id
+			FROM emp e
+			WHERE e.empno = #{empno}
 			)
 		</if>
 	</delete>
 
+	<!-- 게시판 목록 조회 -->
+	<select id="_select_Board" parameterType="map"
+		resultType="kr.or.saeroi.dto.BoradDTO">
+		SELECT
+		b.board_id,
+		b.title,
+		b.content,
+		b.emp_id,
+		e.empno AS empno,
+		e.ename
+		AS ename,
+		e.dept AS dept,
+		b.view_count,
+		TO_CHAR(b.created_date,
+		'YYYY-MM-DD') AS created_date,
+		TO_CHAR(b.updated_date, 'YYYY-MM-DD') AS
+		updated_date,
+		b.status,
+		b.use_yn,
+		b.remark
+		FROM board b, emp e
+		WHERE
+		b.emp_id = e.emp_id
+		AND NVL(b.use_yn, 'Y') = 'Y'
+
+		<!-- 시작일 검색 -->
+		<if test="startDate != null and startDate != ''">
+			AND TRUNC(b.created_date) &gt;= TO_DATE(#{startDate},
+			'YYYY-MM-DD')
+		</if>
+
+		<!-- 종료일 검색 -->
+		<if test="endDate != null and endDate != ''">
+			AND TRUNC(b.created_date) &lt;= TO_DATE(#{endDate},
+			'YYYY-MM-DD')
+		</if>
+
+		<!-- 검색어 검색 -->
+		<if test="keyword != null and keyword != ''">
+			AND (
+			b.title LIKE '%' || #{keyword} || '%'
+			OR b.content
+			LIKE '%' || #{keyword} || '%'
+			OR e.ename LIKE '%' || #{keyword} || '%'
+			OR e.dept LIKE '%' || #{keyword} || '%'
+			OR b.status LIKE '%' ||
+			#{keyword} || '%'
+			)
+		</if>
+
+		ORDER BY b.board_id DESC
+	</select>
 </mapper>

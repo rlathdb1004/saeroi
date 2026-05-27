@@ -37,7 +37,8 @@ public class BoardDAOImpl implements BoardDAO {
 
 	// 공지 등록
 	@Override
-	public int _dao_insert_Notice(int notice_id, String title, String content, String empno, String status, String remark) {
+	public int _dao_insert_Notice(int notice_id, String title, String content, String empno, String status,
+			String remark) {
 		Map<String, Object> param = new HashMap<String, Object>();
 
 		param.put("notice_id", notice_id);
@@ -52,7 +53,8 @@ public class BoardDAOImpl implements BoardDAO {
 
 	// 공지 첨부파일 등록
 	@Override
-	public int _dao_insert_Notice_file(int notice_id, String file_title, String saved_title, String file_path, long file_size) {
+	public int _dao_insert_Notice_file(int notice_id, String file_title, String saved_title, String file_path,
+			long file_size) {
 		Map<String, Object> param = new HashMap<String, Object>();
 
 		param.put("notice_id", notice_id);
@@ -120,5 +122,17 @@ public class BoardDAOImpl implements BoardDAO {
 		param.put("remark", remark);
 
 		return sqlSession.update("mapper.board._update_Notice", param);
+	}
+
+	// 게시판 목록
+	@Override
+	public List<BoradDTO> _dao_select_Board(String startDate, String endDate, String keyword) {
+		Map<String, Object> param = new HashMap<String, Object>();
+
+		param.put("startDate", startDate);
+		param.put("endDate", endDate);
+		param.put("keyword", keyword);
+
+		return sqlSession.selectList("mapper.board._select_Board", param);
 	}
 }

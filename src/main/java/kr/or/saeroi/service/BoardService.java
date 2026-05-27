@@ -32,4 +32,7 @@ public interface BoardService {
 
 	// 공지 수정
 	int _ser_update_Notice(String notice_id, String title, String content, String status, String remark);
+
+	//게시판 목록
+	List<BoradDTO> _ser_select_Board(String startDate, String endDate, String keyword);
 }
