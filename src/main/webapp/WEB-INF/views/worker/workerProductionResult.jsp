@@ -11,41 +11,34 @@
 
 <head>
 
-
 <meta charset="UTF-8">
 
 <title>
 	작업자 생산실적
 </title>
+
 <link rel="icon"
 	href="${pageContext.request.contextPath}/resources/favicon.ico">
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/worker.css">
+
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/common/worker.css">
 
 </head>
 
 <body class="workerSubPage workerProductionResultPage">
 
-	<!-- =================================================
-		타이틀
-	================================================= -->
 	<h2 class="workerResultTitle">
 
 		작업자 생산실적 조회
 
 	</h2>
 
-	<!-- =================================================
-		작업자 정보
-	================================================= -->
 	<div class="workerInfoBox">
 
 		${workerName} 작업자 생산실적 목록
 
 	</div>
 
-	<!-- =================================================
-		테이블
-	================================================= -->
 	<div class="workerTableWrap">
 
 		<table class="workerTable">
@@ -67,6 +60,10 @@
 					</th>
 
 					<th>
+						불량수량
+					</th>
+
+					<th>
 						생산상태
 					</th>
 
@@ -80,14 +77,11 @@
 
 			<tbody>
 
-				<!-- =========================================
-					데이터 없을 때
-				========================================= -->
 				<c:if test="${empty list}">
 
 					<tr>
 
-						<td colspan="5"
+						<td colspan="6"
 							class="noData">
 
 							생산실적 데이터가 없습니다.
@@ -98,16 +92,13 @@
 
 				</c:if>
 
-				<!-- =========================================
-					생산실적 목록
-				========================================= -->
 				<c:forEach var="dto"
 					items="${list}">
 
 					<tr>
 
 						<td>
-							${dto.prodNo}
+							${dto.prodId}
 						</td>
 
 						<td>
@@ -116,6 +107,10 @@
 
 						<td>
 							${dto.prodQty}
+						</td>
+
+						<td>
+							${dto.lossQty}
 						</td>
 
 						<td>
@@ -134,9 +129,6 @@
 
 		</table>
 
-		<!-- =============================================
-			메인 이동 버튼
-		============================================= -->
 		<button type="button"
 			class="moveMainBtn"
 			onclick="location.href='${pageContext.request.contextPath}/worker/main'">

@@ -83,7 +83,6 @@
 .report-table tr:hover {
     background-color: #f1f3f5;
 }
-@media (max-width: 992px) {
     .dashboard-container {
         flex-direction: column; /* 가로 배열을 세로 배열로 변경 ✨ */
     }
@@ -92,7 +91,6 @@
         flex: 1;
         width: 100%; /* 좌우 판넬이 모바일 화면 꽉 차게 조절 */
     }
-}
 </style>
 </head>
 <body>
@@ -156,6 +154,7 @@
                 <thead>
                     <tr>
                         <th>일자/기간</th>
+                        <th>품목명</th>
                         <th>계획량</th>
                         <th>작업량</th>
                         <th>불량</th>
@@ -265,6 +264,7 @@
       		let row = document.createElement('tr');
       		row.innerHTML = `
       			<td>\${item.계획일자}</td>
+      			</td>\${item.품목명}</td>
                 <td>\${Number(item.생산계획량).toLocaleString()}</td>
                 <td>\${Number(item.작업량).toLocaleString()}</td>
                 <td style="color: #FF4560; font-weight: bold;">\${Number(item.불량수량).toLocaleString()}</td>
@@ -287,7 +287,8 @@
       	            left: 2,
       	            blur: 4,
       	            opacity: 0.15
-      	        }
+      	        },
+      	        events:{}
       		},
       		plotOptions: {
       	        pie: {
@@ -297,7 +298,7 @@
       	        }
       	    },
       		labels: [],
-            colors: ['#00E396', '#FF4560', '#FEB019', '#008FFB', '#775DD0', '#546E7A'],
+            colors: ['#00E396', '#FF4560', '#FEB019', '#008FFB', '#775DD0', '#546E7A', '#FF69B4'],
             legend: {
                 position: 'bottom'
             },
@@ -457,12 +458,34 @@
 					})
 				}      			
 			});
-      	let finalNames = Object.keys(reasonMap);
+      	let rawKeys = Object.keys(reasonMap);
       	let finalValues = Object.values(reasonMap);
+
+      	let finalNames = rawKeys.map(key => key.split('_')[1]);
+      	let finalCodes = rawKeys.map(key => key. split('_')[0]);
       	
       	ochart.updateOptions({
       		series: finalValues,
-      		labels: finalNames
+      		labels: finalNames,
+      		chart:{
+      			 events:{
+       	        	dataPointSelection: function(event, chartContext, config){
+       	        		let clickIndex = config.dataPointIndex;
+       	        		let defectCode = finalCodes[clickIndex];
+       	        		if(defectCode){
+       	        			let currentStartDate = document.querySelector('#startDate').value;
+       	                    let currentEndDate = document.querySelector('#endDate').value;
+       	                    
+       	                 let targetUrl = '${pageContext.request.contextPath}/quality/defect'
+                             + '?startDate=' + encodeURIComponent(currentStartDate)
+                             + '&endDate=' + encodeURIComponent(currentEndDate)
+                             + '&searchType=defectCode'
+                             + '&keyword=' + encodeURIComponent(defectCode);
+       	                 window.location.href = targetUrl;
+       	        		}
+       	        	}
+       	        }
+      		}
       	})
 		}catch (error){
 			console.error("데이터 로딩 중 에러 발생:", error);

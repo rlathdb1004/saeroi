@@ -64,7 +64,7 @@ public class LoginController {
             }
             
             if("WORKER".equals(login.getRole())) {
-				return "redirect:/worker/main";
+				return "redirect:/worker/main";				
 			}
 
             return "redirect:/";
@@ -123,7 +123,8 @@ public class LoginController {
         response.addCookie(cookie);
 
         return "redirect:/login";
-    }
+    }    
+    
 
 }
     

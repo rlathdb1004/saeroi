@@ -157,4 +157,10 @@ WHERE table_name IN (
 AND column_name IN ('DOC_NO', 'DOC_SEQ')
 ORDER BY table_name, column_id;
 
+-- ============================================================
+-- 10. 거래처 위도 경도 컬럼추가
+-- 지도 거래처 위치 잡기위해서
+-- ============================================================
+ALTER TABLE client ADD (latitude NUMBER(13,10), longitude NUMBER(13,10));
+
 COMMIT;

@@ -78,7 +78,10 @@
 			<when test="searchItem != null and searchItem != '' and searchItem != 'all'">it.item_name</when>
 			<otherwise>'전체'</otherwise>
 		</choose> AS item_name,
-		d.defect_name AS defect_name, SUM(dl.defect_qty) AS reason_qty FROM production_plan
+		d.defect_code AS defect_code,
+		d.defect_name AS defect_name, 
+		SUM(dl.defect_qty) AS reason_qty 
+		FROM production_plan
 		pp
 		JOIN work_order wo ON (pp.prod_plan_id = wo.prod_plan_id)
 		JOIN production p ON (wo.order_id = p.order_id)
@@ -95,7 +98,7 @@
 		<choose>
 			<when test="searchItem != null and searchItem != '' and searchItem != 'all'">it.item_name</when>
 			<otherwise>'전체'</otherwise>
-		</choose>, d.defect_name
+		</choose>,d.defect_code, d.defect_name
 		)
 		<choose>
 			<when test="searchType == 'week'">
@@ -106,7 +109,7 @@
 				round(avg(nvl(w.total_order_qty,0)),1) 작업량,
 				round(avg(nvl(d.total_defect_qty,0)),1) 불량수량,
 				(
-				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
+				SELECT LISTAGG(dr.defect_code || '_' || dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
 				FROM defect_reason dr
 				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-IW') = TO_CHAR(p.prod_plan_date, 'YYYY-IW')
 				  AND dr.item_name = p.item_name ) AS 불량사유상세
@@ -124,7 +127,7 @@
 				nvl(w.total_order_qty,0) 작업량,
 				nvl(d.total_defect_qty,0) 불량수량,
 				(
-				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
+				SELECT LISTAGG(dr.defect_code || '_' || dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
 				FROM defect_reason dr
 				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-MM-DD') = TO_CHAR(p.prod_plan_date, 'YYYY-MM-DD')
 				  AND dr.item_name = p.item_name ) AS 불량사유상세
@@ -141,7 +144,7 @@
 				sum(nvl(w.total_order_qty,0)) 작업량,
 				sum(nvl(d.total_defect_qty,0)) 불량수량,
 				(
-				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
+				SELECT LISTAGG(dr.defect_code || '_' || dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
 				FROM defect_reason dr
 				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY') = TO_CHAR(p.prod_plan_date, 'YYYY')
 				  AND dr.item_name = p.item_name ) AS 불량사유상세
@@ -159,7 +162,7 @@
 				round(avg(nvl(w.total_order_qty,0)),1) 작업량,
 				round(avg(nvl(d.total_defect_qty,0)),1) 불량수량,
 				(
-				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
+				SELECT LISTAGG(dr.defect_code || '_' || dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
 				FROM defect_reason dr
 				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY') = TO_CHAR(p.prod_plan_date, 'YYYY')
 				  AND dr.item_name = p.item_name ) AS 불량사유상세
@@ -177,7 +180,7 @@
 				round(avg(nvl(w.total_order_qty,0)),1) 작업량,
 				round(avg(nvl(d.total_defect_qty,0)),1) 불량수량,
 				(
-				SELECT LISTAGG(dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
+				SELECT LISTAGG(dr.defect_code || '_' || dr.defect_name || ':' || dr.reason_qty, ',') WITHIN GROUP (ORDER BY dr.reason_qty DESC)
 				FROM defect_reason dr
 				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-MM') = TO_CHAR(p.prod_plan_date, 'YYYY-MM')
 				  AND dr.item_name = p.item_name ) AS 불량사유상세

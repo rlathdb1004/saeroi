@@ -64,6 +64,7 @@
 
 .board_comment_write {
 	display: flex;
+	align-items: center;
 	gap: 10px;
 	margin-top: 12px;
 }
@@ -121,6 +122,10 @@
 .board_comment_delete_form {
 	margin: 0;
 }
+.board_comment_write .search-btn {
+	height: 36px;
+	flex-shrink: 0;
+}
 </style>
 
 <div class="detail_page">
@@ -168,7 +173,19 @@
 
 			<button type="button" class="detail_btn_line"
 				onclick="location.href='${pageContext.request.contextPath}/board/suggestion'">
-				목록</button>
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round"
+					stroke-linejoin="round"
+					style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+					<path d="M8 6h13"></path>
+					<path d="M8 12h13"></path>
+					<path d="M8 18h13"></path>
+					<path d="M3 6h.01"></path>
+					<path d="M3 12h.01"></path>
+					<path d="M3 18h.01"></path>
+				</svg>
+				목록
+			</button>
 
 		</div>
 	</div>
