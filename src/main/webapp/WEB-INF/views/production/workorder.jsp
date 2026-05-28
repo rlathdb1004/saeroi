@@ -15,9 +15,12 @@
 	  DTO / DAO / Service / Controller / Mapper는 생산관리 1개 파일로 관리
 	  JSP만 페이지별 관리
 	- 작업지시 등록 시 작업지시번호, 완제품 LOT는 Mapper에서 자동 생성
+	- 작업지시 등록 시 Service에서 QR코드 생성
 	- 작업지시 등록 시 Service에서 BOM 기준 원자재 투입 이력 자동 생성
 	- 사용자는 BOM을 직접 선택하지 않음
 	  생산계획 → 완제품 item_id → 사용중 BOM → BOM_DETAIL 순서로 자동 적용
+	- 작업지시 등록 모달에서 지난 생산계획 보기 체크 가능
+	- 검색조건 기준 전체 작업지시 인쇄 가능
 	- PC 목록 8컬럼 / 모바일 5컬럼 기준
 --%>
 
@@ -38,7 +41,7 @@
 	<%-- =========================================================
 	     2. 검색 영역
 	     ========================================================= --%>
-	<form class="search-form" method="get"
+	<form class="search-form" id="workOrderSearchForm" method="get"
 		action="${contextPath}/production/workorder">
 
 		<div class="search-box">
@@ -46,50 +49,39 @@
 			<div class="search-row">
 
 				<div class="search-item">
-					<label class="search-label">시작일</label> <input type="date"
-						name="startDate" class="search-date" value="${startDate}">
+					<label class="search-label">시작일</label>
+					<input type="date" name="startDate" class="search-date"
+						value="${startDate}">
 				</div>
 
 				<div class="search-item">
-					<label class="search-label">종료일</label> <input type="date"
-						name="endDate" class="search-date" value="${endDate}">
+					<label class="search-label">종료일</label>
+					<input type="date" name="endDate" class="search-date"
+						value="${endDate}">
 				</div>
 
 				<div class="search-item">
-					<label class="search-label">상태</label> <select name="prodStatus"
-						class="search-select">
+					<label class="search-label">상태</label>
+					<select name="prodStatus" class="search-select">
 						<option value="">전체</option>
 
 						<c:forEach var="status" items="${workOrderStatusList}">
 							<option value="${status}"
 								<c:if test="${prodStatus eq status}">selected</c:if>>
-								${status}</option>
+								${status}
+							</option>
 						</c:forEach>
 					</select>
 				</div>
 
 				<div class="search-item">
-					<label class="search-label">검색어</label> <input type="text"
-						name="keyword" class="search-input"
+					<label class="search-label">검색어</label>
+					<input type="text" name="keyword" class="search-input"
 						placeholder="작업지시번호 / LOT / 품목코드 / 품명" value="${keyword}">
 				</div>
 
-				<div class="search-item">
-					<label class="search-label">보기</label> <select name="size"
-						class="search-select">
-						<option value="5"
-							<c:if test="${pageInfo.size == 5}">selected</c:if>>5개씩</option>
-						<option value="10"
-							<c:if test="${pageInfo.size == 10}">selected</c:if>>
-							10개씩</option>
-						<option value="20"
-							<c:if test="${pageInfo.size == 20}">selected</c:if>>
-							20개씩</option>
-						<option value="30"
-							<c:if test="${pageInfo.size == 30}">selected</c:if>>
-							30개씩</option>
-					</select>
-				</div>
+				<input type="hidden" name="includePastPlan" id="searchIncludePastPlan"
+					value="${includePastPlan}">
 
 				<div class="search-btn-wrap">
 
@@ -142,6 +134,23 @@
 			<div class="search-btn-right">
 
 				<button type="button"
+					class="search-btn search-btn-sub workorder_print_btn"
+					onclick="goWorkOrderPrint();">
+					<svg viewBox="0 0 24 24" fill="none">
+						<path d="M7 8V4H17V8" stroke="currentColor" stroke-width="2"
+							stroke-linejoin="round">
+						</path>
+						<path d="M7 17H5C3.9 17 3 16.1 3 15V10C3 8.9 3.9 8 5 8H19C20.1 8 21 8.9 21 10V15C21 16.1 20.1 17 19 17H17"
+							stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+						</path>
+						<path d="M7 14H17V21H7V14Z" stroke="currentColor" stroke-width="2"
+							stroke-linejoin="round">
+						</path>
+					</svg>
+					검색결과 인쇄
+				</button>
+
+				<button type="button"
 					class="search-btn search-btn-main modal_open_btn"
 					data_modal_target="#modal_insert">
 					<svg viewBox="0 0 24 24" fill="none">
@@ -188,9 +197,11 @@
 
 				<thead>
 					<tr>
-						<th class="mobile_show"><label id="workOrderCheckAllLabel">선택</label>
+						<th class="mobile_show">
+							<label id="workOrderCheckAllLabel">선택</label>
 							<input type="checkbox" id="workOrderCheckAll"
-							style="display: none;"></th>
+								style="display: none;">
+						</th>
 
 						<th class="mobile_hidden">작업지시번호</th>
 						<th class="mobile_show">LOT번호</th>
@@ -207,45 +218,60 @@
 					<c:forEach var="workOrder" items="${list}">
 
 						<tr>
-							<td class="mobile_show"><input type="checkbox"
-								name="orderIds" value="${workOrder.orderId}"></td>
+							<td class="mobile_show">
+								<input type="checkbox" name="orderIds"
+									value="${workOrder.orderId}">
+							</td>
 
 							<td class="mobile_hidden" title="${workOrder.docNo}">
-								${workOrder.docNo}</td>
+								${workOrder.docNo}
+							</td>
 
 							<td class="mobile_show" title="${workOrder.productLot}">
-								${workOrder.productLot}</td>
+								${workOrder.productLot}
+							</td>
 
 							<td class="coTextLeft mobile_hidden"
-								title="${workOrder.itemName}">${workOrder.itemName}</td>
+								title="${workOrder.itemName}">
+								${workOrder.itemName}
+							</td>
 
-							<td class="mobile_show"><fmt:formatNumber
-									value="${workOrder.orderQty}" pattern="#,##0" />
-								${workOrder.itemUnit}</td>
+							<td class="mobile_show">
+								<fmt:formatNumber value="${workOrder.orderQty}"
+									pattern="#,##0" />
+								${workOrder.itemUnit}
+							</td>
 
 							<td class="mobile_hidden">${workOrder.orderDate}</td>
 
-							<td class="mobile_show"><c:choose>
+							<td class="mobile_show">
+								<c:choose>
 									<c:when test="${workOrder.prodStatus eq '완료'}">
 										<span class="coStatus coStatusUse">
-											${workOrder.prodStatus} </span>
+											${workOrder.prodStatus}
+										</span>
 									</c:when>
 
 									<c:when
 										test="${workOrder.prodStatus eq '취소' or workOrder.prodStatus eq '보류'}">
 										<span class="coStatus coStatusStop">
-											${workOrder.prodStatus} </span>
+											${workOrder.prodStatus}
+										</span>
 									</c:when>
 
 									<c:otherwise>
-										<span class="coStatus"> ${workOrder.prodStatus} </span>
+										<span class="coStatus">
+											${workOrder.prodStatus}
+										</span>
 									</c:otherwise>
-								</c:choose></td>
+								</c:choose>
+							</td>
 
 							<td class="mobile_show">
 								<button type="button" class="coDetailBtn"
 									onclick="location.href='${contextPath}/production/workorder/detail?orderId=${workOrder.orderId}'">
-									보기</button>
+									보기
+								</button>
 							</td>
 						</tr>
 
@@ -284,9 +310,22 @@
 				<div class="modal_body modal_body_2col">
 
 					<div class="modal_item modal_item_full">
-						<label class="modal_label"> 생산계획 선택 <span
-							class="modal_required">*</span>
-						</label> <select name="prodPlanId" id="insertProdPlanId"
+
+						<div class="workorder_plan_option_row">
+							<label class="modal_label"> 생산계획 선택 <span
+								class="modal_required">*</span>
+							</label>
+
+							<label class="workorder_past_check_label">
+								<input type="checkbox" id="includePastPlanCheck"
+									value="Y"
+									<c:if test="${includePastPlan eq 'Y'}">checked</c:if>
+									onchange="changeIncludePastPlan(this);">
+								<span>지난 생산계획 보기</span>
+							</label>
+						</div>
+
+						<select name="prodPlanId" id="insertProdPlanId"
 							class="modal_select" onchange="setWorkOrderPlanInfo();" required>
 
 							<option value="">선택</option>
@@ -301,8 +340,9 @@
 									data-remain-qty="${plan.remainQty}"
 									data-item-unit="${plan.itemUnit}"
 									data-prod-plan-date="${plan.prodPlanDate}"
-									data-due-date="${plan.dueDate}">${plan.docNo} /
-									${plan.itemCode} / ${plan.itemName} / 잔량
+									data-due-date="${plan.dueDate}">
+									${plan.docNo} / ${plan.prodPlanDate} / ${plan.itemCode} /
+									${plan.itemName} / 잔량
 									<fmt:formatNumber value="${plan.remainQty}" pattern="#,##0" />${plan.itemUnit}
 								</option>
 
@@ -310,64 +350,81 @@
 
 						</select>
 
-						<div class="modal_help_text">선택한 생산계획의 완제품 기준으로 사용중 BOM이 자동
-							적용되고, BOM 상세 기준 원자재 투입 이력이 자동 생성됩니다.</div>
+						<div class="modal_help_text">
+							기본값은 잔량이 있고 생산계획일자가 오늘 이후인 계획만 표시합니다.
+							지난 생산계획도 작업지시가 필요하면 “지난 생산계획 보기”를 체크하세요.
+						</div>
+
+						<div class="modal_help_text">
+							선택한 생산계획의 완제품 기준으로 사용중 BOM이 자동 적용되고,
+							BOM 상세 기준 원자재 투입 이력이 자동 생성됩니다.
+						</div>
 					</div>
 
 
 					<div class="modal_item">
-						<label class="modal_label">작업지시번호</label> <input type="text"
-							id="insertDocNo" class="modal_input" value="저장 시 자동 생성" readonly>
+						<label class="modal_label">작업지시번호</label>
+						<input type="text" id="insertDocNo" class="modal_input"
+							value="저장 시 자동 생성" readonly>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">완제품 LOT</label> <input type="text"
-							id="insertProductLot" class="modal_input" value="저장 시 자동 생성"
-							readonly>
+						<label class="modal_label">완제품 LOT</label>
+						<input type="text" id="insertProductLot" class="modal_input"
+							value="저장 시 자동 생성" readonly>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">품목코드</label> <input type="text"
-							id="insertItemCode" class="modal_input"
+						<label class="modal_label">QR코드</label>
+						<input type="text" id="insertQrText" class="modal_input"
+							value="작업지시 저장 시 자동 생성" readonly>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">품목코드</label>
+						<input type="text" id="insertItemCode" class="modal_input"
 							placeholder="생산계획 선택 시 자동 표시" readonly>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">품목명</label> <input type="text"
-							id="insertItemName" class="modal_input"
+						<label class="modal_label">품목명</label>
+						<input type="text" id="insertItemName" class="modal_input"
 							placeholder="생산계획 선택 시 자동 표시" readonly>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">계획수량</label> <input type="text"
-							id="insertPlanQtyText" class="modal_input"
+						<label class="modal_label">계획수량</label>
+						<input type="text" id="insertPlanQtyText" class="modal_input"
 							placeholder="생산계획 선택 시 자동 표시" readonly>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">납기일</label> <input type="text"
-							id="insertDueDate" class="modal_input"
+						<label class="modal_label">납기일</label>
+						<input type="text" id="insertDueDate" class="modal_input"
 							placeholder="생산계획 선택 시 자동 표시" readonly>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label"> 지시수량 <span
 							class="modal_required">*</span>
-						</label> <input type="number" name="orderQty" id="insertOrderQty"
+						</label>
+						<input type="number" name="orderQty" id="insertOrderQty"
 							class="modal_input" min="1" required>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label"> 작업지시일 <span
 							class="modal_required">*</span>
-						</label> <input type="date" name="orderDate" id="insertOrderDate"
+						</label>
+						<input type="date" name="orderDate" id="insertOrderDate"
 							class="modal_input modal_today" required>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label"> 라인 <span
 							class="modal_required">*</span>
-						</label> <select name="lineId" id="insertLineId" class="modal_select"
+						</label>
+						<select name="lineId" id="insertLineId" class="modal_select"
 							required>
 
 							<option value="">선택</option>
@@ -382,7 +439,8 @@
 					<div class="modal_item">
 						<label class="modal_label"> 담당자 <span
 							class="modal_required">*</span>
-						</label> <select name="empId" id="insertEmpId" class="modal_select"
+						</label>
+						<select name="empId" id="insertEmpId" class="modal_select"
 							required>
 
 							<option value="">선택</option>
@@ -402,8 +460,10 @@
 					</div>
 
 					<div class="modal_item modal_item_full">
-						<div class="modal_help_text workorder_auto_help">작업지시 등록 후
-							작업지시번호와 완제품 LOT가 자동 생성됩니다. 등록이 완료되면 BOM 기준 원자재 투입 이력이 함께 생성됩니다.</div>
+						<div class="modal_help_text workorder_auto_help">
+							작업지시 등록 후 작업지시번호, 완제품 LOT, QR코드가 자동 생성됩니다.
+							등록이 완료되면 BOM 기준 원자재 투입 이력이 함께 생성됩니다.
+						</div>
 					</div>
 
 				</div>
@@ -411,10 +471,13 @@
 				<div class="modal_footer">
 
 					<button type="button"
-						class="modal_btn modal_btn_cancel modal_close_btn">취소</button>
+						class="modal_btn modal_btn_cancel modal_close_btn">
+						취소
+					</button>
 
 					<button type="submit" class="modal_btn modal_btn_submit">
-						등록</button>
+						등록
+					</button>
 
 				</div>
 
@@ -444,6 +507,32 @@
 	background: #f7f9fb;
 	border: 1px solid #e5e8eb;
 	color: #444;
+}
+
+.workorder_plan_option_row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 6px;
+}
+
+.workorder_past_check_label {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	color: #333;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.workorder_past_check_label input {
+	margin: 0;
+}
+
+.workorder_print_btn {
+	min-width: 130px;
 }
 </style>
 
@@ -512,6 +601,62 @@
 		alert("작업지시는 생산실적과 원자재 투입 이력에 연결되므로 삭제 기능은 다음 단계에서 별도 검토합니다.");
 	}
 
+	// 작업지시 등록 모달에서 지난 생산계획 보기 체크 시 목록을 다시 조회한다.
+	function changeIncludePastPlan(checkBox) {
+
+		var url = new URL(window.location.href);
+
+		if (checkBox.checked) {
+			url.searchParams.set("includePastPlan", "Y");
+		} else {
+			url.searchParams.delete("includePastPlan");
+		}
+
+		url.searchParams.set("openInsertModal", "Y");
+
+		window.location.href = url.toString();
+	}
+
+	// 검색조건에 따른 전체 작업지시 인쇄 화면으로 이동한다.
+	function goWorkOrderPrint() {
+
+		var form = document.getElementById("workOrderSearchForm");
+
+		var params = new URLSearchParams();
+
+		if (form != null) {
+
+			var startDate = form.querySelector("input[name='startDate']").value;
+			var endDate = form.querySelector("input[name='endDate']").value;
+			var prodStatus = form.querySelector("select[name='prodStatus']").value;
+			var keyword = form.querySelector("input[name='keyword']").value;
+
+			if (startDate !== "") {
+				params.set("startDate", startDate);
+			}
+
+			if (endDate !== "") {
+				params.set("endDate", endDate);
+			}
+
+			if (prodStatus !== "") {
+				params.set("prodStatus", prodStatus);
+			}
+
+			if (keyword !== "") {
+				params.set("keyword", keyword);
+			}
+		}
+
+		var printUrl = "${contextPath}/production/workorder/print";
+
+		if (params.toString() !== "") {
+			printUrl += "?" + params.toString();
+		}
+
+		window.open(printUrl, "_blank");
+	}
+
 	// 생산계획을 선택하면 품목정보와 계획수량을 작업지시 등록 모달에 자동 표시한다.
 	function setWorkOrderPlanInfo() {
 
@@ -577,7 +722,7 @@
 			document.getElementById("insertOrderQty").focus();
 			return false;
 		}
-		
+
 		var prodPlanSelect = document.getElementById("insertProdPlanId");
 		var selectedOption = prodPlanSelect.options[prodPlanSelect.selectedIndex];
 		var remainQty = 0;
@@ -610,7 +755,7 @@
 			return false;
 		}
 
-		if (!confirm("작업지시를 등록하시겠습니까?\n등록 시 해당 완제품의 BOM 기준으로 원자재 투입 이력이 자동 생성됩니다.")) {
+		if (!confirm("작업지시를 등록하시겠습니까?\n등록 시 작업지시 QR코드와 BOM 기준 원자재 투입 이력이 자동 생성됩니다.")) {
 			return false;
 		}
 
@@ -632,4 +777,20 @@
 
 		return numberValue.toLocaleString();
 	}
+
+	// 지난 생산계획 보기 변경 후 다시 진입했을 때 등록 모달을 자동으로 연다.
+	document.addEventListener("DOMContentLoaded", function() {
+
+		var params = new URLSearchParams(window.location.search);
+
+		if (params.get("openInsertModal") === "Y") {
+
+			var modal = document.getElementById("modal_insert");
+
+			if (modal != null) {
+				modal.classList.add("active");
+				modal.setAttribute("aria-hidden", "false");
+			}
+		}
+	});
 </script>
