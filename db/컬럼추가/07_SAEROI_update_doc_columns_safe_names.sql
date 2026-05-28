@@ -372,3 +372,78 @@ UNION ALL
 SELECT 'equipment_history', history_id, doc_no, doc_seq FROM equipment_history WHERE ROWNUM <= 5
 UNION ALL
 SELECT 'actual_cost_daily', actual_cost_id, doc_no, doc_seq FROM actual_cost_daily WHERE ROWNUM <= 5;
+-- ============================================================
+-- 12. 거래처 정보 업데이트
+-- ============================================================
+-- 1. 한국EPDM소재 -> 아산 둔포면 실존 고무/부품 기업 (동일고무벨트 아산공장)
+UPDATE client 
+SET client_name = '동일고무벨트 아산공장', 
+    client_adress = '충남 아산시 둔포면 아산밸리로 357', 
+    latitude = 36.932822, longitude = 127.067342 
+WHERE client_id = 1;
+
+-- 2. 실리콘폼코리아 -> 화성 향남읍 실존 화학/소재 기업 (동진쎄미켐 발안공장)
+UPDATE client 
+SET client_name = '동진쎄미켐 발안공장', 
+    client_adress = '경기 화성시 향남읍 토성로 106', 
+    latitude = 37.142075, longitude = 126.899471 
+WHERE client_id = 2;
+
+-- 3. PU테크폼 -> 진천 덕산읍 실존 우레탄/폼 기업 (동성화학 진천공장)
+UPDATE client 
+SET client_name = '동성케미컬 진천공장', 
+    client_adress = '충북 진천군 덕산읍 신척산단5로 37', 
+    latitude = 36.924831, longitude = 127.531885 
+WHERE client_id = 3;
+
+-- 4. 오토접착소재 -> 평택 청북읍 실존 자동차 부품 기업 (만도 평택공장)
+UPDATE client 
+SET client_name = 'HL만도 평택공장', 
+    client_adress = '경기 평택시 청북읍 청오로 421', 
+    latitude = 37.027415, longitude = 126.928131 
+WHERE client_id = 4;
+
+-- 5. 패키징파트너스 -> 천안 서북구 실존 패키징/반도체 기업 (하나마이크론)
+UPDATE client 
+SET client_name = '하나마이크론 본사', 
+    client_adress = '충남 천안시 서북구 음봉로 87-117', 
+    latitude = 36.839841, longitude = 127.085812 
+WHERE client_id = 5;
+
+-- 6. 현대모비스 아산 (실존 주소 정밀화)
+UPDATE client 
+SET client_name = '현대모비스 아산공장', 
+    client_adress = '충남 아산시 영인면 아산호로 842', 
+    latitude = 36.877864, longitude = 126.969123 
+WHERE client_id = 6;
+
+-- 7. 기아 오토랜드 화성 (실존 주소 정밀화)
+UPDATE client 
+SET client_name = '기아 AutoLand 화성', 
+    client_adress = '경기 화성시 우정읍 기아자동차로 95', 
+    latitude = 37.031582, longitude = 126.764512 
+WHERE client_id = 7;
+
+-- 8. 배터리팩검증센터 -> 의왕 포일동 실존 배터리 관련 연구소 (현대자동차 의왕연구소)
+UPDATE client 
+SET client_name = '현대자동차 의왕연구소', 
+    client_adress = '경기 의왕시 철도박물관로 37', 
+    latitude = 37.320491, longitude = 126.953531 
+WHERE client_id = 8;
+
+UPDATE client 
+SET client_name = '영화테크 아산공장', 
+    client_adress = '충남 아산시 둔포면 아산밸리로 222', 
+    latitude = 36.927612, longitude = 127.072814 
+WHERE client_id = 9;
+
+
+
+
+
+
+
+
+
+
+

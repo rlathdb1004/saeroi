@@ -64,6 +64,7 @@
 
 .board_comment_write {
 	display: flex;
+	align-items: center;
 	gap: 10px;
 	margin-top: 12px;
 }
@@ -120,6 +121,10 @@
 
 .board_comment_delete_form {
 	margin: 0;
+}
+.board_comment_write .search-btn {
+	height: 36px;
+	flex-shrink: 0;
 }
 </style>
 

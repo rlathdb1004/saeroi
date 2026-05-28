@@ -95,7 +95,7 @@ public class ProductionDAO {
 
 	// 작업지시 목록을 조회한다.
 	public List<ProductionDTO> selectWorkOrderList(ProductionDTO productionDTO) {
-
+		
 		return sqlSession.selectList(
 				NAMESPACE + "selectWorkOrderList",
 				productionDTO);
@@ -180,7 +180,7 @@ public class ProductionDAO {
 	// 작업지시를 등록한다.
 	// Mapper의 selectKey에서 orderId가 DTO에 세팅되어야 한다.
 	public int insertWorkOrder(ProductionDTO productionDTO) {
-
+		
 		return sqlSession.insert(
 				NAMESPACE + "insertWorkOrder",
 				productionDTO);

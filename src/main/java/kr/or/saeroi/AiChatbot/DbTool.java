@@ -41,9 +41,57 @@ public class DbTool {
 	@Autowired // 재고조회
 	private InventoryDAO inventoryDAO;
 
-	@Autowired // 재고조회
+	@Autowired // 재고조회 //작업지시
 	private ProductionDAO productionDAO;
 
+	@Tool("특정 작업지시서의 상세 정보를 조회합니다."
+			+ "만약 사용자가 날짜를 조회했다면 startDate와 endDate에 YYYY-MM-DD 형식을 지켜서 넘겨주고, 언급하지 않았다면 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
+			+ "사용자가 특정 품목 구분이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기', '완료', '보류', 등으로 지정할 수 있습니다."
+			+ "사용자가 '1번 작업지시서', '작업지시 ID 5'와 같이 요청하면 문맥에서 순수한 숫자 ID만 추출해야 합니다. "
+		    + "절대 '1번', 'ID 5'와 같이 텍스트를 포함해서 넘기지 말고 오직 정수 숫자만 추출하세요.")
+	public String getWorkOrderDetail(Integer orderId, String ename, String empno) {
+		try {
+			
+			ProductionDTO list = productionDAO.selectWorkOrderDetail(orderId);
+			System.out.println("ai" + list);
+			if(list == null) {
+				return "해당 조건으로 조회된 생산계획 관리 조회 결과가 없습니다.";
+			}
+			return  list.toString();
+		} catch (Exception e) {
+			return "생산계획관리조회 중 오류: " + e.getMessage();
+		}
+	}
+	
+	@Tool("작업지시를 조회합니다"
+			+ "만약 사용자가 날짜를 조회했다면 startDate와 endDate에 YYYY-MM-DD 형식을 지켜서 넘겨주고, 언급하지 않았다면 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
+			+ "사용자가 특정 품목 구분이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기', '완료', '보류', 등으로 지정할 수 있습니다."
+			)
+	public String getworkorder(String startDate, String endDate, String itemType, String keyword) {
+		try {
+			
+			ProductionDTO productionDTO = new ProductionDTO();
+			
+			if (startDate != null && !startDate.isEmpty())
+				productionDTO.setStartDate(startDate.trim());
+			if (endDate != null && !endDate.isEmpty())
+				productionDTO.setEndDate(endDate.trim());
+			if (itemType != null && !itemType.isEmpty())
+				productionDTO.setItemType(itemType.trim());
+			if (keyword != null && !keyword.isEmpty())
+				productionDTO.setKeyword(keyword.trim());
+			
+			productionDTO.setStartRow(1);
+			productionDTO.setEndRow(50);
+			
+			List<ProductionDTO> list = productionDAO.selectWorkOrderList(productionDTO);
+			System.out.println("ai" + list);
+			return list.isEmpty() ? "해당 조건으로 조회된 생산계획 관리 조회 결과가 없습니다." : list.toString();
+		} catch (Exception e) {
+			return "생산계획관리조회 중 오류: " + e.getMessage();
+		}
+	}
+	
 	@Tool("생산계획 조회를합니다"
 			+ "만약 사용자가 날짜를 조회했다면 startDate와 endDate에 YYYY-MM-DD 형식을 지켜서 넘겨주고, 언급하지 않았다면 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
 			+ "사용자가 특정 품목 구분이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 'FG' 등으로 지정할 수 있습니다.")
