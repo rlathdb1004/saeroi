@@ -222,10 +222,18 @@
 							<label id="checkAllLabel">선택</label>
 							<input type="checkbox" id="checkAll" style="display:none;">
 						</th>
+
 						<th class="mobile_hidden">입출고번호</th>
 						<th class="mobile_hidden">입출고구분</th>
 						<th class="mobile_show">품목명</th>
-						<th class="mobile_hidden">입출고량</th>
+
+						<%-- =====================================================
+							모바일 표시 컬럼 추가
+							재고조회 화면처럼 모바일에서도 주요 수량 컬럼을 보이게 한다.
+							선택 / 품목명 / 입출고량 / 일자 / 상세 = 총 5개
+						===================================================== --%>
+						<th class="mobile_show">입출고량</th>
+
 						<th class="mobile_hidden">단위</th>
 						<th class="mobile_show">일자</th>
 						<th class="mobile_show">상세</th>
@@ -271,7 +279,11 @@
 								${inout.itemName}
 							</td>
 
-							<td class="mobile_hidden">
+							<%-- =====================================================
+								모바일 표시 컬럼 추가
+								thead의 입출고량과 맞춰서 td도 mobile_show로 변경
+							===================================================== --%>
+							<td class="mobile_show">
 								${inout.inoutQty}
 							</td>
 

@@ -25,7 +25,7 @@ public class RoleInterceptor extends HandlerInterceptorAdapter {
 
         LoginDTO loginUser =
             (LoginDTO) session.getAttribute("loginUser");
-       
+
         if (loginUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return false;
@@ -52,7 +52,11 @@ public class RoleInterceptor extends HandlerInterceptorAdapter {
                 || uri.contains("/worker/productionresult")
                 || uri.contains("/worker/workorder")
                 || uri.contains("/notice/list")
-                || uri.contains("/mypage")) {
+                || uri.contains("/mypage")
+
+                // 작업자 화면 날씨 API 허용
+                || uri.contains("/weather/current")
+                || uri.contains("/weather/today")) {
 
                 return true;
             }
@@ -71,6 +75,8 @@ public class RoleInterceptor extends HandlerInterceptorAdapter {
             return false;
         }
 
+        // 위 조건에 해당하지 않는 권한은 차단
+        response.sendRedirect(request.getContextPath() + "/login");
         return false;
     }
 }
