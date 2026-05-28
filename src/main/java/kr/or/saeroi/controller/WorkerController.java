@@ -9,228 +9,220 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import kr.or.saeroi.common.PageDTO;
+import kr.or.saeroi.dao.WorkerDAO;
 import kr.or.saeroi.dto.LoginDTO;
 import kr.or.saeroi.dto.ProductionDTO;
 import kr.or.saeroi.service.ProductionService;
 
 // =========================================================
 // 작업자 컨트롤러
+// 작업자 메인 / 작업지시 조회 / 생산실적 조회 처리
 // =========================================================
 @Controller
 public class WorkerController {
 
-	// =====================================================
-	// 생산관리 Service
-	// =====================================================
 	@Autowired
 	private ProductionService productionService;
 
-	// =====================================================
-	// 작업자 메인 페이지
-	// =====================================================
+	@Autowired
+	private WorkerDAO workerDAO;
+
 	@RequestMapping("/worker/main")
 	public String workerMain(
 			HttpSession session,
 			Model model) {
 
-		// =================================================
-		// 로그인 세션 확인
-		// =================================================
 		LoginDTO loginUser =
-			(LoginDTO) session.getAttribute(
-				"loginUser");
+			(LoginDTO) session.getAttribute("loginUser");
 
-		// =================================================
-		// 로그인 안했으면 로그인 페이지 이동
-		// =================================================
 		if (loginUser == null) {
 
 			return "redirect:/login";
 		}
 
-		// =================================================
-		// 작업자 정보 전달
-		// =================================================
-		model.addAttribute(
-			"workerName",
-			loginUser.getEname());
+		model.addAttribute("workerName", loginUser.getEname());
+		model.addAttribute("workerDept", loginUser.getDept());
 
-		model.addAttribute(
-			"workerDept",
-			loginUser.getDept());
-
-		// =================================================
-		// 작업자 메인 페이지 이동
-		// =================================================
 		return "worker/workerMain";
 	}
 
-	// =====================================================
-	// 작업지시 조회
-	// 로그인한 작업자 본인 데이터만 출력
-	// =====================================================
 	@RequestMapping("/worker/workorder")
 	public String workerWorkOrder(
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "5") int size,
 			HttpSession session,
 			Model model) {
 
-		// =================================================
-		// 로그인 세션 확인
-		// =================================================
 		LoginDTO loginUser =
-			(LoginDTO) session.getAttribute(
-				"loginUser");
+			(LoginDTO) session.getAttribute("loginUser");
 
-		// =================================================
-		// 로그인 안했으면 로그인 이동
-		// =================================================
 		if (loginUser == null) {
 
 			return "redirect:/login";
 		}
 
-		// =================================================
-		// 전체 작업지시 조회
-		// =================================================
-		List<ProductionDTO> allList =
-			productionService.selectWorkOrderList(
-				new ProductionDTO());
+		String empno = "";
 
-		// =================================================
-		// 로그인 작업자 데이터만 저장할 리스트
-		// =================================================
-		List<ProductionDTO> myWorkList =
-			new ArrayList<>();
+		if (loginUser.getEmpno() != null) {
 
-		// =================================================
-		// 로그인 사용자 이름
-		// =================================================
-		String myName = "";
+			empno =
+				loginUser.getEmpno().trim();
+		}
+
+		String ename = "";
 
 		if (loginUser.getEname() != null) {
 
-			myName =
+			ename =
 				loginUser.getEname().trim();
 		}
 
-		// =================================================
-		// 로그인한 작업자 데이터만 필터링
-		// =================================================
-		if (allList != null) {
+		List<ProductionDTO> myAllList =
+			workerDAO.selectMyWorkOrderList(
+				empno,
+				ename);
 
-			for (ProductionDTO item : allList) {
+		if (myAllList == null) {
 
-				String itemEname = "";
-
-				if (item.getEname() != null) {
-
-					itemEname =
-						item.getEname().trim();
-				}
-
-				// =========================================
-				// 이름 비교
-				// =========================================
-				if (itemEname.equals(myName)) {
-
-					myWorkList.add(item);
-				}
-			}
+			myAllList =
+				new ArrayList<ProductionDTO>();
 		}
 
-		// =================================================
-		// JSP 전달
-		// =================================================
-		model.addAttribute(
-			"list",
-			myWorkList);
+		int totalCount =
+			myAllList.size();
 
-		model.addAttribute(
-			"workerName",
-			loginUser.getEname());
+		PageDTO pageInfo =
+			new PageDTO(page, size, totalCount);
 
-		model.addAttribute(
-			"workerDept",
-			loginUser.getDept());
+		int startIndex =
+			(page - 1) * size;
 
-		// =================================================
-		// 기존 작업지시 페이지 이동
-		// =================================================
-		return "production/workorder";
+		int endIndex =
+			page * size;
+
+		if (startIndex < 0) {
+
+			startIndex = 0;
+		}
+
+		if (endIndex > totalCount) {
+
+			endIndex = totalCount;
+		}
+
+		List<ProductionDTO> list =
+			new ArrayList<ProductionDTO>();
+
+		if (startIndex <= endIndex
+				&& startIndex < totalCount) {
+
+			list =
+				myAllList.subList(startIndex, endIndex);
+		}
+
+		model.addAttribute("list", list);
+		model.addAttribute("pageInfo", pageInfo);
+		model.addAttribute("pageUrl", "/worker/workorder");
+
+		model.addAttribute("prodStatus", "");
+		model.addAttribute("keyword", "");
+		model.addAttribute("startDate", "");
+		model.addAttribute("endDate", "");
+
+		model.addAttribute("workOrderStatusList",
+			productionService.selectWorkOrderStatusList());
+
+		model.addAttribute("workOrderPlanList",
+			productionService.selectWorkOrderPlanList());
+
+		model.addAttribute("lineList",
+			productionService.selectLineList());
+
+		model.addAttribute("empList",
+			productionService.selectWorkOrderEmpList());
+
+		model.addAttribute("workerName", loginUser.getEname());
+		model.addAttribute("workerDept", loginUser.getDept());
+
+		model.addAttribute("headerTitle", "생산관리");
+		model.addAttribute("headerSubTitle", "작업지시 관리");
+
+		return "production/workorder.tiles";
 	}
 
 	// =====================================================
-	// 생산실적 페이지 이동
-	// 기존 생산실적 Controller 로 redirect
+	// 생산실적 조회
+	// 로그인한 작업자 본인 생산실적만 조회
 	// =====================================================
 	@RequestMapping("/worker/productionresult")
 	public String workerProductionResult(
 			HttpSession session,
 			Model model) {
 
-		// =================================================
-		// 로그인 세션 확인
-		// =================================================
 		LoginDTO loginUser =
-			(LoginDTO) session.getAttribute(
-				"loginUser");
+			(LoginDTO) session.getAttribute("loginUser");
 
-		// =================================================
-		// 로그인 안했으면 로그인 이동
-		// =================================================
 		if (loginUser == null) {
 
 			return "redirect:/login";
 		}
 
-		// =================================================
-		// 기존 생산실적 Controller 로 이동
-		// =================================================
-		return "redirect:/production/productionresult";
+		String empno = "";
+
+		if (loginUser.getEmpno() != null) {
+
+			empno =
+				loginUser.getEmpno().trim();
+		}
+
+		String ename = "";
+
+		if (loginUser.getEname() != null) {
+
+			ename =
+				loginUser.getEname().trim();
+		}
+
+		List<ProductionDTO> list =
+			workerDAO.selectMyProductionResultList(
+				empno,
+				ename);
+
+		if (list == null) {
+
+			list =
+				new ArrayList<ProductionDTO>();
+		}
+
+		model.addAttribute("list", list);
+		model.addAttribute("workerName", loginUser.getEname());
+		model.addAttribute("workerDept", loginUser.getDept());
+
+		return "worker/workerProductionResult";
 	}
 
-	// =====================================================
-	// 공지사항 페이지 이동
-	// 기존 공지사항 Controller 로 redirect
-	// =====================================================
 	@RequestMapping("/worker/notice")
 	public String workerNotice(
 			HttpSession session,
 			Model model) {
 
-		// =================================================
-		// 로그인 세션 확인
-		// =================================================
 		LoginDTO loginUser =
-			(LoginDTO) session.getAttribute(
-				"loginUser");
+			(LoginDTO) session.getAttribute("loginUser");
 
-		// =================================================
-		// 로그인 안했으면 로그인 이동
-		// =================================================
 		if (loginUser == null) {
 
 			return "redirect:/login";
 		}
 
-		// =================================================
-		// 기존 공지사항 Controller 로 이동
-		// =================================================
 		return "redirect:/board/notice";
 	}
 
-	// =====================================================
-	// 기존 notice/list 요청 처리
-	// 팀원 JSP 호환용
-	// =====================================================
 	@RequestMapping("/notice/list")
 	public String noticeListRedirect() {
 
-		// =================================================
-		// 실제 공지사항 Controller 로 이동
-		// =================================================
 		return "redirect:/board/notice";
 	}
-
 }

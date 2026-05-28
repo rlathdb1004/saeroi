@@ -354,7 +354,7 @@
 			<div class="workerMenuList">
 
 				<div class="workerMenuCard"
-					onclick="location.href='${pageContext.request.contextPath}/production/workorder'">
+					onclick="location.href='${pageContext.request.contextPath}/worker/workorder'">
 
 					<div class="workerMenuIconCircle">
 
@@ -387,7 +387,7 @@
 
 					<button type="button"
 						class="workerMenuArrowBtn"
-						onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/production/workorder'">
+						onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/worker/workorder'">
 
 						›
 

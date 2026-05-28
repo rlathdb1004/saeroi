@@ -17,6 +17,9 @@
 
 <style>
 
+	/* =====================================================
+		등록 모달 에러 메시지
+	===================================================== */
 	.input_error_text {
 		margin-top: 6px;
 		font-size: 12px;
@@ -25,6 +28,9 @@
 		display: none;
 	}
 
+	/* =====================================================
+		등록 모달 에러 테두리
+	===================================================== */
 	.input_error {
 		border: 1px solid #e53935 !important;
 	}
@@ -241,10 +247,6 @@
 									value="${inout.inoutId}">
 							</td>
 
-							<%-- =====================================================
-								입출고번호
-								화면 순번으로 1번부터 출력
-							===================================================== --%>
 							<td class="mobile_hidden">
 								${status.count}
 							</td>
@@ -328,6 +330,7 @@
 				method="post"
 				action="${pageContext.request.contextPath}/inventory/materialIn/insert"
 				autocomplete="off"
+				novalidate
 				onsubmit="return checkInoutInsert();">
 
 				<div class="modal_body modal_body_2col">
@@ -341,8 +344,7 @@
 
 						<select name="inoutType"
 							id="insertInoutType"
-							class="modal_select"
-							required>
+							class="modal_select">
 
 							<option value="">선택</option>
 							<option value="MI">입고</option>
@@ -366,8 +368,7 @@
 
 						<select name="itemId"
 							id="insertItemId"
-							class="modal_select"
-							required>
+							class="modal_select">
 
 							<option value="">선택</option>
 
@@ -400,12 +401,11 @@
 							name="inoutQty"
 							id="insertInoutQty"
 							class="modal_input"
-							min="1"
-							required>
+							min="1">
 
 						<div id="qtyError"
 							class="input_error_text">
-							입출고수량을 입력해주세요.
+							입출고수량은 1 이상 입력해주세요.
 						</div>
 
 					</div>
@@ -420,8 +420,7 @@
 						<input type="date"
 							name="inoutDate"
 							id="insertInoutDate"
-							class="modal_input modal_today"
-							required>
+							class="modal_input modal_today">
 
 						<div id="dateError"
 							class="input_error_text">
@@ -474,6 +473,11 @@
 
 <script>
 
+	// =========================================================
+	// 등록 모달 방어코딩
+	// 아무것도 입력하지 않고 등록하면
+	// 빨간 테두리 + 빨간 안내문 출력
+	// =========================================================
 	function checkInoutInsert() {
 
 		var inoutType =
@@ -500,6 +504,9 @@
 		var dateError =
 			document.getElementById("dateError");
 
+		// =====================================================
+		// 기존 에러 초기화
+		// =====================================================
 		inoutType.classList.remove("input_error");
 		itemId.classList.remove("input_error");
 		inoutQty.classList.remove("input_error");
@@ -512,6 +519,9 @@
 
 		var isValid = true;
 
+		// =====================================================
+		// 입출고구분 체크
+		// =====================================================
 		if (inoutType.value == "") {
 
 			inoutType.classList.add("input_error");
@@ -522,6 +532,9 @@
 			isValid = false;
 		}
 
+		// =====================================================
+		// 품목명 체크
+		// =====================================================
 		if (itemId.value == "") {
 
 			itemId.classList.add("input_error");
@@ -532,6 +545,9 @@
 			isValid = false;
 		}
 
+		// =====================================================
+		// 입출고수량 체크
+		// =====================================================
 		if (inoutQty.value == ""
 			|| Number(inoutQty.value) <= 0) {
 
@@ -543,6 +559,9 @@
 			isValid = false;
 		}
 
+		// =====================================================
+		// 입출고일자 체크
+		// =====================================================
 		if (inoutDate.value == "") {
 
 			inoutDate.classList.add("input_error");
@@ -556,6 +575,9 @@
 		return isValid;
 	}
 
+	// =========================================================
+	// 선택 삭제
+	// =========================================================
 	function deleteCheck() {
 
 		var checkedList =
@@ -574,6 +596,9 @@
 		}
 	}
 
+	// =========================================================
+	// 오늘 날짜 자동 세팅 + 전체선택 + 에러 자동 해제
+	// =========================================================
 	window.addEventListener("load", function() {
 
 		var dateInput =
@@ -624,6 +649,70 @@
 
 					checks[i].checked =
 						!allChecked;
+				}
+			});
+		}
+
+		// =====================================================
+		// 입력하면 빨간 경고 자동 제거
+		// =====================================================
+		var inoutType =
+			document.getElementById("insertInoutType");
+
+		var itemId =
+			document.getElementById("insertItemId");
+
+		var inoutQty =
+			document.getElementById("insertInoutQty");
+
+		var inoutDate =
+			document.getElementById("insertInoutDate");
+
+		if (inoutType != null) {
+
+			inoutType.addEventListener("change", function() {
+
+				if (inoutType.value != "") {
+
+					inoutType.classList.remove("input_error");
+					document.getElementById("inoutTypeError").style.display = "none";
+				}
+			});
+		}
+
+		if (itemId != null) {
+
+			itemId.addEventListener("change", function() {
+
+				if (itemId.value != "") {
+
+					itemId.classList.remove("input_error");
+					document.getElementById("itemError").style.display = "none";
+				}
+			});
+		}
+
+		if (inoutQty != null) {
+
+			inoutQty.addEventListener("input", function() {
+
+				if (inoutQty.value != ""
+					&& Number(inoutQty.value) > 0) {
+
+					inoutQty.classList.remove("input_error");
+					document.getElementById("qtyError").style.display = "none";
+				}
+			});
+		}
+
+		if (inoutDate != null) {
+
+			inoutDate.addEventListener("change", function() {
+
+				if (inoutDate.value != "") {
+
+					inoutDate.classList.remove("input_error");
+					document.getElementById("dateError").style.display = "none";
 				}
 			});
 		}
