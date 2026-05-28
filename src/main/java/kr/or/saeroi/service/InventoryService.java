@@ -1,5 +1,7 @@
 // =========================================================================
 // InventoryService.java
+// 재고 관리 Service 인터페이스
+// Controller ↔ DAO 중간 연결
 // =========================================================================
 
 package kr.or.saeroi.service;
@@ -8,13 +10,22 @@ import java.util.List;
 
 import kr.or.saeroi.dto.InventoryDTO;
 
-// Controller와 Service 연결
+/**
+ * 재고 관리 Service 인터페이스
+ * 
+ * 역할:
+ * - Controller 와 DAO 연결
+ * - 비즈니스 로직 처리
+ * - 재고 CRUD 처리
+ */
 public interface InventoryService {
 
 	// =========================================================================
 	// 재고 목록 조회
+	// 검색 + 페이징 처리
 	// =========================================================================
 	public List<InventoryDTO> getInventoryList(
+
 			String searchType,
 			String keyword,
 			String startDate,
@@ -22,13 +33,13 @@ public interface InventoryService {
 
 	// =========================================================================
 	// 품목 목록 조회
-	// - 등록 모달 select 출력용
-	// - 품목 선택 시 창고위치 자동입력용
+	// 등록 모달 select 출력용
 	// =========================================================================
 	public List<InventoryDTO> getItemList();
 
 	// =========================================================================
-	// 품목 선택 시 창고위치 조회
+	// 품목 선택 시 창고 위치 조회
+	// AJAX 자동입력용
 	// =========================================================================
 	public String getStockLocationByItemId(
 			int itemId);
@@ -41,12 +52,14 @@ public interface InventoryService {
 
 	// =========================================================================
 	// 재고 상세조회
+	// inventoryDetail.jsp 출력용
 	// =========================================================================
 	public InventoryDTO getInventoryDetail(
 			int inventoryId);
 
 	// =========================================================================
 	// 재고 선택 삭제
+	// 체크박스 다중 삭제
 	// =========================================================================
 	public int removeInventory(
 			String[] inventoryIds);
@@ -56,4 +69,5 @@ public interface InventoryService {
 	// =========================================================================
 	public int modifyInventory(
 			InventoryDTO dto);
+
 }

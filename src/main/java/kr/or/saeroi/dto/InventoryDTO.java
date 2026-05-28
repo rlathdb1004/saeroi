@@ -105,4 +105,14 @@ public class InventoryDTO {
 	public void setItemUnit(String itemUnit) {
 		this.itemUnit = itemUnit;
 	}
+
+	@Override
+	public String toString() {
+		return "InventoryDTO [inventoryId=" + inventoryId + ", inventoryStock=" + inventoryStock + ", remark=" + remark
+				+ ", stockLocation=" + stockLocation + ", createdDate=" + createdDate + ", updatedDate=" + updatedDate
+				+ ", itemId=" + itemId + ", itemCode=" + itemCode + ", itemName=" + itemName + ", itemType=" + itemType
+				+ ", itemUnit=" + itemUnit + "]";
+	}
+	
+	
 }

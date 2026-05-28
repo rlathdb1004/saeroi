@@ -5,7 +5,6 @@ import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +18,6 @@ import kr.or.saeroi.dto.InoutDTO;
 @Repository
 public class InoutDAOImpl implements InoutDAO {
 
-	// =============================================================
-	// DB 연결
-	// =============================================================
 	private Connection getConnection() throws Exception {
 
 		Class.forName("oracle.jdbc.driver.OracleDriver");
@@ -38,9 +34,6 @@ public class InoutDAOImpl implements InoutDAO {
 				pw);
 	}
 
-	// =============================================================
-	// 입출고 목록 조회 오버로딩
-	// =============================================================
 	@Override
 	public List<InoutDTO> selectInoutList(
 			String searchType,
@@ -49,10 +42,6 @@ public class InoutDAOImpl implements InoutDAO {
 			String endDate) {
 
 		String inoutType = "";
-
-		// =========================================================
-		// 검색어에 입고 / 출고 직접 입력 시 처리
-		// =========================================================
 
 		if ("입고".equals(keyword)) {
 
@@ -73,9 +62,6 @@ public class InoutDAOImpl implements InoutDAO {
 				endDate);
 	}
 
-	// =============================================================
-	// 입출고 목록 조회
-	// =============================================================
 	@Override
 	public List<InoutDTO> selectInoutList(
 			String searchType,
@@ -86,10 +72,6 @@ public class InoutDAOImpl implements InoutDAO {
 
 		List<InoutDTO> list =
 				new ArrayList<InoutDTO>();
-
-		// =========================================================
-		// 검색어에 입고 / 출고 직접 입력 시 처리
-		// =========================================================
 
 		if ((inoutType == null || inoutType.equals(""))
 				&& keyword != null) {
@@ -135,19 +117,11 @@ public class InoutDAOImpl implements InoutDAO {
 
 			sql += " WHERE 1 = 1 ";
 
-			// =========================================================
-			// 입출고 타입 검색
-			// =========================================================
-
 			if (inoutType != null
 					&& !inoutType.equals("")) {
 
 				sql += " AND MI.INOUT_TYPE = ? ";
 			}
-
-			// =========================================================
-			// 검색 기능
-			// =========================================================
 
 			if (keyword != null
 					&& !keyword.trim().equals("")) {
@@ -157,90 +131,48 @@ public class InoutDAOImpl implements InoutDAO {
 				boolean isNumber = false;
 
 				try {
-
 					Integer.parseInt(keyword);
-
 					isNumber = true;
-
 				} catch (Exception e) {
-
 					isNumber = false;
 				}
-
-				// =====================================================
-				// 품목코드 검색
-				// =====================================================
 
 				if ("itemCode".equals(searchType)) {
 
 					sql += " AND I.ITEM_CODE LIKE ? ";
-				}
 
-				// =====================================================
-				// 품목명 검색
-				// =====================================================
-
-				else if ("itemName".equals(searchType)) {
+				} else if ("itemName".equals(searchType)) {
 
 					sql += " AND I.ITEM_NAME LIKE ? ";
-				}
 
-				// =====================================================
-				// 숫자 검색 시 입출고량 정확검색
-				// =====================================================
-
-				else if (isNumber) {
+				} else if (isNumber) {
 
 					sql += " AND MI.INOUT_QTY = ? ";
-				}
 
-				// =====================================================
-				// 전체 검색
-				// =====================================================
-
-				else {
+				} else {
 
 					sql += " AND ( ";
-
 					sql += "     I.ITEM_CODE LIKE ? ";
 					sql += "     OR I.ITEM_NAME LIKE ? ";
 					sql += "     OR I.ITEM_UNIT LIKE ? ";
 					sql += "     OR MI.DOC_NO LIKE ? ";
 					sql += "     OR MI.MATERIAL_LOT LIKE ? ";
 					sql += "     OR MI.REMARK LIKE ? ";
-
 					sql += "     OR TO_CHAR(MI.INOUT_DATE, 'YYYY-MM-DD') LIKE ? ";
-
 					sql += "     OR CASE ";
-					sql += "            WHEN MI.INOUT_TYPE = 'MI' ";
-					sql += "            THEN '입고' ";
-
-					sql += "            WHEN MI.INOUT_TYPE = 'MO-PROD' ";
-					sql += "            THEN '출고' ";
-
+					sql += "            WHEN MI.INOUT_TYPE = 'MI' THEN '입고' ";
+					sql += "            WHEN MI.INOUT_TYPE = 'MO-PROD' THEN '출고' ";
 					sql += "            ELSE MI.INOUT_TYPE ";
 					sql += "        END LIKE ? ";
-
 					sql += "     OR CASE ";
-					sql += "            WHEN I.ITEM_TYPE = 'FG' ";
-					sql += "            THEN '완제품' ";
-
-					sql += "            WHEN I.ITEM_TYPE = 'RM' ";
-					sql += "            THEN '원자재' ";
-
-					sql += "            WHEN I.ITEM_TYPE = 'SM' ";
-					sql += "            THEN '부자재' ";
-
+					sql += "            WHEN I.ITEM_TYPE = 'FG' THEN '완제품' ";
+					sql += "            WHEN I.ITEM_TYPE = 'RM' THEN '원자재' ";
+					sql += "            WHEN I.ITEM_TYPE = 'SM' THEN '부자재' ";
 					sql += "            ELSE I.ITEM_TYPE ";
 					sql += "        END LIKE ? ";
-
 					sql += " ) ";
 				}
 			}
-
-			// =========================================================
-			// 날짜 검색
-			// =========================================================
 
 			if (startDate != null
 					&& !startDate.equals("")) {
@@ -256,10 +188,6 @@ public class InoutDAOImpl implements InoutDAO {
 				sql += " TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
-			// =========================================================
-			// 최신순 정렬
-			// =========================================================
-
 			sql += " ORDER BY MI.INOUT_ID DESC ";
 
 			PreparedStatement pstmt =
@@ -267,19 +195,11 @@ public class InoutDAOImpl implements InoutDAO {
 
 			int idx = 1;
 
-			// =========================================================
-			// 입출고 타입 바인딩
-			// =========================================================
-
 			if (inoutType != null
 					&& !inoutType.equals("")) {
 
 				pstmt.setString(idx++, inoutType);
 			}
-
-			// =========================================================
-			// 검색어 바인딩
-			// =========================================================
 
 			if (keyword != null
 					&& !keyword.trim().equals("")) {
@@ -289,42 +209,25 @@ public class InoutDAOImpl implements InoutDAO {
 				boolean isNumber = false;
 
 				try {
-
 					Integer.parseInt(keyword);
-
 					isNumber = true;
-
 				} catch (Exception e) {
-
 					isNumber = false;
 				}
 
-				// 품목코드 검색
 				if ("itemCode".equals(searchType)) {
 
-					pstmt.setString(
-							idx++,
-							"%" + keyword + "%");
-				}
+					pstmt.setString(idx++, "%" + keyword + "%");
 
-				// 품목명 검색
-				else if ("itemName".equals(searchType)) {
+				} else if ("itemName".equals(searchType)) {
 
-					pstmt.setString(
-							idx++,
-							"%" + keyword + "%");
-				}
+					pstmt.setString(idx++, "%" + keyword + "%");
 
-				// 숫자 검색
-				else if (isNumber) {
+				} else if (isNumber) {
 
-					pstmt.setInt(
-							idx++,
-							Integer.parseInt(keyword));
-				}
+					pstmt.setInt(idx++, Integer.parseInt(keyword));
 
-				// 전체 검색
-				else {
+				} else {
 
 					pstmt.setString(idx++, "%" + keyword + "%");
 					pstmt.setString(idx++, "%" + keyword + "%");
@@ -337,10 +240,6 @@ public class InoutDAOImpl implements InoutDAO {
 					pstmt.setString(idx++, "%" + keyword + "%");
 				}
 			}
-
-			// =========================================================
-			// 날짜 바인딩
-			// =========================================================
 
 			if (startDate != null
 					&& !startDate.equals("")) {
@@ -357,56 +256,25 @@ public class InoutDAOImpl implements InoutDAO {
 			ResultSet rs =
 					pstmt.executeQuery();
 
-			// =========================================================
-			// 결과 DTO 저장
-			// =========================================================
-
 			while (rs.next()) {
 
 				InoutDTO dto =
 						new InoutDTO();
 
-				dto.setInoutId(
-						rs.getInt("INOUT_ID"));
-
-				dto.setInoutType(
-						rs.getString("INOUT_TYPE"));
-
-				dto.setMaterialLot(
-						rs.getString("MATERIAL_LOT"));
-
-				dto.setInoutQty(
-						rs.getInt("INOUT_QTY"));
-
-				dto.setInoutDate(
-						rs.getDate("INOUT_DATE"));
-
-				dto.setRemark(
-						rs.getString("REMARK"));
-
-				dto.setStatus(
-						rs.getString("STATUS"));
-
-				dto.setItemId(
-						rs.getInt("ITEM_ID"));
-
-				dto.setDocNo(
-						rs.getString("DOC_NO"));
-
-				dto.setDocSeq(
-						rs.getInt("DOC_SEQ"));
-
-				dto.setItemCode(
-						rs.getString("ITEM_CODE"));
-
-				dto.setItemName(
-						rs.getString("ITEM_NAME"));
-
-				dto.setItemType(
-						rs.getString("ITEM_TYPE"));
-
-				dto.setItemUnit(
-						rs.getString("ITEM_UNIT"));
+				dto.setInoutId(rs.getInt("INOUT_ID"));
+				dto.setInoutType(rs.getString("INOUT_TYPE"));
+				dto.setMaterialLot(rs.getString("MATERIAL_LOT"));
+				dto.setInoutQty(rs.getInt("INOUT_QTY"));
+				dto.setInoutDate(rs.getDate("INOUT_DATE"));
+				dto.setRemark(rs.getString("REMARK"));
+				dto.setStatus(rs.getString("STATUS"));
+				dto.setItemId(rs.getInt("ITEM_ID"));
+				dto.setDocNo(rs.getString("DOC_NO"));
+				dto.setDocSeq(rs.getInt("DOC_SEQ"));
+				dto.setItemCode(rs.getString("ITEM_CODE"));
+				dto.setItemName(rs.getString("ITEM_NAME"));
+				dto.setItemType(rs.getString("ITEM_TYPE"));
+				dto.setItemUnit(rs.getString("ITEM_UNIT"));
 
 				list.add(dto);
 			}
@@ -423,9 +291,6 @@ public class InoutDAOImpl implements InoutDAO {
 		return list;
 	}
 
-	// =============================================================
-	// 입출고 상세조회
-	// =============================================================
 	@Override
 	public InoutDTO selectInoutDetail(int inoutId) {
 
@@ -448,17 +313,13 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += "     MI.ITEM_ID, ";
 			sql += "     MI.DOC_NO, ";
 			sql += "     MI.DOC_SEQ, ";
-
 			sql += "     I.ITEM_CODE, ";
 			sql += "     I.ITEM_NAME, ";
 			sql += "     I.ITEM_TYPE, ";
 			sql += "     I.ITEM_UNIT ";
-
 			sql += " FROM MATERIAL_INOUT MI ";
-
 			sql += " JOIN ITEM I ";
 			sql += " ON MI.ITEM_ID = I.ITEM_ID ";
-
 			sql += " WHERE MI.INOUT_ID = ? ";
 
 			PreparedStatement pstmt =
@@ -473,47 +334,20 @@ public class InoutDAOImpl implements InoutDAO {
 
 				dto = new InoutDTO();
 
-				dto.setInoutId(
-						rs.getInt("INOUT_ID"));
-
-				dto.setInoutType(
-						rs.getString("INOUT_TYPE"));
-
-				dto.setMaterialLot(
-						rs.getString("MATERIAL_LOT"));
-
-				dto.setInoutQty(
-						rs.getInt("INOUT_QTY"));
-
-				dto.setInoutDate(
-						rs.getDate("INOUT_DATE"));
-
-				dto.setRemark(
-						rs.getString("REMARK"));
-
-				dto.setStatus(
-						rs.getString("STATUS"));
-
-				dto.setItemId(
-						rs.getInt("ITEM_ID"));
-
-				dto.setDocNo(
-						rs.getString("DOC_NO"));
-
-				dto.setDocSeq(
-						rs.getInt("DOC_SEQ"));
-
-				dto.setItemCode(
-						rs.getString("ITEM_CODE"));
-
-				dto.setItemName(
-						rs.getString("ITEM_NAME"));
-
-				dto.setItemType(
-						rs.getString("ITEM_TYPE"));
-
-				dto.setItemUnit(
-						rs.getString("ITEM_UNIT"));
+				dto.setInoutId(rs.getInt("INOUT_ID"));
+				dto.setInoutType(rs.getString("INOUT_TYPE"));
+				dto.setMaterialLot(rs.getString("MATERIAL_LOT"));
+				dto.setInoutQty(rs.getInt("INOUT_QTY"));
+				dto.setInoutDate(rs.getDate("INOUT_DATE"));
+				dto.setRemark(rs.getString("REMARK"));
+				dto.setStatus(rs.getString("STATUS"));
+				dto.setItemId(rs.getInt("ITEM_ID"));
+				dto.setDocNo(rs.getString("DOC_NO"));
+				dto.setDocSeq(rs.getInt("DOC_SEQ"));
+				dto.setItemCode(rs.getString("ITEM_CODE"));
+				dto.setItemName(rs.getString("ITEM_NAME"));
+				dto.setItemType(rs.getString("ITEM_TYPE"));
+				dto.setItemUnit(rs.getString("ITEM_UNIT"));
 			}
 
 			rs.close();
@@ -528,9 +362,6 @@ public class InoutDAOImpl implements InoutDAO {
 		return dto;
 	}
 
-	// =============================================================
-	// 입출고 수정
-	// =============================================================
 	@Override
 	public int updateInout(InoutDTO dto) {
 
@@ -556,25 +387,11 @@ public class InoutDAOImpl implements InoutDAO {
 
 			int idx = 1;
 
-			pstmt.setString(
-					idx++,
-					dto.getInoutType());
-
-			pstmt.setInt(
-					idx++,
-					dto.getInoutQty());
-
-			pstmt.setDate(
-					idx++,
-					dto.getInoutDate());
-
-			pstmt.setString(
-					idx++,
-					dto.getRemark());
-
-			pstmt.setInt(
-					idx++,
-					dto.getInoutId());
+			pstmt.setString(idx++, dto.getInoutType());
+			pstmt.setInt(idx++, dto.getInoutQty());
+			pstmt.setDate(idx++, dto.getInoutDate());
+			pstmt.setString(idx++, dto.getRemark());
+			pstmt.setInt(idx++, dto.getInoutId());
 
 			result =
 					pstmt.executeUpdate();
@@ -590,11 +407,6 @@ public class InoutDAOImpl implements InoutDAO {
 		return result;
 	}
 
-	// =============================================================
-	// 추가
-	// 등록 모달 품목 목록 조회
-	// 품목명이 안뜨던 문제 해결
-	// =============================================================
 	@Override
 	public List<InoutDTO> selectItemList() {
 
@@ -605,10 +417,6 @@ public class InoutDAOImpl implements InoutDAO {
 
 			Connection conn =
 					getConnection();
-
-			// =====================================================
-			// ITEM 테이블 품목 조회
-			// =====================================================
 
 			String sql = "";
 
@@ -624,20 +432,13 @@ public class InoutDAOImpl implements InoutDAO {
 			ResultSet rs =
 					pstmt.executeQuery();
 
-			// =====================================================
-			// 품목 DTO 저장
-			// =====================================================
-
 			while (rs.next()) {
 
 				InoutDTO dto =
 						new InoutDTO();
 
-				dto.setItemId(
-						rs.getInt("ITEM_ID"));
-
-				dto.setItemName(
-						rs.getString("ITEM_NAME"));
+				dto.setItemId(rs.getInt("ITEM_ID"));
+				dto.setItemName(rs.getString("ITEM_NAME"));
 
 				list.add(dto);
 			}
@@ -656,6 +457,9 @@ public class InoutDAOImpl implements InoutDAO {
 
 	// =============================================================
 	// 입출고 등록
+	// EMP_ID가 NOT NULL이라 반드시 INSERT에 넣어야 등록됨
+	// 지금은 임시로 EMP_ID = 1 넣음
+	// 만약 1번 사원이 없으면 DB에 실제 존재하는 EMP_ID로 바꿔야 함
 	// =============================================================
 	@Override
 	public int insertInout(InoutDTO dto) {
@@ -671,6 +475,7 @@ public class InoutDAOImpl implements InoutDAO {
 
 			sql += " INSERT INTO MATERIAL_INOUT ( ";
 			sql += "     INOUT_ID, ";
+			sql += "     EMP_ID, ";
 			sql += "     ITEM_ID, ";
 			sql += "     INOUT_TYPE, ";
 			sql += "     INOUT_QTY, ";
@@ -678,49 +483,57 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += "     REMARK ";
 			sql += " ) VALUES ( ";
 			sql += "     SEQ_MATERIAL_INOUT.NEXTVAL, ";
-			sql += "     ?, ?, ?, ?, ? ";
+			sql += "     ?, ?, ?, ?, ?, ? ";
 			sql += " ) ";
 
 			PreparedStatement pstmt =
 					conn.prepareStatement(sql);
 
+			// =====================================================
+			// 사원 ID
+			// MATERIAL_INOUT.EMP_ID가 NOT NULL이라 필수
+			// =====================================================
 			pstmt.setInt(
 					1,
+					1);
+
+			pstmt.setInt(
+					2,
 					dto.getItemId());
 
 			pstmt.setString(
-					2,
+					3,
 					dto.getInoutType());
 
 			pstmt.setInt(
-					3,
+					4,
 					dto.getInoutQty());
 
 			pstmt.setDate(
-					4,
+					5,
 					dto.getInoutDate());
 
 			pstmt.setString(
-					5,
+					6,
 					dto.getRemark());
 
 			result =
 					pstmt.executeUpdate();
+
+			System.out.println("입출고 등록 성공 : " + result);
 
 			pstmt.close();
 			conn.close();
 
 		} catch (Exception e) {
 
+			System.out.println("입출고 등록 실패");
 			e.printStackTrace();
 		}
 
 		return result;
 	}
 
-	// =============================================================
-	// 선택 삭제
-	// =============================================================
 	@Override
 	public int deleteInout(String[] inoutIds) {
 
@@ -760,9 +573,6 @@ public class InoutDAOImpl implements InoutDAO {
 		return result;
 	}
 
-	// =============================================================
-	// 입출고 개수 조회
-	// =============================================================
 	@Override
 	public int selectInoutCount(
 			String searchType,
