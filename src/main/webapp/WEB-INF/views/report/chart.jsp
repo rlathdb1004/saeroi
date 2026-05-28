@@ -458,8 +458,11 @@
 					})
 				}      			
 			});
-      	let finalNames = Object.keys(reasonMap);
+      	let rawKeys = Object.keys(reasonMap);
       	let finalValues = Object.values(reasonMap);
+
+      	let finalNames = rawKeys.map(key => key.split('_')[1]);
+      	let finalCodes = rawKeys.map(key => key. split('_')[0]);
       	
       	ochart.updateOptions({
       		series: finalValues,
@@ -468,10 +471,9 @@
       			 events:{
        	        	dataPointSelection: function(event, chartContext, config){
        	        		let clickIndex = config.dataPointIndex;
-       	        		let labels = chartContext.w.config.labels
-       	        		let defectName = labels[clickIndex];
-       	        		if(defectName){
-       	        			let targetUrl = '${pageContext.request.contextPath}/quality/defect?keywoed='+encodeURIComponent(defectName);
+       	        		let defectCode = finalCodes[clickIndex];
+       	        		if(defectCode){
+       	        			let targetUrl = '${pageContext.request.contextPath}/quality/defect?keywoed='+encodeURIComponent(defectCode);
        	        			window.location.href = targetUrl;
        	        		}
        	        	}
