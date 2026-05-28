@@ -158,9 +158,12 @@ public class WorkerController {
 	// 로그인한 작업자 본인 생산실적만 조회
 	// 기존 팀원 productionresult.jsp + tiles 사용
 	// CSS / 사이드바 / 헤더 유지
+	// 작업지시 조회처럼 5개씩 페이징 처리
 	// =====================================================
 	@RequestMapping("/worker/productionresult")
 	public String workerProductionResult(
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "5") int size,
 			HttpSession session,
 			Model model) {
 
@@ -188,18 +191,59 @@ public class WorkerController {
 				loginUser.getEname().trim();
 		}
 
-		List<ProductionDTO> list =
+		// =================================================
+		// 로그인한 작업자 기준 생산실적 전체 조회
+		// =================================================
+		List<ProductionDTO> myAllList =
 			workerDAO.selectMyProductionResultList(
 				empno,
 				ename);
 
-		if (list == null) {
+		if (myAllList == null) {
 
-			list =
+			myAllList =
 				new ArrayList<ProductionDTO>();
 		}
 
+		// =================================================
+		// 생산실적도 작업지시처럼 5개씩 보이도록 페이징 처리
+		// =================================================
+		int totalCount =
+			myAllList.size();
+
+		PageDTO pageInfo =
+			new PageDTO(page, size, totalCount);
+
+		int startIndex =
+			(page - 1) * size;
+
+		int endIndex =
+			page * size;
+
+		if (startIndex < 0) {
+
+			startIndex = 0;
+		}
+
+		if (endIndex > totalCount) {
+
+			endIndex = totalCount;
+		}
+
+		List<ProductionDTO> list =
+			new ArrayList<ProductionDTO>();
+
+		if (startIndex <= endIndex
+				&& startIndex < totalCount) {
+
+			list =
+				myAllList.subList(startIndex, endIndex);
+		}
+
 		model.addAttribute("list", list);
+		model.addAttribute("pageInfo", pageInfo);
+		model.addAttribute("pageUrl", "/worker/productionresult");
+
 		model.addAttribute("workerName", loginUser.getEname());
 		model.addAttribute("workerDept", loginUser.getDept());
 
