@@ -19,7 +19,7 @@
 									or sessionScope.loginUser.role eq 'MANAGER'}">
 							<c:if test="${mode ne 'edit'}">
 								<button type="button" class="detail_btn_green"
-									onclick="location.href='${pageContext.request.contextPath}/equipment/detail?equip_id=${eqp.equip_id}&mode=edit'">
+									onclick="location.href='${pageContext.request.contextPath}/equipment/equipment/detail?equip_id=${eqp.equip_id}&mode=edit'">
 
 									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 										stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -46,7 +46,7 @@
 								</button>
 
 								<button type="button" class="detail_btn_line"
-									onclick="location.href='${pageContext.request.contextPath}/equipment/detail?equip_id=${eqp.equip_id}'">
+									onclick="location.href='${pageContext.request.contextPath}/equipment/equipment/detail?equip_id=${eqp.equip_id}'">
 									<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
 										stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
 										style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">

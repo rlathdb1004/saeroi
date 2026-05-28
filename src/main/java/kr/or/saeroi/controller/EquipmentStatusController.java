@@ -13,8 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.or.saeroi.common.PageDTO;
 import kr.or.saeroi.dao.EquipmentStatusDAO;
-import kr.or.saeroi.dto.EquipmentDTO;
+import kr.or.saeroi.dto.EquipmentMaintenanceDTO;
 import kr.or.saeroi.dto.EquipmentStatusDTO;
+import kr.or.saeroi.dto.EquipmentTroubleDTO;
 import kr.or.saeroi.service.EquipmentStatusService;
 
 @Controller
@@ -68,22 +69,32 @@ public class EquipmentStatusController {
     
     @GetMapping("/equipment/equipmentstatus/detail")
     public String equipment_status_detail(
-    		@RequestParam("history_id") int history_id, 
-    		@RequestParam(required = false) String mode,
-    		Model model) {
+            @RequestParam("history_id") int history_id,
+            @RequestParam(required = false) String mode,
+            Model model) {
 
-        EquipmentStatusDTO dto = service.get_equipment_status_detail(history_id);        
-        
+        EquipmentStatusDTO dto = service.get_equipment_status_detail(history_id);
+
+        List<EquipmentMaintenanceDTO> maintenanceList =
+                service.maintenance_history(dto.getEquip_id(),
+                							dto.getOperation_date());
+
+        List<EquipmentTroubleDTO> troubleList =
+                service.trouble_history(dto.getEquip_id(),
+                        				dto.getOperation_date());
+
         model.addAttribute("eqp", dto);
+        model.addAttribute("maintenanceList",maintenanceList);
+        model.addAttribute("troubleList",troubleList);
         model.addAttribute("mode", mode);
 
-        return "master/equipmentStatusDetail.tiles"; 
+        return "master/equipmentStatusDetail.tiles";
     }
 
     @PostMapping("/equipment_status/update")
     public String update(EquipmentStatusDTO dto) {
         service.update(dto);
-        return "redirect:/equipment_status/detail?history_id=" + dto.getHistory_id();
+        return "redirect:/equipment/equipmentstatus/detail?history_id=" + dto.getHistory_id();
     }
 
     @PostMapping("/equipment_status/delete")
