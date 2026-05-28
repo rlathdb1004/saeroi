@@ -122,9 +122,7 @@
 			<table class="coTable">
 				<thead>
 					<tr>
-						<c:if test="${canManageQuality}">
-							<th class="mobile_show checkAllHeader" style="cursor: pointer;">선택</th>
-						</c:if>
+						<th class="mobile_show checkAllHeader" style="cursor: pointer;">선택</th>
 						<th class="mobile_hidden">불량코드</th>
 						<th class="mobile_show">발생일시</th>
 						<th class="mobile_show">품목명</th>
@@ -138,12 +136,12 @@
 				<tbody>
 					<c:forEach var="defect" items="${list}">
 						<tr>
-							<c:if test="${canManageQuality}">
-								<td class="mobile_show">
+							<td class="mobile_show">
+<%-- 								<c:if test="${canManageQuality}"> --%>
 									<input type="checkbox" name="defect_list_id"
 										value="${defect.defect_list_id}">
-								</td>
-							</c:if>
+<%-- 								</c:if> --%>
+							</td>
 
 							<td class="mobile_hidden">${defect.defect_code}</td>
 							<td class="mobile_show">${defect.defect_date}</td>
@@ -165,9 +163,7 @@
 
 					<c:if test="${empty list}">
 						<tr>
-							<td colspan="${canManageQuality ? 8 : 7}">
-								조회된 불량 내역이 없습니다.
-							</td>
+							<td colspan="8">조회된 불량 내역이 없습니다.</td>
 						</tr>
 					</c:if>
 				</tbody>
@@ -193,27 +189,31 @@
 				<div class="modal_body modal_body_2col">
 
 					<div class="modal_item">
-						<label class="modal_label">발생일시<span class="modal_required">*</span></label>
+						<label class="modal_label">발생일시<span
+							class="modal_required">*</span></label>
 						<input type="date" name="defect_date"
 							class="modal_input modal_today" required>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">검사번호<span class="modal_required">*</span></label>
+						<label class="modal_label">검사번호<span
+							class="modal_required">*</span></label>
 						<select name="insp_id" class="modal_select" required>
 							<option value="">선택</option>
 						</select>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">불량명<span class="modal_required">*</span></label>
+						<label class="modal_label">불량명<span
+							class="modal_required">*</span></label>
 						<select name="defect_id" class="modal_select" required>
 							<option value="">선택</option>
 						</select>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">불량수량<span class="modal_required">*</span></label>
+						<label class="modal_label">불량수량<span
+							class="modal_required">*</span></label>
 						<input type="number" name="defect_qty"
 							class="modal_input" min="0" required>
 					</div>

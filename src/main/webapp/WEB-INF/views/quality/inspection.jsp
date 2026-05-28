@@ -41,14 +41,20 @@
 					</select>
 				</div>
 
+				<div class="search-item">
+					<label class="search-label">검색어</label> <input type="text"
+						name="keyword" class="search-input" placeholder="검색키워드"
+						value="${keyword}">
+				</div>
+
 				<div class="search-btn-wrap">
 					<button type="submit" class="search-btn search-btn-main">
 						<svg viewBox="0 0 24 24" fill="none">
-			<circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor"
+							<circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor"
 								stroke-width="2"></circle>
-			<path d="M16 16L21 21" stroke="currentColor" stroke-width="2"
+							<path d="M16 16L21 21" stroke="currentColor" stroke-width="2"
 								stroke-linecap="round"></path>
-		</svg>
+						</svg>
 						검색
 					</button>
 
@@ -56,12 +62,12 @@
 						class="search-btn search-btn-sub search-reset-btn"
 						onclick="location.href='${pageContext.request.contextPath}/quality/inspection'">
 						<svg viewBox="0 0 24 24" fill="none">
-			<path
+							<path
 								d="M20 12C20 16.4 16.4 20 12 20C7.6 20 4 16.4 4 12C4 7.6 7.6 4 12 4C14.4 4 16.5 5.1 18 6.8"
 								stroke="currentColor" stroke-width="2" stroke-linecap="round"></path>
-			<path d="M18 4V7H21" stroke="currentColor" stroke-width="2"
+							<path d="M18 4V7H21" stroke="currentColor" stroke-width="2"
 								stroke-linecap="round" stroke-linejoin="round"></path>
-		</svg>
+						</svg>
 						초기화
 					</button>
 				</div>
@@ -83,27 +89,27 @@
 						class="search-btn search-btn-main modal_open_btn"
 						data_modal_target="#modal_insert">
 						<svg viewBox="0 0 24 24" fill="none">
-		<path d="M12 5V19" stroke="currentColor" stroke-width="2"
+							<path d="M12 5V19" stroke="currentColor" stroke-width="2"
 								stroke-linecap="round"></path>
-		<path d="M5 12H19" stroke="currentColor" stroke-width="2"
+							<path d="M5 12H19" stroke="currentColor" stroke-width="2"
 								stroke-linecap="round"></path>
-	</svg>
+						</svg>
 						등록
 					</button>
 
 					<button type="submit" class="search-btn search-btn-sub">
 						<svg viewBox="0 0 24 24" fill="none">
-		<path d="M4 7H20" stroke="currentColor" stroke-width="2"
+							<path d="M4 7H20" stroke="currentColor" stroke-width="2"
 								stroke-linecap="round"></path>
-		<path d="M10 11V17" stroke="currentColor" stroke-width="2"
+							<path d="M10 11V17" stroke="currentColor" stroke-width="2"
 								stroke-linecap="round"></path>
-		<path d="M14 11V17" stroke="currentColor" stroke-width="2"
+							<path d="M14 11V17" stroke="currentColor" stroke-width="2"
 								stroke-linecap="round"></path>
-		<path d="M6 7L7 21H17L18 7" stroke="currentColor" stroke-width="2"
+							<path d="M6 7L7 21H17L18 7" stroke="currentColor"
+								stroke-width="2" stroke-linejoin="round"></path>
+							<path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
 								stroke-linejoin="round"></path>
-		<path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
-								stroke-linejoin="round"></path>
-	</svg>
+						</svg>
 						선택 삭제
 					</button>
 				</div>
@@ -114,9 +120,7 @@
 			<table class="coTable">
 				<thead>
 					<tr>
-						<c:if test="${canManageQuality}">
-							<th class="mobile_show checkAllHeader" style="cursor: pointer;">선택</th>
-						</c:if>
+						<th class="mobile_show checkAllHeader" style="cursor: pointer;">선택</th>
 						<th class="mobile_show">검사번호</th>
 						<th class="mobile_hidden">검사일시</th>
 						<th class="mobile_show">품목명</th>
@@ -130,10 +134,11 @@
 				<tbody>
 					<c:forEach var="inspection" items="${list}">
 						<tr>
-							<c:if test="${canManageQuality}">
-								<td class="mobile_show"><input type="checkbox"
-									name="insp_id" value="${inspection.insp_id}"></td>
-							</c:if>
+							<td class="mobile_show">
+								<%-- 								<c:if test="${canManageQuality}"> --%> <input
+								type="checkbox" name="insp_id" value="${inspection.insp_id}">
+								<%-- 								</c:if> --%>
+							</td>
 
 							<td class="mobile_show">${inspection.doc_no}</td>
 							<td class="mobile_hidden">${inspection.insp_date}</td>
@@ -160,7 +165,7 @@
 
 					<c:if test="${empty list}">
 						<tr>
-							<td colspan="${canManageQuality ? 8 : 7}">조회된 검사 내역이 없습니다.</td>
+							<td colspan="8">조회된 검사 내역이 없습니다.</td>
 						</tr>
 					</c:if>
 				</tbody>
