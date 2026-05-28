@@ -133,7 +133,7 @@
 										</td>
 
 										<th>수정일</th>
-										<td>${eqp.updated_date}</td>
+										<td><fmt:formatDate value="${eqp.updated_date}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
 
 										<th>비고</th>
 										<td><input type="text" name="remark" value="${eqp.remark}">
@@ -179,8 +179,8 @@
 									<td>${eqp.equip_loc}</td>
 
 									<th>수정일</th>
-									<td>${eqp.updated_date}</td>
-
+									<td><fmt:formatDate value="${eqp.updated_date}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+									
 									<th>비고</th>
 									<td>${eqp.remark}</td>
 								</tr>
