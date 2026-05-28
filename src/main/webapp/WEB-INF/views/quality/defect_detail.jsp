@@ -65,6 +65,17 @@
 .defect_action_table .coTextLeft {
 	text-align: left;
 }
+.defect_action_table th:first-child,
+.defect_action_table td:first-child {
+	width: 110px;
+	min-width: 110px;
+	white-space: nowrap;
+}
+
+.defect_action_table td:first-child {
+	overflow: visible;
+	text-overflow: clip;
+}
 
 @media ( max-width : 900px) {
 	.defect_detail_bottom {
