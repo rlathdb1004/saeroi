@@ -7,7 +7,7 @@ import kr.or.saeroi.dto.ProductionDTO;
 // =========================================================
 // 작업자 전용 DAO
 // 팀원 ProductionMapper.xml 안 건드리고
-// 작업자 본인 작업지시만 조회
+// 작업자 본인 작업지시 / 생산실적만 조회
 // =========================================================
 public interface WorkerDAO {
 
@@ -16,6 +16,14 @@ public interface WorkerDAO {
 	// empno + ename 둘 다 전달
 	// =====================================================
 	List<ProductionDTO> selectMyWorkOrderList(
+			String empno,
+			String ename);
+
+	// =====================================================
+	// 로그인 작업자 생산실적 조회
+	// empno + ename 둘 다 전달
+	// =====================================================
+	List<ProductionDTO> selectMyProductionResultList(
 			String empno,
 			String ename);
 }

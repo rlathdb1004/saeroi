@@ -40,29 +40,29 @@ public class RoleInterceptor extends HandlerInterceptorAdapter {
         String uri = request.getRequestURI();
 
         // 작업자(USER) 허용 페이지
-        if ("WORKER".equals(loginUser.getRole())) {
-
-        	if (uri.contains("/worker/main")
-        	        || uri.contains("/board/notice")
-        	        || uri.contains("/board/suggestion")
-        	        || uri.contains("/production/workorder")
-        	        || uri.contains("/production/productionresult")) {
-
-                return true;
-            }
-        }
+//        if ("WORKER".equals(loginUser.getRole())) {
+//
+//        	if (uri.contains("/worker/main")
+//        	        || uri.contains("/board/notice")
+//        	        || uri.contains("/board/suggestion")
+//        	        || uri.contains("/production/workorder")
+//        	        || uri.contains("/production/productionresult")) {
+//
+//                return true;
+//            }
+//        }
         
-        response.setContentType("text/html; charset=UTF-8");
-
-        response.getWriter().println(
-            "<script>" +
-            "alert('접근 권한이 없습니다.');" +
-            "location.href='" + request.getContextPath() + "/worker/main';" +
-            "</script>"
-        );
-
-        response.getWriter().flush();        
+//        response.setContentType("text/html; charset=UTF-8");
+//
+//        response.getWriter().println(
+//            "<script>" +
+//            "alert('접근 권한이 없습니다.');" +
+//            "location.href='" + request.getContextPath() + "/worker/main';" +
+//            "</script>"
+//        );
+//
+//        response.getWriter().flush();        
        
-        return false;
+        return true;
     }
 }
