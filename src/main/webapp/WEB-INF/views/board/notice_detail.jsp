@@ -92,7 +92,8 @@
 					<path d="M3 12h.01"></path>
 					<path d="M3 18h.01"></path>
 				</svg>
-				목록</button>
+				목록
+			</button>
 
 		</div>
 	</div>

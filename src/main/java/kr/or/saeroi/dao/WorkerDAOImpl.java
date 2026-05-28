@@ -13,10 +13,15 @@ import kr.or.saeroi.dto.ProductionDTO;
 
 // =========================================================
 // 작업자 전용 DAO 구현 클래스
+// 팀원 ProductionMapper.xml 안 건드림
+// 로그인한 작업자 데이터만 조회
 // =========================================================
 @Repository
 public class WorkerDAOImpl implements WorkerDAO {
 
+	// =====================================================
+	// DB 연결
+	// =====================================================
 	private Connection getConnection()
 			throws Exception {
 
@@ -31,6 +36,9 @@ public class WorkerDAOImpl implements WorkerDAO {
 		return DriverManager.getConnection(url, id, pw);
 	}
 
+	// =====================================================
+	// 로그인한 작업자 작업지시 조회
+	// =====================================================
 	@Override
 	public List<ProductionDTO> selectMyWorkOrderList(
 			String empno,
@@ -103,13 +111,6 @@ public class WorkerDAOImpl implements WorkerDAO {
 			PreparedStatement ps =
 				conn.prepareStatement(sql);
 
-			// =================================================
-			// 디버그: DAO로 넘어온 값 확인
-			// =================================================
-			System.out.println("========== WorkerDAOImpl 조회 ==========");
-			System.out.println("DAO empno = " + empno);
-			System.out.println("DAO ename = " + ename);
-
 			ps.setString(1, empno);
 			ps.setString(2, ename);
 
@@ -151,10 +152,115 @@ public class WorkerDAOImpl implements WorkerDAO {
 				list.add(dto);
 			}
 
+			rs.close();
+			ps.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return list;
+	}
+
+	// =====================================================
+	// 로그인한 작업자 생산실적 조회
+	// 생산실적은 PRODUCTION → WORK_ORDER → EMP 기준으로 연결
+	// =====================================================
+	@Override
+	public List<ProductionDTO> selectMyProductionResultList(
+			String empno,
+			String ename) {
+
+		List<ProductionDTO> list =
+			new ArrayList<ProductionDTO>();
+
+		try {
+
+			Connection conn =
+				getConnection();
+
+			String sql = "";
+
+			sql += " SELECT ";
+			sql += "     P.PROD_ID, ";
+			sql += "     P.ORDER_ID, ";
+			sql += "     TO_CHAR(P.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE, ";
+			sql += "     P.PROD_QTY, ";
+			sql += "     P.LOSS_QTY, ";
+			sql += "     P.PROD_STATUS, ";
+			sql += "     WO.EMP_ID, ";
+			sql += "     WO.PRODUCT_LOT, ";
+			sql += "     WO.ORDER_QTY, ";
+			sql += "     I.ITEM_ID, ";
+			sql += "     I.ITEM_CODE, ";
+			sql += "     I.ITEM_NAME, ";
+			sql += "     I.ITEM_TYPE, ";
+			sql += "     I.ITEM_UNIT, ";
+			sql += "     E.EMPNO, ";
+			sql += "     E.ENAME, ";
+			sql += "     E.DEPT, ";
+			sql += "     E.JOB ";
+			sql += " FROM PRODUCTION P ";
+			sql += " JOIN WORK_ORDER WO ";
+			sql += "   ON P.ORDER_ID = WO.ORDER_ID ";
+			sql += " JOIN PRODUCTION_PLAN PP ";
+			sql += "   ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID ";
+			sql += " JOIN ITEM I ";
+			sql += "   ON PP.ITEM_ID = I.ITEM_ID ";
+			sql += " LEFT JOIN EMP E ";
+			sql += "   ON WO.EMP_ID = E.EMP_ID ";
+
 			// =================================================
-			// 디버그: DAO 조회 결과 수 확인
+			// 핵심 WHERE 조건
+			// 로그인한 작업자의 사원번호 또는 이름과 일치하는 생산실적만 조회
 			// =================================================
-			System.out.println("DAO 조회 결과 수 = " + list.size());
+			sql += " WHERE ( ";
+			sql += "     TRIM(E.EMPNO) = TRIM(?) ";
+			sql += "     OR TRIM(E.ENAME) = TRIM(?) ";
+			sql += " ) ";
+
+			sql += " ORDER BY P.PROD_DATE DESC, P.PROD_ID DESC ";
+
+			PreparedStatement ps =
+				conn.prepareStatement(sql);
+
+			ps.setString(1, empno);
+			ps.setString(2, ename);
+
+			ResultSet rs =
+				ps.executeQuery();
+
+			while (rs.next()) {
+
+				ProductionDTO dto =
+					new ProductionDTO();
+
+				dto.setProdId(rs.getInt("PROD_ID"));
+				dto.setOrderId(rs.getInt("ORDER_ID"));
+				dto.setProdDate(rs.getString("PROD_DATE"));
+				dto.setProdQty(rs.getInt("PROD_QTY"));
+				dto.setLossQty(rs.getInt("LOSS_QTY"));
+				dto.setProdStatus(rs.getString("PROD_STATUS"));
+
+				dto.setEmpId(rs.getInt("EMP_ID"));
+				dto.setProductLot(rs.getString("PRODUCT_LOT"));
+				dto.setOrderQty(rs.getInt("ORDER_QTY"));
+
+				dto.setItemId(rs.getInt("ITEM_ID"));
+				dto.setItemCode(rs.getString("ITEM_CODE"));
+				dto.setItemName(rs.getString("ITEM_NAME"));
+				dto.setItemType(rs.getString("ITEM_TYPE"));
+				dto.setItemUnit(rs.getString("ITEM_UNIT"));
+
+				dto.setEmpno(rs.getString("EMPNO"));
+				dto.setEname(rs.getString("ENAME"));
+				dto.setDept(rs.getString("DEPT"));
+				dto.setJob(rs.getString("JOB"));
+
+				list.add(dto);
+			}
 
 			rs.close();
 			ps.close();

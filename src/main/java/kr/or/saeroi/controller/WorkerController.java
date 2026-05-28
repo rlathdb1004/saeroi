@@ -19,6 +19,7 @@ import kr.or.saeroi.service.ProductionService;
 
 // =========================================================
 // 작업자 컨트롤러
+// 작업자 메인 / 작업지시 조회 / 생산실적 조회 처리
 // =========================================================
 @Controller
 public class WorkerController {
@@ -63,13 +64,6 @@ public class WorkerController {
 			return "redirect:/login";
 		}
 
-		// =================================================
-		// 디버그: 컨트롤러 진입 확인
-		// =================================================
-		System.out.println("========== 작업자 작업지시 컨트롤러 진입 ==========");
-		System.out.println("로그인 empno = " + loginUser.getEmpno());
-		System.out.println("로그인 ename = " + loginUser.getEname());
-
 		String empno = "";
 
 		if (loginUser.getEmpno() != null) {
@@ -96,11 +90,6 @@ public class WorkerController {
 			myAllList =
 				new ArrayList<ProductionDTO>();
 		}
-
-		// =================================================
-		// 디버그: DAO 조회 결과 확인
-		// =================================================
-		System.out.println("조회된 작업지시 수 = " + myAllList.size());
 
 		int totalCount =
 			myAllList.size();
@@ -164,6 +153,10 @@ public class WorkerController {
 		return "production/workorder.tiles";
 	}
 
+	// =====================================================
+	// 생산실적 조회
+	// 로그인한 작업자 본인 생산실적만 조회
+	// =====================================================
 	@RequestMapping("/worker/productionresult")
 	public String workerProductionResult(
 			HttpSession session,
@@ -177,7 +170,38 @@ public class WorkerController {
 			return "redirect:/login";
 		}
 
-		return "redirect:/production/productionresult";
+		String empno = "";
+
+		if (loginUser.getEmpno() != null) {
+
+			empno =
+				loginUser.getEmpno().trim();
+		}
+
+		String ename = "";
+
+		if (loginUser.getEname() != null) {
+
+			ename =
+				loginUser.getEname().trim();
+		}
+
+		List<ProductionDTO> list =
+			workerDAO.selectMyProductionResultList(
+				empno,
+				ename);
+
+		if (list == null) {
+
+			list =
+				new ArrayList<ProductionDTO>();
+		}
+
+		model.addAttribute("list", list);
+		model.addAttribute("workerName", loginUser.getEname());
+		model.addAttribute("workerDept", loginUser.getDept());
+
+		return "worker/workerProductionResult";
 	}
 
 	@RequestMapping("/worker/notice")
