@@ -17,13 +17,13 @@
 	max-width: 100%;
 	background-color: #FFFFFF;
 	border: 1px solid #DDE5E1;
-	border-radius: 12px;
-	box-shadow: 0 8px 20px rgba(15, 61, 46, 0.04);
+	border-radius: 14px;
+	box-shadow: 0 10px 26px rgba(15, 61, 46, 0.06);
 	box-sizing: border-box;
 	overflow: hidden;
 }
 
-/* SVG 아이콘 공통이다. */
+/* 대시보드 공통 SVG이다. */
 .dashboard-page svg {
 	width: 100%;
 	height: 100%;
@@ -47,15 +47,15 @@
 .dashboard-page .dash-title-box {
 	display: flex;
 	align-items: center;
-	gap: 7px;
+	gap: 8px;
 	min-width: 0;
 }
 
 /* 카드 제목이다. */
 .dashboard-page .dash-card-title {
 	margin: 0;
-	font-size: 15px;
-	font-weight: 800;
+	font-size: 16px;
+	font-weight: 900;
 	color: #111827;
 	line-height: 1.2;
 	white-space: nowrap;
@@ -66,21 +66,21 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 28px;
-	height: 28px;
-	border-radius: 8px;
+	width: 31px;
+	height: 31px;
+	border-radius: 50%;
 	background-color: #E6F2ED;
 	color: #008B4F;
 	flex-shrink: 0;
 }
 
-/* 파란색 제목 아이콘이다. */
-.dashboard-page .dash-title-blue {
-	background-color: #EFF6FF;
-	color: #2563EB;
+/* 제목 왼쪽 아이콘 SVG이다. */
+.dashboard-page .dash-title-icon svg {
+	width: 17px;
+	height: 17px;
 }
 
-/* 제목 옆 안내 표시이다. */
+/* 안내 표시이다. */
 .dashboard-page .dash-info-mark {
 	display: inline-flex;
 	align-items: center;
@@ -90,7 +90,7 @@
 	border: 1px solid #9CA3AF;
 	border-radius: 50%;
 	font-size: 10px;
-	font-weight: 800;
+	font-weight: 900;
 	color: #6B7280;
 	line-height: 1;
 	flex-shrink: 0;
@@ -99,10 +99,10 @@
 /* 더보기 링크이다. */
 .dashboard-page .dash-more-link {
 	position: relative;
-	padding-right: 14px;
-	font-size: 12px;
-	font-weight: 800;
-	color: #4B5563;
+	padding-right: 16px;
+	font-size: 13px;
+	font-weight: 900;
+	color: #0B5C35;
 	text-decoration: none;
 	white-space: nowrap;
 }
@@ -114,168 +114,488 @@
 	right: 0;
 	top: 50%;
 	transform: translateY(-52%);
-	font-size: 18px;
-	font-weight: 800;
-	color: #4B5563;
+	font-size: 19px;
+	font-weight: 900;
+	color: #0B5C35;
 }
 
-/* 더보기 hover이다. */
-.dashboard-page .dash-more-link:hover,
-.dashboard-page .dash-more-link:hover::after {
-	color: #008B4F;
+/* 대표 상태판이다. */
+.dashboard-page .dash-hero-card {
+	display: grid;
+	grid-template-columns: minmax(360px, 1.15fr) minmax(520px, 1.85fr);
+	align-items: center;
+	gap: 26px;
+	min-height: 178px;
+	margin-bottom: 14px;
+	padding: 27px 34px;
+	border-radius: 16px;
+	background:
+		radial-gradient(circle at 0% 40%, rgba(49, 211, 127, 0.26), transparent 34%),
+		linear-gradient(135deg, #006B3D 0%, #064E3B 100%);
+	box-shadow: 0 16px 32px rgba(6, 78, 59, 0.18);
+	color: #FFFFFF;
+	box-sizing: border-box;
+	overflow: hidden;
+}
+
+/* 대표 상태판 왼쪽 영역이다. */
+.dashboard-page .dash-hero-left {
+	display: flex;
+	align-items: center;
+	gap: 22px;
+	min-width: 0;
+}
+
+/* 대표 상태판 아이콘이다. */
+.dashboard-page .dash-hero-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 72px;
+	height: 72px;
+	border-radius: 50%;
+	background-color: rgba(255, 255, 255, 0.14);
+	color: #FFFFFF;
+	flex-shrink: 0;
+}
+
+/* 대표 상태판 아이콘 SVG이다. */
+.dashboard-page .dash-hero-icon svg {
+	width: 44px;
+	height: 44px;
+}
+
+/* 대표 상태판 문구 영역이다. */
+.dashboard-page .dash-hero-text {
+	min-width: 0;
+}
+
+/* 대표 상태판 작은 제목이다. */
+.dashboard-page .dash-hero-text span {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 17px;
+	font-weight: 900;
+	color: rgba(255, 255, 255, 0.92);
+}
+
+/* 대표 상태판 큰 제목이다. */
+.dashboard-page .dash-hero-text strong {
+	display: block;
+	font-size: 43px;
+	font-weight: 900;
+	line-height: 1;
+	letter-spacing: -2px;
+	color: #FFFFFF;
+}
+
+/* 대표 상태판 설명이다. */
+.dashboard-page .dash-hero-text p {
+	margin: 15px 0 12px;
+	font-size: 15px;
+	font-weight: 800;
+	color: rgba(255, 255, 255, 0.86);
+}
+
+/* 대표 상태판 기준 시간이다. */
+.dashboard-page .dash-hero-text em {
+	display: inline-flex;
+	align-items: center;
+	font-size: 13px;
+	font-style: normal;
+	font-weight: 900;
+	color: rgba(255, 255, 255, 0.9);
+}
+
+/* 대표 상태판 KPI 영역이다. */
+.dashboard-page .dash-hero-metrics {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 0;
+	min-width: 0;
+}
+
+/* 대표 상태판 KPI 한 칸이다. */
+.dashboard-page .dash-hero-metric {
+	min-width: 0;
+	padding: 7px 24px;
+	border-left: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* 대표 상태판 KPI 라벨이다. */
+.dashboard-page .dash-hero-metric span {
+	display: block;
+	margin-bottom: 12px;
+	font-size: 14px;
+	font-weight: 900;
+	color: rgba(255, 255, 255, 0.82);
+}
+
+/* 대표 상태판 KPI 숫자이다. */
+.dashboard-page .dash-hero-metric strong {
+	display: block;
+	font-size: 31px;
+	font-weight: 900;
+	line-height: 1;
+	letter-spacing: -1px;
+	color: #FFFFFF;
+}
+
+/* 대표 상태판 KPI 단위이다. */
+.dashboard-page .dash-hero-metric strong em {
+	margin-left: 3px;
+	font-size: 14px;
+	font-style: normal;
+	font-weight: 900;
+	color: rgba(255, 255, 255, 0.88);
+}
+
+/* 대표 상태판 KPI 설명이다. */
+.dashboard-page .dash-hero-metric p {
+	margin: 12px 0 0;
+	font-size: 13px;
+	font-weight: 800;
+	color: rgba(255, 255, 255, 0.78);
+}
+
+/* 대표 상태판 위험 KPI이다. */
+.dashboard-page .dash-hero-metric-red strong,
+.dashboard-page .dash-hero-metric-red p {
+	color: #FFB4B4;
 }
 
 /* KPI 카드 배치 영역이다. */
 .dashboard-page .dash-kpi-grid {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 10px;
-	margin-bottom: 12px;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 12px;
+	margin-bottom: 14px;
 }
 
 /* KPI 카드이다. */
 .dashboard-page .dash-kpi-card {
-	min-height: 142px;
-	padding: 14px 16px;
+	min-height: 250px;
+	padding: 18px 19px 16px;
 }
 
-/* KPI 카드 내부 2분할 영역이다. */
-.dashboard-page .dash-kpi-split {
+/* 생산달성률 카드이다. */
+.dashboard-page .dash-kpi-card-production {
+	border-color: #DDE5E1;
+}
+
+/* 불량률 카드 아이콘이다. */
+.dashboard-page .dash-kpi-card-defect .dash-title-icon {
+	background-color: #FEF2F2;
+	color: #EF4444;
+}
+
+/* KPI 카드 본문이다. */
+.dashboard-page .dash-kpi-body {
 	display: grid;
-	grid-template-columns: 118px minmax(0, 1fr);
+	grid-template-columns: 150px minmax(0, 1fr);
 	align-items: center;
-	gap: 12px;
-	padding-top: 8px;
+	gap: 15px;
 	min-width: 0;
+	padding: 18px 0 16px;
 }
 
 /* 도넛 그래프이다. */
 .dashboard-page .dash-donut {
 	position: relative;
-	width: 112px;
-	height: 112px;
+	width: 146px;
+	height: 146px;
 	margin: 0 auto;
 	border-radius: 50%;
 	background: conic-gradient(#008B4F calc(var(--rate) * 1%), #E8EFEC 0);
-	flex-shrink: 0;
 }
 
 /* 도넛 안쪽 흰색 원이다. */
 .dashboard-page .dash-donut::before {
 	content: "";
 	position: absolute;
-	inset: 12px;
+	inset: 20px;
 	background-color: #FFFFFF;
 	border-radius: 50%;
 	z-index: 1;
 }
 
-/* 도넛 안쪽 숫자 영역이다. */
+/* 도넛 중앙 영역이다. */
 .dashboard-page .dash-donut-center {
 	position: absolute;
 	inset: 0;
+	z-index: 2;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	flex-wrap: wrap;
 	align-content: center;
-	z-index: 2;
+	flex-wrap: wrap;
 	text-align: center;
 }
 
 /* 도넛 숫자이다. */
 .dashboard-page .dash-donut-center strong {
-	font-size: 27px;
+	font-size: 33px;
 	font-weight: 900;
-	color: #111827;
 	line-height: 1;
 	letter-spacing: -1px;
+	color: #0B5C35;
 }
 
 /* 도넛 단위이다. */
 .dashboard-page .dash-donut-center span {
 	margin-left: 3px;
-	font-size: 15px;
+	font-size: 17px;
 	font-weight: 900;
-	color: #111827;
-	line-height: 1;
+	color: #0B5C35;
 }
 
 /* 도넛 보조 문구이다. */
 .dashboard-page .dash-donut-center em {
 	width: 100%;
-	margin-top: 7px;
+	margin-top: 9px;
+	font-size: 13px;
 	font-style: normal;
-	font-size: 11px;
-	font-weight: 800;
+	font-weight: 900;
 	color: #374151;
-	line-height: 1;
 }
 
-/* 생산달성률 계획/실적 목록이다. */
+/* 생산달성률 상세 목록이다. */
 .dashboard-page .dash-kpi-detail-list {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 20px;
 	min-width: 0;
 }
 
-/* 생산달성률 계획/실적 한 줄이다. */
-.dashboard-page .dash-kpi-detail-item {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	min-width: 0;
-}
-
-/* 생산달성률 계획/실적 아이콘이다. */
-.dashboard-page .dash-detail-icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 25px;
-	height: 25px;
-	color: #64748B;
-	flex-shrink: 0;
-}
-
-/* 생산달성률 작은 라벨이다. */
-.dashboard-page .dash-kpi-detail-item span:not(.dash-detail-icon) {
+/* 생산달성률 상세 라벨이다. */
+.dashboard-page .dash-kpi-detail-list span {
 	display: block;
-	margin-bottom: 4px;
-	font-size: 11px;
-	font-weight: 800;
+	margin-bottom: 7px;
+	font-size: 13px;
+	font-weight: 900;
 	color: #4B5563;
 }
 
-/* 생산달성률 수치이다. */
-.dashboard-page .dash-kpi-detail-item strong {
+/* 생산달성률 상세 숫자이다. */
+.dashboard-page .dash-kpi-detail-list strong {
 	display: block;
-	font-size: 14px;
+	font-size: 20px;
 	font-weight: 900;
 	color: #111827;
 	white-space: nowrap;
+}
+
+/* 생산달성률 상세 단위이다. */
+.dashboard-page .dash-kpi-detail-list strong em {
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 900;
+	color: #111827;
+}
+
+/* 반달 게이지이다. */
+.dashboard-page .dash-half-gauge {
+	position: relative;
+	width: 230px;
+	height: 116px;
+	margin: 17px auto 12px;
+	overflow: hidden;
+}
+
+/* 반달 게이지 외곽이다. */
+.dashboard-page .dash-half-gauge::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 230px;
+	height: 230px;
+	border-radius: 50%;
+	background: conic-gradient(from 270deg, var(--gauge-color) 0deg var(--gauge-deg), #E5E7EB var(--gauge-deg) 180deg, transparent 180deg 360deg);
+}
+
+/* 반달 게이지 안쪽이다. */
+.dashboard-page .dash-half-gauge::after {
+	content: "";
+	position: absolute;
+	left: 25px;
+	top: 25px;
+	width: 180px;
+	height: 180px;
+	border-radius: 50%;
+	background-color: #FFFFFF;
+}
+
+/* 반달 게이지 중앙 영역이다. */
+.dashboard-page .dash-half-gauge-center {
+	position: absolute;
+	left: 0;
+	top: 34px;
+	z-index: 2;
+	width: 100%;
+	text-align: center;
+}
+
+/* 반달 게이지 숫자이다. */
+.dashboard-page .dash-half-gauge-center strong {
+	font-size: 34px;
+	font-weight: 900;
+	line-height: 1;
+	letter-spacing: -1px;
+	color: #0B5C35;
+}
+
+/* 반달 게이지 단위이다. */
+.dashboard-page .dash-half-gauge-center span {
+	margin-left: 3px;
+	font-size: 17px;
+	font-weight: 900;
+	color: #0B5C35;
+}
+
+/* 반달 게이지 설명이다. */
+.dashboard-page .dash-half-gauge-center em {
+	display: block;
+	margin-top: 8px;
+	font-size: 13px;
+	font-style: normal;
+	font-weight: 900;
+	color: #374151;
+}
+
+/* 불량률 반달 게이지 숫자이다. */
+.dashboard-page .dash-kpi-card-defect .dash-half-gauge-center strong,
+.dashboard-page .dash-kpi-card-defect .dash-half-gauge-center span {
+	color: #EF4444;
+}
+
+/* 불량률 기준 영역이다. */
+.dashboard-page .dash-defect-scale {
+	margin: 0 2px 15px;
+}
+
+/* 불량률 기준 라벨이다. */
+.dashboard-page .dash-scale-label {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 7px;
+	font-size: 13px;
+	font-weight: 900;
+	color: #111827;
+}
+
+/* 불량률 목표 라벨이다. */
+.dashboard-page .dash-scale-label strong {
+	color: #EF4444;
+}
+
+/* 불량률 기준 막대이다. */
+.dashboard-page .dash-scale-track {
+	position: relative;
+	height: 6px;
+	background-color: #E5E7EB;
+	border-radius: 999px;
+}
+
+/* 불량률 현재 막대이다. */
+.dashboard-page .dash-scale-track em {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	background-color: #EF4444;
+	border-radius: 999px;
+}
+
+/* 불량률 목표선이다. */
+.dashboard-page .dash-scale-track i {
+	position: absolute;
+	top: -5px;
+	width: 2px;
+	height: 16px;
+	background-color: #EF4444;
+}
+
+/* KPI 하단 변화율 영역이다. */
+.dashboard-page .dash-card-bottom {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	height: 40px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 900;
+}
+
+/* KPI 하단 숫자이다. */
+.dashboard-page .dash-card-bottom strong {
+	font-size: 16px;
+	font-weight: 900;
+}
+
+/* 좋은 변화율 영역이다. */
+.dashboard-page .dash-card-bottom-green {
+	background-color: #EEF8F2;
+	color: #064E3B;
+}
+
+/* 위험 변화율 영역이다. */
+.dashboard-page .dash-card-bottom-red {
+	background-color: #FEF2F2;
+	color: #EF4444;
+}
+
+/* 작은 점 공통이다. */
+.dashboard-page .dash-dot {
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	border-radius: 3px;
+	flex-shrink: 0;
+}
+
+/* 초록 점이다. */
+.dashboard-page .dash-dot-green {
+	background-color: #008B4F;
+}
+
+/* 회색 점이다. */
+.dashboard-page .dash-dot-gray {
+	background-color: #9CA3AF;
+}
+
+/* 주황 점이다. */
+.dashboard-page .dash-dot-orange {
+	background-color: #F59E0B;
+}
+
+/* 빨간 점이다. */
+.dashboard-page .dash-dot-red {
+	background-color: #EF4444;
 }
 
 /* 진행률 목록이다. */
 .dashboard-page .dash-progress-list {
 	display: flex;
 	flex-direction: column;
-	gap: 9px;
+	gap: 11px;
 	width: 100%;
 	min-width: 0;
+	margin: 0 0 15px;
 }
 
 /* 진행률 한 줄이다. */
 .dashboard-page .dash-progress-row {
 	display: grid;
-	grid-template-columns: 66px minmax(0, 1fr) 44px;
+	grid-template-columns: 74px minmax(0, 1fr) 52px;
 	align-items: center;
-	gap: 7px;
+	gap: 8px;
 	width: 100%;
 	min-width: 0;
-	font-size: 12px;
-	font-weight: 800;
+	font-size: 13px;
+	font-weight: 900;
 	color: #111827;
 }
 
@@ -290,36 +610,16 @@
 	white-space: nowrap;
 }
 
-/* 작은 점 공통이다. */
-.dashboard-page .dash-dot {
-	display: inline-block;
-	width: 10px;
-	height: 10px;
-	border-radius: 3px;
-	flex-shrink: 0;
-}
-
-/* 초록색 점이다. */
-.dashboard-page .dash-dot-green {
-	background-color: #008B4F;
-}
-
-/* 회색 점이다. */
-.dashboard-page .dash-dot-gray {
-	background-color: #94A3B8;
-}
-
-/* 진행률 배경 막대이다. */
+/* 진행률 배경이다. */
 .dashboard-page .dash-progress-track {
 	width: 100%;
-	min-width: 0;
-	height: 7px;
-	background-color: #E8EEF0;
+	height: 6px;
+	background-color: #E5E7EB;
 	border-radius: 999px;
 	overflow: hidden;
 }
 
-/* 진행률 실제 막대이다. */
+/* 진행률 실제값이다. */
 .dashboard-page .dash-progress-track em {
 	display: block;
 	height: 100%;
@@ -327,193 +627,31 @@
 	border-radius: 999px;
 }
 
-/* 회색 진행률 실제 막대이다. */
+/* 회색 진행률 실제값이다. */
 .dashboard-page .dash-progress-track .dash-progress-gray {
-	background-color: #94A3B8;
+	background-color: #9CA3AF;
 }
 
 /* 진행률 수치이다. */
 .dashboard-page .dash-progress-row strong {
-	font-size: 12px;
+	font-size: 13px;
 	font-weight: 900;
 	text-align: right;
 	white-space: nowrap;
 }
 
-/* 불량률과 원가 편차율 영역이다. */
-.dashboard-page .dash-scale-body {
-	display: flex;
-	flex-direction: column;
-	justify-content: center;
-	min-height: 105px;
-	padding: 2px 4px 0;
-}
-
-/* 불량률과 원가 편차율 숫자 영역이다. */
-.dashboard-page .dash-scale-value {
-	text-align: center;
-}
-
-/* 불량률과 원가 편차율 숫자이다. */
-.dashboard-page .dash-scale-value strong {
-	font-size: 30px;
-	font-weight: 900;
-	color: #111827;
-	line-height: 1;
-	letter-spacing: -1px;
-}
-
-/* 불량률과 원가 편차율 단위이다. */
-.dashboard-page .dash-scale-value span {
-	margin-left: 3px;
-	font-size: 16px;
-	font-weight: 900;
-	color: #111827;
-}
-
-/* 좋은 수치 색상이다. */
-.dashboard-page .dash-good-value strong,
-.dashboard-page .dash-good-value span {
-	color: #008B4F;
-}
-
-/* 작은 KPI 보조 문구이다. */
-.dashboard-page .dash-scale-value em {
-	display: block;
-	margin-top: 7px;
-	font-size: 12px;
-	font-style: normal;
-	font-weight: 800;
-	color: #374151;
-}
-
-/* 작은 KPI 막대 영역이다. */
-.dashboard-page .dash-scale-area {
-	margin-top: 13px;
-}
-
-/* 작은 KPI 막대 라벨이다. */
-.dashboard-page .dash-scale-labels {
-	display: flex;
-	justify-content: space-between;
-	margin-bottom: 8px;
-	font-size: 12px;
-	font-weight: 800;
-	color: #4B5563;
-}
-
-/* 작은 KPI 기준 막대이다. */
-.dashboard-page .dash-scale-track {
-	position: relative;
-	height: 7px;
-	background-color: #E5E7EB;
-	border-radius: 999px;
-}
-
-/* 작은 KPI 현재값 막대이다. */
-.dashboard-page .dash-scale-track em {
-	position: absolute;
-	left: 0;
-	top: 0;
-	height: 100%;
-	background-color: #008B4F;
-	border-radius: 999px;
-}
-
-/* 작은 KPI 목표선이다. */
-.dashboard-page .dash-scale-track i {
-	position: absolute;
-	top: -5px;
-	width: 1px;
-	height: 17px;
-	background-color: #94A3B8;
-}
-
-/* 불량률 카드는 빨간색으로 강조한다. */
-.dashboard-page .dash-kpi-card-defect .dash-title-icon {
-	background-color: #FEF2F2;
-	color: #DC2626;
-}
-
-/* 불량률 숫자 색상이다. */
-.dashboard-page .dash-kpi-card-defect .dash-scale-value strong,
-.dashboard-page .dash-kpi-card-defect .dash-scale-value span {
-	color: #DC2626;
-}
-
-/* 불량률 막대 색상이다. */
-.dashboard-page .dash-kpi-card-defect .dash-scale-track em {
-	background-color: #DC2626;
-}
-
-/* 원가 편차율 아이콘은 파란색으로 표시한다. */
-.dashboard-page .dash-kpi-card-cost .dash-title-icon {
-	background-color: #EFF6FF;
-	color: #2563EB;
-}
-
-/* 금일 생산평가 영역이다. */
-.dashboard-page .dash-eval-body {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 28px;
-	min-height: 105px;
-}
-
-/* 금일 생산평가 문구 영역이다. */
-.dashboard-page .dash-eval-text {
-	text-align: center;
-}
-
-/* 금일 생산평가 상태이다. */
-.dashboard-page .dash-eval-text strong {
-	display: block;
-	font-size: 28px;
-	font-weight: 900;
-	color: #008B4F;
-	line-height: 1;
-}
-
-/* 금일 생산평가 설명이다. */
-.dashboard-page .dash-eval-text span {
-	display: block;
-	margin-top: 9px;
-	font-size: 13px;
-	font-weight: 900;
-	color: #374151;
-}
-
-/* 금일 생산평가 체크 박스이다. */
-.dashboard-page .dash-eval-icon {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 58px;
-	height: 54px;
-	border-radius: 12px;
-	background-color: #E6F2ED;
-	color: #008B4F;
-}
-
-/* 금일 생산평가 체크 아이콘이다. */
-.dashboard-page .dash-eval-icon svg {
-	width: 34px;
-	height: 34px;
-}
-
-/* 그래프 카드 배치 영역이다. */
-.dashboard-page .dash-chart-grid {
+/* 그래프와 사이드 정보 배치 영역이다. */
+.dashboard-page .dash-main-grid {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 10px;
-	margin-bottom: 12px;
+	grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.15fr) minmax(310px, 0.75fr);
+	grid-template-rows: 260px 230px;
+	gap: 12px;
+	margin-bottom: 14px;
 }
 
 /* 그래프 카드이다. */
 .dashboard-page .dash-chart-card {
-	min-height: 208px;
-	padding: 14px 16px 16px;
+	padding: 18px 19px 17px;
 }
 
 /* 그래프 카드 상단이다. */
@@ -529,41 +667,64 @@
 	white-space: nowrap;
 }
 
-/* 그래프 핵심 수치 영역이다. */
-.dashboard-page .dash-chart-value {
-	text-align: right;
-	color: #008B4F;
+/* 그래프 범례이다. */
+.dashboard-page .dash-chart-legend {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 13px;
+	font-size: 12px;
+	font-weight: 900;
+	color: #374151;
 	white-space: nowrap;
 }
 
-/* 그래프 핵심 수치이다. */
-.dashboard-page .dash-chart-value strong {
-	display: block;
-	font-size: 18px;
-	font-weight: 900;
-	line-height: 1;
+/* 그래프 범례 항목이다. */
+.dashboard-page .dash-chart-legend span {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 }
 
-/* 그래프 핵심 수치 설명이다. */
-.dashboard-page .dash-chart-value span {
-	display: block;
-	margin-top: 5px;
-	font-size: 11px;
-	font-weight: 800;
-	color: #64748B;
+/* 선 범례 공통이다. */
+.dashboard-page .dash-legend-line {
+	display: inline-block;
+	width: 25px;
+	height: 4px;
+	border-radius: 999px;
+	background-color: #008B4F;
 }
 
-/* 불량 그래프 수치 색상이다. */
-.dashboard-page .dash-chart-value-red {
-	color: #DC2626;
+/* 회색 선 범례이다. */
+.dashboard-page .dash-legend-gray {
+	background-color: #9CA3AF;
+}
+
+/* 초록 선 범례이다. */
+.dashboard-page .dash-legend-green {
+	background-color: #008B4F;
+}
+
+/* 빨간 선 범례이다. */
+.dashboard-page .dash-legend-red {
+	background-color: #EF4444;
+}
+
+/* 막대 범례이다. */
+.dashboard-page .dash-legend-bar {
+	display: inline-block;
+	width: 18px;
+	height: 12px;
+	border-radius: 3px;
+	background-color: rgba(156, 163, 175, 0.3);
 }
 
 /* Chart.js canvas 감싸는 영역이다. */
 .dashboard-page .dash-canvas-wrap {
 	position: relative;
 	width: 100%;
-	height: 146px;
-	margin-top: 10px;
+	height: 194px;
+	margin-top: 13px;
 }
 
 /* Chart.js canvas 크기이다. */
@@ -573,240 +734,210 @@
 	height: 100% !important;
 }
 
-/* MES 운영 흐름 섹션이다. */
-.dashboard-page .dash-flow-section {
-	padding: 14px 20px 16px;
-	margin-bottom: 12px;
+/* 사이드 카드이다. */
+.dashboard-page .dash-side-card {
+	padding: 18px 19px 17px;
 }
 
-/* MES 운영 흐름 목록이다. */
-.dashboard-page .dash-flow-list {
-	display: grid;
-	grid-template-columns: 1fr 42px 1fr 42px 1fr 42px 1fr 42px 1fr;
-	align-items: center;
-	gap: 8px;
-	padding: 8px 12px 0;
-}
-
-/* MES 운영 흐름 단계이다. */
-.dashboard-page .dash-flow-step {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	gap: 8px;
-	min-width: 0;
-}
-
-/* MES 운영 흐름 아이콘이다. */
-.dashboard-page .dash-flow-icon {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 44px;
-	height: 44px;
-	border: 1px solid #B8DED0;
-	border-radius: 50%;
-	background-color: #F8FCFA;
-	color: #007A43;
-	font-size: 22px;
-	font-weight: 900;
-	line-height: 1;
-}
-
-/* MES 운영 흐름 글씨이다. */
-.dashboard-page .dash-flow-step strong {
-	font-size: 13px;
-	font-weight: 900;
-	color: #111827;
-	white-space: nowrap;
-}
-
-/* MES 운영 흐름 화살표이다. */
-.dashboard-page .dash-flow-list i {
-	font-size: 26px;
-	font-style: normal;
-	font-weight: 500;
-	color: #007A43;
-	text-align: center;
-	line-height: 1;
-}
-
-/* 하단 정보는 PC에서 한 줄에 세 개씩 배치한다. */
-.dashboard-page .dash-bottom-grid {
-	display: grid;
-	grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1.08fr);
-	gap: 10px;
-	align-items: stretch;
-}
-
-/* 하단 카드이다. */
-.dashboard-page .dash-bottom-card {
-	min-height: 166px;
-	padding: 14px 16px;
-}
-
-/* 최근 작업지시 테이블이다. */
-.dashboard-page .dash-work-table {
-	width: 100%;
-	margin-top: 10px;
-	border-collapse: collapse;
-	table-layout: fixed;
-}
-
-/* 최근 작업지시 헤더이다. */
-.dashboard-page .dash-work-table th {
-	padding: 8px 8px;
-	background-color: #F1F5F4;
-	font-size: 12px;
-	font-weight: 900;
-	color: #374151;
-	text-align: center;
-	white-space: nowrap;
-}
-
-/* 최근 작업지시 데이터이다. */
-.dashboard-page .dash-work-table td {
-	padding: 8px 8px;
-	border-bottom: 1px solid #EEF2F0;
-	font-size: 12px;
-	font-weight: 800;
-	color: #111827;
-	text-align: center;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-/* 최근 작업지시 첫 번째 칸이다. */
-.dashboard-page .dash-work-table th:first-child,
-.dashboard-page .dash-work-table td:first-child {
-	width: 34%;
-	text-align: left;
-}
-
-/* 최근 작업지시 품목 칸이다. */
-.dashboard-page .dash-work-table th:nth-child(2),
-.dashboard-page .dash-work-table td:nth-child(2) {
-	width: 18%;
-}
-
-/* 최근 작업지시 진행률 칸이다. */
-.dashboard-page .dash-work-table th:nth-child(3),
-.dashboard-page .dash-work-table td:nth-child(3) {
-	width: 28%;
-}
-
-/* 최근 작업지시 상태 칸이다. */
-.dashboard-page .dash-work-table th:nth-child(4),
-.dashboard-page .dash-work-table td:nth-child(4) {
-	width: 20%;
-}
-
-/* 테이블 진행률 영역이다. */
-.dashboard-page .dash-table-progress {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) 36px;
-	align-items: center;
-	gap: 7px;
-}
-
-/* 테이블 진행률 배경이다. */
-.dashboard-page .dash-table-progress::before {
-	content: "";
-	grid-column: 1;
-	grid-row: 1;
-	height: 7px;
-	background-color: #E5E7EB;
-	border-radius: 999px;
-}
-
-/* 테이블 진행률 실제 막대이다. */
-.dashboard-page .dash-table-progress em {
-	grid-column: 1;
-	grid-row: 1;
-	height: 7px;
-	background-color: #008B4F;
-	border-radius: 999px;
-	z-index: 1;
-}
-
-/* 테이블 진행률 숫자이다. */
-.dashboard-page .dash-table-progress span {
-	font-size: 11px;
-	font-weight: 900;
-	color: #111827;
-}
-
-/* 상태 칩 공통이다. */
-.dashboard-page .dash-status {
+/* 실시간 표시이다. */
+.dashboard-page .dash-live-mark {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	min-width: 50px;
-	height: 22px;
-	padding: 0 8px;
+	height: 24px;
+	padding: 0 10px;
 	border-radius: 999px;
-	font-size: 11px;
+	background-color: #E6F7EC;
+	font-size: 12px;
 	font-weight: 900;
-	line-height: 1;
-	white-space: nowrap;
-}
-
-/* 완료 상태이다. */
-.dashboard-page .dash-status-green {
-	background-color: #DDF7E7;
 	color: #008B4F;
 }
 
-/* 진행중 상태이다. */
-.dashboard-page .dash-status-blue {
-	background-color: #E7F0FF;
-	color: #1D4ED8;
+/* 설비 현황 본문이다. */
+.dashboard-page .dash-equipment-body {
+	display: grid;
+	grid-template-columns: 120px minmax(0, 1fr);
+	align-items: center;
+	gap: 17px;
+	margin-top: 17px;
 }
 
-/* 대기 상태이다. */
-.dashboard-page .dash-status-gray {
-	background-color: #E5E7EB;
-	color: #4B5563;
+/* 설비 현황 도넛이다. */
+.dashboard-page .dash-equipment-donut {
+	position: relative;
+	width: 116px;
+	height: 116px;
+	border-radius: 50%;
+	background: conic-gradient(#008B4F 0 var(--run-end), #F59E0B var(--run-end) var(--stop-end), #EF4444 var(--stop-end) 100%);
+}
+
+/* 설비 현황 도넛 안쪽이다. */
+.dashboard-page .dash-equipment-donut::before {
+	content: "";
+	position: absolute;
+	inset: 22px;
+	background-color: #FFFFFF;
+	border-radius: 50%;
+}
+
+/* 설비 현황 중앙이다. */
+.dashboard-page .dash-equipment-center {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	align-content: center;
+	flex-wrap: wrap;
+	text-align: center;
+}
+
+/* 설비 현황 중앙 라벨이다. */
+.dashboard-page .dash-equipment-center span {
+	width: 100%;
+	font-size: 12px;
+	font-weight: 900;
+	color: #374151;
+}
+
+/* 설비 현황 중앙 숫자이다. */
+.dashboard-page .dash-equipment-center strong {
+	margin-top: 5px;
+	font-size: 26px;
+	font-weight: 900;
+	color: #111827;
+	line-height: 1;
+}
+
+/* 설비 현황 중앙 단위이다. */
+.dashboard-page .dash-equipment-center em {
+	margin: 6px 0 0 3px;
+	font-size: 13px;
+	font-style: normal;
+	font-weight: 900;
+	color: #111827;
+}
+
+/* 설비 현황 목록이다. */
+.dashboard-page .dash-equipment-list {
+	display: flex;
+	flex-direction: column;
+	gap: 11px;
+	min-width: 0;
+}
+
+/* 설비 현황 한 줄이다. */
+.dashboard-page .dash-equipment-list div {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	font-size: 13px;
+	font-weight: 900;
+	color: #111827;
+}
+
+/* 설비 현황 이름이다. */
+.dashboard-page .dash-equipment-list span {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	white-space: nowrap;
+}
+
+/* 설비 현황 수치이다. */
+.dashboard-page .dash-equipment-list strong {
+	font-size: 13px;
+	font-weight: 900;
+	white-space: nowrap;
+}
+
+/* 설비 가동률 요약이다. */
+.dashboard-page .dash-equipment-rate {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	height: 38px;
+	margin-top: 15px;
+	border-radius: 8px;
+	background-color: #EEF8F2;
+	font-size: 13px;
+	font-weight: 900;
+	color: #064E3B;
+}
+
+/* 설비 가동률 숫자이다. */
+.dashboard-page .dash-equipment-rate strong {
+	font-size: 17px;
+	font-weight: 900;
+}
+
+/* 설비 가동률 설명이다. */
+.dashboard-page .dash-equipment-rate em {
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 900;
+	color: #374151;
 }
 
 /* 공지사항 목록이다. */
-.dashboard-page .dash-list {
+.dashboard-page .dash-notice-list {
 	list-style: none;
-	margin: 12px 0 0;
+	margin: 15px 0 0;
 	padding: 0;
 }
 
 /* 공지사항 한 줄이다. */
-.dashboard-page .dash-list li {
-	display: flex;
+.dashboard-page .dash-notice-list li {
+	display: grid;
+	grid-template-columns: 47px minmax(0, 1fr) 46px;
 	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	padding: 9px 0;
+	gap: 10px;
+	min-height: 36px;
 	border-bottom: 1px solid #EEF2F0;
 }
 
-/* 공지사항 점이다. */
-.dashboard-page .dash-list li::before {
-	content: "";
-	width: 5px;
-	height: 5px;
-	border-radius: 50%;
-	background-color: #008B4F;
-	flex-shrink: 0;
-}
-
 /* 공지사항 마지막 줄이다. */
-.dashboard-page .dash-list li:last-child,
-.dashboard-page .dash-alert-list li:last-child {
+.dashboard-page .dash-notice-list li:last-child {
 	border-bottom: none;
 }
 
+/* 공지사항 배지이다. */
+.dashboard-page .dash-notice-badge {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	height: 22px;
+	padding: 0 8px;
+	border-radius: 5px;
+	font-size: 12px;
+	font-weight: 900;
+	line-height: 1;
+}
+
+/* 공지 배지이다. */
+.dashboard-page .dash-notice-green {
+	background-color: #E6F7EC;
+	color: #008B4F;
+}
+
+/* 알림 배지이다. */
+.dashboard-page .dash-notice-blue {
+	background-color: #EAF2FF;
+	color: #2563EB;
+}
+
+/* 안전 배지이다. */
+.dashboard-page .dash-notice-orange {
+	background-color: #FFF3E0;
+	color: #EA580C;
+}
+
 /* 공지사항 링크이다. */
-.dashboard-page .dash-list a {
+.dashboard-page .dash-notice-list a {
 	min-width: 0;
-	flex: 1;
 	font-size: 13px;
 	font-weight: 800;
 	color: #111827;
@@ -816,119 +947,245 @@
 	white-space: nowrap;
 }
 
+/* 공지사항 hover이다. */
+.dashboard-page .dash-notice-list a:hover {
+	color: #008B4F;
+}
+
 /* 공지사항 날짜이다. */
-.dashboard-page .dash-list span {
-	font-size: 12px;
-	font-weight: 800;
-	color: #64748B;
-	white-space: nowrap;
-}
-
-/* 오늘 알림 목록이다. */
-.dashboard-page .dash-alert-list {
-	list-style: none;
-	margin: 12px 0 0;
-	padding: 0;
-}
-
-/* 오늘 알림 한 줄이다. */
-.dashboard-page .dash-alert-list li {
-	display: grid;
-	grid-template-columns: 26px minmax(0, 1fr);
-	align-items: center;
-	gap: 10px;
-	padding: 8px 0;
-	border-bottom: 1px solid #EEF2F0;
-}
-
-/* 오늘 알림 아이콘이다. */
-.dashboard-page .dash-alert-icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 24px;
-	height: 24px;
-	border-radius: 50%;
-	font-size: 12px;
-	font-weight: 900;
-	color: #FFFFFF;
-	line-height: 1;
-}
-
-/* 초록색 알림 아이콘이다. */
-.dashboard-page .dash-alert-green {
-	background-color: #008B4F;
-}
-
-/* 주황색 알림 아이콘이다. */
-.dashboard-page .dash-alert-orange {
-	background-color: #F59E0B;
-}
-
-/* 파란색 알림 아이콘이다. */
-.dashboard-page .dash-alert-blue {
-	background-color: #1D4ED8;
-}
-
-/* 알림 내용 영역이다. */
-.dashboard-page .dash-alert-list div {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 10px;
-	min-width: 0;
-}
-
-/* 알림 제목이다. */
-.dashboard-page .dash-alert-list strong {
-	font-size: 13px;
-	font-weight: 800;
-	color: #111827;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-/* 알림 시간이다. */
-.dashboard-page .dash-alert-list em {
+.dashboard-page .dash-notice-list em {
 	font-size: 12px;
 	font-style: normal;
 	font-weight: 800;
 	color: #64748B;
+	text-align: right;
 	white-space: nowrap;
 }
 
-/* 태블릿에서는 하단 영역만 세로로 정리한다. */
-@media (max-width: 900px) {
-	.dashboard-page .dash-flow-list {
-		grid-template-columns: repeat(5, minmax(96px, 1fr));
-		overflow-x: auto;
-		padding: 10px 0 2px;
-	}
+/* 하단 요약 영역이다. */
+.dashboard-page .dash-footer-summary {
+	display: grid;
+	grid-template-columns: minmax(280px, 0.85fr) minmax(420px, 1.45fr) 190px;
+	gap: 12px;
+	align-items: stretch;
+}
 
-	.dashboard-page .dash-flow-list i {
-		display: none;
-	}
+/* 하단 요약 카드이다. */
+.dashboard-page .dash-footer-card {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+	min-height: 74px;
+	padding: 16px 20px;
+}
 
-	.dashboard-page .dash-bottom-grid {
+/* 하단 요약 아이콘이다. */
+.dashboard-page .dash-footer-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 46px;
+	height: 46px;
+	border-radius: 50%;
+	background-color: #E6F2ED;
+	color: #008B4F;
+	flex-shrink: 0;
+}
+
+/* 하단 요약 아이콘 SVG이다. */
+.dashboard-page .dash-footer-icon svg {
+	width: 28px;
+	height: 28px;
+}
+
+/* 하단 요약 라벨이다. */
+.dashboard-page .dash-footer-card span {
+	display: block;
+	font-size: 14px;
+	font-weight: 900;
+	color: #374151;
+}
+
+/* 하단 요약 숫자이다. */
+.dashboard-page .dash-footer-card strong {
+	display: inline-block;
+	margin-top: 4px;
+	font-size: 26px;
+	font-weight: 900;
+	color: #008B4F;
+	letter-spacing: -1px;
+}
+
+/* 하단 요약 설명이다. */
+.dashboard-page .dash-footer-card em {
+	margin-left: 8px;
+	font-size: 13px;
+	font-style: normal;
+	font-weight: 900;
+	color: #374151;
+}
+
+/* 원가 편차 카드이다. */
+.dashboard-page .dash-cost-card {
+	justify-content: space-between;
+	gap: 24px;
+}
+
+/* 원가 편차 막대 영역이다. */
+.dashboard-page .dash-cost-track {
+	display: grid;
+	grid-template-columns: 36px minmax(0, 1fr) 28px minmax(0, 1fr) 36px;
+	align-items: center;
+	gap: 9px;
+	width: 58%;
+	min-width: 300px;
+	font-size: 12px;
+	font-weight: 900;
+	color: #374151;
+}
+
+/* 원가 편차 막대이다. */
+.dashboard-page .dash-cost-track div {
+	height: 7px;
+	background-color: #E5E7EB;
+	border-radius: 999px;
+	overflow: hidden;
+}
+
+/* 원가 편차 실제 막대이다. */
+.dashboard-page .dash-cost-track div em {
+	display: block;
+	height: 100%;
+	margin: 0;
+	background-color: #008B4F;
+	border-radius: 999px;
+}
+
+/* 원가 편차 회색 막대이다. */
+.dashboard-page .dash-cost-track-gray {
+	background-color: #CBD5E1 !important;
+}
+
+/* 상세 리포트 버튼이다. */
+.dashboard-page .dash-report-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	min-height: 74px;
+	border-radius: 13px;
+	background-color: #007A43;
+	box-shadow: 0 10px 22px rgba(0, 122, 67, 0.18);
+	font-size: 15px;
+	font-weight: 900;
+	color: #FFFFFF;
+	text-decoration: none;
+}
+
+/* 상세 리포트 버튼 화살표이다. */
+.dashboard-page .dash-report-btn span {
+	font-size: 24px;
+	font-weight: 900;
+	line-height: 1;
+}
+
+/* 상세 리포트 버튼 hover이다. */
+.dashboard-page .dash-report-btn:hover {
+	background-color: #006B3D;
+}
+
+/* 작은 PC에서는 대표 상태판과 KPI를 정리한다. */
+@media (max-width: 1400px) {
+	.dashboard-page .dash-hero-card {
 		grid-template-columns: 1fr;
+		gap: 24px;
+	}
+
+	.dashboard-page .dash-hero-metrics {
+		border-top: 1px solid rgba(255, 255, 255, 0.16);
+		padding-top: 20px;
+	}
+
+	.dashboard-page .dash-kpi-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.dashboard-page .dash-main-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		grid-template-rows: auto;
+	}
+
+	.dashboard-page .dash-chart-card {
+		min-height: 260px;
+	}
+
+	.dashboard-page .dash-side-card {
+		min-height: 220px;
+	}
+
+	.dashboard-page .dash-footer-summary {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.dashboard-page .dash-report-btn {
+		grid-column: 1 / -1;
 	}
 }
 
-/* 모바일에서는 한 줄에 하나씩 배치한다. */
-@media (max-width: 768px) {
+/* 태블릿에서는 한 줄에 하나씩 보여준다. */
+@media (max-width: 1024px) {
+	.dashboard-page .dash-hero-metrics,
 	.dashboard-page .dash-kpi-grid,
-	.dashboard-page .dash-chart-grid {
+	.dashboard-page .dash-main-grid,
+	.dashboard-page .dash-footer-summary {
 		grid-template-columns: 1fr;
 	}
 
-	.dashboard-page .dash-kpi-card {
-		padding: 14px;
+	.dashboard-page .dash-hero-metric {
+		border-left: none;
+		border-top: 1px solid rgba(255, 255, 255, 0.16);
+		padding: 16px 0;
 	}
 
-	.dashboard-page .dash-kpi-split {
+	.dashboard-page .dash-hero-metric:first-child {
+		border-top: none;
+	}
+
+	.dashboard-page .dash-cost-card {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.dashboard-page .dash-cost-track {
+		width: 100%;
+		min-width: 0;
+	}
+}
+
+/* 모바일에서는 여백과 크기를 줄인다. */
+@media (max-width: 768px) {
+	.dashboard-page .dash-hero-card {
+		padding: 24px 22px;
+	}
+
+	.dashboard-page .dash-hero-left {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.dashboard-page .dash-hero-text strong {
+		font-size: 34px;
+	}
+
+	.dashboard-page .dash-kpi-card,
+	.dashboard-page .dash-chart-card,
+	.dashboard-page .dash-side-card,
+	.dashboard-page .dash-footer-card {
+		padding: 16px;
+	}
+
+	.dashboard-page .dash-kpi-body {
 		grid-template-columns: 1fr;
-		gap: 10px;
 	}
 
 	.dashboard-page .dash-kpi-detail-list {
@@ -936,15 +1193,402 @@
 		justify-content: center;
 	}
 
-	.dashboard-page .dash-progress-row {
-		grid-template-columns: 82px minmax(0, 1fr) 52px;
+	.dashboard-page .dash-half-gauge {
+		width: 210px;
+		height: 108px;
+	}
+
+	.dashboard-page .dash-half-gauge::before {
+		width: 210px;
+		height: 210px;
+	}
+
+	.dashboard-page .dash-half-gauge::after {
+		left: 24px;
+		top: 24px;
+		width: 162px;
+		height: 162px;
+	}
+
+	.dashboard-page .dash-chart-head {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.dashboard-page .dash-chart-legend {
+		margin-top: 8px;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+	}
+
+	.dashboard-page .dash-canvas-wrap {
+		height: 210px;
+	}
+
+	.dashboard-page .dash-equipment-body {
+		grid-template-columns: 1fr;
+		justify-items: center;
+	}
+
+	.dashboard-page .dash-equipment-list {
+		width: 100%;
+	}
+
+	.dashboard-page .dash-notice-list li {
+		grid-template-columns: 47px minmax(0, 1fr);
+		padding: 7px 0;
+	}
+
+	.dashboard-page .dash-notice-list em {
+		grid-column: 2;
+		text-align: left;
+	}
+
+	.dashboard-page .dash-cost-track {
+		grid-template-columns: 32px minmax(0, 1fr) 24px minmax(0, 1fr) 32px;
+	}
+}
+/* CEO 대시보드 실제 화면 보정 CSS이다. */
+/* KPI 카드가 2열로 커지는 문제를 막고, 그래프 영역을 더 크게 보이게 조정한다. */
+
+/* 대표 상태판 높이를 줄여서 그래프가 첫 화면에 더 빨리 보이게 한다. */
+.dashboard-page .dash-hero-card {
+	min-height: 134px;
+	margin-bottom: 12px;
+	padding: 22px 30px;
+}
+
+/* 대표 상태판 큰 문구 크기를 줄인다. */
+.dashboard-page .dash-hero-text strong {
+	font-size: 36px;
+}
+
+/* 대표 상태판 설명 여백을 줄인다. */
+.dashboard-page .dash-hero-text p {
+	margin: 10px 0 8px;
+}
+
+/* 대표 상태판 KPI 숫자를 조금 줄인다. */
+.dashboard-page .dash-hero-metric strong {
+	font-size: 27px;
+}
+
+/* PC 화면에서는 KPI 4개를 무조건 한 줄로 유지한다. */
+.dashboard-page .dash-kpi-grid {
+	grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+/* KPI 카드 높이를 줄여서 그래프가 위로 올라오게 한다. */
+.dashboard-page .dash-kpi-card {
+	min-height: 182px;
+	padding: 15px 16px 14px;
+}
+
+/* 카드 제목 크기를 살짝 줄인다. */
+.dashboard-page .dash-card-title {
+	font-size: 15px;
+}
+
+/* KPI 아이콘 크기를 줄인다. */
+.dashboard-page .dash-title-icon {
+	width: 28px;
+	height: 28px;
+}
+
+/* KPI 아이콘 내부 SVG 크기이다. */
+.dashboard-page .dash-title-icon svg {
+	width: 15px;
+	height: 15px;
+}
+
+/* 생산달성률 내부를 압축한다. */
+.dashboard-page .dash-kpi-body {
+	grid-template-columns: 112px minmax(0, 1fr);
+	gap: 12px;
+	padding: 12px 0 11px;
+}
+
+/* 생산달성률 도넛 크기를 줄인다. */
+.dashboard-page .dash-donut {
+	width: 108px;
+	height: 108px;
+}
+
+/* 도넛 안쪽 원 크기를 조정한다. */
+.dashboard-page .dash-donut::before {
+	inset: 15px;
+}
+
+/* 도넛 숫자 크기를 줄인다. */
+.dashboard-page .dash-donut-center strong {
+	font-size: 27px;
+}
+
+/* 도넛 단위 크기를 줄인다. */
+.dashboard-page .dash-donut-center span {
+	font-size: 14px;
+}
+
+/* 도넛 보조 문구 크기이다. */
+.dashboard-page .dash-donut-center em {
+	margin-top: 7px;
+	font-size: 11px;
+}
+
+/* 생산달성률 계획/실적 간격을 줄인다. */
+.dashboard-page .dash-kpi-detail-list {
+	gap: 12px;
+}
+
+/* 생산달성률 계획/실적 라벨이다. */
+.dashboard-page .dash-kpi-detail-list span {
+	margin-bottom: 5px;
+	font-size: 12px;
+}
+
+/* 생산달성률 계획/실적 숫자이다. */
+.dashboard-page .dash-kpi-detail-list strong {
+	font-size: 17px;
+}
+
+/* 반달 게이지 크기를 줄인다. */
+.dashboard-page .dash-half-gauge {
+	width: 178px;
+	height: 91px;
+	margin: 11px auto 8px;
+}
+
+/* 반달 게이지 외곽 크기이다. */
+.dashboard-page .dash-half-gauge::before {
+	width: 178px;
+	height: 178px;
+}
+
+/* 반달 게이지 안쪽 크기이다. */
+.dashboard-page .dash-half-gauge::after {
+	left: 22px;
+	top: 22px;
+	width: 134px;
+	height: 134px;
+}
+
+/* 반달 게이지 중앙 숫자 위치이다. */
+.dashboard-page .dash-half-gauge-center {
+	top: 27px;
+}
+
+/* 반달 게이지 숫자 크기이다. */
+.dashboard-page .dash-half-gauge-center strong {
+	font-size: 28px;
+}
+
+/* 반달 게이지 단위 크기이다. */
+.dashboard-page .dash-half-gauge-center span {
+	font-size: 14px;
+}
+
+/* 반달 게이지 보조 문구이다. */
+.dashboard-page .dash-half-gauge-center em {
+	margin-top: 5px;
+	font-size: 11px;
+}
+
+/* 불량률 기준 영역 여백을 줄인다. */
+.dashboard-page .dash-defect-scale {
+	margin: 0 2px 10px;
+}
+
+/* 불량률 기준 라벨이다. */
+.dashboard-page .dash-scale-label {
+	margin-bottom: 5px;
+	font-size: 12px;
+}
+
+/* 진행률 목록 간격을 줄인다. */
+.dashboard-page .dash-progress-list {
+	gap: 8px;
+	margin: 0 0 10px;
+}
+
+/* 진행률 한 줄이다. */
+.dashboard-page .dash-progress-row {
+	grid-template-columns: 66px minmax(0, 1fr) 48px;
+	gap: 7px;
+	font-size: 12px;
+}
+
+/* 진행률 수치이다. */
+.dashboard-page .dash-progress-row strong {
+	font-size: 12px;
+}
+
+/* KPI 하단 변화율 높이를 줄인다. */
+.dashboard-page .dash-card-bottom {
+	height: 34px;
+	font-size: 12px;
+}
+
+/* KPI 하단 변화율 숫자이다. */
+.dashboard-page .dash-card-bottom strong {
+	font-size: 14px;
+}
+
+/* 그래프 영역은 2열로 크게 보여준다. */
+.dashboard-page .dash-main-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	grid-template-rows: auto !important;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+/* 그래프 카드를 더 크게 만든다. */
+.dashboard-page .dash-chart-card {
+	min-height: 318px;
+	padding: 18px 20px 19px;
+}
+
+/* 그래프 캔버스를 크게 잡는다. */
+.dashboard-page .dash-canvas-wrap {
+	height: 245px;
+	margin-top: 14px;
+}
+
+/* 설비/공지 카드는 그래프 아래 2열로 배치한다. */
+.dashboard-page .dash-side-card {
+	min-height: 220px;
+	padding: 18px 20px;
+}
+
+/* 그래프 제목 줄 정리이다. */
+.dashboard-page .dash-chart-head {
+	align-items: center;
+}
+
+/* 그래프 범례를 보기 좋게 정리한다. */
+.dashboard-page .dash-chart-legend {
+	gap: 12px;
+	font-size: 12px;
+}
+
+/* 그래프 선 범례이다. */
+.dashboard-page .dash-legend-line {
+	width: 24px;
+	height: 4px;
+}
+
+/* 하단 요약 영역은 조금 더 압축한다. */
+.dashboard-page .dash-footer-summary {
+	grid-template-columns: minmax(240px, 0.8fr) minmax(360px, 1.35fr) 180px;
+	gap: 12px;
+}
+
+/* 하단 요약 카드 높이를 줄인다. */
+.dashboard-page .dash-footer-card,
+.dashboard-page .dash-report-btn {
+	min-height: 66px;
+}
+
+/* 원가 편차율 하단 숫자 크기를 조정한다. */
+.dashboard-page .dash-footer-card strong {
+	font-size: 23px;
+}
+
+/* 1200px 이하에서는 KPI를 2개씩 보여준다. */
+@media (max-width: 1200px) {
+	.dashboard-page .dash-kpi-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	}
+
+	.dashboard-page .dash-kpi-card {
+		min-height: 190px;
+	}
+
+	.dashboard-page .dash-main-grid {
+		grid-template-columns: 1fr !important;
 	}
 
 	.dashboard-page .dash-chart-card {
-		min-height: 220px;
+		min-height: 330px;
 	}
 
-	.dashboard-page .dash-card-title {
-		font-size: 14px;
+	.dashboard-page .dash-canvas-wrap {
+		height: 255px;
+	}
+
+	.dashboard-page .dash-footer-summary {
+		grid-template-columns: 1fr;
+	}
+
+	.dashboard-page .dash-report-btn {
+		min-height: 62px;
+	}
+}
+
+/* 모바일에서는 한 줄에 하나씩 보여준다. */
+@media (max-width: 768px) {
+	.dashboard-page .dash-hero-card {
+		padding: 22px 20px;
+	}
+
+	.dashboard-page .dash-hero-text strong {
+		font-size: 31px;
+	}
+
+	.dashboard-page .dash-kpi-grid {
+		grid-template-columns: 1fr !important;
+	}
+
+	.dashboard-page .dash-kpi-card {
+		min-height: auto;
+	}
+
+	.dashboard-page .dash-kpi-body {
+		grid-template-columns: 1fr;
+	}
+
+	.dashboard-page .dash-donut {
+		width: 132px;
+		height: 132px;
+	}
+
+	.dashboard-page .dash-donut::before {
+		inset: 18px;
+	}
+
+	.dashboard-page .dash-half-gauge {
+		width: 205px;
+		height: 104px;
+	}
+
+	.dashboard-page .dash-half-gauge::before {
+		width: 205px;
+		height: 205px;
+	}
+
+	.dashboard-page .dash-half-gauge::after {
+		left: 24px;
+		top: 24px;
+		width: 157px;
+		height: 157px;
+	}
+
+	.dashboard-page .dash-half-gauge-center {
+		top: 31px;
+	}
+
+	.dashboard-page .dash-chart-card {
+		min-height: 300px;
+	}
+
+	.dashboard-page .dash-canvas-wrap {
+		height: 225px;
+	}
+
+	.dashboard-page .dash-chart-head {
+		align-items: flex-start;
+		flex-direction: column;
 	}
 }

@@ -4,6 +4,10 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
 
+<c:set var="canManageQuality"
+	value="${sessionScope.loginUser.role eq 'ADMIN'
+		or sessionScope.loginUser.role eq 'MANAGER'}" />
+
 <div class="detail_page">
 
 	<div class="detail_header">
@@ -14,15 +18,71 @@
 
 		<div class="detail_btn_area">
 
-			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
-				or sessionScope.loginUser.role eq 'MANAGER'}">
-				<button type="button" class="detail_btn_green" id="editBtn">
+			<c:if test="${canManageQuality}">
+				<button type="submit" id="saveBtn" class="detail_btn_green"
+					form="inspectionDetailForm" style="display: none;">
+
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+						stroke="currentColor" stroke-width="2" stroke-linecap="round"
+						stroke-linejoin="round"
+						style="vertical-align: -3px; margin-right: 6px;"
+						aria-hidden="true">
+						<path
+							d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+						<path d="M17 21v-8H7v8"></path>
+						<path d="M7 3v5h8"></path>
+					</svg>
+
+					저장
+				</button>
+
+				<button type="button" id="cancelBtn" class="detail_btn_line"
+					onclick="changeInspectionEditMode(false);" style="display: none;">
+
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+						stroke="currentColor" stroke-width="2" stroke-linecap="round"
+						stroke-linejoin="round"
+						style="vertical-align: -3px; margin-right: 6px;"
+						aria-hidden="true">
+						<path d="M18 6L6 18"></path>
+						<path d="M6 6l12 12"></path>
+					</svg>
+
+					취소
+				</button>
+
+				<button type="button" id="editBtn" class="detail_btn_green"
+					onclick="changeInspectionEditMode(true);">
+
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+						stroke="currentColor" stroke-width="2" stroke-linecap="round"
+						stroke-linejoin="round"
+						style="vertical-align: -3px; margin-right: 6px;"
+						aria-hidden="true">
+						<path d="M12 20h9"></path>
+						<path
+							d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+					</svg>
+
 					수정
 				</button>
 			</c:if>
 
 			<button type="button" class="detail_btn_line"
 				onclick="location.href='${pageContext.request.contextPath}/quality/inspection'">
+
+				<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+					stroke="currentColor" stroke-width="2" stroke-linecap="round"
+					stroke-linejoin="round"
+					style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
+					<path d="M8 6h13"></path>
+					<path d="M8 12h13"></path>
+					<path d="M8 18h13"></path>
+					<path d="M3 6h.01"></path>
+					<path d="M3 12h.01"></path>
+					<path d="M3 18h.01"></path>
+				</svg>
+
 				목록
 			</button>
 
@@ -57,7 +117,8 @@
 							<span class="viewMode">${inspection.insp_date}</span>
 							<input type="date" name="insp_date"
 								class="detailInput editMode"
-								value="${inspection.insp_date}" style="display: none;" required>
+								value="${inspection.insp_date}" style="display: none;"
+								required>
 						</td>
 
 						<th>품목명</th>
@@ -88,12 +149,10 @@
 								style="display: none;" required>
 								<option value="합격"
 									<c:if test="${inspection.result == '합격'}">selected</c:if>>
-									합격
-								</option>
+									합격</option>
 								<option value="조건부"
 									<c:if test="${inspection.result == '조건부'}">selected</c:if>>
-									조건부
-								</option>
+									조건부</option>
 							</select>
 						</td>
 					</tr>
@@ -106,16 +165,13 @@
 								style="display: none;" required>
 								<option value="수입검사"
 									<c:if test="${inspection.insp_type == '수입검사'}">selected</c:if>>
-									수입검사
-								</option>
+									수입검사</option>
 								<option value="공정검사"
 									<c:if test="${inspection.insp_type == '공정검사'}">selected</c:if>>
-									공정검사
-								</option>
+									공정검사</option>
 								<option value="최종검사"
 									<c:if test="${inspection.insp_type == '최종검사'}">selected</c:if>>
-									최종검사
-								</option>
+									최종검사</option>
 							</select>
 						</td>
 
@@ -142,7 +198,8 @@
 						<th>비고</th>
 						<td colspan="5">
 							<span class="viewMode">${inspection.remark}</span>
-							<input type="text" name="remark" class="detailInput editMode"
+							<input type="text" name="remark"
+								class="detailInput editMode"
 								value="${inspection.remark}" style="display: none;">
 						</td>
 					</tr>
@@ -155,32 +212,37 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-	const editBtn = document.getElementById('editBtn');
-	const form = document.getElementById('inspectionDetailForm');
+	function changeInspectionEditMode(isEdit) {
+		const viewModes = document.querySelectorAll('.viewMode');
+		const editModes = document.querySelectorAll('.editMode');
 
-	if (!editBtn) {
-		return;
-	}
+		const editBtn = document.getElementById('editBtn');
+		const saveBtn = document.getElementById('saveBtn');
+		const cancelBtn = document.getElementById('cancelBtn');
+		const form = document.getElementById('inspectionDetailForm');
 
-	editBtn.addEventListener('click', function () {
-		const isEditMode = editBtn.dataset.mode === 'edit';
+		viewModes.forEach(function(el) {
+			el.style.display = isEdit ? 'none' : '';
+		});
 
-		if (!isEditMode) {
-			document.querySelectorAll('.viewMode').forEach(function (el) {
-				el.style.display = 'none';
-			});
+		editModes.forEach(function(el) {
+			el.style.display = isEdit ? '' : 'none';
+		});
 
-			document.querySelectorAll('.editMode').forEach(function (el) {
-				el.style.display = '';
-			});
-
-			editBtn.dataset.mode = 'edit';
-			editBtn.textContent = '저장';
-			return;
+		if (editBtn) {
+			editBtn.style.display = isEdit ? 'none' : 'inline-flex';
 		}
 
-		form.submit();
-	});
-});
+		if (saveBtn) {
+			saveBtn.style.display = isEdit ? 'inline-flex' : 'none';
+		}
+
+		if (cancelBtn) {
+			cancelBtn.style.display = isEdit ? 'inline-flex' : 'none';
+		}
+
+		if (!isEdit && form) {
+			form.reset();
+		}
+	}
 </script>
