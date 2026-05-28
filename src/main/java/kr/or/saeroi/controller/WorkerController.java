@@ -156,6 +156,8 @@ public class WorkerController {
 	// =====================================================
 	// 생산실적 조회
 	// 로그인한 작업자 본인 생산실적만 조회
+	// 기존 팀원 productionresult.jsp + tiles 사용
+	// CSS / 사이드바 / 헤더 유지
 	// =====================================================
 	@RequestMapping("/worker/productionresult")
 	public String workerProductionResult(
@@ -201,7 +203,18 @@ public class WorkerController {
 		model.addAttribute("workerName", loginUser.getEname());
 		model.addAttribute("workerDept", loginUser.getDept());
 
-		return "worker/workerProductionResult";
+		// =================================================
+		// 공통 header.jsp 제목
+		// =================================================
+		model.addAttribute("headerTitle", "생산관리");
+		model.addAttribute("headerSubTitle", "생산실적 등록");
+
+		// =================================================
+		// 중요
+		// worker/workerProductionResult 사용 안 함
+		// 기존 팀원 tiles 화면으로 이동해야 CSS가 깨지지 않음
+		// =================================================
+		return "production/productionresult.tiles";
 	}
 
 	@RequestMapping("/worker/notice")
