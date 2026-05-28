@@ -12,34 +12,43 @@ import kr.or.saeroi.dto.LoginDTO;
 @Component
 public class RoleInterceptor extends HandlerInterceptorAdapter {
 
-    @Override
-    public boolean preHandle(HttpServletRequest request,
-                             HttpServletResponse response,
-                             Object handler) throws Exception {
+	@Override
+	public boolean preHandle(HttpServletRequest request,
+	                         HttpServletResponse response,
+	                         Object handler) throws Exception {
 
-        HttpSession session = request.getSession(false);
+	    String uri = request.getRequestURI();
 
-        if (session == null) {
-            return true;
-        }
+	    // 로그인 없이 접근 허용
+	    if (uri.contains("/login")
+	        || uri.contains("/find_pw")
+	        || uri.contains("/resources/")) {
 
-        LoginDTO loginUser =
-            (LoginDTO) session.getAttribute("loginUser");
+	        return true;
+	    }
 
-        if (loginUser == null) {
-            response.sendRedirect(request.getContextPath() + "/login");
-            return false;
-        }
+	    HttpSession session = request.getSession(false);
 
-        String role = loginUser.getRole();
+	    if (session == null) {
+	        response.sendRedirect(request.getContextPath() + "/login");
+	        return false;
+	    }
+
+	    LoginDTO loginUser =
+	        (LoginDTO) session.getAttribute("loginUser");
+
+	    if (loginUser == null) {
+	        response.sendRedirect(request.getContextPath() + "/login");
+	        return false;
+	    }
+
+	    String role = loginUser.getRole();
 
         // 관리자, 매니저 전체 허용
         if ("ADMIN".equalsIgnoreCase(role)
             || "MANAGER".equalsIgnoreCase(role)) {
             return true;
-        }
-
-        String uri = request.getRequestURI();
+        }       
 
         // WORKER 허용 페이지
         if ("WORKER".equalsIgnoreCase(role)) {
