@@ -101,29 +101,6 @@
 						value="${keyword}">
 				</div>
 
-				<div class="search-item">
-					<label class="search-label">보기</label>
-
-					<select name="size" class="search-select">
-						<option value="5"
-							<c:if test="${pageInfo.size == 5}">selected</c:if>>
-							5개씩
-						</option>
-						<option value="10"
-							<c:if test="${pageInfo.size == 10}">selected</c:if>>
-							10개씩
-						</option>
-						<option value="20"
-							<c:if test="${pageInfo.size == 20}">selected</c:if>>
-							20개씩
-						</option>
-						<option value="30"
-							<c:if test="${pageInfo.size == 30}">selected</c:if>>
-							30개씩
-						</option>
-					</select>
-				</div>
-
 				<div class="search-btn-wrap">
 
 					<button type="submit" class="search-btn search-btn-main">

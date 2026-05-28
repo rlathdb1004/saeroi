@@ -14,37 +14,15 @@
 	- 생산관리 파일 구조 유지
 	  DTO / DAO / Service / Controller / Mapper는 생산관리 1개 파일로 관리
 	  JSP만 페이지별 관리
-	- 공정진행 현황은 작업지시 기준 누적 생산수량 / 누적 불량수량 / 진행률 조회 화면
-	- 등록 모달은 생산실적 등록과 동일하게 PRODUCTION 테이블에 실적을 추가하는 구조
-	- 지시수량 / 누적생산수량 / 누적불량수량 천단위 표시
-	- 진행률 바 표시
-
-	목록 컬럼 기준:
-	- PC: 체크박스 포함 8개
-	  1 선택
-	  2 작업지시번호
-	  3 LOT번호
-	  4 품명
-	  5 라인
-	  6 누적생산
-	  7 진행률
-	  8 상세
-
-	- 모바일: 체크박스 포함 5개
-	  1 선택
-	  2 작업지시번호
-	  3 품명
-	  4 진행률
-	  5 상세
+	- LOSS_QTY는 불량수량이 아니라 LOSS량 / 손실수량이다.
+	- 공정진행 현황은 작업지시 기준으로 진행률을 조회한다.
+	- PC 목록 8컬럼 / 모바일 5컬럼 기준
 --%>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
 
 <div class="coPageWrap">
 
-	<%-- =========================================================
-	     1. 메시지
-	     ========================================================= --%>
 	<c:if test="${not empty msg}">
 		<script>
 			alert("${msg}");
@@ -53,7 +31,7 @@
 
 
 	<%-- =========================================================
-	     2. 검색 영역
+	     1. 검색 영역
 	     ========================================================= --%>
 	<form class="search-form" method="get"
 		action="${contextPath}/production/processprogress">
@@ -64,27 +42,24 @@
 
 				<div class="search-item">
 					<label class="search-label">시작일</label>
-
 					<input type="date" name="startDate" class="search-date"
 						value="${startDate}">
 				</div>
 
 				<div class="search-item">
 					<label class="search-label">종료일</label>
-
 					<input type="date" name="endDate" class="search-date"
 						value="${endDate}">
 				</div>
 
 				<div class="search-item">
 					<label class="search-label">진행상태</label>
-
-					<select name="progressStatus" class="search-select">
+					<select name="prodStatus" class="search-select">
 						<option value="">전체</option>
 
 						<c:forEach var="status" items="${processProgressStatusList}">
 							<option value="${status}"
-								<c:if test="${progressStatus eq status}">selected</c:if>>
+								<c:if test="${prodStatus eq status}">selected</c:if>>
 								${status}
 							</option>
 						</c:forEach>
@@ -93,44 +68,20 @@
 
 				<div class="search-item">
 					<label class="search-label">검색어</label>
-
 					<input type="text" name="keyword" class="search-input"
 						placeholder="작업지시번호 / LOT / 품목코드 / 품명 / 라인"
 						value="${keyword}">
-				</div>
-
-				<div class="search-item">
-					<label class="search-label">보기</label>
-
-					<select name="size" class="search-select">
-						<option value="5"
-							<c:if test="${pageInfo.size == 5}">selected</c:if>>
-							5개씩
-						</option>
-						<option value="10"
-							<c:if test="${pageInfo.size == 10}">selected</c:if>>
-							10개씩
-						</option>
-						<option value="20"
-							<c:if test="${pageInfo.size == 20}">selected</c:if>>
-							20개씩
-						</option>
-						<option value="30"
-							<c:if test="${pageInfo.size == 30}">selected</c:if>>
-							30개씩
-						</option>
-					</select>
 				</div>
 
 				<div class="search-btn-wrap">
 
 					<button type="submit" class="search-btn search-btn-main">
 						<svg viewBox="0 0 24 24" fill="none">
-							<circle cx="10.5" cy="10.5" r="7.5"
-								stroke="currentColor" stroke-width="2">
+							<circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor"
+								stroke-width="2">
 							</circle>
-							<path d="M16 16L21 21" stroke="currentColor"
-								stroke-width="2" stroke-linecap="round">
+							<path d="M16 16L21 21" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round">
 							</path>
 						</svg>
 						검색
@@ -161,7 +112,7 @@
 
 
 	<%-- =========================================================
-	     3. 상단 버튼
+	     2. 목록 상단
 	     ========================================================= --%>
 	<div class="coTableTop">
 
@@ -180,7 +131,7 @@
 						stroke-linecap="round">
 					</path>
 				</svg>
-				공정실적 등록
+				등록
 			</button>
 
 		</div>
@@ -189,25 +140,21 @@
 
 
 	<%-- =========================================================
-	     4. 공정진행 현황 목록
+	     3. 목록
 	     ========================================================= --%>
 	<div class="coTableWrap">
 
-		<table class="coTable process-progress-table">
+		<table class="coTable process_progress_table">
 
 			<thead>
 				<tr>
-					<th class="mobile_show">
-						<label id="processProgressCheckAllLabel">선택</label>
-						<input type="checkbox" id="processProgressCheckAll"
-							style="display: none;">
-					</th>
-
-					<th class="mobile_show">작업지시번호</th>
-					<th class="mobile_hidden">LOT번호</th>
-					<th class="mobile_show">품명</th>
+					<th class="mobile_hidden">작업지시번호</th>
+					<th class="mobile_show">LOT번호</th>
+					<th class="mobile_hidden">품목명</th>
 					<th class="mobile_hidden">라인</th>
-					<th class="mobile_hidden">누적생산</th>
+					<th class="mobile_show">지시수량</th>
+					<th class="mobile_show">누적생산</th>
+					<th class="mobile_hidden">LOSS량</th>
 					<th class="mobile_show">진행률</th>
 					<th class="mobile_show">상세</th>
 				</tr>
@@ -215,114 +162,92 @@
 
 			<tbody>
 
-				<c:choose>
+				<c:forEach var="progress" items="${list}">
 
-					<c:when test="${not empty list}">
+					<tr>
+						<td class="mobile_hidden" title="${progress.workOrderDocNo}">
+							${progress.workOrderDocNo}
+						</td>
 
-						<c:forEach var="progress" items="${list}">
+						<td class="mobile_show" title="${progress.productLot}">
+							${progress.productLot}
+						</td>
 
-							<tr>
-								<td class="mobile_show">
-									<input type="checkbox" name="progressOrderIds"
-										value="${progress.orderId}">
-								</td>
+						<td class="coTextLeft mobile_hidden"
+							title="${progress.itemName}">
+							${progress.itemName}
+						</td>
 
-								<td class="mobile_show" title="${progress.docNo}">
-									${progress.docNo}
-								</td>
+						<td class="mobile_hidden" title="${progress.lineName}">
+							${progress.lineName}
+						</td>
 
-								<td class="mobile_hidden" title="${progress.productLot}">
-									${progress.productLot}
-								</td>
+						<td class="mobile_show">
+							<fmt:formatNumber value="${progress.orderQty}" pattern="#,##0" />
+							${progress.itemUnit}
+						</td>
 
-								<td class="coTextLeft mobile_show" title="${progress.itemName}">
-									${progress.itemName}
-								</td>
+						<td class="mobile_show">
+							<fmt:formatNumber value="${progress.totalProdQty}" pattern="#,##0" />
+							${progress.itemUnit}
+						</td>
 
-								<td class="mobile_hidden" title="${progress.lineName}">
+						<td class="mobile_hidden">
+							<fmt:formatNumber value="${progress.totalLossQty}" pattern="#,##0" />
+							${progress.itemUnit}
+						</td>
+
+						<td class="mobile_show">
+							<div class="progress_cell">
+
+								<div class="progress_bar">
+									<div class="progress_bar_fill"
+										style="width:${progress.progressRate}%;">
+									</div>
+								</div>
+
+								<div class="progress_text">
+									<fmt:formatNumber value="${progress.progressRate}" pattern="#,##0" />%
+									/
 									<c:choose>
-										<c:when test="${not empty progress.lineName}">
-											${progress.lineName}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
-
-								<td class="mobile_hidden">
-									<div>
-										<fmt:formatNumber value="${progress.totalProdQty}"
-											pattern="#,##0" />
-										${progress.itemUnit}
-									</div>
-
-									<div class="process-progress-loss-text">
-										불량
-										<fmt:formatNumber value="${progress.totalLossQty}"
-											pattern="#,##0" />
-										${progress.itemUnit}
-									</div>
-								</td>
-
-								<td class="mobile_show">
-									<div class="process-progress-rate-box">
-										<div class="process-progress-rate-top">
-											<span>
-												<c:choose>
-													<c:when test="${not empty progress.progressRate}">
-														${progress.progressRate}%
-													</c:when>
-													<c:otherwise>0%</c:otherwise>
-												</c:choose>
+										<c:when test="${progress.progressStatus eq '완료'}">
+											<span class="coStatus coStatusUse">
+												${progress.progressStatus}
 											</span>
+										</c:when>
 
-											<c:choose>
-												<c:when test="${progress.progressStatus eq '완료'}">
-													<span class="coStatus coStatusUse">
-														${progress.progressStatus}
-													</span>
-												</c:when>
+										<c:when test="${progress.progressStatus eq '보류' or progress.progressStatus eq '취소'}">
+											<span class="coStatus coStatusStop">
+												${progress.progressStatus}
+											</span>
+										</c:when>
 
-												<c:when test="${progress.progressStatus eq '보류'}">
-													<span class="coStatus coStatusStop">
-														${progress.progressStatus}
-													</span>
-												</c:when>
+										<c:otherwise>
+											<span class="coStatus">
+												${progress.progressStatus}
+											</span>
+										</c:otherwise>
+									</c:choose>
+								</div>
 
-												<c:otherwise>
-													<span class="coStatus">
-														${progress.progressStatus}
-													</span>
-												</c:otherwise>
-											</c:choose>
-										</div>
+							</div>
+						</td>
 
-										<div class="process-progress-bar">
-											<div class="process-progress-bar-fill"
-												style="width:${empty progress.progressRate ? 0 : progress.progressRate}%;">
-											</div>
-										</div>
-									</div>
-								</td>
+						<td class="mobile_show">
+							<button type="button" class="coDetailBtn"
+								onclick="location.href='${contextPath}/production/processprogress/detail?orderId=${progress.orderId}'">
+								보기
+							</button>
+						</td>
+					</tr>
 
-								<td class="mobile_show">
-									<button type="button" class="coDetailBtn"
-										onclick="location.href='${contextPath}/production/processprogress/detail?orderId=${progress.orderId}'">
-										보기
-									</button>
-								</td>
-							</tr>
+				</c:forEach>
 
-						</c:forEach>
-
-					</c:when>
-
-					<c:otherwise>
-						<tr>
-							<td colspan="8">조회된 공정진행 현황이 없습니다.</td>
-						</tr>
-					</c:otherwise>
-
-				</c:choose>
+				<c:if test="${empty list}">
+					<tr>
+						<td colspan="9">조회된 공정진행 정보가 없습니다.</td>
+					</tr>
+				</c:if>
 
 			</tbody>
 
@@ -332,14 +257,14 @@
 
 
 	<%-- =========================================================
-	     5. 공정실적 등록 모달
+	     4. 공정진행 등록 모달
 	     ========================================================= --%>
 	<div id="modal_insert" class="modal_wrap" aria-hidden="true">
 
 		<div class="modal_box" role="dialog" aria-modal="true">
 
 			<div class="modal_header">
-				<h3 class="modal_title">공정실적 등록</h3>
+				<h3 class="modal_title">공정진행 등록</h3>
 			</div>
 
 			<form class="modal_form" method="post"
@@ -355,129 +280,92 @@
 
 						<select name="orderId" id="insertOrderId"
 							class="modal_select"
-							onchange="setProcessProgressOrderInfo();"
-							required>
+							onchange="setProcessProgressOrderInfo();" required>
 
 							<option value="">선택</option>
 
 							<c:forEach var="order" items="${processProgressOrderList}">
-
 								<option value="${order.orderId}"
+									data-prod-plan-doc-no="${order.prodPlanDocNo}"
 									data-work-order-doc-no="${order.workOrderDocNo}"
 									data-product-lot="${order.productLot}"
+									data-order-qty="${order.orderQty}"
 									data-item-code="${order.itemCode}"
 									data-item-name="${order.itemName}"
-									data-order-qty="${order.orderQty}"
-									data-order-date="${order.orderDate}"
 									data-item-unit="${order.itemUnit}">
 									${order.workOrderDocNo} / ${order.productLot} /
-									${order.itemCode} / ${order.itemName}
+									${order.itemCode} / ${order.itemName} /
+									지시수량
+									<fmt:formatNumber value="${order.orderQty}" pattern="#,##0" />${order.itemUnit}
 								</option>
-
 							</c:forEach>
 
 						</select>
 
 						<div class="modal_help_text">
-							작업지시를 선택하면 LOT, 품목, 지시수량이 자동 표시됩니다.
+							공정진행 등록은 생산실적 등록과 같은 production 테이블에 저장됩니다.
+							LOSS량은 불량수량이 아니라 생산 중 손실수량입니다.
 						</div>
 					</div>
 
 
 					<div class="modal_item">
-						<label class="modal_label">작업지시번호</label>
-
-						<input type="text" id="insertWorkOrderDocNo"
-							class="modal_input"
-							placeholder="작업지시 선택 시 자동 표시" readonly>
+						<label class="modal_label">생산계획번호</label>
+						<input type="text" id="insertProdPlanDocNo"
+							class="modal_input" readonly>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">LOT번호</label>
+						<label class="modal_label">작업지시번호</label>
+						<input type="text" id="insertWorkOrderDocNo"
+							class="modal_input" readonly>
+					</div>
 
+					<div class="modal_item">
+						<label class="modal_label">완제품 LOT</label>
 						<input type="text" id="insertProductLot"
-							class="modal_input"
-							placeholder="작업지시 선택 시 자동 표시" readonly>
+							class="modal_input" readonly>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">품목코드</label>
-
 						<input type="text" id="insertItemCode"
-							class="modal_input"
-							placeholder="작업지시 선택 시 자동 표시" readonly>
-					</div>
-
-					<div class="modal_item modal_item_full">
-						<label class="modal_label">품목명</label>
-
-						<input type="text" id="insertItemName"
-							class="modal_input"
-							placeholder="작업지시 선택 시 자동 표시" readonly>
+							class="modal_input" readonly>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">지시수량</label>
+						<label class="modal_label">품목명</label>
+						<input type="text" id="insertItemName"
+							class="modal_input" readonly>
+					</div>
 
+					<div class="modal_item">
+						<label class="modal_label">작업지시수량</label>
 						<input type="text" id="insertOrderQtyText"
-							class="modal_input"
-							placeholder="작업지시 선택 시 자동 표시" readonly>
+							class="modal_input" readonly>
+						<input type="hidden" name="orderQty" id="insertOrderQty">
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">
 							생산수량 <span class="modal_required">*</span>
 						</label>
-
-						<div class="process-progress-qty-box">
-							<input type="number" name="prodQty" id="insertProdQty"
-								class="modal_input" min="1"
-								oninput="setProcessProgressQtyPreview();"
-								required>
-
-							<input type="text" id="insertProdUnit"
-								class="modal_input process-progress-unit-input"
-								placeholder="단위" readonly>
-						</div>
-
-						<div id="prodQtyPreviewText" class="modal_help_text">
-							생산수량을 입력하세요.
-						</div>
+						<input type="number" name="prodQty" id="insertProdQty"
+							class="modal_input" min="1" required>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">불량수량</label>
-
+						<label class="modal_label">LOSS량</label>
 						<input type="number" name="lossQty" id="insertLossQty"
-							class="modal_input" min="0" value="0"
-							oninput="setProcessProgressQtyPreview();">
-
-						<div id="lossQtyPreviewText" class="modal_help_text">
-							불량수량은 생산수량보다 클 수 없습니다.
-						</div>
+							class="modal_input" min="0" value="0">
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">
-							생산일자 <span class="modal_required">*</span>
+							생산일 <span class="modal_required">*</span>
 						</label>
-
 						<input type="date" name="prodDate" id="insertProdDate"
 							class="modal_input modal_today" required>
-					</div>
-
-					<div class="modal_item">
-						<label class="modal_label">
-							진행상태 <span class="modal_required">*</span>
-						</label>
-
-						<select name="prodStatus" id="insertProdStatus"
-							class="modal_select" required>
-							<option value="">선택</option>
-							<option value="진행중">진행중</option>
-							<option value="완료">완료</option>
-							<option value="보류">보류</option>
-						</select>
 					</div>
 
 					<div class="modal_item">
@@ -499,11 +387,22 @@
 						</select>
 					</div>
 
+					<div class="modal_item">
+						<label class="modal_label">
+							진행상태 <span class="modal_required">*</span>
+						</label>
+
+						<select name="prodStatus" id="insertProdStatus"
+							class="modal_select" required>
+							<option value="진행중">진행중</option>
+							<option value="완료">완료</option>
+							<option value="보류">보류</option>
+						</select>
+					</div>
+
 					<div class="modal_item modal_item_full">
 						<label class="modal_label">비고</label>
-
 						<textarea name="remark" class="modal_textarea"
-							maxlength="500"
 							placeholder="공정진행 관련 메모를 입력하세요."></textarea>
 					</div>
 
@@ -542,219 +441,104 @@
 	line-height: 1.5;
 }
 
-.process-progress-loss-text {
-	margin-top: 4px;
-	font-size: 12px;
-	color: #888;
+.process_progress_table {
+	table-layout: fixed;
 }
 
-.process-progress-rate-box {
+.progress_cell {
 	width: 100%;
-	min-width: 130px;
-}
-
-.process-progress-rate-top {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 8px;
-	margin-bottom: 6px;
-}
-
-.process-progress-rate-top span:first-child {
-	font-weight: 700;
-	color: #333;
-}
-
-.process-progress-bar {
-	width: 100%;
-	height: 8px;
-	border-radius: 999px;
-	background: #e9edf2;
-	overflow: hidden;
-}
-
-.process-progress-bar-fill {
-	height: 100%;
-	border-radius: 999px;
-	background: #2f7d5b;
-}
-
-.process-progress-qty-box {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	width: 100%;
-	box-sizing: border-box;
-}
-
-.process-progress-qty-box .modal_input:first-child {
-	flex: 1 1 auto;
 	min-width: 0;
 }
 
-.process-progress-unit-input {
-	flex: 0 0 80px;
-	text-align: center;
+.progress_bar {
+	width: 100%;
+	height: 7px;
+	background: #e9edf0;
+	border-radius: 99px;
+	overflow: hidden;
+	margin-bottom: 5px;
 }
 
+.progress_bar_fill {
+	height: 100%;
+	background: #174c3c;
+	border-radius: 99px;
+}
 
+.progress_text {
+	font-size: 12px;
+	color: #444;
+	white-space: nowrap;
+}
 </style>
 
 
 <script>
-	/*
-	 * 선택 컬럼명 클릭 시 전체 선택 / 전체 해제
-	 */
-	var processProgressCheckAllLabel = document
-			.getElementById("processProgressCheckAllLabel");
-
-	if (processProgressCheckAllLabel != null) {
-
-		processProgressCheckAllLabel.onclick = function() {
-
-			var checkAll = document.getElementById("processProgressCheckAll");
-			var checks = document.getElementsByName("progressOrderIds");
-
-			if (checkAll == null || checks == null) {
-				return;
-			}
-
-			checkAll.checked = !checkAll.checked;
-
-			for (var i = 0; i < checks.length; i++) {
-				checks[i].checked = checkAll.checked;
-			}
-		};
-	}
-
-
-	/*
-	 * 개별 체크박스 상태에 따라 전체 선택 상태를 맞춘다.
-	 */
-	var progressChecks = document.getElementsByName("progressOrderIds");
-
-	for (var i = 0; i < progressChecks.length; i++) {
-
-		progressChecks[i].onclick = function() {
-
-			var allChecked = true;
-
-			for (var j = 0; j < progressChecks.length; j++) {
-
-				if (!progressChecks[j].checked) {
-					allChecked = false;
-					break;
-				}
-			}
-
-			var checkAll = document.getElementById("processProgressCheckAll");
-
-			if (checkAll != null) {
-				checkAll.checked = allChecked;
-			}
-		};
-	}
-
-
-	/*
-	 * 작업지시 선택 시 LOT, 품목, 지시수량을 자동 표시한다.
-	 */
+	// 작업지시 선택 시 공정진행 등록 정보 자동입력
 	function setProcessProgressOrderInfo() {
 
 		var orderSelect = document.getElementById("insertOrderId");
+
 		var selectedOption = orderSelect.options[orderSelect.selectedIndex];
 
 		if (selectedOption == null || selectedOption.value === "") {
-			document.getElementById("insertWorkOrderDocNo").value = "";
-			document.getElementById("insertProductLot").value = "";
-			document.getElementById("insertItemCode").value = "";
-			document.getElementById("insertItemName").value = "";
-			document.getElementById("insertOrderQtyText").value = "";
-			document.getElementById("insertProdQty").value = "";
-			document.getElementById("insertProdUnit").value = "";
-			setProcessProgressQtyPreview();
+			clearProcessProgressOrderInfo();
 			return;
 		}
 
+		var prodPlanDocNo = selectedOption.getAttribute("data-prod-plan-doc-no");
 		var workOrderDocNo = selectedOption.getAttribute("data-work-order-doc-no");
 		var productLot = selectedOption.getAttribute("data-product-lot");
+		var orderQty = selectedOption.getAttribute("data-order-qty");
 		var itemCode = selectedOption.getAttribute("data-item-code");
 		var itemName = selectedOption.getAttribute("data-item-name");
-		var orderQty = selectedOption.getAttribute("data-order-qty");
 		var itemUnit = selectedOption.getAttribute("data-item-unit");
 
+		document.getElementById("insertProdPlanDocNo").value = prodPlanDocNo || "";
 		document.getElementById("insertWorkOrderDocNo").value = workOrderDocNo || "";
 		document.getElementById("insertProductLot").value = productLot || "";
 		document.getElementById("insertItemCode").value = itemCode || "";
 		document.getElementById("insertItemName").value = itemName || "";
-		document.getElementById("insertProdUnit").value = itemUnit || "";
+
+		document.getElementById("insertOrderQty").value = orderQty || "";
 
 		if (orderQty != null && orderQty !== "") {
 			document.getElementById("insertOrderQtyText").value =
 				formatNumber(orderQty) + " " + (itemUnit || "");
+
 			document.getElementById("insertProdQty").value = orderQty;
 		} else {
 			document.getElementById("insertOrderQtyText").value = "";
 			document.getElementById("insertProdQty").value = "";
 		}
 
-		setProcessProgressQtyPreview();
+		document.getElementById("insertLossQty").value = "0";
 	}
 
+	// 공정진행 등록 정보 초기화
+	function clearProcessProgressOrderInfo() {
 
-	/*
-	 * 생산수량 / 불량수량 천단위 미리보기
-	 */
-	function setProcessProgressQtyPreview() {
-
-		var prodQty = document.getElementById("insertProdQty").value;
-		var lossQty = document.getElementById("insertLossQty").value;
-		var unit = document.getElementById("insertProdUnit").value;
-
-		var prodPreview = document.getElementById("prodQtyPreviewText");
-		var lossPreview = document.getElementById("lossQtyPreviewText");
-
-		if (prodQty == null || prodQty === "") {
-			prodPreview.innerHTML = "생산수량을 입력하세요.";
-		} else if (Number(prodQty) <= 0) {
-			prodPreview.innerHTML = "생산수량은 1 이상 입력해야 합니다.";
-		} else {
-			prodPreview.innerHTML =
-				"생산수량: " + formatNumber(prodQty) + " " + (unit || "");
-		}
-
-		if (lossQty == null || lossQty === "") {
-			lossPreview.innerHTML = "불량수량 미입력 시 0으로 처리됩니다.";
-			return;
-		}
-
-		if (Number(lossQty) < 0) {
-			lossPreview.innerHTML = "불량수량은 0 이상 입력해야 합니다.";
-			return;
-		}
-
-		if (prodQty !== "" && Number(lossQty) > Number(prodQty)) {
-			lossPreview.innerHTML = "불량수량은 생산수량보다 클 수 없습니다.";
-			return;
-		}
-
-		lossPreview.innerHTML =
-			"불량수량: " + formatNumber(lossQty) + " " + (unit || "");
+		document.getElementById("insertProdPlanDocNo").value = "";
+		document.getElementById("insertWorkOrderDocNo").value = "";
+		document.getElementById("insertProductLot").value = "";
+		document.getElementById("insertItemCode").value = "";
+		document.getElementById("insertItemName").value = "";
+		document.getElementById("insertOrderQtyText").value = "";
+		document.getElementById("insertOrderQty").value = "";
+		document.getElementById("insertProdQty").value = "";
+		document.getElementById("insertLossQty").value = "0";
 	}
 
-
-	/*
-	 * 공정실적 등록 검증
-	 */
+	// 공정진행 등록 방어코딩
 	function checkProcessProgressInsert() {
 
 		var orderId = document.getElementById("insertOrderId").value;
+		var orderQty = document.getElementById("insertOrderQty").value;
 		var prodQty = document.getElementById("insertProdQty").value;
 		var lossQty = document.getElementById("insertLossQty").value;
 		var prodDate = document.getElementById("insertProdDate").value;
-		var prodStatus = document.getElementById("insertProdStatus").value;
 		var empId = document.getElementById("insertEmpId").value;
+		var prodStatus = document.getElementById("insertProdStatus").value;
 
 		if (orderId === "") {
 			alert("작업지시를 선택해주세요.");
@@ -768,32 +552,28 @@
 			return false;
 		}
 
-		if (lossQty === "") {
-			document.getElementById("insertLossQty").value = 0;
-			lossQty = 0;
-		}
-
-		if (Number(lossQty) < 0) {
-			alert("불량수량은 0 이상 입력해주세요.");
+		if (lossQty === "" || Number(lossQty) < 0) {
+			alert("LOSS량은 0 이상 입력해주세요.");
 			document.getElementById("insertLossQty").focus();
 			return false;
 		}
 
+		if (orderQty !== "" && Number(prodQty) > Number(orderQty)) {
+			if (!confirm("생산수량이 작업지시수량보다 큽니다.\n그래도 등록하시겠습니까?")) {
+				document.getElementById("insertProdQty").focus();
+				return false;
+			}
+		}
+
 		if (Number(lossQty) > Number(prodQty)) {
-			alert("불량수량은 생산수량보다 클 수 없습니다.");
+			alert("LOSS량은 생산수량보다 클 수 없습니다.");
 			document.getElementById("insertLossQty").focus();
 			return false;
 		}
 
 		if (prodDate === "") {
-			alert("생산일자를 선택해주세요.");
+			alert("생산일을 선택해주세요.");
 			document.getElementById("insertProdDate").focus();
-			return false;
-		}
-
-		if (prodStatus === "") {
-			alert("진행상태를 선택해주세요.");
-			document.getElementById("insertProdStatus").focus();
 			return false;
 		}
 
@@ -803,17 +583,20 @@
 			return false;
 		}
 
-		if (!confirm("공정실적을 등록하시겠습니까?")) {
+		if (prodStatus === "") {
+			alert("진행상태를 선택해주세요.");
+			document.getElementById("insertProdStatus").focus();
+			return false;
+		}
+
+		if (!confirm("공정진행 정보를 등록하시겠습니까?")) {
 			return false;
 		}
 
 		return true;
 	}
 
-
-	/*
-	 * 숫자 천단위 구분 표시
-	 */
+	// 숫자 천단위 구분
 	function formatNumber(value) {
 
 		if (value == null || value === "") {

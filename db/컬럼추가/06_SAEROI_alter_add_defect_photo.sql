@@ -29,3 +29,11 @@ SET use_yn = 'Y'
 WHERE use_yn IS NULL;
 
 COMMIT;
+
+-- 4. 작업지시 테이블 qr정보 컬럼 2개 추가 --
+ALTER TABLE work_order ADD (
+    qr_url VARCHAR2(500),
+    qr_image_path VARCHAR2(500)
+);
+
+COMMIT ;

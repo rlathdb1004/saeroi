@@ -1,13 +1,15 @@
 package kr.or.saeroi.service;
 
+import java.sql.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import kr.or.saeroi.dao.EquipmentStatusDAO;
-import kr.or.saeroi.dto.EquipmentDTO;
+import kr.or.saeroi.dto.EquipmentMaintenanceDTO;
 import kr.or.saeroi.dto.EquipmentStatusDTO;
+import kr.or.saeroi.dto.EquipmentTroubleDTO;
 
 @Service
 public class EquipmentStatusService {
@@ -39,7 +41,17 @@ public class EquipmentStatusService {
 		return dao.delete(ids);		
 	}
 
+	public List<EquipmentMaintenanceDTO> maintenance_history(
+	        int equip_id, Date operation_date) {
 
+	    return dao.maintenance_history(equip_id, operation_date);
+	}
+	
+	public List<EquipmentTroubleDTO> trouble_history(
+	        int equip_id, Date operation_date) {
+
+	    return dao.trouble_history(equip_id, operation_date);
+	}
 
 	
 
