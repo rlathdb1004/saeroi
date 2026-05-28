@@ -473,8 +473,15 @@
        	        		let clickIndex = config.dataPointIndex;
        	        		let defectCode = finalCodes[clickIndex];
        	        		if(defectCode){
-       	        			let targetUrl = '${pageContext.request.contextPath}/quality/defect?keywoed='+encodeURIComponent(defectCode);
-       	        			window.location.href = targetUrl;
+       	        			let currentStartDate = document.querySelector('#startDate').value;
+       	                    let currentEndDate = document.querySelector('#endDate').value;
+       	                    
+       	                 let targetUrl = '${pageContext.request.contextPath}/quality/defect'
+                             + '?startDate=' + encodeURIComponent(currentStartDate)
+                             + '&endDate=' + encodeURIComponent(currentEndDate)
+                             + '&searchType=defectCode'
+                             + '&keyword=' + encodeURIComponent(defectCode);
+       	                 window.location.href = targetUrl;
        	        		}
        	        	}
        	        }
