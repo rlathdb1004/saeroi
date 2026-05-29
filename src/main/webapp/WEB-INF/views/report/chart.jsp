@@ -83,7 +83,10 @@
 .dashboard-container {
 	flex-direction: column; /* 가로 배열을 세로 배열로 변경 ✨ */
 }
-
+.apexcharts-toolbar {
+    top: 30px !important;    /* 🔴 원래 0px 근처인 값을 아래로 내림 (원하는 만큼 수정 가능) */
+    right: 10px !important;  /* 우측 여백 조정 */
+}
 
 </style>
 </head>
@@ -354,7 +357,6 @@
       			+ '<td>' + orderQty.toLocaleString() + '</td>'
       			+ '<td class="mobile_hidden" style="color: #FF4560; font-weight: bold;">' + defectQty.toLocaleString() + '</td>'
       			+ '<td class="mobile_hidden">' + escapeHtml(achievementRate) + '</td>'
-      			+ '<td><a href="' + escapeHtml(detailUrl) + '" class="coDetailBtn">보기</a></td>';
       		tableBody.appendChild(row);
       		
       		totalPlan += Number(item.생산계획량 || 0);
@@ -444,7 +446,7 @@
       	chart: {
       		height: 480,
       		type: 'line',
-      		toolbar: {show:false},
+      		toolbar: {show:true},
       	events: {
       		zoomed:function(chartContext,{xaxis,yaxis}){
       			
