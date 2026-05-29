@@ -1,4 +1,5 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%-- 대시보드 본문 화면이다. --%>
 
 <section class="dashboard-page">
@@ -731,74 +732,103 @@
 		</article>
 
 		<article class="dash-card dash-bottom-card">
-			<div class="dash-card-head">
-				<h3>최근 작업지시</h3>
-				<a href="${pageContext.request.contextPath}/production/workOrder"
-					class="dash-more-link">더보기</a>
-			</div>
+	<div class="dash-card-head">
+		<h3>최근 작업지시</h3>
+		<a href="${pageContext.request.contextPath}/production/workorder"
+			class="dash-more-link">더보기</a>
+	</div>
 
-			<table class="dash-simple-table">
-				<thead>
-					<tr>
-						<th>작업지시</th>
-						<th>품목</th>
-						<th>수량</th>
-						<th>상태</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td>WO-0528-001</td>
-						<td>GSK-A01</td>
-						<td>2,000</td>
-						<td><span class="dash-state dash-state-green">진행</span></td>
-					</tr>
-					<tr>
-						<td>WO-0528-002</td>
-						<td>GSK-B02</td>
-						<td>1,500</td>
-						<td><span class="dash-state dash-state-orange">대기</span></td>
-					</tr>
-					<tr>
-						<td>WO-0528-003</td>
-						<td>GSK-C03</td>
-						<td>3,000</td>
-						<td><span class="dash-state dash-state-blue">검사</span></td>
-					</tr>
-					<tr>
-						<td>WO-0528-004</td>
-						<td>GSK-D04</td>
-						<td>1,200</td>
-						<td><span class="dash-state dash-state-green">진행</span></td>
-					</tr>
-					<tr>
-						<td>WO-0528-005</td>
-						<td>GSK-E05</td>
-						<td>2,400</td>
-						<td><span class="dash-state dash-state-orange">대기</span></td>
-					</tr>
-				</tbody>
-			</table>
-		</article>
+	<table class="dash-simple-table">
+		<thead>
+			<tr>
+				<th>작업지시</th>
+				<th>품목</th>
+				<th>수량</th>
+				<th>상태</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<c:forEach var="workOrder" items="${dashWorkOrderList}">
+				<tr onclick="location.href='${pageContext.request.contextPath}/production/workorder'"
+					style="cursor: pointer;">
+					<td title="${workOrder.docNo}">
+						${workOrder.docNo}
+					</td>
+
+					<td title="${workOrder.itemName}">
+						${workOrder.itemName}
+					</td>
+
+					<td>
+						<fmt:formatNumber value="${workOrder.orderQty}" pattern="#,##0" />
+						${workOrder.itemUnit}
+					</td>
+
+					<td>
+						<c:choose>
+							<c:when test="${workOrder.prodStatus eq '완료'}">
+								<span class="coStatus coStatusUse">
+									${workOrder.prodStatus}
+								</span>
+							</c:when>
+
+							<c:when test="${workOrder.prodStatus eq '취소' or workOrder.prodStatus eq '보류'}">
+								<span class="coStatus coStatusStop">
+									${workOrder.prodStatus}
+								</span>
+							</c:when>
+
+							<c:otherwise>
+								<span class="coStatus">
+									${workOrder.prodStatus}
+								</span>
+							</c:otherwise>
+						</c:choose>
+					</td>
+				</tr>
+			</c:forEach>
+
+			<c:if test="${empty dashWorkOrderList}">
+				<tr>
+					<td colspan="4">등록된 작업지시가 없습니다.</td>
+				</tr>
+			</c:if>
+		</tbody>
+	</table>
+</article>
 
 		<article class="dash-card dash-bottom-card">
 			<div class="dash-card-head">
-				<h3>공지사항</h3>
+				<h3>
+					<a href="${pageContext.request.contextPath}/board/notice">공지사항</a>
+				</h3>
 				<a href="${pageContext.request.contextPath}/board/notice"
 					class="dash-more-link">더보기</a>
 			</div>
 
 			<ul class="dash-notice-list">
-				<li><a href="${pageContext.request.contextPath}/board/notice"><span>5월
-							정기 안전 점검 안내</span><em>05-28</em></a></li>
-				<li><a href="${pageContext.request.contextPath}/board/notice"><span>MES
-							시스템 정기 점검 안내</span><em>05-27</em></a></li>
-				<li><a href="${pageContext.request.contextPath}/board/notice"><span>생산
-							보고서 자동 생성 기능 업데이트</span><em>05-26</em></a></li>
-				<li><a href="${pageContext.request.contextPath}/board/notice"><span>여름철
-							작업장 안전 수칙 안내</span><em>05-25</em></a></li>
-				<li><a href="${pageContext.request.contextPath}/board/notice"><span>현장
-							작업자 QR 등록 안내</span><em>05-24</em></a></li>
+				<c:choose>
+					<c:when test="${empty dashNoticeList}">
+						<li>
+							<a href="${pageContext.request.contextPath}/board/notice">
+								<span>등록된 공지사항이 없습니다.</span>
+								<em>-</em>
+							</a>
+						</li>
+					</c:when>
+
+					<c:otherwise>
+						<c:forEach var="notice" items="${dashNoticeList}">
+							<li>
+								<a href="${pageContext.request.contextPath}/board/notice">
+									<span><c:out value="${notice.title}" /></span>
+									<em><c:out value="${notice.created_date}" /></em>
+								</a>
+							</li>
+						</c:forEach>
+					</c:otherwise>
+				</c:choose>
 			</ul>
 		</article>
 
@@ -1496,9 +1526,38 @@
 					datasets : [
 						{
 							data : [ 82.3, 17.7 ],
-							backgroundColor : [ chartGreen, "#E5E7EB" ],
+							backgroundColor : function(context) {
+								const chart = context.chart;
+								const chartArea = chart.chartArea;
+
+								if (context.active) {
+									return context.dataIndex === 0 ? "#1F7A57" : "#D1D5DB";
+								}
+
+								if (chartArea == null) {
+									return context.dataIndex === 0 ? "rgba(31, 122, 87, 0.34)" : "rgba(229, 231, 235, 0.95)";
+								}
+
+								const gradient = chart.ctx.createLinearGradient(chartArea.left, chartArea.top, chartArea.right, chartArea.bottom);
+
+								if (context.dataIndex === 0) {
+									gradient.addColorStop(0, "rgba(31, 122, 87, 0.52)");
+									gradient.addColorStop(0.55, "rgba(31, 122, 87, 0.34)");
+									gradient.addColorStop(1, "rgba(31, 122, 87, 0.16)");
+
+									return gradient;
+								}
+
+								gradient.addColorStop(0, "rgba(229, 231, 235, 0.98)");
+								gradient.addColorStop(1, "rgba(229, 231, 235, 0.55)");
+
+								return gradient;
+							},
+							hoverBackgroundColor : [ "#1F7A57", "#D1D5DB" ],
+							hoverBorderColor : [ "#166243", "#C7CDD4" ],
 							borderColor : "#FFFFFF",
 							borderWidth : 2,
+							hoverBorderWidth : 3,
 							hoverOffset : 0
 						}
 					]
@@ -1509,6 +1568,15 @@
 					cutout : "68%",
 					rotation : -90,
 					circumference : 180,
+					onHover : function(event, elements) {
+						const target = event.native != null ? event.native.target : event.target;
+
+						if (target == null) {
+							return;
+						}
+
+						target.style.cursor = elements != null && elements.length > 0 ? "pointer" : "default";
+					},
 					plugins : {
 						legend : {
 							display : false

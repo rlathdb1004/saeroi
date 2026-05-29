@@ -794,7 +794,7 @@
 	min-width: 0;
 	margin: 0;
 	color: var(--dash-text);
-	font-size: 15px;
+	font-size: 16px;
 	font-weight: 900;
 	letter-spacing: -0.5px;
 	white-space: nowrap;
@@ -2404,4 +2404,98 @@
 .dashboard-page .dash-black-icon {
 	background-color: #F7F8FA;
 	color: var(--dash-text);
+}
+/* 모바일에서 차트 요약 박스만 가로 3칸으로 유지한다. */
+@media (max-width: 768px) {
+	.dashboard-page .dash-chart-summary {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.dashboard-page .dash-summary-item {
+		min-height: 62px;
+		padding: 10px 6px;
+	}
+
+	.dashboard-page .dash-summary-item + .dash-summary-item {
+		border-top: 0;
+		border-left: 1px solid #E6EEEA;
+	}
+
+	.dashboard-page .dash-chart-summary-red .dash-summary-item + .dash-summary-item {
+		border-left-color: #F2DCDC;
+	}
+
+	.dashboard-page .dash-chart-summary-neutral .dash-summary-item + .dash-summary-item {
+		border-left-color: #E7EBF0;
+	}
+
+	.dashboard-page .dash-summary-label {
+		font-size: 10px;
+		line-height: 1.2;
+		white-space: nowrap;
+	}
+
+	.dashboard-page .dash-summary-value {
+		margin-top: 6px;
+		font-size: 13px;
+		white-space: nowrap;
+	}
+}
+
+/* 모바일에서 설비 가동 상태만 가로 3칸으로 유지한다. */
+@media (max-width: 768px) {
+	.dashboard-page .dash-facility-list {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 8px;
+		width: 100%;
+	}
+
+	.dashboard-page .dash-facility-list li {
+		display: grid;
+		grid-template-columns: 8px minmax(0, 1fr);
+		grid-template-rows: auto auto;
+		align-items: center;
+		gap: 6px 6px;
+		min-width: 0;
+		padding: 10px 8px;
+	}
+
+	.dashboard-page .dash-facility-list li > span {
+		overflow: hidden;
+		font-size: 11px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.dashboard-page .dash-facility-meta {
+		grid-column: 1 / 3;
+		align-items: center;
+		margin-top: 4px;
+	}
+
+	.dashboard-page .dash-facility-meta strong {
+		font-size: 16px;
+	}
+
+	.dashboard-page .dash-facility-meta em {
+		font-size: 10px;
+	}
+}
+/* 대시보드 최근 작업지시 상태 뱃지 크기 조정 */
+.dash-simple-table .coStatus {
+	min-width: 42px;
+	height: 22px;
+	padding: 0 10px;
+	font-size: 11px;
+	line-height: 20px;
+	border-radius: 6px;
+	box-sizing: border-box;
+}
+
+.dash-simple-table .coStatusUse,
+.dash-simple-table .coStatusStop {
+	font-size: 11px;
+	line-height: 20px;
 }
