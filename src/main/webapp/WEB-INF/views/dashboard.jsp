@@ -541,7 +541,8 @@
 						<div class="dash-flow-scroll">
 							<div class="dash-flow-list">
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step"
+									onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
 									<span> <svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M3 7L12 2L21 7L12 12L3 7Z"></path>
 											<path d="M3 17L12 22L21 17"></path>
@@ -552,7 +553,8 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step"
+									onclick="location.href='${pageContext.request.contextPath}/production/productionplan'">
 									<span> <svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M8 2V5"></path>
 											<path d="M16 2V5"></path>
@@ -565,7 +567,8 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step"
+									onclick="location.href='${pageContext.request.contextPath}/production/workorder'">
 									<span> <svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M8 6H21"></path>
 											<path d="M8 12H21"></path>
@@ -579,7 +582,8 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step"
+									onclick="location.href='${pageContext.request.contextPath}/production/processprogress'">
 									<span> <svg viewBox="0 0 24 24" aria-hidden="true">
 											<circle cx="12" cy="12" r="3"></circle>
 											<path
@@ -590,7 +594,8 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step"
+									onclick="location.href='${pageContext.request.contextPath}/production/productionresult'">
 									<span> <svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M4 19V5"></path>
 											<path d="M4 19H20"></path>
@@ -603,7 +608,8 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step"
+									onclick="location.href='${pageContext.request.contextPath}/quality/inspection'">
 									<span> <svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M12 22S20 18 20 10V5L12 2L4 5V10C4 18 12 22 12 22Z"></path>
 											<path d="M9 12L11 14L15 10"></path>
@@ -613,7 +619,8 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step"
+									onclick="location.href='${pageContext.request.contextPath}/inventory/inventoryStatus'">
 									<span> <svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M3 7H16V17H3Z"></path>
 											<path d="M16 10H20L22 13V17H16Z"></path>
@@ -634,7 +641,7 @@
 	<%-- 하단 현황 영역이다. --%>
 	<section class="dash-bottom-grid">
 
-		<article class="dash-card dash-bottom-card">
+		<article class="dash-card dash-bottom-card dash-defect-top5">
 			<div class="dash-card-head">
 				<h3>불량 TOP5</h3>
 				<a href="${pageContext.request.contextPath}/quality/defect"
@@ -711,7 +718,7 @@
 									</c:when>
 
 									<c:when
-										test="${workOrder.prodStatus eq '취소' or workOrder.prodStatus eq '보류'}">
+										test="${workOrder.prodStatus eq '보류' or workOrder.prodStatus eq '취소'}">
 										<span class="coStatus coStatusStop">
 											${workOrder.prodStatus} </span>
 									</c:when>
