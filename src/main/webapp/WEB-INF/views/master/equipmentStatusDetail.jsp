@@ -4,6 +4,42 @@
 
 			<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/common/detail.css">
 
+			<style>
+				.detail_card_title {
+					display: flex;
+					align-items: center;
+					justify-content: space-between;
+					font-size: 18px;
+					font-weight: 600;
+					margin-bottom: 14px;
+				}
+
+				.detail_add_btn {
+					display: inline-flex;
+					align-items: center;
+					gap: 6px;
+
+					padding: 7px 14px;
+
+					border: none;
+					border-radius: 6px;
+
+					background: #2f7d62;
+					color: #fff;
+
+					font-size: 14px;
+					font-weight: 500;
+
+					cursor: pointer;
+					transition: 0.2s;
+				}
+
+				.detail_add_btn svg {
+					width: 16px;
+					height: 16px;
+				}
+			</style>
+
 			<div class="detail_page">
 
 				<div class="detail_header">
@@ -172,27 +208,24 @@
 
 
 						<div class="detail_card">
-
 							<div class="detail_card_title">
 								정비 이력
-								<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
-									or sessionScope.loginUser.role eq 'MANAGER'}">
+								<button type="button" class="detail_add_btn modal_open_btn"
+									data_modal_target="#eqp_main_insert">
 
-									<button type="button" class="search-btn search-btn-main modal_open_btn"
-										data_modal_target="#modal_insert">
+									<svg viewBox="0 0 24 24" fill="none">
+										<path d="M12 5V19" stroke="currentColor" stroke-width="2"
+											stroke-linecap="round">
+										</path>
 
-										<svg viewBox="0 0 24 24" fill="none" width="18" height="18">
-											<path d="M12 5V19" stroke="currentColor" stroke-width="2"
-												stroke-linecap="round">
-											</path>
+										<path d="M5 12H19" stroke="currentColor" stroke-width="2"
+											stroke-linecap="round">
+										</path>
+									</svg>
 
-											<path d="M5 12H19" stroke="currentColor" stroke-width="2"
-												stroke-linecap="round">
-											</path>
-										</svg>
-										등록
-									</button>
-								</c:if>
+									등록
+								</button>
+
 							</div>
 
 							<table class="detail_info_table">
@@ -234,24 +267,21 @@
 						<div class="detail_card">
 							<div class="detail_card_title">
 								고장 이력
-								<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
-									or sessionScope.loginUser.role eq 'MANAGER'}">
+								<button type="button" class="detail_add_btn modal_open_btn"
+									data_modal_target="#eqp_trouble_insert">
 
-									<button type="button" class="search-btn search-btn-main modal_open_btn"
-										data_modal_target="#modal_insert">
+									<svg viewBox="0 0 24 24" fill="none">
+										<path d="M12 5V19" stroke="currentColor" stroke-width="2"
+											stroke-linecap="round">
+										</path>
 
-										<svg viewBox="0 0 24 24" fill="none" width="18" height="18">
-											<path d="M12 5V19" stroke="currentColor" stroke-width="2"
-												stroke-linecap="round">
-											</path>
+										<path d="M5 12H19" stroke="currentColor" stroke-width="2"
+											stroke-linecap="round">
+										</path>
+									</svg>
 
-											<path d="M5 12H19" stroke="currentColor" stroke-width="2"
-												stroke-linecap="round">
-											</path>
-										</svg>
-										등록
-									</button>
-								</c:if>
+									등록
+								</button>
 							</div>
 
 							<table class="detail_info_table">
@@ -299,7 +329,175 @@
 
 				</c:choose>
 
+				<%-- 공통 모달 구조 사용 --%>
+					<div id="eqp_main_insert" class="modal_wrap" aria-hidden="true">
+						<div class="modal_box" role="dialog" aria-modal="true">
+
+							<div class="modal_header">
+								<h3 class="modal_title">설비 정비 이력 등록</h3>
+							</div>
+
+							<form class="modal_form" method="post"
+								action="${pageContext.request.contextPath}/equipment_maintenance/insert"
+								onsubmit="return checkEquipmentInsert();">
+
+								<div class="modal_body modal_body_2col">
+
+									<div class="modal_item">
+										<label class="modal_label">
+											설비명<span class="modal_required">*</span>
+										</label>
+										<input type="text" name="equip_name" value="${eqp.equip_name}"
+											class="modal_input eqp_name" readonly>
+									</div>
+
+									<div class="modal_item">
+										<label class="modal_label">
+											작업자<span class="modal_required">*</span>
+										</label>
+										<select name="empno" class="modal_select id_select" required>
+												<option value="">선택</option>
+												<c:forEach var="emp" items="${empList}">
+													<option value="${emp.empno}">
+														${emp.ename} 
+													</option>
+												</c:forEach>
+											</select>
+									</div>
+
+									<div class="modal_item">
+										<label class="modal_label">
+											정비 일자<span class="modal_required">*</span>
+										</label>
+										<input type="date" name="equip_main_date" class="modal_input" required>
+									</div>
+
+									<div class="modal_item">
+										<label class="modal_label">
+											정비 타입<span class="modal_required">*</span>
+										</label>
+										<input type="text" name="equip_main_type" class="modal_input" required>
+									</div>
+
+									<div class="modal_item">
+										<label class="modal_label">
+											정비 내용<span class="modal_required">*</span>
+										</label>
+										<input type="text" name="equip_main_content" class="modal_input" required>
+									</div>
+
+									<div class="modal_item">
+										<label class="modal_label">
+											정비 시간<span class="modal_required">*</span>
+										</label>
+										<input type="number" name="equip_main_time" class="modal_input" required>
+									</div>
+
+									<div class="modal_item">
+										<label class="modal_label">비고</label>
+										<input type="text" name="remark" class="modal_input">
+									</div>
+								</div>
+
+								<div class="modal_footer">
+									<button type="button" class="modal_btn modal_btn_cancel modal_close_btn">
+										취소
+									</button>
+									<button type="submit" class="modal_btn modal_btn_submit">
+										등록
+									</button>
+								</div>
+							</form>
+						</div>
+					</div>
+
+					<%-- 공통 모달 구조 사용 --%>
+						<div id="eqp_trouble_insert" class="modal_wrap" aria-hidden="true">
+
+							<div class="modal_box" role="dialog" aria-modal="true">
+
+								<div class="modal_header">
+									<h3 class="modal_title">설비 고장 이력 등록</h3>
+								</div>
+
+								<form class="modal_form" method="post"
+									action="${pageContext.request.contextPath}/equipment_trouble/insert"
+									onsubmit="return checkEquipmentInsert();">
+
+									<div class="modal_body modal_body_2col">
+
+										<div class="modal_item">
+											<label class="modal_label">
+												설비명<span class="modal_required">*</span>
+											</label>
+											<input type="text" name="equip_name" value="${eqp.equip_name}"
+												class="modal_input eqp_name" readonly>
+										</div>
+
+										<div class="modal_item">
+											<label class="modal_label">
+												고장 발생일<span class="modal_required">*</span>
+											</label>
+											<input type="datetime-local" name="trouble_date" class="modal_input"
+												required>
+										</div>
+
+										<div class="modal_item">
+											<label class="modal_label">
+												고장 내용<span class="modal_required">*</span>
+											</label>
+											<input type="text" name="trouble_content" class="modal_input" required>
+										</div>
+
+										<div class="modal_item">
+											<label class="modal_label">
+												작업자<span class="modal_required">*</span>
+											</label>
+											<select name="empno" class="modal_select id_select" required>
+												<option value="">선택</option>
+												<c:forEach var="emp" items="${empList}">
+													<option value="${emp.empno}">
+														${emp.ename} 
+													</option>
+												</c:forEach>
+											</select>
+										</div>
+
+										<div class="modal_item">
+											<label class="modal_label">
+												해결 방법
+											</label>
+											<input type="text" name="trouble_resolve" class="modal_input">
+										</div>
+
+										<div class="modal_item">
+											<label class="modal_label">
+												고장 해결일
+											</label>
+											<input type="datetime-local" name="trouble_date" class="modal_input"
+												required>
+										</div>
+
+										<div class="modal_item">
+											<label class="modal_label">비고</label>
+											<input type="text" name="remark" class="modal_input">
+										</div>
+									</div>
+
+									<div class="modal_footer">
+										<button type="button" class="modal_btn modal_btn_cancel modal_close_btn">
+											취소
+										</button>
+										<button type="submit" class="modal_btn modal_btn_submit">
+											등록
+										</button>
+									</div>
+								</form>
+							</div>
+						</div>
+
 			</div>
+
 			<script>
 				const planTime = ${ eqp.plan_time_min };
 

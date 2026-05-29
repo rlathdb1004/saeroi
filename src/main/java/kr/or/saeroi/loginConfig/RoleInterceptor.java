@@ -44,13 +44,26 @@ public class RoleInterceptor extends HandlerInterceptorAdapter {
 
 	    String role = loginUser.getRole();
 
-        // 관리자, 매니저 전체 허용
-        if ("ADMIN".equalsIgnoreCase(role)
-            || "MANAGER".equalsIgnoreCase(role)) {
+        
+        if ("ADMIN".equalsIgnoreCase(role)) {
             return true;
-        }       
+        }           
+        
+        if("MANAGER".equalsIgnoreCase(role)) {
+        	if(uri.contains("/master")) {
+        		response.setContentType("text/html; charset=UTF-8");
+                response.getWriter().write(
+                    "<script>" + "alert('접근 권한이 없습니다.');" +
+                    "location.href='" + request.getContextPath() + "/';" +
+                    "</script>"
+                );
+                response.getWriter().flush();
 
-        // WORKER 허용 페이지
+                return false;
+        	}
+        	return true;
+        }
+
         if ("WORKER".equalsIgnoreCase(role)) {
 
             if (uri.contains("/worker/main")
@@ -61,9 +74,7 @@ public class RoleInterceptor extends HandlerInterceptorAdapter {
                 || uri.contains("/worker/productionresult")
                 || uri.contains("/worker/workorder")
                 || uri.contains("/notice/list")
-                || uri.contains("/mypage")
-
-                // 작업자 화면 날씨 API 허용
+                || uri.contains("/mypage")                
                 || uri.contains("/weather/current")
                 || uri.contains("/weather/today")) {
 
@@ -71,20 +82,16 @@ public class RoleInterceptor extends HandlerInterceptorAdapter {
             }
 
             response.setContentType("text/html; charset=UTF-8");
-
             response.getWriter().write(
-                "<script>" +
-                "alert('접근 권한이 없습니다.');" +
+                "<script>" + "alert('접근 권한이 없습니다.');" +
                 "location.href='" + request.getContextPath() + "/worker/main';" +
                 "</script>"
             );
-
             response.getWriter().flush();
 
             return false;
         }
-
-        // 위 조건에 해당하지 않는 권한은 차단
+        
         response.sendRedirect(request.getContextPath() + "/login");
         return false;
     }

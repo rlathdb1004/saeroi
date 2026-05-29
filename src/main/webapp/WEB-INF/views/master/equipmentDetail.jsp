@@ -115,28 +115,22 @@
 										<td>${eqp.buy_date}</td>
 									</tr>
 
-									<tr>
-										<th>사용 여부</th>
-										<td>
-											<select>
-												<option>Y</option>
-												<option>N</option>
-											</select>
-										</td>
-
+									<tr>										
 										<th>설비 위치</th>
 										<td>${eqp.equip_loc}</td>
 
 										<th>비고</th>
 										<td><input type="text" name="remark" value="${eqp.remark}">
 										</td>
-									</tr>
 
-									<tr>
 										<th>수정일</th>
 										<td>
 											<fmt:formatDate value="${eqp.updated_date}" pattern="yyyy-MM-dd HH:mm:ss" />
 										</td>
+									</tr>
+
+									<tr>
+										
 									</tr>
 								</table>
 							</div>
@@ -184,21 +178,21 @@
 								</tr>
 
 								<tr>
-									<th>사용 여부</th>
-									<td>${eqp.use_yn}</td>
-
+									
 									<th>설비 위치</th>
 									<td>${eqp.equip_loc}</td>
 
 									<th>비고</th>
 									<td>${eqp.remark}</td>
-								</tr>
 
-								<tr>
 									<th>수정일</th>
 									<td>
 										<fmt:formatDate value="${eqp.updated_date}" pattern="yyyy-MM-dd HH:mm:ss" />
 									</td>
+								</tr>
+
+								<tr>
+									
 								</tr>
 							</table>
 						</div>

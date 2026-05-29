@@ -111,8 +111,7 @@ public class EquipmentController {
     		 @RequestParam(required = false) String mode,
     		Model model) {
 
-        EquipmentDTO dto = equipmentService.get_equipment_detail(equip_id);
-        
+        EquipmentDTO dto = equipmentService.get_equipment_detail(equip_id);        
         
         model.addAttribute("clientList",equipmentDAO.get_client_list());
         model.addAttribute("lineList", equipmentDAO.get_line_list());
@@ -126,11 +125,10 @@ public class EquipmentController {
     
     @PostMapping("/equipment/update")
     public String updateEquipment(EquipmentDTO dto) {
-
-    	dto.setEquip_loc(dto.getLine_id() + "라인");
+    	
         equipmentService.update_equipment(dto);
 
-        return "redirect:/equipment/detail?equip_id=" + dto.getEquip_id();
+        return "redirect:/equipment/equipment/detail?equip_id=" + dto.getEquip_id();
     }
    
 }

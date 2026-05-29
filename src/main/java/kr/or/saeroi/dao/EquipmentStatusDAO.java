@@ -444,9 +444,9 @@ public class EquipmentStatusDAO {
 	            dto.setEmp_id(rs.getInt("EMP_ID"));
 	            dto.setEname(rs.getString("ENAME"));
 	            dto.setTrouble_content(rs.getString("TROUBLE_CONTENT"));
-	            dto.setTrouble_date(rs.getDate("TROUBLE_DATE"));
+	            dto.setTrouble_date(rs.getTimestamp("TROUBLE_DATE"));
 	            dto.setTrouble_resolve(rs.getString("TROUBLE_RESOLVE"));
-	            dto.setResolve_date(rs.getDate("RESOLVE_DATE"));
+	            dto.setResolve_date(rs.getTimestamp("RESOLVE_DATE"));
 	            dto.setRemark(rs.getString("REMARK"));
 
 	            list.add(dto);

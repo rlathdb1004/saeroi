@@ -98,10 +98,9 @@
 					<table class="coTable">
 						<thead>
 							<tr>
-								<th class="mobile_show">설비 코드</th>
-								<th class="mobile_show">설비명</th>
 								<th class="mobile_show">설비 상태</th>
-								<th class="mobile_hidden">사용 여부</th>
+								<th class="mobile_show">설비 코드</th>
+								<th class="mobile_show">설비명</th>																
 								<th class="mobile_hidden">설치 위치</th>
 								<th class="mobile_hidden">제조사</th>
 								<th class="mobile_show">비고</th>
@@ -114,8 +113,6 @@
 							<c:forEach var="eqp" items="${list}">
 
 								<tr>
-									<td class="mobile_show">${eqp.equip_code}</td>
-									<td class="mobile_show">${eqp.equip_name}</td>
 									<td class="mobile_show">
 										<c:choose>
 											<c:when test="${eqp.equip_status == '가동'}">
@@ -127,8 +124,10 @@
 												</span>
 											</c:otherwise>
 										</c:choose>
-									</td>
-									<td class="mobile_hidden">${eqp.use_yn}</td>
+									</td>		
+									<td class="mobile_show">${eqp.equip_code}</td>
+									<td class="mobile_show">${eqp.equip_name}</td>
+																
 									<td class="mobile_hidden">${eqp.equip_loc}</td>
 									<td class="mobile_hidden">${eqp.client_name}</td>
 									<td class="mobile_show">${eqp.remark}</td>
@@ -148,60 +147,4 @@
 			<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 
 		</div>
-
-		<script>
-			document.getElementById("checkAllLabel").onclick = function () {
-
-				var checkAll = document.getElementById("checkAll");
-				var checks = document.getElementsByName("eqp_ids");
-
-				checkAll.checked = !checkAll.checked;
-
-				for (var i = 0; i < checks.length; i++) {
-
-					checks[i].checked = checkAll.checked;
-				}
-			};
-
-			var checks = document.getElementsByName("eqp_ids");
-
-			for (var i = 0; i < checks.length; i++) {
-
-				checks[i].onclick = function () {
-
-					var allChecked = true;
-
-					for (var j = 0; j < checks.length; j++) {
-
-						if (!checks[j].checked) {
-							allChecked = false;
-							break;
-						}
-					}
-
-					document.getElementById("checkAll").checked = allChecked;
-				};
-			}
-
-			function deleteCheck() {
-
-				var checks = document.getElementsByName("eqp_ids");
-				var checked = false;
-
-				for (var i = 0; i < checks.length; i++) {
-
-					if (checks[i].checked) {
-						checked = true;
-					}
-				}
-
-				if (!checked) {
-					alert("삭제할 항목을 선택해주세요.");
-					return;
-				}
-
-				if (confirm("선택한 항목을 삭제하시겠습니까?")) {
-					document.getElementById("deleteForm").submit();
-				}
-			}
-		</script>
+		
