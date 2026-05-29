@@ -17,9 +17,6 @@
 
 <style>
 
-	/* =====================================================
-		등록 모달 에러 메시지
-	===================================================== */
 	.input_error_text {
 		margin-top: 6px;
 		font-size: 12px;
@@ -28,9 +25,6 @@
 		display: none;
 	}
 
-	/* =====================================================
-		등록 모달 에러 테두리
-	===================================================== */
 	.input_error {
 		border: 1px solid #e53935 !important;
 	}
@@ -49,41 +43,22 @@
 
 				<div class="search-item">
 					<label class="search-label">시작일</label>
-					<input type="date"
-						name="startDate"
-						class="search-date"
-						value="${startDate}">
+					<input type="date" name="startDate" class="search-date" value="${startDate}">
 				</div>
 
 				<div class="search-item">
 					<label class="search-label">종료일</label>
-					<input type="date"
-						name="endDate"
-						class="search-date"
-						value="${endDate}">
+					<input type="date" name="endDate" class="search-date" value="${endDate}">
 				</div>
 
 				<div class="search-item">
-
 					<label class="search-label">구분</label>
 
-					<select name="inoutType"
-						class="search-select">
-
+					<select name="inoutType" class="search-select">
 						<option value="">전체</option>
-
-						<option value="MI"
-							<c:if test="${inoutType eq 'MI'}">selected</c:if>>
-							입고
-						</option>
-
-						<option value="MO-PROD"
-							<c:if test="${inoutType eq 'MO-PROD'}">selected</c:if>>
-							출고
-						</option>
-
+						<option value="MI" <c:if test="${inoutType eq 'MI'}">selected</c:if>>입고</option>
+						<option value="MO-PROD" <c:if test="${inoutType eq 'MO-PROD'}">selected</c:if>>출고</option>
 					</select>
-
 				</div>
 
 				<div class="search-item">
@@ -97,9 +72,7 @@
 
 				<div class="search-btn-wrap">
 
-					<button type="submit"
-						class="search-btn search-btn-main">
-
+					<button type="submit" class="search-btn search-btn-main">
 						<svg viewBox="0 0 24 24" fill="none">
 							<circle cx="10.5" cy="10.5" r="7.5"
 								stroke="currentColor" stroke-width="2"></circle>
@@ -108,9 +81,7 @@
 								stroke-width="2"
 								stroke-linecap="round"></path>
 						</svg>
-
 						검색
-
 					</button>
 
 					<button type="button"
@@ -130,7 +101,6 @@
 						</svg>
 
 						초기화
-
 					</button>
 
 				</div>
@@ -171,7 +141,6 @@
 						</svg>
 
 						등록
-
 					</button>
 
 					<button type="button"
@@ -202,7 +171,6 @@
 						</svg>
 
 						선택 삭제
-
 					</button>
 
 				</div>
@@ -216,29 +184,20 @@
 			<table class="coTable">
 
 				<thead>
-
 					<tr>
-						<th class="mobile_show">
+						<th>
 							<label id="checkAllLabel">선택</label>
 							<input type="checkbox" id="checkAll" style="display:none;">
 						</th>
 
-						<th class="mobile_hidden">입출고번호</th>
-						<th class="mobile_hidden">입출고구분</th>
-						<th class="mobile_show">품목명</th>
-
-						<%-- =====================================================
-							모바일 표시 컬럼 추가
-							재고조회 화면처럼 모바일에서도 주요 수량 컬럼을 보이게 한다.
-							선택 / 품목명 / 입출고량 / 일자 / 상세 = 총 5개
-						===================================================== --%>
-						<th class="mobile_show">입출고량</th>
-
-						<th class="mobile_hidden">단위</th>
-						<th class="mobile_show">일자</th>
-						<th class="mobile_show">상세</th>
+						<th>입출고번호</th>
+						<th>입출고구분</th>
+						<th>품목명</th>
+						<th>입출고량</th>
+						<th>단위</th>
+						<th>일자</th>
+						<th>상세</th>
 					</tr>
-
 				</thead>
 
 				<tbody>
@@ -249,62 +208,52 @@
 
 						<tr>
 
-							<td class="mobile_show">
+							<td>
 								<input type="checkbox"
 									name="inoutIds"
 									value="${inout.inoutId}">
 							</td>
 
-							<td class="mobile_hidden">
-								${status.count}
+							<%-- =====================================================
+								입출고번호 출력
+								팀장님 요청 기준으로 숫자 INOUT_ID 대체 출력은 하지 않는다.
+								DOC_NO는 등록 시 DB에 반드시 저장되어야 한다.
+							===================================================== --%>
+							<td>
+								${inout.docNo}
 							</td>
 
-							<td class="mobile_hidden">
-
+							<td>
 								<c:choose>
-									<c:when test="${inout.inoutType eq 'MI'}">
-										입고
-									</c:when>
-									<c:when test="${inout.inoutType eq 'MO-PROD'}">
-										출고
-									</c:when>
-									<c:otherwise>
-										${inout.inoutType}
-									</c:otherwise>
+									<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
+									<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
+									<c:otherwise>${inout.inoutType}</c:otherwise>
 								</c:choose>
-
 							</td>
 
-							<td class="mobile_show">
+							<td>
 								${inout.itemName}
 							</td>
 
-							<%-- =====================================================
-								모바일 표시 컬럼 추가
-								thead의 입출고량과 맞춰서 td도 mobile_show로 변경
-							===================================================== --%>
-							<td class="mobile_show">
+							<td>
 								${inout.inoutQty}
 							</td>
 
-							<td class="mobile_hidden">
+							<td>
 								${inout.itemUnit}
 							</td>
 
-							<td class="mobile_show">
+							<td>
 								${inout.inoutDate}
 							</td>
 
-							<td class="mobile_show">
-
+							<td>
 								<button type="button"
 									class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
 
 									보기
-
 								</button>
-
 							</td>
 
 						</tr>
@@ -319,8 +268,15 @@
 
 	</form>
 
+
 	<%-- =========================================================
 		등록 모달
+		공통 영역은 건드리지 않고 등록 모달 내부만 팀장님 요구사항 기준으로 수정
+		- 사원번호는 로그인 사용자 정보로 자동 표시
+		- 담당자 / 거래처명 / 현재재고는 품목 선택 시 자동 표시
+		- 창고위치는 품목 선택 시 select 박스로 자동 표시
+		- LOT번호는 입고 선택 시 자동 생성, 출고 선택 시 기존 LOT select 박스 표시
+		- 작업지시번호 / 문서번호 / 문서순번 입력칸 제거
 	========================================================= --%>
 	<div id="modal_insert"
 		class="modal_wrap"
@@ -345,8 +301,44 @@
 				novalidate
 				onsubmit="return checkInoutInsert();">
 
+				<%-- =====================================================
+					화면에서 제거한 DB 저장용 값
+					사용여부 / 작업지시번호 / 문서번호 / 문서순번은 화면에는 보이지 않게 유지한다.
+					Controller가 해당 값을 받더라도 등록이 깨지지 않도록 hidden 기본값만 전송한다.
+				===================================================== --%>
+				<input type="hidden" name="useYn" value="Y">
+				<input type="hidden" name="orderId" value="0">
+				<input type="hidden" name="docNo" value="">
+				<input type="hidden" name="docSeq" value="0">
+
 				<div class="modal_body modal_body_2col">
 
+					<%-- =====================================================
+						사원번호
+						화면에서는 로그인 사용자 사원번호를 자동 표시한다.
+						실제 저장은 Controller에서 session 로그인 정보 기준으로 한 번 더 처리한다.
+					===================================================== --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							사원번호
+							<span class="modal_required">*</span>
+						</label>
+
+						<input type="number"
+							name="empId"
+							id="insertEmpId"
+							class="modal_input"
+							value="${loginEmpId}"
+							readonly>
+
+					</div>
+
+					<%-- =====================================================
+						입출고구분
+						입고 선택 시 LOT번호 자동 생성
+						출고 선택 시 LOT번호 select 박스 목록 조회
+					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -371,6 +363,10 @@
 
 					</div>
 
+					<%-- =====================================================
+						품목명
+						품목 선택 시 AJAX로 거래처명 / 담당자 / 현재재고 / 창고위치 / LOT 목록을 가져온다.
+					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -402,6 +398,114 @@
 
 					</div>
 
+					<%-- =====================================================
+						거래처명
+						품목 + 입출고구분 기준으로 자동 표시한다.
+						입고는 공급처, 출고는 납품처 기준으로 DAO에서 조회한다.
+					===================================================== --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							거래처명
+						</label>
+
+						<input type="text"
+							id="insertClientName"
+							class="modal_input"
+							readonly>
+
+					</div>
+
+					<%-- =====================================================
+						담당자
+						CLIENT.CLIENT_MAN 값을 자동 표시한다.
+					===================================================== --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							담당자
+						</label>
+
+						<input type="text"
+							id="insertClientManager"
+							class="modal_input"
+							readonly>
+
+					</div>
+
+					<%-- =====================================================
+						창고위치
+						품목 선택 시 INVENTORY 기준 창고위치를 select 박스로 출력한다.
+					===================================================== --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							창고위치
+						</label>
+
+						<select name="stockLocation"
+							id="insertStockLocation"
+							class="modal_select">
+
+							<option value="">창고위치 선택</option>
+
+						</select>
+
+					</div>
+
+					<%-- =====================================================
+						현재재고
+						품목 선택 시 전체 현재재고를 표시하고,
+						창고위치 선택 시 해당 창고의 현재재고로 표시한다.
+					===================================================== --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							현재재고
+						</label>
+
+						<input type="text"
+							id="insertInventoryStock"
+							class="modal_input"
+							readonly>
+
+					</div>
+
+					<%-- =====================================================
+						LOT번호
+						실제 저장용 hidden input은 항상 materialLot 이름을 가진다.
+						입고: 자동 생성된 LOT번호를 input으로 보여준다.
+						출고: 기존 LOT 목록을 select 박스로 보여주고 선택값을 hidden에 복사한다.
+					===================================================== --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							LOT번호
+							<span class="modal_required">*</span>
+						</label>
+
+						<input type="hidden"
+							name="materialLot"
+							id="insertMaterialLot">
+
+						<input type="text"
+							id="insertMaterialLotInput"
+							class="modal_input"
+							readonly>
+
+						<select id="insertMaterialLotSelect"
+							class="modal_select"
+							style="display:none;">
+
+							<option value="">LOT번호 선택</option>
+
+						</select>
+
+					</div>
+
+					<%-- =====================================================
+						입출고수량
+					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -422,6 +526,9 @@
 
 					</div>
 
+					<%-- =====================================================
+						입출고일자
+					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -441,6 +548,30 @@
 
 					</div>
 
+					<%-- =====================================================
+						상태
+						텍스트 입력이 아니라 select 박스로 선택한다.
+					===================================================== --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							상태
+						</label>
+
+						<select name="status"
+							class="modal_select">
+
+							<option value="완료">완료</option>
+							<option value="진행">진행</option>
+							<option value="보류">보류</option>
+
+						</select>
+
+					</div>
+
+					<%-- =====================================================
+						비고
+					===================================================== --%>
 					<div class="modal_item">
 
 						<label class="modal_label">
@@ -486,9 +617,8 @@
 <script>
 
 	// =========================================================
-	// 등록 모달 방어코딩
-	// 아무것도 입력하지 않고 등록하면
-	// 빨간 테두리 + 빨간 안내문 출력
+	// 등록 모달 필수값 방어코딩
+	// 공통 JS는 건드리지 않고 현재 JSP 안에서만 검증한다.
 	// =========================================================
 	function checkInoutInsert() {
 
@@ -504,6 +634,9 @@
 		var inoutDate =
 			document.getElementById("insertInoutDate");
 
+		var materialLot =
+			document.getElementById("insertMaterialLot");
+
 		var inoutTypeError =
 			document.getElementById("inoutTypeError");
 
@@ -516,9 +649,6 @@
 		var dateError =
 			document.getElementById("dateError");
 
-		// =====================================================
-		// 기존 에러 초기화
-		// =====================================================
 		inoutType.classList.remove("input_error");
 		itemId.classList.remove("input_error");
 		inoutQty.classList.remove("input_error");
@@ -531,56 +661,39 @@
 
 		var isValid = true;
 
-		// =====================================================
-		// 입출고구분 체크
-		// =====================================================
 		if (inoutType.value == "") {
 
 			inoutType.classList.add("input_error");
-
-			inoutTypeError.style.display =
-				"block";
-
+			inoutTypeError.style.display = "block";
 			isValid = false;
 		}
 
-		// =====================================================
-		// 품목명 체크
-		// =====================================================
 		if (itemId.value == "") {
 
 			itemId.classList.add("input_error");
-
-			itemError.style.display =
-				"block";
-
+			itemError.style.display = "block";
 			isValid = false;
 		}
 
-		// =====================================================
-		// 입출고수량 체크
-		// =====================================================
 		if (inoutQty.value == ""
 			|| Number(inoutQty.value) <= 0) {
 
 			inoutQty.classList.add("input_error");
-
-			qtyError.style.display =
-				"block";
-
+			qtyError.style.display = "block";
 			isValid = false;
 		}
 
-		// =====================================================
-		// 입출고일자 체크
-		// =====================================================
 		if (inoutDate.value == "") {
 
 			inoutDate.classList.add("input_error");
+			dateError.style.display = "block";
+			isValid = false;
+		}
 
-			dateError.style.display =
-				"block";
+		if (materialLot != null
+			&& materialLot.value == "") {
 
+			alert("LOT번호를 확인해주세요.");
 			isValid = false;
 		}
 
@@ -609,8 +722,72 @@
 	}
 
 	// =========================================================
-	// 오늘 날짜 자동 세팅 + 전체선택 + 에러 자동 해제
+	// 날짜를 yyyy-MM-dd 형식으로 만든다.
 	// =========================================================
+	function formatDateForInput(date) {
+
+		var year =
+			date.getFullYear();
+
+		var month =
+			String(date.getMonth() + 1).padStart(2, "0");
+
+		var day =
+			String(date.getDate()).padStart(2, "0");
+
+		return year + "-" + month + "-" + day;
+	}
+
+	// =========================================================
+	// 입고 LOT번호 자동 생성
+	// DB 저장 전 서버에서도 한 번 더 방어 생성하지만 화면에도 즉시 표시한다.
+	// =========================================================
+	function createInsertMaterialLot() {
+
+		var dateInput =
+			document.getElementById("insertInoutDate");
+
+		var dateText =
+			"";
+
+		if (dateInput != null
+			&& dateInput.value != "") {
+
+			dateText =
+				dateInput.value.replaceAll("-", "");
+
+		} else {
+
+			dateText =
+				formatDateForInput(new Date()).replaceAll("-", "");
+		}
+
+		var randomNo =
+			String(new Date().getTime()).slice(-4);
+
+		return "RMLOT-" + dateText + "-" + randomNo;
+	}
+
+	// =========================================================
+	// JSON 요청 공통 함수
+	// =========================================================
+	function fetchJson(url, callback) {
+
+		fetch(url)
+			.then(function(response) {
+
+				return response.json();
+			})
+			.then(function(data) {
+
+				callback(data);
+			})
+			.catch(function(error) {
+
+				console.error(error);
+			});
+	}
+
 	window.addEventListener("load", function() {
 
 		var dateInput =
@@ -619,22 +796,8 @@
 		if (dateInput != null
 			&& dateInput.value == "") {
 
-			var today =
-				new Date();
-
-			var year =
-				today.getFullYear();
-
-			var month =
-				String(today.getMonth() + 1)
-					.padStart(2, "0");
-
-			var day =
-				String(today.getDate())
-					.padStart(2, "0");
-
 			dateInput.value =
-				year + "-" + month + "-" + day;
+				formatDateForInput(new Date());
 		}
 
 		var checkAllLabel =
@@ -665,66 +828,343 @@
 			});
 		}
 
-		// =====================================================
-		// 입력하면 빨간 경고 자동 제거
-		// =====================================================
-		var inoutType =
+		var insertInoutType =
 			document.getElementById("insertInoutType");
 
-		var itemId =
+		var insertItemId =
 			document.getElementById("insertItemId");
 
-		var inoutQty =
-			document.getElementById("insertInoutQty");
+		var insertClientName =
+			document.getElementById("insertClientName");
 
-		var inoutDate =
-			document.getElementById("insertInoutDate");
+		var insertClientManager =
+			document.getElementById("insertClientManager");
 
-		if (inoutType != null) {
+		var insertStockLocation =
+			document.getElementById("insertStockLocation");
 
-			inoutType.addEventListener("change", function() {
+		var insertInventoryStock =
+			document.getElementById("insertInventoryStock");
 
-				if (inoutType.value != "") {
+		var insertMaterialLot =
+			document.getElementById("insertMaterialLot");
 
-					inoutType.classList.remove("input_error");
-					document.getElementById("inoutTypeError").style.display = "none";
+		var insertMaterialLotInput =
+			document.getElementById("insertMaterialLotInput");
+
+		var insertMaterialLotSelect =
+			document.getElementById("insertMaterialLotSelect");
+
+		// =====================================================
+		// 품목 / 구분 변경 시 거래처명, 담당자, 현재재고 자동 표시
+		// =====================================================
+		function loadItemInfo() {
+
+			if (insertItemId == null
+				|| insertItemId.value == "") {
+
+				if (insertClientName != null) {
+					insertClientName.value = "";
+				}
+
+				if (insertClientManager != null) {
+					insertClientManager.value = "";
+				}
+
+				if (insertInventoryStock != null) {
+					insertInventoryStock.value = "";
+				}
+
+				return;
+			}
+
+			var inoutTypeValue =
+				"";
+
+			if (insertInoutType != null) {
+
+				inoutTypeValue =
+					insertInoutType.value;
+			}
+
+			var url =
+				"${pageContext.request.contextPath}/inventory/materialIn/itemInfo"
+				+ "?itemId=" + encodeURIComponent(insertItemId.value)
+				+ "&inoutType=" + encodeURIComponent(inoutTypeValue);
+
+			fetchJson(url, function(data) {
+
+				if (insertClientName != null) {
+
+					insertClientName.value =
+						data.clientName || "";
+				}
+
+				if (insertClientManager != null) {
+
+					insertClientManager.value =
+						data.clientManager || "";
+				}
+
+				if (insertInventoryStock != null) {
+
+					insertInventoryStock.value =
+						data.inventoryStock == null ? "" : data.inventoryStock;
 				}
 			});
 		}
 
-		if (itemId != null) {
+		// =====================================================
+		// 품목 선택 시 창고위치 select 박스 자동 구성
+		// =====================================================
+		function loadStockLocations() {
 
-			itemId.addEventListener("change", function() {
+			if (insertStockLocation == null) {
 
-				if (itemId.value != "") {
+				return;
+			}
 
-					itemId.classList.remove("input_error");
-					document.getElementById("itemError").style.display = "none";
+			insertStockLocation.innerHTML =
+				"<option value=''>창고위치 선택</option>";
+
+			if (insertItemId == null
+				|| insertItemId.value == "") {
+
+				return;
+			}
+
+			var url =
+				"${pageContext.request.contextPath}/inventory/materialIn/stockLocations"
+				+ "?itemId=" + encodeURIComponent(insertItemId.value);
+
+			fetchJson(url, function(list) {
+
+				for (var i = 0; i < list.length; i++) {
+
+					var option =
+						document.createElement("option");
+
+					option.value =
+						list[i].stockLocation || "";
+
+					option.text =
+						list[i].stockLocation || "";
+
+					option.setAttribute(
+						"data-inventory-stock",
+						list[i].inventoryStock == null ? "" : list[i].inventoryStock);
+
+					insertStockLocation.appendChild(option);
+				}
+
+				if (list.length == 1) {
+
+					insertStockLocation.selectedIndex = 1;
+					setStockLocationInventory();
 				}
 			});
 		}
 
-		if (inoutQty != null) {
+		// =====================================================
+		// 창고위치 선택 시 해당 창고 현재재고 표시
+		// =====================================================
+		function setStockLocationInventory() {
 
-			inoutQty.addEventListener("input", function() {
+			if (insertStockLocation == null
+				|| insertInventoryStock == null) {
 
-				if (inoutQty.value != ""
-					&& Number(inoutQty.value) > 0) {
+				return;
+			}
 
-					inoutQty.classList.remove("input_error");
-					document.getElementById("qtyError").style.display = "none";
+			var option =
+				insertStockLocation.options[insertStockLocation.selectedIndex];
+
+			if (option == null) {
+
+				return;
+			}
+
+			var stock =
+				option.getAttribute("data-inventory-stock");
+
+			if (stock != null
+				&& stock != "") {
+
+				insertInventoryStock.value =
+					stock;
+			}
+		}
+
+		// =====================================================
+		// 입출고구분에 따라 LOT번호 입력 방식을 바꾼다.
+		// 입고: 자동 생성 input
+		// 출고: 기존 LOT 목록 select
+		// =====================================================
+		function refreshMaterialLotArea() {
+
+			if (insertMaterialLot == null
+				|| insertMaterialLotInput == null
+				|| insertMaterialLotSelect == null) {
+
+				return;
+			}
+
+			var inoutTypeValue =
+				insertInoutType == null ? "" : insertInoutType.value;
+
+			if (inoutTypeValue == "MI") {
+
+				var lotNo =
+					createInsertMaterialLot();
+
+				insertMaterialLot.value =
+					lotNo;
+
+				insertMaterialLotInput.value =
+					lotNo;
+
+				insertMaterialLotInput.style.display =
+					"";
+
+				insertMaterialLotSelect.style.display =
+					"none";
+
+				return;
+			}
+
+			if (inoutTypeValue == "MO-PROD") {
+
+				insertMaterialLot.value =
+					"";
+
+				insertMaterialLotInput.value =
+					"";
+
+				insertMaterialLotInput.style.display =
+					"none";
+
+				insertMaterialLotSelect.style.display =
+					"";
+
+				loadMaterialLotList();
+
+				return;
+			}
+
+			insertMaterialLot.value =
+				"";
+
+			insertMaterialLotInput.value =
+				"";
+
+			insertMaterialLotInput.style.display =
+				"";
+
+			insertMaterialLotSelect.style.display =
+				"none";
+		}
+
+		// =====================================================
+		// 출고용 LOT 목록 조회
+		// =====================================================
+		function loadMaterialLotList() {
+
+			if (insertMaterialLotSelect == null) {
+
+				return;
+			}
+
+			insertMaterialLotSelect.innerHTML =
+				"<option value=''>LOT번호 선택</option>";
+
+			if (insertItemId == null
+				|| insertItemId.value == "") {
+
+				return;
+			}
+
+			var url =
+				"${pageContext.request.contextPath}/inventory/materialIn/lotList"
+				+ "?itemId=" + encodeURIComponent(insertItemId.value);
+
+			fetchJson(url, function(list) {
+
+				for (var i = 0; i < list.length; i++) {
+
+					var option =
+						document.createElement("option");
+
+					option.value =
+						list[i].materialLot || "";
+
+					var remainQty =
+						0;
+
+					if (list[i].remainQty != null) {
+
+						remainQty =
+							list[i].remainQty;
+
+					} else if (list[i].inoutQty != null) {
+
+						remainQty =
+							list[i].inoutQty;
+					}
+
+					option.text =
+						(list[i].materialLot || "")
+						+ " / 잔량 "
+						+ remainQty;
+
+					insertMaterialLotSelect.appendChild(option);
 				}
 			});
 		}
 
-		if (inoutDate != null) {
+		if (insertInoutType != null) {
 
-			inoutDate.addEventListener("change", function() {
+			insertInoutType.addEventListener("change", function() {
 
-				if (inoutDate.value != "") {
+				loadItemInfo();
+				refreshMaterialLotArea();
+			});
+		}
 
-					inoutDate.classList.remove("input_error");
-					document.getElementById("dateError").style.display = "none";
+		if (insertItemId != null) {
+
+			insertItemId.addEventListener("change", function() {
+
+				loadItemInfo();
+				loadStockLocations();
+				refreshMaterialLotArea();
+			});
+		}
+
+		if (insertStockLocation != null) {
+
+			insertStockLocation.addEventListener("change", setStockLocationInventory);
+		}
+
+		if (insertMaterialLotSelect != null) {
+
+			insertMaterialLotSelect.addEventListener("change", function() {
+
+				if (insertMaterialLot != null) {
+
+					insertMaterialLot.value =
+						insertMaterialLotSelect.value;
+				}
+			});
+		}
+
+		if (dateInput != null) {
+
+			dateInput.addEventListener("change", function() {
+
+				if (insertInoutType != null
+					&& insertInoutType.value == "MI") {
+
+					refreshMaterialLotArea();
 				}
 			});
 		}
