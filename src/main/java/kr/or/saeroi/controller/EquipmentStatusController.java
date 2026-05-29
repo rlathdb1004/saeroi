@@ -113,9 +113,15 @@ public class EquipmentStatusController {
         return "redirect:/equipment/equipmentstatus";
     }
     
+    @PostMapping("/equipment_trouble/insert")
+    public String trouble_insert(EquipmentStatusDTO dto) {
+        service.trouble_insert(dto);
+        return "redirect:/equipment/equipmentstatus/detail?history_id=\" + dto.getHistory_id()";
+    }
+    
     @PostMapping("/equipment_trouble/update")
     public String update_trouble(EquipmentStatusDTO dto) {
-        service.update(dto);
+        service.trouble_update(dto);
         return "redirect:/equipment/equipmentstatus/detail?history_id=" + dto.getHistory_id();
     }
 }

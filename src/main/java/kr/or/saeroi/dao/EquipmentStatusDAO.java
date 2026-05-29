@@ -230,7 +230,45 @@ public class EquipmentStatusDAO {
 	        e.printStackTrace();
 	    }
 	    return result;
-	}	
+	}
+	
+	public int trouble_insert(EquipmentStatusDTO dto) {
+		int result = 0;
+
+	    String sql =
+	        "INSERT INTO EQUIPMENT_TROUBLE (" +
+	        "TROUBLE_ID, EQUIP_ID, "+
+	        "EMP_ID, TROUBLE_CONTENT, TROUBLE_DATE, " +
+	        "TROUBLE_RESOLVE, RESOLVE_DATE, REMARK, " +
+	        "CREATED_DATE, UPDATED_DATE) " +
+	        "VALUES (" +
+	        "EQUIPMENT_HISTORY_SEQ.NEXTVAL, ?, "+
+	        "?, ?, ?, ?, " +
+	        "?, ?, ?, " +
+	        "SYSDATE, SYSDATE)";
+
+	    try (
+	        Connection conn = dataSource.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql)
+	    ) {
+
+	        ps.setInt(1, dto.getEquip_id());
+	        ps.setDate(2, dto.getOperation_date());
+	        ps.setDate(3, dto.getOperation_date());
+	        ps.setDate(4, dto.getOperation_date());
+	        ps.setInt(5, dto.getPlan_time_min());
+	        ps.setInt(6, dto.getRuntime_min());
+	        ps.setInt(7, dto.getDowntime_min());
+	        ps.setString(8, dto.getDown_reason());
+	        ps.setString(9, dto.getRemark());
+
+	        result = ps.executeUpdate();
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return result;
+	}
 	
 	public EquipmentStatusDTO equipment_status_detail(int history_id) {
 
@@ -282,6 +320,35 @@ public class EquipmentStatusDAO {
 
 	    String sql =
 	        "UPDATE EQUIPMENT_HISTORY " +
+	        "SET RUNTIME_MIN = ?, " +
+	        "    DOWNTIME_MIN = ?, " +
+	        "    DOWN_REASON = ?, " +
+	        "    REMARK = ? " +	          
+	        "WHERE HISTORY_ID = ?";
+
+	    try (
+	        Connection conn = dataSource.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql)
+	    ) {
+
+	        ps.setInt(1, dto.getRuntime_min());
+	        ps.setInt(2, dto.getDowntime_min());
+	        ps.setString(3, dto.getDown_reason());
+	        ps.setString(4, dto.getRemark());
+	        ps.setInt(5, dto.getHistory_id());
+
+	        result = ps.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return result;
+	}
+	
+	public int truoble_update(EquipmentStatusDTO dto) {
+		int result = 0;
+
+	    String sql =
+	        "UPDATE EQUIPMENT_TROUBLE " +
 	        "SET RUNTIME_MIN = ?, " +
 	        "    DOWNTIME_MIN = ?, " +
 	        "    DOWN_REASON = ?, " +
@@ -456,4 +523,8 @@ public class EquipmentStatusDAO {
 	    }
 	    return list;
 	}
+
+	
+
+	
 }
