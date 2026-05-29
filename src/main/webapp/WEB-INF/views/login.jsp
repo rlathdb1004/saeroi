@@ -294,7 +294,7 @@
                 <label>비밀번호</label>
                 <div class="pw-box">
                     <input type="password" class="pw" name="pw" placeholder="비밀번호를 입력하세요" required>
-                    <button type="button" class="pwShow" onclick="togglePassword()">
+                    <button type="button" class="pwShow">
                         <i class="fa-regular fa-eye"></i>
                     </button>
                 </div>
@@ -312,7 +312,7 @@
             </label>
 
             <button class="btn primary-btn" type="submit">로그인</button>
-            <button class="btn" type="button" onclick="openModal()">비밀번호 찾기</button>
+            <button class="btn" type="button">비밀번호 찾기</button>
         </form>
 
         <div class="modal-overlay" id="pwModal">
@@ -336,86 +336,109 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn" onclick="closeModal()">취소</button>
-                    <button type="button" class="btn primary" onclick="findPassword()">발송</button>
+                    <button type="button" class="btn">취소</button>
+                    <button type="button" class="btn primary" >발송</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script>
-        const pw = document.querySelector(".pw");
-        const show = document.querySelector(".pwShow");
+   <script>
 
-        pw.addEventListener("input", () => {
-            show.style.display = pw.value.length > 0 ? "block" : "none";
+document.addEventListener("DOMContentLoaded", () => {
+
+    const ctx = "${pageContext.request.contextPath}";
+
+    const pw = document.querySelector(".pw");
+    const show = document.querySelector(".pwShow");
+
+    const modal = document.getElementById("pwModal");
+
+    const openBtn = document.querySelector(".btn:not(.primary-btn)");
+    const closeBtn = document.querySelector(".modal-footer .btn");
+
+    const sendBtn = document.querySelector(".modal-footer .primary");
+
+    pw.addEventListener("input", () => {
+        show.style.display = pw.value.length > 0 ? "block" : "none";
+    });
+
+    show.addEventListener("click", () => {
+
+        const icon = show.querySelector("i");
+
+        if (pw.type === "password") {
+            pw.type = "text";
+            icon.classList.replace("fa-eye", "fa-eye-slash");
+        } else {
+            pw.type = "password";
+            icon.classList.replace("fa-eye-slash", "fa-eye");
+        }
+    });
+
+    openBtn.addEventListener("click", () => {
+        modal.style.display = "flex";
+    });
+
+    closeBtn.addEventListener("click", () => {
+
+        modal.style.display = "none";
+
+        document.getElementById("find_empno").value = "";
+        document.getElementById("find_email").value = "";
+        document.getElementById("modalMsg").textContent = "";
+    });
+
+    sendBtn.addEventListener("click", () => {
+
+        const empno = document.getElementById("find_empno").value;
+        const email = document.getElementById("find_email").value;
+        const msg = document.getElementById("modalMsg");
+
+        console.log("send clicked");
+
+        if (!empno || !email) {
+
+            msg.style.color = "#df473c";
+            msg.innerHTML =
+                "<i class='fa-solid fa-circle-exclamation'></i> 사원번호와 이메일을 입력하세요.";
+
+            return;
+        }
+
+        fetch(ctx + "/find_pw", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                empno: empno,
+                email: email
+            })
+        })
+        .then(res => {
+            console.log(res);
+            return res.json();
+        })
+        .then(data => {
+
+            msg.style.color =
+                data.success ? "#1e6e53" : "#df473c";
+            msg.textContent = data.message;
+        })
+        .catch(err => {
+            console.log(err);
+            msg.style.color = "#df473c";
+            msg.textContent = "서버 오류가 발생했습니다.";
         });
+    });
 
-        function togglePassword() {
-            const icon = show.querySelector("i");
-            if (pw.type === "password") {
-                pw.type = "text";
-                icon.classList.remove("fa-eye");
-                icon.classList.add("fa-eye-slash");
-            } else {
-                pw.type = "password";
-                icon.classList.remove("fa-eye-slash");
-                icon.classList.add("fa-eye");
-            }
-        }
+});
 
-        function openModal() {
-            document.getElementById("pwModal").style.display = "flex";
-        }
-
-        function closeModal() {
-            document.getElementById("pwModal").style.display = "none";
-            document.getElementById("find_empno").value = "";
-            document.getElementById("find_email").value = "";
-            document.getElementById("modalMsg").textContent = "";
-        }
-
-        function findPassword() {
-            const empno = document.getElementById("find_empno").value;
-            const email = document.getElementById("find_email").value;
-            const msg = document.getElementById("modalMsg");
-
-            if (!empno || !email) {
-                msg.style.color = "#df473c";
-                msg.innerHTML = "<i class='fa-solid fa-circle-exclamation'></i> 사원번호와 이메일을 입력하세요.";
-                return;
-            }
-            
-            fetch("${pageContext.request.contextPath}/find_pw", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ empno: empno, email: email })
-            })
-            .then(res => res.json())
-            .then(data => {
-                msg.style.color = data.success ? "#1e6e53" : "#df473c";
-                msg.textContent = data.message;
-            })
-            .catch(() => {
-                msg.style.color = "#df473c";
-                msg.textContent = "서버 오류가 발생했습니다.";
-            });
-        }
-        
-        document.title = "SAEROI MES";
-        (function () {
-            var favicon = document.querySelector("link[rel='icon']");
-            if (!favicon) {
-                favicon = document.createElement("link");
-                favicon.rel = "icon";
-                document.head.appendChild(favicon);
-            }           
-            favicon.type = "image/x-icon";
-            favicon.href = "${pageContext.request.contextPath}/resources/favicon.ico?v=1";
-        })();
-    </script>
+</script>
 </body>
 
 </html>

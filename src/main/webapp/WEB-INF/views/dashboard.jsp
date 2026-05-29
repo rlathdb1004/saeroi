@@ -36,141 +36,153 @@
 	</section>
 
 	<%-- KPI 핵심 6대 지표 영역이다. --%>
-	<section class="dash-kpi-panel">
+<section class="dash-kpi-panel">
 
-		<div class="dash-kpi-panel-head">
-			<h3>KPI 핵심 6대 지표</h3>
-		</div>
+	<div class="dash-kpi-panel-head">
+		<h3>KPI 핵심 6대 지표</h3>
+	</div>
 
-		<section class="dash-kpi-grid">
+	<section class="dash-kpi-grid">
 
-			<article class="dash-kpi-card">
-				<div class="dash-kpi-head">
-					<strong>생산달성률</strong> <span class="dash-info-mini">i</span>
-				</div>
+		<article class="dash-kpi-card">
+			<div class="dash-kpi-head">
+				<strong>생산달성률</strong>
+				<span class="dash-info-mini">i</span>
+			</div>
 
-				<div class="dash-kpi-body">
-					<span class="dash-kpi-icon dash-green-icon"> <svg
-							viewBox="0 0 24 24" aria-hidden="true">
+			<div class="dash-kpi-body">
+				<span class="dash-kpi-icon dash-green-icon">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
 						<circle cx="12" cy="12" r="8"></circle>
 						<circle cx="12" cy="12" r="4"></circle>
 						<path d="M12 12L18 6"></path>
 						<path d="M17 6H20V9"></path>
 					</svg>
-					</span>
+				</span>
 
-					<div class="dash-kpi-value dash-green-text">
-						<strong>96.4</strong> <span>%</span>
-					</div>
+				<div class="dash-kpi-value dash-green-text">
+					<strong>96.4</strong>
+					<span>%</span>
 				</div>
+			</div>
 
-				<div class="dash-kpi-detail">
-					<span>목표 <strong>20,000 EA</strong></span> <span>실적 <strong>19,280
-							EA</strong></span>
-				</div>
+			<div class="dash-kpi-detail">
+				<span>목표 <strong>20,000 EA</strong></span>
+				<span>실적 <strong>19,280 EA</strong></span>
+			</div>
 
-				<div class="dash-kpi-bottom">
-					<span>전일 대비</span> <strong class="dash-up">▲ 2.1%p</strong>
-				</div>
-			</article>
+			<div class="dash-kpi-bottom">
+				<span>전일 대비</span>
+				<strong class="dash-up">▲ 2.1%p</strong>
+			</div>
+		</article>
 
-			<article class="dash-kpi-card">
-				<div class="dash-kpi-head">
-					<strong>금일 생산량</strong> <span class="dash-info-mini">i</span>
-				</div>
+		<article class="dash-kpi-card">
+			<div class="dash-kpi-head">
+				<strong>금일 생산량</strong>
+				<span class="dash-info-mini">i</span>
+			</div>
 
-				<div class="dash-kpi-body">
-					<span class="dash-kpi-icon dash-green-icon"> <svg
-							viewBox="0 0 24 24" aria-hidden="true">
+			<div class="dash-kpi-body">
+				<span class="dash-kpi-icon dash-green-icon">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M5 19V13"></path>
 						<path d="M10 19V9"></path>
 						<path d="M15 19V5"></path>
 						<path d="M20 19V11"></path>
 					</svg>
-					</span>
+				</span>
 
-					<div class="dash-kpi-value dash-green-text">
-						<strong>12,480</strong> <span>EA</span>
-					</div>
+				<div class="dash-kpi-value dash-green-text">
+					<strong>12,480</strong>
+					<span>EA</span>
 				</div>
+			</div>
 
-				<div class="dash-kpi-detail">
-					<span>전일 <strong>11,230 EA</strong></span>
-				</div>
+			<div class="dash-kpi-detail">
+				<span>전일 <strong>11,230 EA</strong></span>
+			</div>
 
-				<div class="dash-kpi-bottom">
-					<span>전일 대비</span> <strong class="dash-up">▲ 1,250 EA</strong>
-				</div>
-			</article>
+			<div class="dash-kpi-bottom">
+				<span>전일 대비</span>
+				<strong class="dash-up">▲ 1,250 EA</strong>
+			</div>
+		</article>
 
-			<article class="dash-kpi-card">
-				<div class="dash-kpi-head">
-					<strong>불량률</strong> <span class="dash-info-mini">i</span>
-				</div>
+		<article class="dash-kpi-card">
+			<div class="dash-kpi-head">
+				<strong>불량률</strong>
+				<span class="dash-info-mini">i</span>
+			</div>
 
-				<div class="dash-kpi-body">
-					<span class="dash-kpi-icon dash-red-icon"> <svg
-							viewBox="0 0 24 24" aria-hidden="true">
+			<div class="dash-kpi-body">
+				<span class="dash-kpi-icon dash-red-icon">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M12 22S20 18 20 10V5L12 2L4 5V10C4 18 12 22 12 22Z"></path>
 						<path d="M9 9L15 15"></path>
 						<path d="M15 9L9 15"></path>
 					</svg>
-					</span>
+				</span>
 
-					<div class="dash-kpi-value dash-red-text">
-						<strong>1.8</strong> <span>%</span>
-					</div>
+				<div class="dash-kpi-value dash-red-text">
+					<strong>1.8</strong>
+					<span>%</span>
 				</div>
+			</div>
 
-				<div class="dash-kpi-detail">
-					<span>불량 <strong>225 EA</strong></span> <span>검사 <strong>12,480
-							EA</strong></span>
-				</div>
+			<div class="dash-kpi-detail">
+				<span>불량 <strong>225 EA</strong></span>
+				<span>검사 <strong>12,480 EA</strong></span>
+			</div>
 
-				<div class="dash-kpi-bottom">
-					<span>전일 대비</span> <strong class="dash-down">▼ 0.4%p</strong>
-				</div>
-			</article>
+			<div class="dash-kpi-bottom">
+				<span>전일 대비</span>
+				<strong class="dash-down">▼ 0.4%p</strong>
+			</div>
+		</article>
 
-			<article class="dash-kpi-card">
-				<div class="dash-kpi-head">
-					<strong>생산원가</strong> <span class="dash-info-mini">i</span>
-				</div>
+		<article class="dash-kpi-card">
+			<div class="dash-kpi-head">
+				<strong>생산원가</strong>
+				<span class="dash-info-mini">i</span>
+			</div>
 
-				<div class="dash-kpi-body">
-					<span class="dash-kpi-icon dash-blue-icon"> <svg
-							viewBox="0 0 24 24" aria-hidden="true">
+			<div class="dash-kpi-body">
+				<span class="dash-kpi-icon dash-blue-icon">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M12 2V22"></path>
-						<path
-								d="M17 5H9.5C7.6 5 6 6.3 6 8C6 9.7 7.6 11 9.5 11H14.5C16.4 11 18 12.3 18 14C18 15.7 16.4 17 14.5 17H6"></path>
+						<path d="M17 5H9.5C7.6 5 6 6.3 6 8C6 9.7 7.6 11 9.5 11H14.5C16.4 11 18 12.3 18 14C18 15.7 16.4 17 14.5 17H6"></path>
 					</svg>
-					</span>
+				</span>
 
-					<div class="dash-kpi-value dash-blue-text">
-						<strong>842</strong> <span>만원</span>
-					</div>
+				<div class="dash-kpi-value dash-blue-text">
+					<strong>842</strong>
+					<span>만원</span>
 				</div>
+			</div>
 
-				<div class="dash-kpi-detail">
-					<span>목표 <strong>880 만원</strong></span> <span>실적 <strong>842
-							만원</strong></span>
-				</div>
+			<div class="dash-kpi-detail">
+				<span>목표 <strong>880 만원</strong></span>
+				<span>실적 <strong>842 만원</strong></span>
+			</div>
 
-				<div class="dash-kpi-bottom">
-					<span>전일 대비</span> <strong class="dash-up">▼ 18만원</strong>
-				</div>
-			</article>
+			<div class="dash-kpi-bottom">
+				<span>전일 대비</span>
+				<strong class="dash-up">▼ 18만원</strong>
+			</div>
+		</article>
 
-			<article class="dash-kpi-card">
-				<div class="dash-kpi-head">
-					<strong>OEE</strong> <span class="dash-info-mini">i</span>
-				</div>
+		<article class="dash-kpi-card">
+			<div class="dash-kpi-head">
+				<strong>OEE</strong>
+				<span class="dash-info-mini">i</span>
+			</div>
 
-				<div class="dash-kpi-body">
-					<span class="dash-kpi-icon dash-green-icon dash-oee-icon"> <svg
-							class="dash-oee-svg" viewBox="0 0 64 64" aria-hidden="true">
+			<div class="dash-kpi-body">
+				<span class="dash-kpi-icon dash-green-icon dash-oee-icon">
+					<svg class="dash-oee-svg" viewBox="0 0 64 64" aria-hidden="true">
 						<path class="dash-oee-arc"
-								d="M12 42C12 30.95 20.95 22 32 22C43.05 22 52 30.95 52 42"></path>
+							  d="M12 42C12 30.95 20.95 22 32 22C43.05 22 52 30.95 52 42"></path>
 						<path class="dash-oee-tick" d="M16 42H10"></path>
 						<path class="dash-oee-tick" d="M20.5 30.5L16.2 26.2"></path>
 						<path class="dash-oee-tick" d="M32 26V19"></path>
@@ -179,126 +191,133 @@
 						<path class="dash-oee-needle" d="M32 42L44 30"></path>
 						<circle class="dash-oee-center" cx="32" cy="42" r="4"></circle>
 					</svg>
-					</span>
+				</span>
 
-					<div class="dash-kpi-value dash-green-text">
-						<strong>87.6</strong> <span>%</span>
-					</div>
+				<div class="dash-kpi-value dash-green-text">
+					<strong>87.6</strong>
+					<span>%</span>
 				</div>
+			</div>
 
-				<div class="dash-kpi-detail">
-					<span>설비 효율 기준</span>
-				</div>
+			<div class="dash-kpi-detail">
+				<span>설비 효율 기준</span>
+			</div>
 
-				<div class="dash-kpi-bottom">
-					<span>전일 대비</span> <strong class="dash-up">▲ 1.1%p</strong>
-				</div>
-			</article>
+			<div class="dash-kpi-bottom">
+				<span>전일 대비</span>
+				<strong class="dash-up">▲ 1.1%p</strong>
+			</div>
+		</article>
 
-			<article class="dash-kpi-card">
-				<div class="dash-kpi-head">
-					<strong>지연 작업지시</strong> <span class="dash-info-mini">i</span>
-				</div>
+		<article class="dash-kpi-card">
+			<div class="dash-kpi-head">
+				<strong>지연 작업지시</strong>
+				<span class="dash-info-mini">i</span>
+			</div>
 
-				<div class="dash-kpi-body">
-					<span class="dash-kpi-icon dash-orange-icon"> <svg
-							viewBox="0 0 24 24" aria-hidden="true">
+			<div class="dash-kpi-body">
+				<span class="dash-kpi-icon dash-orange-icon">
+					<svg viewBox="0 0 24 24" aria-hidden="true">
 						<circle cx="12" cy="12" r="9"></circle>
 						<path d="M12 7V12L16 15"></path>
 					</svg>
-					</span>
+				</span>
 
-					<div class="dash-kpi-value dash-orange-text">
-						<strong>8</strong> <span>건</span>
-					</div>
+				<div class="dash-kpi-value dash-orange-text">
+					<strong>8</strong>
+					<span>건</span>
 				</div>
+			</div>
 
-				<div class="dash-kpi-detail">
-					<span>지연 수량 <strong>2,340 EA</strong></span>
-				</div>
+			<div class="dash-kpi-detail">
+				<span>지연 수량 <strong>2,340 EA</strong></span>
+			</div>
 
-				<div class="dash-kpi-bottom">
-					<span>전일 대비</span> <strong class="dash-orange-text">▲ 2건</strong>
-				</div>
-			</article>
-
-		</section>
+			<div class="dash-kpi-bottom">
+				<span>전일 대비</span>
+				<strong class="dash-orange-text">▲ 2건</strong>
+			</div>
+		</article>
 
 	</section>
 
+</section>
+
 	<%-- 현장 이슈와 LOT 현황 영역이다. --%>
-	<section class="dash-alert-panel">
+<section class="dash-alert-panel">
 
-		<div class="dash-alert-panel-head">
-			<h3>현장 이슈 &amp; LOT 현황</h3>
-			<p>주요 현장 이슈와 LOT 진행 현황을 확인하세요.</p>
-		</div>
+	<div class="dash-alert-panel-head">
+		<h3>현장 이슈 &amp; LOT 현황</h3>
+		<p>주요 현장 이슈와 LOT 진행 현황을 확인하세요.</p>
+	</div>
 
-		<div class="dash-alert-main">
-			<span class="dash-alert-bell"> <svg viewBox="0 0 24 24"
-					aria-hidden="true">
+	<div class="dash-alert-main">
+		<span class="dash-alert-bell">
+			<svg viewBox="0 0 24 24" aria-hidden="true">
 				<path d="M18 8A6 6 0 0 0 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8"></path>
 				<path d="M10 21H14"></path>
 			</svg>
-			</span> <strong>긴급 알림</strong> <em>3건</em>
-		</div>
+		</span>
 
-		<div class="dash-alert-items">
-			<div class="dash-alert-card">
-				<div class="dash-alert-text">
-					<div class="dash-alert-title-row">
-						<strong>불량 경고</strong>
-						<time>10:18</time>
-					</div>
+		<strong>긴급 알림</strong>
+		<em>3건</em>
+	</div>
 
-					<span class="dash-alert-desc"> 불량률 1.8% <span
-						class="dash-alert-desc-sub">(기준 1.5% 초과)</span>
-					</span>
+	<div class="dash-alert-items">
+		<div class="dash-alert-card">
+			<div class="dash-alert-text">
+				<div class="dash-alert-title-row">
+					<strong>불량 경고</strong>
+					<time>10:18</time>
 				</div>
-			</div>
 
-			<div class="dash-alert-card">
-				<div class="dash-alert-text">
-					<div class="dash-alert-title-row">
-						<strong>설비 고장</strong>
-						<time>09:25</time>
-					</div>
-
-					<span>M-10 OC 석서 이상</span>
-				</div>
-			</div>
-
-			<div class="dash-alert-card dash-alert-orange">
-				<div class="dash-alert-text">
-					<div class="dash-alert-title-row">
-						<strong>지연 작업지시</strong>
-						<time>10:20</time>
-					</div>
-
-					<span>지연 작업지시 8건 발생</span>
-				</div>
+				<span>불량률 1.8% (기준 1.5% 초과)</span>
 			</div>
 		</div>
 
-		<div class="dash-lot-row">
-			<div class="dash-lot-box">
-				<span class="dash-lot-icon dash-lot-red-icon"> <svg
-						viewBox="0 0 24 24" aria-hidden="true">
+		<div class="dash-alert-card">
+			<div class="dash-alert-text">
+				<div class="dash-alert-title-row">
+					<strong>설비 고장</strong>
+					<time>09:25</time>
+				</div>
+
+				<span>M-10 OC 석서 이상</span>
+			</div>
+		</div>
+
+		<div class="dash-alert-card dash-alert-orange">
+			<div class="dash-alert-text">
+				<div class="dash-alert-title-row">
+					<strong>지연 작업지시</strong>
+					<time>10:20</time>
+				</div>
+
+				<span>지연 작업지시 8건 발생</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="dash-lot-row">
+		<div class="dash-lot-box">
+			<span class="dash-lot-icon dash-lot-red-icon">
+				<svg viewBox="0 0 24 24" aria-hidden="true">
 					<circle cx="12" cy="12" r="9"></circle>
 					<path d="M12 7V12L15 14"></path>
 				</svg>
-				</span>
+			</span>
 
-				<div class="dash-lot-info">
-					<span>지연 LOT</span> <strong class="dash-red-text">2건</strong>
-				</div>
-
-				<em class="dash-lot-arrow">›</em>
+			<div class="dash-lot-info">
+				<span>지연 LOT</span>
+				<strong class="dash-red-text">2건</strong>
 			</div>
 
-			<div class="dash-lot-box">
-				<span class="dash-lot-icon dash-lot-orange-icon"> <svg
-						viewBox="0 0 24 24" aria-hidden="true">
+			<em class="dash-lot-arrow">›</em>
+		</div>
+
+		<div class="dash-lot-box">
+			<span class="dash-lot-icon dash-lot-orange-icon">
+				<svg viewBox="0 0 24 24" aria-hidden="true">
 					<path d="M8 3H16"></path>
 					<path d="M9 3V7"></path>
 					<path d="M15 3V7"></path>
@@ -306,35 +325,37 @@
 					<path d="M9 12H15"></path>
 					<path d="M9 16H13"></path>
 				</svg>
-				</span>
+			</span>
 
-				<div class="dash-lot-info">
-					<span>검사대기 LOT</span> <strong class="dash-orange-text">5건</strong>
-				</div>
-
-				<em class="dash-lot-arrow">›</em>
+			<div class="dash-lot-info">
+				<span>검사대기 LOT</span>
+				<strong class="dash-orange-text">5건</strong>
 			</div>
 
-			<div class="dash-lot-box">
-				<span class="dash-lot-icon dash-lot-blue-icon"> <svg
-						viewBox="0 0 24 24" aria-hidden="true">
+			<em class="dash-lot-arrow">›</em>
+		</div>
+
+		<div class="dash-lot-box">
+			<span class="dash-lot-icon dash-lot-blue-icon">
+				<svg viewBox="0 0 24 24" aria-hidden="true">
 					<path d="M21 8L12 3L3 8L12 13L21 8Z"></path>
 					<path d="M3 8V16L12 21L21 16V8"></path>
 					<path d="M12 13V21"></path>
 				</svg>
-				</span>
+			</span>
 
-				<div class="dash-lot-info">
-					<span>출하대기 LOT</span> <strong class="dash-blue-text">7건</strong>
-				</div>
-
-				<em class="dash-lot-arrow">›</em>
+			<div class="dash-lot-info">
+				<span>출하대기 LOT</span>
+				<strong class="dash-blue-text">7건</strong>
 			</div>
+
+			<em class="dash-lot-arrow">›</em>
 		</div>
+	</div>
 
-	</section>
+</section>
 
-
+	
 	<%-- 주요 그래프 영역이다. --%>
 	<section class="dash-chart-grid">
 
@@ -405,58 +426,121 @@
 
 	<%-- MES 운영 흐름 영역이다. --%>
 	<section class="dash-flow-card">
-		<strong class="dash-flow-title">MES 운영 흐름</strong>
 
-		<div class="dash-flow-list">
-			<div class="dash-flow-step">
-				<span><svg viewBox="0 0 24 24" aria-hidden="true">
-						<path d="M3 7L12 2L21 7L12 12L3 7Z"></path>
-						<path d="M3 17L12 22L21 17"></path>
-						<path d="M3 12L12 17L21 12"></path></svg></span>자재
-			</div>
-			<em>›</em>
-			<div class="dash-flow-step">
-				<span><svg viewBox="0 0 24 24" aria-hidden="true">
-						<path d="M8 2V5"></path>
-						<path d="M16 2V5"></path>
-						<rect x="4" y="4" width="16" height="17" rx="2"></rect>
-						<path d="M8 11H16"></path>
-						<path d="M8 15H13"></path></svg></span>계획
-			</div>
-			<em>›</em>
-			<div class="dash-flow-step">
-				<span><svg viewBox="0 0 24 24" aria-hidden="true">
-						<path d="M8 6H21"></path>
-						<path d="M8 12H21"></path>
-						<path d="M8 18H21"></path>
-						<path d="M3 6H3.01"></path>
-						<path d="M3 12H3.01"></path>
-						<path d="M3 18H3.01"></path></svg></span>지시
-			</div>
-			<em>›</em>
-			<div class="dash-flow-step">
-				<span><svg viewBox="0 0 24 24" aria-hidden="true">
-						<path d="M4 19V5"></path>
-						<path d="M4 19H20"></path>
-						<path d="M8 16V11"></path>
-						<path d="M12 16V8"></path>
-						<path d="M16 16V13"></path></svg></span>실적
-			</div>
-			<em>›</em>
-			<div class="dash-flow-step">
-				<span><svg viewBox="0 0 24 24" aria-hidden="true">
-						<path d="M12 22S20 18 20 10V5L12 2L4 5V10C4 18 12 22 12 22Z"></path>
-						<path d="M9 12L11 14L15 10"></path></svg></span>품질
-			</div>
-			<em>›</em>
-			<div class="dash-flow-step">
-				<span><svg viewBox="0 0 24 24" aria-hidden="true">
-						<path d="M3 7H16V17H3Z"></path>
-						<path d="M16 10H20L22 13V17H16Z"></path>
-						<circle cx="7" cy="19" r="2"></circle>
-						<circle cx="18" cy="19" r="2"></circle></svg></span>출하
-			</div>
+		<%-- MES 운영 흐름 제목 영역이다. --%>
+		<div class="dash-flow-panel-head">
+			<h3>MES 운영 흐름도</h3>
 		</div>
+
+		<%-- MES 운영 흐름 부모 테이블이다. --%>
+		<table class="dash-flow-inner-table">
+			<tbody>
+				<tr>
+					<td>
+						<div class="dash-flow-scroll">
+							<div class="dash-flow-list">
+
+								<div class="dash-flow-step">
+									<span>
+										<svg viewBox="0 0 24 24" aria-hidden="true">
+											<path d="M3 7L12 2L21 7L12 12L3 7Z"></path>
+											<path d="M3 17L12 22L21 17"></path>
+											<path d="M3 12L12 17L21 12"></path>
+										</svg>
+									</span>
+									1. 자재입고
+								</div>
+
+								<em>›</em>
+
+								<div class="dash-flow-step">
+									<span>
+										<svg viewBox="0 0 24 24" aria-hidden="true">
+											<path d="M8 2V5"></path>
+											<path d="M16 2V5"></path>
+											<rect x="4" y="4" width="16" height="17" rx="2"></rect>
+											<path d="M8 11H16"></path>
+											<path d="M8 15H13"></path>
+										</svg>
+									</span>
+									2. 생산계획
+								</div>
+
+								<em>›</em>
+
+								<div class="dash-flow-step">
+									<span>
+										<svg viewBox="0 0 24 24" aria-hidden="true">
+											<path d="M8 6H21"></path>
+											<path d="M8 12H21"></path>
+											<path d="M8 18H21"></path>
+											<path d="M3 6H3.01"></path>
+											<path d="M3 12H3.01"></path>
+											<path d="M3 18H3.01"></path>
+										</svg>
+									</span>
+									3. 작업지시
+								</div>
+
+								<em>›</em>
+
+								<div class="dash-flow-step">
+									<span>
+										<svg viewBox="0 0 24 24" aria-hidden="true">
+											<circle cx="12" cy="12" r="3"></circle>
+											<path d="M19.4 15A1.65 1.65 0 0 0 20 13.8A1.65 1.65 0 0 0 19.4 12.6L17.9 11.4A6.5 6.5 0 0 0 17.2 9.7L17.8 7.8A1.65 1.65 0 0 0 17 5.9A1.65 1.65 0 0 0 15 6.1L13.5 7.2A6.5 6.5 0 0 0 10.5 7.2L9 6.1A1.65 1.65 0 0 0 7 5.9A1.65 1.65 0 0 0 6.2 7.8L6.8 9.7A6.5 6.5 0 0 0 6.1 11.4L4.6 12.6A1.65 1.65 0 0 0 4 13.8A1.65 1.65 0 0 0 4.6 15L6.1 16.2A6.5 6.5 0 0 0 6.8 17.9L6.2 19.8A1.65 1.65 0 0 0 7 21.7A1.65 1.65 0 0 0 9 21.5L10.5 20.4A6.5 6.5 0 0 0 13.5 20.4L15 21.5A1.65 1.65 0 0 0 17 21.7A1.65 1.65 0 0 0 17.8 19.8L17.2 17.9A6.5 6.5 0 0 0 17.9 16.2Z"></path>
+										</svg>
+									</span>
+									4.공정진행
+								</div>
+
+								<em>›</em>
+
+								<div class="dash-flow-step">
+									<span>
+										<svg viewBox="0 0 24 24" aria-hidden="true">
+											<path d="M4 19V5"></path>
+											<path d="M4 19H20"></path>
+											<path d="M8 16V11"></path>
+											<path d="M12 16V8"></path>
+											<path d="M16 16V13"></path>
+										</svg>
+									</span>
+									5. 생산실적
+								</div>
+
+								<em>›</em>
+
+								<div class="dash-flow-step">
+									<span>
+										<svg viewBox="0 0 24 24" aria-hidden="true">
+											<path d="M12 22S20 18 20 10V5L12 2L4 5V10C4 18 12 22 12 22Z"></path>
+											<path d="M9 12L11 14L15 10"></path>
+										</svg>
+									</span>
+									6. 품질검사
+								</div>
+
+								<em>›</em>
+
+								<div class="dash-flow-step">
+									<span>
+										<svg viewBox="0 0 24 24" aria-hidden="true">
+											<path d="M3 7H16V17H3Z"></path>
+											<path d="M16 10H20L22 13V17H16Z"></path>
+											<circle cx="7" cy="19" r="2"></circle>
+											<circle cx="18" cy="19" r="2"></circle>
+										</svg>
+									</span>
+									7. 출하
+								</div>
+
+							</div>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
 	</section>
 
 	<%-- 하단 현황 영역이다. --%>
@@ -903,3 +987,4 @@
 						}
 					});
 </script>
+
