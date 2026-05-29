@@ -25,9 +25,9 @@ public class EquipmentDAO {
 		List<EquipmentDTO> list = new ArrayList<>();
 
 		String sql = "SELECT " 
-			    	+ "E.EQUIP_ID, E.LINE_ID, " 
-			    	+ "E.EQUIP_CODE, E.EQUIP_NAME, E.EQUIP_STATUS, E.EQUIP_LOC, " 
-			    	+ "C.CLIENT_NAME, E.REMARK " 
+			    	+ "E.EQUIP_ID, E.LINE_ID, E.EQUIP_CODE, " 
+			    	+ "E.EQUIP_NAME, E.EQUIP_STATUS, E.USE_YN, " 
+			    	+ "E.EQUIP_LOC, C.CLIENT_NAME, E.REMARK " 
 			    	+ "FROM EQUIPMENT E " 
 			    	+ "LEFT JOIN CLIENT C ON E.CLIENT_ID = C.CLIENT_ID " 
 			    	+ "ORDER BY E.EQUIP_ID DESC";
@@ -45,6 +45,7 @@ public class EquipmentDAO {
 				equipment.setEquip_code(rs.getString("EQUIP_CODE"));
 				equipment.setEquip_name(rs.getString("EQUIP_NAME"));
 				equipment.setEquip_status(rs.getString("EQUIP_STATUS"));
+				equipment.setUse_yn(rs.getString("USE_YN"));
 				equipment.setEquip_loc(rs.getString("EQUIP_LOC"));
 				equipment.setClient_name(rs.getString("CLIENT_NAME"));
 				equipment.setRemark(rs.getString("REMARK"));
@@ -60,97 +61,133 @@ public class EquipmentDAO {
 		return list;
 	}
 
-	public List<EquipmentDTO> search_eqp_list(String search_type, String keyword) {
+	public List<EquipmentDTO> search_eqp_list(
+	        String searchType,
+	        String keyword) {
 
-		List<EquipmentDTO> list = new ArrayList<>();
+	    List<EquipmentDTO> list = new ArrayList<>();
 
-		String sql = "";
+	    StringBuilder sql = new StringBuilder();
 
-		if (search_type == null || search_type.equals("") || search_type.equals("all")) {
+	    sql.append(
+	        "SELECT " +
+	        "    e.EQUIP_ID, " +
+	        "    e.EQUIP_CODE, " +
+	        "    e.EQUIP_NAME, " +
+	        "    e.USE_YN, " +
+	        "    e.EQUIP_STATUS, " +
+	        "    e.EQUIP_LOC, " +
+	        "    e.REMARK, " +
+	        "    c.CLIENT_NAME, " +
+	        "    e.EQUIP_PRICE, " +
+	        "    e.BUY_DATE " +
+	        "FROM EQUIPMENT e " +
+	        "LEFT JOIN CLIENT c " +
+	        "ON e.CLIENT_ID = c.CLIENT_ID " +
+	        "WHERE 1=1 "
+	    );
 
-			sql = "SELECT " 
-					+ "    e.EQUIP_ID, e.EQUIP_CODE, e.EQUIP_NAME, " 
-					+ "    e.EQUIP_STATUS, e.EQUIP_LOC, e.REMARK, c.CLIENT_NAME "
-					+ "FROM EQUIPMENT e "
-					+ "LEFT JOIN CLIENT c " + "ON e.CLIENT_ID = c.CLIENT_ID " + "WHERE "
-					+ "    e.EQUIP_CODE LIKE '%' || ? || '%' " 
-					+ "    OR e.EQUIP_NAME LIKE '%' || ? || '%' "
-					+ "    OR e.EQUIP_STATUS LIKE '%' || ? || '%' " 
-					+ "    OR e.EQUIP_LOC LIKE '%' || ? || '%' "
-					+ "    OR c.CLIENT_NAME LIKE '%' || ? || '%' " 
-					+ "ORDER BY e.EQUIP_ID DESC";
+	    boolean hasKeyword =
+	            keyword != null &&
+	            !keyword.trim().isEmpty();
 
-		} else {
+	    if (hasKeyword) {
 
-			String column = "";
+	        switch (searchType) {
 
-			switch (search_type) {
-			case "equip_code":
-				column = "e.EQUIP_CODE";
-				break;
-			case "equip_name":
-				column = "e.EQUIP_NAME";
-				break;
-			case "equip_status":
-				column = "e.EQUIP_STATUS";
-				break;
-			case "equip_loc":
-				column = "e.EQUIP_LOC";
-				break;
-			case "client_name":
-				column = "c.CLIENT_NAME";
-				break;
-			}
+	            case "equip_code":
+	                sql.append(
+	                    " AND UPPER(e.EQUIP_CODE) LIKE UPPER(?) ");
+	                break;
+	            case "equip_name":
+	                sql.append(
+	                    " AND UPPER(e.EQUIP_NAME) LIKE UPPER(?) ");
+	                break;
+	            case "equip_status":
+	                sql.append(
+	                    " AND UPPER(e.EQUIP_STATUS) LIKE UPPER(?) ");
+	                break;
+	            case "use_yn":
+	                sql.append(
+	                    " AND UPPER(e.USE_YN) LIKE UPPER(?) ");
+	                break;
+	            case "equip_loc":
+	                sql.append(
+	                    " AND UPPER(e.EQUIP_LOC) LIKE UPPER(?) ");
+	                break;
+	            case "client_name":
+	                sql.append(
+	                    " AND UPPER(c.CLIENT_NAME) LIKE UPPER(?) ");
+	                break;
+	            case "all":
+	            default:
+	                sql.append(
+	                    " AND ( " +
+	                    " UPPER(e.EQUIP_CODE) LIKE UPPER(?) " +
+	                    " OR UPPER(e.EQUIP_NAME) LIKE UPPER(?) " +
+	                    " OR UPPER(e.USE_YN) LIKE UPPER(?) " +
+	                    " OR UPPER(e.EQUIP_STATUS) LIKE UPPER(?) " +
+	                    " OR UPPER(e.EQUIP_LOC) LIKE UPPER(?) " +
+	                    " OR UPPER(c.CLIENT_NAME) LIKE UPPER(?) " +
+	                    " ) "
+	                );
+	                break;
+	        }
+	    }
 
-			sql = "SELECT " 
-				+ "    e.EQUIP_ID, e.EQUIP_CODE, e.EQUIP_NAME, e.EQUIP_STATUS, "
-				+ "    e.EQUIP_LOC, e.REMARK, c.CLIENT_NAME " 
-				+ "FROM EQUIPMENT e "
-				+ "LEFT JOIN CLIENT c " 
-				+ "ON e.CLIENT_ID = c.CLIENT_ID " 
-				+ "WHERE " 
-				+ column
-				+ " LIKE '%' || ? || '%' " 
-				+ "ORDER BY e.EQUIP_ID DESC";
-		}
+	    sql.append(" ORDER BY e.EQUIP_ID DESC ");
 
-		try (Connection conn = dataSource.getConnection(); PreparedStatement ps = conn.prepareStatement(sql);) {
+	    try (
+	        Connection conn = dataSource.getConnection();
+	        PreparedStatement ps =
+	                conn.prepareStatement(sql.toString())
+	    ) {
 
-			if (search_type == null || search_type.equals("") || search_type.equals("all")) {
+	        if (hasKeyword) {
 
-				ps.setString(1, keyword);
-				ps.setString(2, keyword);
-				ps.setString(3, keyword);
-				ps.setString(4, keyword);
-				ps.setString(5, keyword);
+	            String param =
+	                    "%" + keyword.trim() + "%";
 
-			} else {
-				ps.setString(1, keyword);
-			}
+	            if ("all".equals(searchType)
+	                    || searchType == null
+	                    || searchType.isEmpty()) {
 
-			ResultSet rs = ps.executeQuery();
+	                ps.setString(1, param);
+	                ps.setString(2, param);
+	                ps.setString(3, param);
+	                ps.setString(4, param);
+	                ps.setString(5, param);
+	                ps.setString(6, param);
 
-			while (rs.next()) {
+	            } else {
 
-				EquipmentDTO dto = new EquipmentDTO();
+	                ps.setString(1, param);
+	            }
+	        }
 
-				dto.setEquip_id(rs.getInt("EQUIP_ID"));
-				dto.setEquip_code(rs.getString("EQUIP_CODE"));
-				dto.setEquip_name(rs.getString("EQUIP_NAME"));
-				dto.setEquip_status(rs.getString("EQUIP_STATUS"));
-				dto.setEquip_loc(rs.getString("EQUIP_LOC"));
-				dto.setRemark(rs.getString("REMARK"));
-				dto.setClient_name(rs.getString("CLIENT_NAME"));
+	        ResultSet rs = ps.executeQuery();
 
-				list.add(dto);
-			}
+	        while (rs.next()) {
 
-		} catch (Exception e) {
+	            EquipmentDTO dto = new EquipmentDTO();
 
-			throw new RuntimeException("설비 검색 실패", e);
-		}
+	            dto.setEquip_id(rs.getInt("EQUIP_ID"));
+	            dto.setEquip_code(rs.getString("EQUIP_CODE"));
+	            dto.setEquip_name(rs.getString("EQUIP_NAME"));
+	            dto.setUse_yn(rs.getString("USE_YN"));
+	            dto.setEquip_status(rs.getString("EQUIP_STATUS"));
+	            dto.setEquip_loc(rs.getString("EQUIP_LOC"));
+	            dto.setRemark(rs.getString("REMARK"));
+	            dto.setClient_name(rs.getString("CLIENT_NAME"));
 
-		return list;
+	            list.add(dto);
+	        }
+
+	    } catch (Exception e) {
+	        throw new RuntimeException(
+	                "설비 검색 실패", e);
+	    }
+	    return list;
 	}
 
 	public int insert_equipment(EquipmentDTO dto) {
@@ -302,7 +339,7 @@ public class EquipmentDAO {
 	    String sql =
 	        "SELECT " +
 	        "E.EQUIP_ID, E.EQUIP_CODE, E.EQUIP_NAME, E.EQUIP_STATUS, E.REMARK, " +
-	        "E.EQUIP_PRICE, E.BUY_DATE, E.EQUIP_LOC, " +
+	        "E.EQUIP_PRICE, E.BUY_DATE, E.EQUIP_LOC, E.USE_YN, " +
 	        "E.CREATED_DATE, E.UPDATED_DATE, " +
 	        "E.LINE_ID, L.LINE_NAME, " +
 	        "E.CLIENT_ID, C.CLIENT_NAME " +
@@ -326,6 +363,7 @@ public class EquipmentDAO {
 	                dto.setEquip_name(rs.getString("EQUIP_NAME"));
 	                dto.setEquip_status(rs.getString("EQUIP_STATUS"));
 	                dto.setRemark(rs.getString("REMARK"));
+	                dto.setUse_yn(rs.getString("USE_YN"));
 	                int price = rs.getInt("EQUIP_PRICE");
 	                dto.setEquip_price(rs.wasNull() ? null : price);
 	                dto.setBuy_date(rs.getDate("BUY_DATE"));
@@ -353,13 +391,8 @@ public class EquipmentDAO {
 
 	    String sql =
 	        "UPDATE EQUIPMENT " +
-	        "SET LINE_ID = ?, " +
-	        "    CLIENT_ID = ?, " +
-	        "    EQUIP_NAME = ?, " +
-	        "    EQUIP_STATUS = ?, " +
-	        "    EQUIP_LOC = ?, " +
-	        "    EQUIP_PRICE = ?, " +
-	        "    BUY_DATE = ?, " +
+	        "SET EQUIP_STATUS = ?, " +	        
+	        "    USE_YN = ?, " +
 	        "    UPDATED_DATE = SYSTIMESTAMP, " +
 	        "    REMARK = ? " +
 	        "WHERE EQUIP_ID = ?";
@@ -368,16 +401,11 @@ public class EquipmentDAO {
 	        Connection conn = dataSource.getConnection();
 	        PreparedStatement ps = conn.prepareStatement(sql)
 	    ) {
-
-	        ps.setInt(1, dto.getLine_id());
-	        ps.setInt(2, dto.getClient_id());
-	        ps.setString(3, dto.getEquip_name());
-	        ps.setString(4, dto.getEquip_status());
-	        ps.setString(5, dto.getEquip_loc());
-	        ps.setObject(6, dto.getEquip_price());
-	        ps.setDate(7, dto.getBuy_date());
-	        ps.setString(8, dto.getRemark());
-	        ps.setInt(9, dto.getEquip_id());
+	    	
+	        ps.setString(1, dto.getEquip_status());
+	        ps.setString(2, dto.getUse_yn());	       
+	        ps.setString(3, dto.getRemark());
+	        ps.setInt(4, dto.getEquip_id());
 
 	        result = ps.executeUpdate();
 

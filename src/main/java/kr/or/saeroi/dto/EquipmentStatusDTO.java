@@ -19,5 +19,7 @@ public class EquipmentStatusDTO {
 	private int downtime_min;
 	private String down_reason;
 	private String remark;
+	private String doc_no;
+	private int doc_seq;
 	
 }

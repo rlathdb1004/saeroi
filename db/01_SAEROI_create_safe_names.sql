@@ -94,7 +94,8 @@ CREATE TABLE emp (
 	status	varchar2(30)		NULL,
 	role	varchar2(30)		NULL,
 	created_date	date		NULL,
-	updated_date	date		NULL
+	updated_date	date		NULL,
+	AUTO_LOGIN_TOKEN VARCHAR2(200) NULL
 );
 
 
