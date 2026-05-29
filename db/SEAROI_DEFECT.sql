@@ -1,7 +1,7 @@
 --use_yn 컬럼 추가 --
 ALTER TABLE inspection ADD (use_yn CHAR(1) DEFAULT 'Y' NOT NULL);
 
-SELECT * FROM DEFECT_list;
+SELECT * FROM PRODUCT_INOUT;
 
 ALTER TABLE defect_list ADD (use_yn CHAR(1) DEFAULT 'Y' NOT NULL);
 
@@ -30,3 +30,10 @@ WHERE defect_id = (
 );
 
 COMMIT;
+
+SELECT defect_list_id, defect_photo
+FROM defect_list
+WHERE defect_photo IS NOT NULL
+ORDER BY defect_list_id DESC;
+---product_inout 검사에서 양품 등록 시 중복으로 등록 방지 컬럼 추가 ---
+

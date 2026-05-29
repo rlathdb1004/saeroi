@@ -84,6 +84,8 @@ document.querySelectorAll('.modal_today').forEach(input => {
 
 const inspectionType = document.querySelector('#modal_insert [name="insp_type"]');
 const inspectionResult = document.querySelector('#modal_insert [name="result"]');
+const RESULT_PASS = '합격';
+const RESULT_CONDITIONAL = '조건부';
 
 if (inspectionType) {
     inspectionType.innerHTML = '';
@@ -97,8 +99,8 @@ if (inspectionType) {
 if (inspectionResult) {
     inspectionResult.innerHTML = '';
     inspectionResult.innerHTML += '<option value="">선택</option>';
-    inspectionResult.innerHTML += '<option value="합격">합격</option>';
-    inspectionResult.innerHTML += '<option value="조건부">조건부</option>';
+    inspectionResult.innerHTML += '<option value="' + RESULT_PASS + '">' + RESULT_PASS + '</option>';
+    inspectionResult.innerHTML += '<option value="' + RESULT_CONDITIONAL + '">' + RESULT_CONDITIONAL + '</option>';
 }
 
 let productionOptions = null;
@@ -325,7 +327,25 @@ function applySelectedProductionQty(selectTag) {
 }
 
 function isPassResult() {
-    return inspectionResult && inspectionResult.value === '합격';
+    return inspectionResult && inspectionResult.value === RESULT_PASS;
+}
+
+function isConditionalResult() {
+    return inspectionResult && inspectionResult.value === RESULT_CONDITIONAL;
+}
+
+function setInspectionQtyError(message) {
+    if (!inspectionQtyError) {
+        return;
+    }
+
+    if (message) {
+        inspectionQtyError.textContent = message;
+        inspectionQtyError.style.display = '';
+        return;
+    }
+
+    inspectionQtyError.style.display = 'none';
 }
 
 function validateInspectionQuantity() {
@@ -336,17 +356,29 @@ function validateInspectionQuantity() {
     const prodQty = toNumber(inspectionProdQty);
     const goodQty = toNumber(inspectionGoodQty);
     const defectQty = hasDefect && hasDefect.checked && !hasDefect.disabled ? toNumber(inspectionDefectQty) : 0;
-    const isExceeded = prodQty > 0 && goodQty + defectQty > prodQty;
+    let errorMessage = '';
 
-    if (inspectionQtyError) {
-        inspectionQtyError.style.display = isExceeded ? '' : 'none';
+    if (prodQty > 0 && goodQty + defectQty > prodQty) {
+        errorMessage = '생산 수량을 초과 할 수 없습니다.';
+    } else if (isPassResult() && prodQty > 0 && goodQty !== prodQty) {
+        errorMessage = '합격은 생산수량 전체가 양품수량이어야 합니다.';
+    } else if (isConditionalResult()) {
+        if (!hasDefect || !hasDefect.checked) {
+            errorMessage = '조건부는 불량 정보 및 조치를 함께 등록해야 합니다.';
+        } else if (defectQty <= 0) {
+            errorMessage = '조건부는 불량수량을 1개 이상 입력해야 합니다.';
+        } else if (prodQty > 0 && goodQty + defectQty !== prodQty) {
+            errorMessage = '조건부는 양품수량과 불량수량의 합계가 생산수량과 같아야 합니다.';
+        }
     }
+
+    setInspectionQtyError(errorMessage);
 
     if (inspectionSubmitBtn) {
-        inspectionSubmitBtn.disabled = isExceeded;
+        inspectionSubmitBtn.disabled = !!errorMessage;
     }
 
-    return !isExceeded;
+    return !errorMessage;
 }
 
 function updateDefectCheckboxByResult() {
@@ -357,6 +389,9 @@ function updateDefectCheckboxByResult() {
     if (isPassResult()) {
         hasDefect.checked = false;
         hasDefect.disabled = true;
+    } else if (isConditionalResult()) {
+        hasDefect.checked = true;
+        hasDefect.disabled = false;
     } else {
         hasDefect.disabled = false;
     }

@@ -33,6 +33,9 @@ public class QualityController {
 	@Autowired
 	QualityService qualityService;
 
+	private static final String RESULT_PASS = "합격";
+	private static final String RESULT_CONDITIONAL = "조건부";
+
 	private boolean canManageQuality(LoginDTO loginUser) {
 		return loginUser != null && ("ADMIN".equals(loginUser.getRole()) || "MANAGER".equals(loginUser.getRole()));
 	}
@@ -102,16 +105,42 @@ public class QualityController {
 			return "redirect:/quality/inspection";
 		}
 
-		if ("합격".equals(result)) {
-			has_defect = null;
-		}
-
 		double inspectionQtyValue = toNumber(inspection_qty);
 		double goodQtyValue = toNumber(good_qty);
-		double defectQtyValue = "Y".equals(has_defect) ? toNumber(defect_qty) : 0;
+		double defectQtyValue = toNumber(defect_qty);
+		boolean isPassResult = RESULT_PASS.equals(result);
+		boolean isConditionalResult = RESULT_CONDITIONAL.equals(result);
 
-		if (inspectionQtyValue > 0 && goodQtyValue + defectQtyValue > inspectionQtyValue) {
+		if (!isPassResult && !isConditionalResult) {
 			return "redirect:/quality/inspection";
+		}
+
+		if (inspectionQtyValue <= 0 || goodQtyValue < 0 || defectQtyValue < 0) {
+			return "redirect:/quality/inspection";
+		}
+
+		if (isPassResult && !isSameQuantity(goodQtyValue, inspectionQtyValue)) {
+			return "redirect:/quality/inspection";
+		}
+
+		if (isPassResult) {
+			has_defect = null;
+			defectQtyValue = 0;
+		}
+
+		if (isConditionalResult) {
+			if (!"Y".equals(has_defect) || defectQtyValue <= 0) {
+				return "redirect:/quality/inspection";
+			}
+
+			if (!isSameQuantity(goodQtyValue + defectQtyValue, inspectionQtyValue)) {
+				return "redirect:/quality/inspection";
+			}
+
+			if (!hasText(defect_date) || !hasText(defect_id) || !hasText(action_date) || !hasText(action_emp_id)
+					|| !hasText(action_content)) {
+				return "redirect:/quality/inspection";
+			}
 		}
 
 		int inspId = qualityService._ser_insert_Inspection(insp_date, prod_id, emp_id, insp_type, result, inspection_qty,
@@ -400,5 +429,9 @@ public class QualityController {
 		} catch (NumberFormatException e) {
 			return 0;
 		}
+	}
+
+	private boolean isSameQuantity(double left, double right) {
+		return Math.abs(left - right) < 0.000001;
 	}
 }
