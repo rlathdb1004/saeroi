@@ -101,10 +101,10 @@
 				<div class="search-item">
 					<label class="search-label">차트구분</label> <select name="searchType"
 						class="search-select" id="select_type">
-						<option value="day" ${searchType == 'day' ? 'selected' : ''}>일별</option>
-						<option value="week" ${searchType == 'week' ? 'selected' : ''}>주별</option>
 						<option value="month"
 							${empty searchType || searchType == 'month' ? 'selected' : ''}>월별</option>
+						<option value="day" ${searchType == 'day' ? 'selected' : ''}>일별</option>
+						<option value="week" ${searchType == 'week' ? 'selected' : ''}>주별</option>
 						<option value="year_sum"
 							${searchType == 'year_sum' ? 'selected' : ''}>년별(합)</option>
 					</select>
@@ -133,6 +133,13 @@
 						</c:forEach>
 					</select>
 				</div>
+				 <div class="search-btn-wrap">
+				 <button type="button"
+                    class="search-btn search-btn-sub search-reset-btn">
+                   
+                    초기화
+                </button>
+                </div>
 			</div>
 		</div>
 	</form>
@@ -144,7 +151,7 @@
 
 		<div class="right-panel">
 			<div class="chart-box">
-				<h4 class="box-title">불량 원인</h4>
+				<h4 class="box-title" id="boxTitle">불량 원인</h4>
 				<div id="oChart"></div>
 			</div>
 			<div class="coTableTop">
@@ -238,6 +245,22 @@
 		    loadChartData(type,this.value);
 		});
 		
+		let resetBtn = document.querySelector('.search-reset-btn');
+		
+		if (resetBtn) {
+		    resetBtn.addEventListener('click', function() {
+		    	
+		        document.querySelector('#select_type').value = 'month'; 
+		        document.querySelector('#select_item').value = 'all';   
+		        document.querySelector('#startDate').value = '';       
+		        document.querySelector('#endDate').value = '';         
+		        
+		        currentPage = 1;
+		        
+		        loadChartData('month', 'all');
+		    });
+		}
+		
 	});
 	
 	async function loadChartData(searchType,searchItem){
@@ -310,6 +333,15 @@
         let totalCount = chartList.length;
         document.querySelector('.coTotalCount').innerText = '총 ' + totalCount + '건';
 
+        let boxTitleEl = document.querySelector('#boxTitle');
+        if (boxTitleEl) {
+            if (searchType === 'year_sum' || searchType === 'year_avg') {
+                boxTitleEl.innerText = '불량 원인 TOP3';
+            } else {
+                boxTitleEl.innerText = '불량 원인';
+            }
+        }
+        
          // 2. 페이징 계산 (JavaScript 버전)
          let totalPage = Math.ceil(totalCount / pageSize) || 1;
          if (currentPage > totalPage) currentPage = totalPage;
