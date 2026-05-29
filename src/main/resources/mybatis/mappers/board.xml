@@ -343,25 +343,24 @@
 	</insert>
 
 	<!-- 게시판 삭제 -->
-	<delete id="_delete_Board" parameterType="map">
-		UPDATE board
-		SET use_yn = 'N',
-		updated_date = SYSDATE
-		WHERE board_id IN
-		<foreach collection="board_id" item="id" open="("
-			separator="," close=")">
-			TO_NUMBER(#{id})
-		</foreach>
+	<update id="_delete_Board" parameterType="map">
+	UPDATE board
+	SET use_yn = 'N',
+	updated_date = SYSDATE
+	WHERE board_id IN
+	<foreach collection="board_id" item="id" open="("
+		separator="," close=")">
+		TO_NUMBER(#{id})
+	</foreach>
 
-		<!-- ADMIN 아니면 본인 글만 삭제 가능 -->
-		<if test="role != 'ADMIN'">
-			AND emp_id = (
+	<if test="role != 'ADMIN'">
+		AND emp_id = (
 			SELECT e.emp_id
 			FROM emp e
 			WHERE e.empno = #{empno}
-			)
-		</if>
-	</delete>
+		)
+	</if>
+</update>
 
 	<!-- 게시판 상세 조회 -->
 	<select id="_select_Board_detail" parameterType="map"
@@ -428,23 +427,21 @@
 
 	<!-- 게시판 수정 -->
 	<update id="_update_Board" parameterType="map">
-		UPDATE board
-		SET title = #{title},
-		content = #{content},
-		status =
-		#{status},
-		remark = #{remark},
-		updated_date = SYSDATE
-		WHERE board_id =
-		TO_NUMBER(#{board_id})
+	UPDATE board
+	SET title = #{title},
+	content = #{content},
+	status = #{status},
+	use_yn = #{use_yn},
+	remark = #{remark},
+	updated_date = SYSDATE
+	WHERE board_id = TO_NUMBER(#{board_id})
 
-		<!-- ADMIN 아니면 본인 글만 수정 가능 -->
-		<if test="role != 'ADMIN'">
-			AND emp_id = (
+	<if test="role != 'ADMIN'">
+		AND emp_id = (
 			SELECT e.emp_id
 			FROM emp e
 			WHERE e.empno = #{empno}
-			)
-		</if>
-	</update>
+		)
+	</if>
+</update>
 </mapper>

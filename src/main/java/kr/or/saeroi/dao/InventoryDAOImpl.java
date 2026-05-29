@@ -434,12 +434,13 @@ public class InventoryDAOImpl implements InventoryDAO {
 			sql += "     INVENTORY_STOCK, ";
 			sql += "     STOCK_LOCATION, ";
 			sql += "     REMARK, ";
-			sql += "     CREATED_DATE ";
+			sql += "     CREATED_DATE, ";
+			sql += "     UPDATED_DATE ";
 			sql += " ) ";
 			sql += " VALUES ";
 			sql += " ( ";
 			sql += "     SEQ_INVENTORY_ID.NEXTVAL, ";
-			sql += "     ?, ?, ?, ?, SYSDATE ";
+			sql += "     ?, ?, ?, ?, SYSDATE, SYSDATE ";
 			sql += " ) ";
 
 			PreparedStatement pstmt =

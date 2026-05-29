@@ -63,7 +63,7 @@
 				and sessionScope.loginUser.empno eq notice.empno)}">
 
 				<button type="button" id="editBtn" class="detail_btn_green"
-					onclick="changeEditMode(true);">
+					onclick="changeNoticeEditMode(true);">
 
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 						stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -75,6 +75,21 @@
 					</svg>
 
 					수정
+				</button>
+
+				<button type="button" id="cancelBtn" class="detail_btn_line"
+					onclick="changeNoticeEditMode(false);" style="display: none;">
+
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+						stroke="currentColor" stroke-width="2" stroke-linecap="round"
+						stroke-linejoin="round"
+						style="vertical-align: -3px; margin-right: 6px;"
+						aria-hidden="true">
+						<path d="M18 6L6 18"></path>
+						<path d="M6 6l12 12"></path>
+					</svg>
+
+					취소
 				</button>
 
 			</c:if>
@@ -120,7 +135,9 @@
 						<td>${notice.notice_id}</td>
 
 						<th>상태</th>
-						<td><span class="viewMode"> <c:choose>
+						<td>
+							<span class="viewMode">
+								<c:choose>
 									<c:when test="${notice.status == '게시'}">
 										<span class="coStatus coStatusUse">${notice.status}</span>
 									</c:when>
@@ -128,23 +145,27 @@
 										<span class="coStatus coStatusStop">${notice.status}</span>
 									</c:otherwise>
 								</c:choose>
-						</span> <select name="status" class="detailInput editMode"
-							style="display: none;">
+							</span>
+
+							<select name="status" class="detailInput editMode"
+								style="display: none;">
 								<option value="게시"
 									<c:if test="${notice.status == '게시'}">selected</c:if>>
 									게시</option>
 								<option value="비게시"
 									<c:if test="${notice.status == '비게시'}">selected</c:if>>
 									비게시</option>
-						</select></td>
+							</select>
+						</td>
 					</tr>
 
 					<tr>
 						<th>제목</th>
-						<td colspan="3"><span class="viewMode">${notice.title}</span>
+						<td colspan="3">
+							<span class="viewMode">${notice.title}</span>
 
 							<input type="text" name="title" class="detailInput editMode"
-							value="${notice.title}" style="display: none;" required>
+								value="${notice.title}" style="display: none;" required>
 						</td>
 					</tr>
 
@@ -167,8 +188,9 @@
 					<tr>
 						<th>내용</th>
 						<td colspan="3">
-							<div class="notice_content_box viewMode">${notice.content}
-							</div> <textarea name="content"
+							<div class="notice_content_box viewMode">${notice.content}</div>
+
+							<textarea name="content"
 								class="detailInput notice_content_textarea editMode"
 								style="display: none;" required>${notice.content}</textarea>
 						</td>
@@ -183,7 +205,7 @@
 										<a class="notice_file_link"
 											href="${pageContext.request.contextPath}${noticeFile.file_path}"
 											download="${noticeFile.file_title}">
-											${noticeFile.file_title} </a>
+											${noticeFile.file_title}</a>
 									</c:when>
 
 									<c:otherwise>
@@ -196,10 +218,12 @@
 
 					<tr>
 						<th>비고</th>
-						<td colspan="3"><span class="viewMode">${notice.remark}</span>
+						<td colspan="3">
+							<span class="viewMode">${notice.remark}</span>
 
 							<input type="text" name="remark" class="detailInput editMode"
-							value="${notice.remark}" style="display: none;"></td>
+								value="${notice.remark}" style="display: none;">
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -210,32 +234,98 @@
 </div>
 
 <script>
-	document.addEventListener('DOMContentLoaded', function() {
+	function setEditButtonIcon() {
 		const editBtn = document.getElementById('editBtn');
-		const form = document.getElementById('noticeDetailForm');
 
 		if (!editBtn) {
 			return;
 		}
 
-		editBtn.addEventListener('click', function() {
-			const isEditMode = editBtn.dataset.mode === 'edit';
+		editBtn.innerHTML = `
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+				stroke="currentColor" stroke-width="2" stroke-linecap="round"
+				stroke-linejoin="round"
+				style="vertical-align: -3px; margin-right: 6px;"
+				aria-hidden="true">
+				<path d="M12 20h9"></path>
+				<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+			</svg>
+			수정
+		`;
+	}
 
-			if (!isEditMode) {
-				document.querySelectorAll('.viewMode').forEach(function(el) {
-					el.style.display = 'none';
-				});
+	function setSaveButtonIcon() {
+		const editBtn = document.getElementById('editBtn');
 
-				document.querySelectorAll('.editMode').forEach(function(el) {
-					el.style.display = '';
-				});
+		if (!editBtn) {
+			return;
+		}
 
-				editBtn.dataset.mode = 'edit';
-				editBtn.textContent = '저장';
-				return;
+		editBtn.innerHTML = `
+			<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+				stroke="currentColor" stroke-width="2" stroke-linecap="round"
+				stroke-linejoin="round"
+				style="vertical-align: -3px; margin-right: 6px;"
+				aria-hidden="true">
+				<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+				<path d="M17 21v-8H7v8"></path>
+				<path d="M7 3v5h8"></path>
+			</svg>
+			저장
+		`;
+	}
+
+	function changeNoticeEditMode(isEdit) {
+		const editBtn = document.getElementById('editBtn');
+		const cancelBtn = document.getElementById('cancelBtn');
+		const form = document.getElementById('noticeDetailForm');
+
+		if (!editBtn || !form) {
+			return;
+		}
+
+		if (!isEdit) {
+			form.reset();
+
+			document.querySelectorAll('.viewMode').forEach(function(el) {
+				el.style.display = '';
+			});
+
+			document.querySelectorAll('.editMode').forEach(function(el) {
+				el.style.display = 'none';
+			});
+
+			editBtn.dataset.mode = '';
+			setEditButtonIcon();
+
+			if (cancelBtn) {
+				cancelBtn.style.display = 'none';
 			}
 
-			form.submit();
-		});
-	});
+			return;
+		}
+
+		const isEditMode = editBtn.dataset.mode === 'edit';
+
+		if (!isEditMode) {
+			document.querySelectorAll('.viewMode').forEach(function(el) {
+				el.style.display = 'none';
+			});
+
+			document.querySelectorAll('.editMode').forEach(function(el) {
+				el.style.display = '';
+			});
+
+			editBtn.dataset.mode = 'edit';
+			setSaveButtonIcon();
+
+			if (cancelBtn) {
+				cancelBtn.style.display = '';
+			}
+
+			return;
+		}
+
+		form.submit();
+	}
 </script>

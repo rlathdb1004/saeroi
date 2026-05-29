@@ -4,6 +4,10 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
 
+<c:set var="canManageQuality"
+	value="${sessionScope.loginUser.role eq 'ADMIN'
+		or sessionScope.loginUser.role eq 'MANAGER'}" />
+
 <style>
 .defect_status_badge {
 	background-color: #FDECEC;
@@ -65,16 +69,12 @@
 .defect_action_table .coTextLeft {
 	text-align: left;
 }
+
 .defect_action_table th:first-child,
 .defect_action_table td:first-child {
 	width: 110px;
 	min-width: 110px;
 	white-space: nowrap;
-}
-
-.defect_action_table td:first-child {
-	overflow: visible;
-	text-overflow: clip;
 }
 
 @media ( max-width : 900px) {
@@ -94,10 +94,7 @@
 
 		<div class="detail_btn_area">
 
-			<c:if
-				test="${sessionScope.loginUser.role eq 'ADMIN'
-				or sessionScope.loginUser.role eq 'MANAGER'}">
-
+			<c:if test="${canManageQuality}">
 				<button type="submit" id="saveBtn" class="detail_btn_green"
 					form="defectDetailForm" style="display: none;">
 
@@ -139,12 +136,12 @@
 						style="vertical-align: -3px; margin-right: 6px;"
 						aria-hidden="true">
 						<path d="M12 20h9"></path>
-						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+						<path
+							d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
 					</svg>
 
 					수정
 				</button>
-
 			</c:if>
 
 			<button type="button" class="detail_btn_line"
@@ -170,7 +167,7 @@
 	<div class="detail_card">
 		<div class="detail_card_title">기본 정보</div>
 
-		<form id="defectDetailForm" method="post"
+		<form id="defectDetailForm" method="post" accept-charset="UTF-8"
 			action="${pageContext.request.contextPath}/quality/defect/update">
 
 			<input type="hidden" name="defect_list_id"
@@ -188,55 +185,117 @@
 
 				<tbody>
 					<tr>
+						<th>불량문서번호</th>
+						<td>${defect.doc_no}</td>
+
+						<th>불량번호</th>
+						<td>${defect.defect_list_id}</td>
+
 						<th>불량코드</th>
 						<td>${defect.defect_code}</td>
+					</tr>
+
+					<tr>
+						<th>불량유형</th>
+						<td>${defect.defect_type}</td>
 
 						<th>발생일시</th>
-						<td><span class="detailText">${defect.defect_date}</span> <input
-							type="date" name="defect_date" class="detailInput"
-							value="${defect.defect_date}" style="display: none;" required>
+						<td>
+							<span class="detailText">${defect.defect_date}</span>
+							<input type="date" name="defect_date" class="detailInput"
+								value="${defect.defect_date}" style="display: none;" required>
 						</td>
+
+						<th>불량명</th>
+						<td>
+							<span
+								class="detailText detail_status_badge defect_status_badge">${defect.defect_name}</span>
+							<select name="defect_id" class="detailInput"
+								data-selected="${defect.defect_id}" style="display: none;"
+								required>
+								<option value="${defect.defect_id}" selected>${defect.defect_name}</option>
+							</select>
+						</td>
+					</tr>
+
+					<tr>
+						<th>불량수량</th>
+						<td>
+							<span class="detailText">${defect.defect_qty}</span>
+							<input type="number" name="defect_qty" class="detailInput"
+								value="${defect.defect_qty}" style="display: none;" min="0"
+								required>
+						</td>
+
+						<th>검사번호</th>
+						<td>${defect.insp_doc_no}</td>
+
+						<th>검사자</th>
+						<td>${defect.ename}</td>
+					</tr>
+
+					<tr>
+						<th>조치부서</th>
+						<td>${defect.action_dept}</td>
+
+						<th>등록일</th>
+						<td>${defect.created_date}</td>
+
+						<th>수정일</th>
+						<td>${defect.updated_date}</td>
+					</tr>
+
+					<tr>
+						<th>품목코드</th>
+						<td>${defect.item_code}</td>
 
 						<th>품목명</th>
 						<td>${defect.item_name}</td>
+
+						<th>단위</th>
+						<td>${defect.item_unit}</td>
 					</tr>
 
 					<tr>
 						<th>LOT번호</th>
 						<td>${defect.product_lot}</td>
 
-						<th>검사자</th>
-						<td>${defect.ename}</td>
+						<th>생산문서번호</th>
+						<td>${defect.prod_doc_no}</td>
 
-						<th>불량명</th>
-						<td><span
-							class="detailText detail_status_badge defect_status_badge">${defect.defect_name}</span>
-							<select name="defect_id" class="detailInput"
-							data-selected="${defect.defect_id}" style="display: none;"
-							required>
-								<option value="${defect.defect_id}" selected>${defect.defect_name}</option>
-						</select></td>
+						<th>작업지시번호</th>
+						<td>${defect.work_order_doc_no}</td>
 					</tr>
 
 					<tr>
-						<th>검사번호</th>
-						<td>${defect.insp_id}</td>
+						<th>생산일자</th>
+						<td>${defect.prod_date}</td>
 
-						<th>불량수량</th>
-						<td><span class="detailText">${defect.defect_qty}</span> <input
-							type="number" name="defect_qty" class="detailInput"
-							value="${defect.defect_qty}" style="display: none;" min="0"
-							required></td>
+						<th>생산수량</th>
+						<td>${defect.prod_qty}</td>
 
-						<th>불량번호</th>
-						<td>${defect.defect_list_id}</td>
+						<th>손실수량</th>
+						<td>${defect.loss_qty}</td>
+					</tr>
+
+					<tr>
+						<th>생산상태</th>
+						<td>${defect.prod_status}</td>
+
+						<th>지시수량</th>
+						<td>${defect.order_qty}</td>
+
+						<th>지시일자</th>
+						<td>${defect.order_date}</td>
 					</tr>
 
 					<tr>
 						<th>비고</th>
-						<td colspan="5"><span class="detailText">${defect.remark}</span>
+						<td colspan="5">
+							<span class="detailText">${defect.remark}</span>
 							<input type="text" name="remark" class="detailInput"
-							value="${defect.remark}" style="display: none;"></td>
+								value="${defect.remark}" style="display: none;">
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -266,9 +325,7 @@
 				<div class="detail_card_title">조치 및 처리 내역
 					(${defectActionList.size()}건)</div>
 
-				<c:if
-					test="${sessionScope.loginUser.role eq 'ADMIN'
-					or sessionScope.loginUser.role eq 'MANAGER'}">
+				<c:if test="${canManageQuality}">
 					<button type="button" class="detail_btn_green modal_open_btn"
 						data_modal_target="#modal_action_insert">조치 추가</button>
 				</c:if>
@@ -279,8 +336,8 @@
 					<tr>
 						<th>일시</th>
 						<th>담당부서</th>
-						<th>조치 담당자</th>
-						<th>조치 내역</th>
+						<th>조치담당자</th>
+						<th>조치내역</th>
 					</tr>
 				</thead>
 
@@ -306,9 +363,7 @@
 	</div>
 </div>
 
-<c:if
-	test="${sessionScope.loginUser.role eq 'ADMIN'
-	or sessionScope.loginUser.role eq 'MANAGER'}">
+<c:if test="${canManageQuality}">
 
 	<div id="modal_action_insert" class="modal_wrap" aria-hidden="true">
 		<div class="modal_box" role="dialog" aria-modal="true">
@@ -327,21 +382,22 @@
 
 					<div class="modal_item">
 						<label class="modal_label">조치 일시<span
-							class="modal_required">*</span></label> <input type="date"
-							name="action_date" class="modal_input modal_today" required>
+							class="modal_required">*</span></label>
+						<input type="date" name="action_date"
+							class="modal_input modal_today" required>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">조치 부서</label> <input type="text"
-							id="actionDept" class="modal_input" value="${defect.dept}"
-							readonly>
+						<label class="modal_label">조치 부서</label>
+						<input type="text" id="actionDept" class="modal_input"
+							value="${defect.action_dept}" readonly>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">조치 담당자<span
-							class="modal_required">*</span></label> <select name="emp_id"
-							id="actionEmpId" class="modal_select" data-dept="${defect.dept}"
-							required>
+							class="modal_required">*</span></label>
+						<select name="emp_id" id="actionEmpId" class="modal_select"
+							data-dept="${defect.action_dept}" required>
 							<option value="">선택</option>
 						</select>
 					</div>
@@ -367,5 +423,6 @@
 	</div>
 
 </c:if>
+
 <script
 	src="${pageContext.request.contextPath}/resources/js/inspection.js"></script>

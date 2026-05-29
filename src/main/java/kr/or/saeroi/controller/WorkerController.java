@@ -261,6 +261,36 @@ public class WorkerController {
 		return "production/productionresult.tiles";
 	}
 
+	// =====================================================
+	// 작업자 자재 입출고 목록
+	// 작업자 권한으로 접근해도 관리자와 같은 자재 입출고 화면을 사용하게 리다이렉트한다.
+	// 사이드바 / 공통 JSP는 건드리지 않고 Controller 경로만 맞춘다.
+	// =====================================================
+	@RequestMapping("/worker/materialIn")
+	public String workerMaterialIn() {
+
+		return "redirect:/inventory/materialIn";
+	}
+
+	// =====================================================
+	// 작업자 자재 입출고 상세
+	// 작업자로 상세페이지에 들어가도 기존 상세 JSP가 아니라
+	// 수정된 inventory/inoutDetail.tiles 화면을 그대로 타도록 리다이렉트한다.
+	// =====================================================
+	@RequestMapping("/worker/materialIn/detail")
+	public String workerMaterialInDetail(
+			@RequestParam("inoutId") int inoutId,
+			@RequestParam(
+				value = "mode",
+				defaultValue = "view")
+			String mode) {
+
+		return "redirect:/inventory/materialIn/detail?inoutId="
+				+ inoutId
+				+ "&mode="
+				+ mode;
+	}
+
 	@RequestMapping("/worker/notice")
 	public String workerNotice(
 			HttpSession session,

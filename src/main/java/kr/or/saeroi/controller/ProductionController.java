@@ -131,6 +131,29 @@ public class ProductionController {
 		return "redirect:/production/productionplan/detail?prodPlanId="
 				+ productionDTO.getProdPlanId();
 	}
+	
+	// 생산계획 선택 삭제 처리이다.
+	// 작업지시가 생성된 생산계획은 Service에서 삭제를 제한한다.
+	@RequestMapping(value = "/production/productionplan/delete", method = RequestMethod.POST)
+	public String deleteProductionPlan(
+			@RequestParam(value = "prodPlanIds", required = false) List<Integer> prodPlanIds,
+			RedirectAttributes rttr) {
+
+		try {
+			int deleteCount = productionService.deleteProductionPlanList(prodPlanIds);
+
+			rttr.addFlashAttribute("msg",
+					deleteCount + "건의 생산계획이 삭제되었습니다.");
+
+		} catch (IllegalArgumentException e) {
+			rttr.addFlashAttribute("msg", e.getMessage());
+
+		} catch (Exception e) {
+			rttr.addFlashAttribute("msg", "생산계획 삭제 중 오류가 발생했습니다.");
+		}
+
+		return "redirect:/production/productionplan";
+	}
 
 
 	// =========================================================

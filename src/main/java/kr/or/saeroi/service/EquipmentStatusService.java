@@ -29,8 +29,8 @@ public class EquipmentStatusService {
 		return dao.insert(dto);		
 	}
 	
-	public EquipmentStatusDTO get_equipment_status_detail(int history_id) {
-	    return dao.get_equipment_status_detail(history_id);
+	public EquipmentStatusDTO equipment_status_detail(int history_id) {
+	    return dao.equipment_status_detail(history_id);
 	}
 
 	public int update(EquipmentStatusDTO dto) {
