@@ -14,13 +14,9 @@ public class CommentDTO {
 	private String status;
 	private String use_yn;
 	private String remark;
-	@Override
-	public String toString() {
-		return "CommentDTO [comment_id=" + comment_id + ", board_id=" + board_id + ", parent_comment_id="
-				+ parent_comment_id + ", emp_id=" + emp_id + ", empno=" + empno + ", ename=" + ename + ", content="
-				+ content + ", created_date=" + created_date + ", updated_date=" + updated_date + ", status=" + status
-				+ ", use_yn=" + use_yn + ", remark=" + remark + "]";
-	}
+	private String dept;
+	private int comment_level;
+	private int comment_indent;
 	public int getComment_id() {
 		return comment_id;
 	}
@@ -33,10 +29,10 @@ public class CommentDTO {
 	public void setBoard_id(int board_id) {
 		this.board_id = board_id;
 	}
-	public int getParent_comment_id() {
+	public Integer getParent_comment_id() {
 		return parent_comment_id;
 	}
-	public void setParent_comment_id(int parent_comment_id) {
+	public void setParent_comment_id(Integer parent_comment_id) {
 		this.parent_comment_id = parent_comment_id;
 	}
 	public int getEmp_id() {
@@ -93,6 +89,33 @@ public class CommentDTO {
 	public void setRemark(String remark) {
 		this.remark = remark;
 	}
+	public String getDept() {
+		return dept;
+	}
+	public void setDept(String dept) {
+		this.dept = dept;
+	}
+	public int getComment_level() {
+		return comment_level;
+	}
+	public void setComment_level(int comment_level) {
+		this.comment_level = comment_level;
+	}
+	public int getComment_indent() {
+		return comment_indent;
+	}
+	public void setComment_indent(int comment_indent) {
+		this.comment_indent = comment_indent;
+	}
+	@Override
+	public String toString() {
+		return "CommentDTO [comment_id=" + comment_id + ", board_id=" + board_id + ", parent_comment_id="
+				+ parent_comment_id + ", emp_id=" + emp_id + ", empno=" + empno + ", ename=" + ename + ", content="
+				+ content + ", created_date=" + created_date + ", updated_date=" + updated_date + ", status=" + status
+				+ ", use_yn=" + use_yn + ", remark=" + remark + ", dept=" + dept + ", comment_level=" + comment_level
+				+ ", comment_indent=" + comment_indent + "]";
+	}
+
 	
 	
 }

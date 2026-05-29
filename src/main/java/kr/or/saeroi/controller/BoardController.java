@@ -19,8 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import kr.or.saeroi.common.PageDTO;
 import kr.or.saeroi.dto.BoradDTO;
+import kr.or.saeroi.dto.CommentDTO;
 import kr.or.saeroi.dto.LoginDTO;
 import kr.or.saeroi.service.BoardService;
+import kr.or.saeroi.service.CommentService;
 
 @Controller
 @RequestMapping("/board")
@@ -28,6 +30,9 @@ public class BoardController {
 
 	@Autowired
 	BoardService boardService;
+
+	@Autowired
+	CommentService commentService;
 
 	// 공지사항 작성 권한 확인
 	private boolean canWriteNotice(LoginDTO loginUser) {
@@ -416,9 +421,13 @@ public class BoardController {
 		// 공지 첨부파일 조회
 		BoradDTO boardFile = boardService._ser_select_Board_file(board_id);
 
+		// 댓글 목록 조회
+		List<CommentDTO> commentList = commentService._ser_select_Comment(Integer.parseInt(board_id));
+
 		// JSP로 상세 정보 전달
 		model.addAttribute("board", board);
 		model.addAttribute("boardFile", boardFile);
+		model.addAttribute("commentList", commentList);
 
 		return "board/board_detail.tiles";
 	}
@@ -539,10 +548,12 @@ public class BoardController {
 	}
 
 	// 게시판 수정
+	// 게시판 수정
 	@RequestMapping(value = "/suggestion/update", method = RequestMethod.POST)
 	public String suggestion_update(HttpSession session, @RequestParam(required = false) String board_id,
 			@RequestParam(required = false) String title, @RequestParam(required = false) String content,
-			@RequestParam(required = false) String status, @RequestParam(required = false) String remark) {
+			@RequestParam(required = false) String status, @RequestParam(required = false) String use_yn,
+			@RequestParam(required = false) String remark) {
 
 		if (board_id == null || board_id.equals("")) {
 			return "redirect:/board/suggestion";
@@ -554,7 +565,7 @@ public class BoardController {
 			return "redirect:/board/suggestion";
 		}
 
-		boardService._ser_update_Board(board_id, title, content, status, remark, loginUser.getRole(),
+		boardService._ser_update_Board(board_id, title, content, status, use_yn, remark, loginUser.getRole(),
 				loginUser.getEmpno());
 
 		return "redirect:/board/suggestion/detail?board_id=" + board_id;

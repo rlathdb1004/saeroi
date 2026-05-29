@@ -61,5 +61,6 @@ public interface BoardService {
 
 	// 게시판 수정
 	int _ser_update_Board(String board_id, String title, String content,
-			String status, String remark, String role, String empno);
+			String status, String use_yn, String remark, String role, String empno);
+
 }

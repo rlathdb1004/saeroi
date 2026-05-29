@@ -17,29 +17,27 @@
 			bc.emp_id,
 			e.empno,
 			e.ename,
+			e.dept,
 			bc.content,
 			TO_CHAR(bc.created_date, 'YYYY-MM-DD HH24:MI') AS created_date,
 			TO_CHAR(bc.updated_date, 'YYYY-MM-DD HH24:MI') AS updated_date,
 			bc.status,
 			bc.use_yn,
-			bc.remark
+			bc.remark,
+			LEVEL - 1 AS comment_level,
+			(LEVEL - 1) * 42 AS comment_indent
 		FROM board_comment bc,
 			 emp e
 		WHERE bc.emp_id = e.emp_id
 		AND bc.board_id = #{board_id}
 		AND bc.use_yn = 'Y'
-		ORDER BY
-			CASE
-				WHEN bc.parent_comment_id IS NULL OR bc.parent_comment_id = 0
-					THEN bc.comment_id
-				ELSE bc.parent_comment_id
-			END ASC,
-			CASE
-				WHEN bc.parent_comment_id IS NULL OR bc.parent_comment_id = 0
-					THEN 0
-				ELSE 1
-			END ASC,
-			bc.comment_id ASC
+		START WITH bc.board_id = #{board_id}
+		AND bc.use_yn = 'Y'
+		AND (bc.parent_comment_id IS NULL OR bc.parent_comment_id = 0)
+		CONNECT BY PRIOR bc.comment_id = bc.parent_comment_id
+		AND bc.board_id = #{board_id}
+		AND bc.use_yn = 'Y'
+		ORDER SIBLINGS BY bc.comment_id ASC
 	</select>
 
 
@@ -60,7 +58,7 @@
 		VALUES (
 			(SELECT NVL(MAX(comment_id), 0) + 1 FROM board_comment),
 			#{board_id},
-			NVL(#{parent_comment_id, jdbcType=NUMERIC}, 0),
+			#{parent_comment_id, jdbcType=NUMERIC},
 			(SELECT emp_id FROM emp WHERE empno = #{empno}),
 			#{content},
 			SYSDATE,
@@ -72,6 +70,25 @@
 	</insert>
 
 
+	<!-- 댓글 수정 -->
+	<update id="_update_comment">
+		UPDATE board_comment
+		SET
+			content = #{content},
+			updated_date = SYSDATE
+		WHERE comment_id = #{comment_id}
+		AND use_yn = 'Y'
+		AND (
+			#{role} = 'ADMIN'
+			OR emp_id = (
+				SELECT emp_id
+				FROM emp
+				WHERE empno = #{empno}
+			)
+		)
+	</update>
+
+
 	<!-- 댓글 삭제 처리 -->
 	<update id="_delete_comment">
 		UPDATE board_comment
@@ -79,13 +96,23 @@
 			use_yn = 'N',
 			status = '삭제',
 			updated_date = SYSDATE
-		WHERE comment_id = #{comment_id}
-		AND (
-			#{role} = 'ADMIN'
-			OR emp_id = (
-				SELECT emp_id
-				FROM emp
-				WHERE empno = #{empno}
+		WHERE comment_id IN (
+			SELECT comment_id
+			FROM board_comment
+			START WITH comment_id = #{comment_id}
+			CONNECT BY PRIOR comment_id = parent_comment_id
+		)
+		AND EXISTS (
+			SELECT 1
+			FROM board_comment target_comment
+			WHERE target_comment.comment_id = #{comment_id}
+			AND (
+				#{role} = 'ADMIN'
+				OR target_comment.emp_id = (
+					SELECT emp_id
+					FROM emp
+					WHERE empno = #{empno}
+				)
 			)
 		)
 	</update>
@@ -103,12 +130,15 @@
 			bc.emp_id,
 			e.empno,
 			e.ename,
+			e.dept,
 			bc.content,
 			TO_CHAR(bc.created_date, 'YYYY-MM-DD HH24:MI') AS created_date,
 			TO_CHAR(bc.updated_date, 'YYYY-MM-DD HH24:MI') AS updated_date,
 			bc.status,
 			bc.use_yn,
-			bc.remark
+			bc.remark,
+			0 AS comment_level,
+			0 AS comment_indent
 		FROM board_comment bc,
 			 emp e
 		WHERE bc.emp_id = e.emp_id
