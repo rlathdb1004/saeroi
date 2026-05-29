@@ -660,7 +660,7 @@
 							<td>${status.count}</td>
 							<td title="${defect.defect_type}">${defect.defect_type}</td>
 							<td><fmt:formatNumber value="${defect.defect_qty}"
-									pattern="#,##0" /></td>
+									pattern="#,##0" />건</td>
 							<td><fmt:formatNumber value="${defect.sort_no}" pattern="0" />%
 							</td>
 						</tr>
