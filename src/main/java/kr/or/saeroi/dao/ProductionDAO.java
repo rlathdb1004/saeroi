@@ -79,6 +79,25 @@ public class ProductionDAO {
 				NAMESPACE + "insertProductionPlan",
 				productionDTO);
 	}
+	
+	// 생산계획 삭제 전 연결된 작업지시 건수를 확인한다.
+	public int selectWorkOrderCountByProdPlanId(Integer prodPlanId) {
+
+		return sqlSession.selectOne(
+				NAMESPACE + "selectWorkOrderCountByProdPlanId",
+				prodPlanId
+		);
+	}
+
+
+	// 작업지시가 연결되지 않은 생산계획을 삭제한다.
+	public int deleteProductionPlan(Integer prodPlanId) {
+
+		return sqlSession.delete(
+				NAMESPACE + "deleteProductionPlan",
+				prodPlanId
+		);
+	}
 
 
 	// =========================================================

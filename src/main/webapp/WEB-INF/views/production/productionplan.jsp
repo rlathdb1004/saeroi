@@ -15,7 +15,8 @@
 	  DTO / DAO / Service / Controller / Mapper는 생산관리 1개 파일로 관리
 	  JSP만 페이지별 관리
 	- 생산계획번호는 Mapper에서 자동 생성
-	- 생산계획은 작업지시의 상위 데이터이므로 화면에서 삭제 기능 제외
+	- 생산계획은 작업지시의 상위 데이터이므로 작업지시가 생성된 생산계획은 삭제 불가
+	- 삭제 불가 사유는 Service에서 검사 후 msg로 안내
 	- 검색 조건: 품목구분 itemType, 검색어 keyword, 시작일 startDate, 종료일 endDate
 	- 등록 모달 품목 select는 품목코드 / 품명 / 단위 표시
 	- 계획수량은 천단위 + 단위 표시
@@ -140,130 +141,157 @@
 
 
 	<%-- =========================================================
-	     3. 상단 버튼
+	     3. 상단 버튼 + 생산계획 목록 삭제 form
 	     ========================================================= --%>
-	<div class="coTableTop">
+	<form method="post" id="deleteForm"
+		action="${contextPath}/production/productionplan/delete">
 
-		<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
+		<div class="coTableTop">
 
-		<div class="search-btn-right">
+			<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
 
-			<button type="button"
-				class="search-btn search-btn-main modal_open_btn"
-				data_modal_target="#modal_insert">
-				<svg viewBox="0 0 24 24" fill="none">
-					<path d="M12 5V19" stroke="currentColor" stroke-width="2"
-						stroke-linecap="round">
-					</path>
-					<path d="M5 12H19" stroke="currentColor" stroke-width="2"
-						stroke-linecap="round">
-					</path>
-				</svg>
-				등록
-			</button>
+			<div class="search-btn-right">
+
+				<button type="button"
+					class="search-btn search-btn-main modal_open_btn"
+					data_modal_target="#modal_insert">
+					<svg viewBox="0 0 24 24" fill="none">
+						<path d="M12 5V19" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round">
+						</path>
+						<path d="M5 12H19" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round">
+						</path>
+					</svg>
+					등록
+				</button>
+
+				<button type="button" class="search-btn search-btn-sub"
+					onclick="deleteProductionPlanCheck();">
+					<svg viewBox="0 0 24 24" fill="none">
+						<path d="M4 7H20" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round">
+						</path>
+						<path d="M10 11V17" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round">
+						</path>
+						<path d="M14 11V17" stroke="currentColor" stroke-width="2"
+							stroke-linecap="round">
+						</path>
+						<path d="M6 7L7 21H17L18 7" stroke="currentColor" stroke-width="2"
+							stroke-linejoin="round">
+						</path>
+						<path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
+							stroke-linejoin="round">
+						</path>
+					</svg>
+					선택 삭제
+				</button>
+
+			</div>
 
 		</div>
 
-	</div>
 
+		<%-- =========================================================
+		     4. 생산계획 목록
+		     ========================================================= --%>
+		<div class="coTableWrap">
 
-	<%-- =========================================================
-	     4. 생산계획 목록
-	     ========================================================= --%>
-	<div class="coTableWrap">
+			<table class="coTable production-plan-table">
 
-		<table class="coTable production-plan-table">
+				<thead>
+					<tr>
+						<th class="mobile_show">
+							<label id="productionPlanCheckAllLabel">선택</label>
+							<input type="checkbox" id="productionPlanCheckAll"
+								style="display: none;">
+						</th>
 
-			<thead>
-				<tr>
-					<th class="mobile_show">
-						<label id="productionPlanCheckAllLabel">선택</label>
-						<input type="checkbox" id="productionPlanCheckAll"
-							style="display: none;">
-					</th>
+						<th class="mobile_show">생산계획번호</th>
+						<th class="mobile_hidden">품목코드</th>
+						<th class="mobile_show">품명</th>
+						<th class="mobile_show">계획수량</th>
+						<th class="mobile_hidden">계획일자</th>
+						<th class="mobile_hidden">납기일</th>
+						<th class="mobile_show">상세</th>
+					</tr>
+				</thead>
 
-					<th class="mobile_show">생산계획번호</th>
-					<th class="mobile_hidden">품목코드</th>
-					<th class="mobile_show">품명</th>
-					<th class="mobile_show">계획수량</th>
-					<th class="mobile_hidden">계획일자</th>
-					<th class="mobile_hidden">납기일</th>
-					<th class="mobile_show">상세</th>
-				</tr>
-			</thead>
+				<tbody>
 
-			<tbody>
+					<c:choose>
 
-				<c:choose>
+						<c:when test="${not empty list}">
 
-					<c:when test="${not empty list}">
+							<c:forEach var="plan" items="${list}">
 
-						<c:forEach var="plan" items="${list}">
+								<tr>
+									<td class="mobile_show">
+										<input type="checkbox" name="prodPlanIds"
+											value="${plan.prodPlanId}">
+									</td>
 
+									<td class="mobile_show" title="${plan.docNo}">
+										<c:choose>
+											<c:when test="${not empty plan.docNo}">
+												${plan.docNo}
+											</c:when>
+											<c:otherwise>
+												PP-${plan.prodPlanId}
+											</c:otherwise>
+										</c:choose>
+									</td>
+
+									<td class="mobile_hidden" title="${plan.itemCode}">
+										${plan.itemCode}
+									</td>
+
+									<td class="coTextLeft mobile_show" title="${plan.itemName}">
+										${plan.itemName}
+									</td>
+
+									<td class="mobile_show">
+										<fmt:formatNumber value="${plan.prodPlanQty}"
+											pattern="#,##0" />
+										${plan.itemUnit}
+									</td>
+
+									<td class="mobile_hidden">
+										${plan.prodPlanDate}
+									</td>
+
+									<td class="mobile_hidden">
+										${plan.dueDate}
+									</td>
+
+									<td class="mobile_show">
+										<button type="button" class="coDetailBtn"
+											onclick="location.href='${contextPath}/production/productionplan/detail?prodPlanId=${plan.prodPlanId}'">
+											보기
+										</button>
+									</td>
+								</tr>
+
+							</c:forEach>
+
+						</c:when>
+
+						<c:otherwise>
 							<tr>
-								<td class="mobile_show">
-									<input type="checkbox" name="prodPlanIds"
-										value="${plan.prodPlanId}">
-								</td>
-
-								<td class="mobile_show" title="${plan.docNo}">
-									<c:choose>
-										<c:when test="${not empty plan.docNo}">
-											${plan.docNo}
-										</c:when>
-										<c:otherwise>
-											PP-${plan.prodPlanId}
-										</c:otherwise>
-									</c:choose>
-								</td>
-
-								<td class="mobile_hidden" title="${plan.itemCode}">
-									${plan.itemCode}
-								</td>
-
-								<td class="coTextLeft mobile_show" title="${plan.itemName}">
-									${plan.itemName}
-								</td>
-
-								<td class="mobile_show">
-									<fmt:formatNumber value="${plan.prodPlanQty}"
-										pattern="#,##0" />
-									${plan.itemUnit}
-								</td>
-
-								<td class="mobile_hidden">
-									${plan.prodPlanDate}
-								</td>
-
-								<td class="mobile_hidden">
-									${plan.dueDate}
-								</td>
-
-								<td class="mobile_show">
-									<button type="button" class="coDetailBtn"
-										onclick="location.href='${contextPath}/production/productionplan/detail?prodPlanId=${plan.prodPlanId}'">
-										보기
-									</button>
-								</td>
+								<td colspan="8">조회된 생산계획이 없습니다.</td>
 							</tr>
+						</c:otherwise>
 
-						</c:forEach>
+					</c:choose>
 
-					</c:when>
+				</tbody>
 
-					<c:otherwise>
-						<tr>
-							<td colspan="8">조회된 생산계획이 없습니다.</td>
-						</tr>
-					</c:otherwise>
+			</table>
 
-				</c:choose>
+		</div>
 
-			</tbody>
-
-		</table>
-
-	</div>
+	</form>
 
 
 	<%-- =========================================================
@@ -499,6 +527,39 @@
 				checkAll.checked = allChecked;
 			}
 		};
+	}
+
+
+	/*
+	 * 생산계획 선택삭제 검증
+	 */
+	function deleteProductionPlanCheck() {
+
+		var checks = document.getElementsByName("prodPlanIds");
+		var checkedCount = 0;
+
+		for (var i = 0; i < checks.length; i++) {
+
+			if (checks[i].checked) {
+				checkedCount++;
+			}
+		}
+
+		if (checkedCount === 0) {
+			alert("삭제할 생산계획을 선택해주세요.");
+			return;
+		}
+
+		var message = ""
+			+ "선택한 생산계획 " + checkedCount + "건을 삭제하시겠습니까?\n\n"
+			+ "단, 작업지시가 생성된 생산계획은 삭제할 수 없습니다.\n"
+			+ "작업지시가 생성된 생산계획은 LOT, 자재투입, 생산실적 이력과 연결될 수 있으므로 삭제가 제한됩니다.";
+
+		if (!confirm(message)) {
+			return;
+		}
+
+		document.getElementById("deleteForm").submit();
 	}
 
 
