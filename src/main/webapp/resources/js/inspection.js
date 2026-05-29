@@ -1,199 +1,401 @@
+const appContextPath = getAppContextPath();
+
+function getAppContextPath() {
+    if (typeof contextPath !== 'undefined') {
+        return contextPath;
+    }
+
+    const scripts = document.querySelectorAll('script[src]');
+    const marker = '/resources/js/inspection.js';
+
+    for (const script of scripts) {
+        const src = script.getAttribute('src');
+
+        if (!src) {
+            continue;
+        }
+
+        const markerIndex = src.indexOf(marker);
+
+        if (markerIndex >= 0) {
+            return src.substring(0, markerIndex);
+        }
+    }
+
+    return '';
+}
+
+function addDefaultOption(selectTag) {
+    if (!selectTag) {
+        return;
+    }
+
+    selectTag.innerHTML = '<option value="">선택</option>';
+}
+
+function fetchJson(url) {
+    return fetch(url).then(response => response.json());
+}
+
+function hasText(value) {
+    return value !== null && value !== undefined && String(value).trim() !== '';
+}
+
+function validateDateRange(form) {
+    const startDate = form.querySelector('[name="startDate"]');
+    const endDate = form.querySelector('[name="endDate"]');
+
+    if (!startDate || !endDate || !startDate.value || !endDate.value) {
+        return true;
+    }
+
+    if (startDate.value > endDate.value) {
+        alert('시작일은 종료일보다 늦을 수 없습니다.');
+        endDate.focus();
+        return false;
+    }
+
+    return true;
+}
+
+window.validateDateRange = validateDateRange;
+
 const coBtnReset = document.querySelector('.search-reset-btn');
-//초기화 기능
+
 if (coBtnReset) {
     coBtnReset.addEventListener('click', function () {
-        document.getElementsByName('startDate')[0].value = '';
-        document.getElementsByName('endDate')[0].value = '';
-        document.getElementsByName('searchType')[0].value = '';
-        document.getElementsByName('keyword')[0].value = '';
+        const startDate = document.getElementsByName('startDate')[0];
+        const endDate = document.getElementsByName('endDate')[0];
+        const searchType = document.getElementsByName('searchType')[0];
+        const keyword = document.getElementsByName('keyword')[0];
+
+        if (startDate) startDate.value = '';
+        if (endDate) endDate.value = '';
+        if (searchType) searchType.value = '';
+        if (keyword) keyword.value = '';
     });
 }
-// 모달 안에 있는 select 태그들 가져오기
-const prodId = document.getElementsByName('prod_id')[0];
-const empId = document.querySelector('#modal_insert .modal_form [name="emp_id"]');
-const inspectionType = document.querySelector('.modal_form [name="insp_type"]');
-const result = document.querySelector('.modal_form [name="result"]');
-// 옵션을 이미 불러왔는지 확인하는 변수
-let prodLoaded = false;
-let empLoaded = false;
-// select 태그를 비우고 기본 옵션을 넣는 함수
-function addDefaultOption(selectTag) {
-    selectTag.innerHTML = '';
-    selectTag.innerHTML += '<option value="">\uC120\uD0DD</option>';
-}
-//품목명 목록 불러옴 DB에서
-function loadProdOptions() {
-    if (!prodId || prodLoaded) {
-        return;
+
+document.querySelectorAll('.modal_today').forEach(input => {
+    if (!input.value) {
+        input.value = new Date().toISOString().slice(0, 10);
     }
+});
 
-    fetch(contextPath + '/quality/inspection/option?searchType=itemName')
-        .then(response => response.json())
-        .then(data => {
-            addDefaultOption(prodId);
+const inspectionType = document.querySelector('#modal_insert [name="insp_type"]');
+const inspectionResult = document.querySelector('#modal_insert [name="result"]');
 
-            data.forEach(item => {
-                prodId.innerHTML += `<option value="${item.prod_id}">${item.item_name}</option>`;
-            });
-
-            prodLoaded = true;
-        });
-}
-//검사자 목록 불러옴 DB에서
-function loadEmpOptions() {
-    if (!empId || empLoaded) {
-        return;
-    }
-
-    fetch(contextPath + '/quality/inspection/option?searchType=ename')
-        .then(response => response.json())
-        .then(data => {
-            console.log('emp option data:', data);
-
-            addDefaultOption(empId);
-
-            data.forEach(emp => {
-                empId.innerHTML += `<option value="${emp.emp_id}">${emp.ename}</option>`;
-            });
-
-            empLoaded = true;
-        });
-}
-// 품목명 select 클릭 또는 포커스 시 품목명 옵션 불러오기
-if (prodId) {
-    prodId.addEventListener('focus', loadProdOptions);
-    prodId.addEventListener('click', loadProdOptions);
-}
-// 검사자 select 클릭 또는 포커스 시 검사자 옵션 불러오기
-if (empId) {
-    empId.addEventListener('focus', loadEmpOptions);
-    empId.addEventListener('click', loadEmpOptions);
-}
-// 검사구분 select에 고정 옵션 넣기
 if (inspectionType) {
     inspectionType.innerHTML = '';
-    inspectionType.innerHTML += '<option value="">\uC120\uD0DD</option>';
-    inspectionType.innerHTML += '<option value="\uC678\uAD00\uAC80\uC0AC">\uC678\uAD00\uAC80\uC0AC</option>';
-    inspectionType.innerHTML += '<option value="\uCE58\uC218\uAC80\uC0AC">\uCE58\uC218\uAC80\uC0AC</option>';
-    inspectionType.innerHTML += '<option value="\uD488\uC9C8\uD310\uC815">\uD488\uC9C8\uD310\uC815</option>';
-    inspectionType.innerHTML += '<option value="\uC7AC\uAC80\uC0AC">\uC7AC\uAC80\uC0AC</option>';
+    inspectionType.innerHTML += '<option value="">선택</option>';
+    inspectionType.innerHTML += '<option value="외관검사">외관검사</option>';
+    inspectionType.innerHTML += '<option value="치수검사">치수검사</option>';
+    inspectionType.innerHTML += '<option value="품질판정">품질판정</option>';
+    inspectionType.innerHTML += '<option value="재검사">재검사</option>';
 }
-// 검사결과 select에 고정 옵션 넣기
-if (result) {
-    result.innerHTML = '';
-    result.innerHTML += '<option value="">\uC120\uD0DD</option>';
-    result.innerHTML += '<option value="\uD569\uACA9">\uD569\uACA9</option>';
-    result.innerHTML += '<option value="\uC870\uAC74\uBD80">\uC870\uAC74\uBD80</option>';
+
+if (inspectionResult) {
+    inspectionResult.innerHTML = '';
+    inspectionResult.innerHTML += '<option value="">선택</option>';
+    inspectionResult.innerHTML += '<option value="합격">합격</option>';
+    inspectionResult.innerHTML += '<option value="조건부">조건부</option>';
+    inspectionResult.innerHTML += '<option value="불합격">불합격</option>';
 }
-// 페이지가 열리면 품목명, 검사자 옵션 미리 불러오기
-//loadProdOptions();
-//loadEmpOptions();
 
-//수정 클릭 하면 인풋창으로 변경 됨(수정은 검사 일시, 품목명, 검사자, 검사결과, 검사 구분, ~수량, 비고까지 가능하게 할 것임)
-//수정 할 칸이 여러 개이므로 All로 해야 함
-const detailEditBtn = document.querySelector('#detailEditBtn');//수정 버튼
-const detailText = document.querySelectorAll('.detailText');//span 부분 공통 클래스
-const detailInput = document.querySelectorAll('.detailInput');//숨어 있는 인풋
+let productionOptions = null;
+let defectOptions = null;
+let inspectionDocOptions = null;
+const actionEmpCache = {};
 
-if (detailEditBtn) {
-    detailEditBtn.addEventListener('click', function () {
+function loadProductionOptions(selectTag) {
+    if (!selectTag || selectTag.dataset.loaded === 'Y') {
+        return;
+    }
 
-        detailText.forEach(function (text) {
-            text.style.display = 'none';
+    const applyOptions = data => {
+        addDefaultOption(selectTag);
+
+        data.forEach(item => {
+            const textParts = [
+                item.prod_doc_no,
+                item.product_lot,
+                item.item_name,
+                item.prod_date ? '생산일 ' + item.prod_date : '',
+                item.prod_qty ? '생산 ' + item.prod_qty : ''
+            ].filter(hasText);
+
+            const option = document.createElement('option');
+            option.value = item.prod_id;
+            option.textContent = textParts.join(' | ');
+            selectTag.appendChild(option);
         });
 
-        detailInput.forEach(function (input) {
-            input.style.display = 'inline-block';
+        selectTag.dataset.loaded = 'Y';
+    };
+
+    if (productionOptions) {
+        applyOptions(productionOptions);
+        return;
+    }
+
+    fetchJson(appContextPath + '/quality/inspection/option?searchType=productionTarget&optionSize=100')
+        .then(data => {
+            productionOptions = data;
+            applyOptions(data);
+        });
+}
+
+function loadDefectOptions(selectTag) {
+    if (!selectTag || selectTag.dataset.loaded === 'Y') {
+        return;
+    }
+
+    const selectedValue = selectTag.dataset.selected || selectTag.value;
+
+    const applyOptions = data => {
+        addDefaultOption(selectTag);
+
+        data.forEach(defect => {
+            const option = document.createElement('option');
+            option.value = defect.defect_id;
+            option.dataset.dept = defect.action_dept || defect.dept || '';
+            option.textContent = [
+                defect.defect_code ? '[' + defect.defect_code + ']' : '',
+                defect.defect_name || '',
+                defect.defect_type ? '(' + defect.defect_type + ')' : ''
+            ].filter(hasText).join(' ');
+
+            if (String(defect.defect_id) === String(selectedValue)) {
+                option.selected = true;
+            }
+
+            selectTag.appendChild(option);
         });
 
-        detailEditBtn.style.display = 'none';
+        selectTag.dataset.loaded = 'Y';
+    };
+
+    if (defectOptions) {
+        applyOptions(defectOptions);
+        return;
+    }
+
+    fetchJson(appContextPath + '/quality/defect/option')
+        .then(data => {
+            defectOptions = data;
+            applyOptions(data);
+        });
+}
+
+function loadInspectionDocOptions(selectTag) {
+    if (!selectTag || selectTag.dataset.loaded === 'Y') {
+        return;
+    }
+
+    const applyOptions = data => {
+        addDefaultOption(selectTag);
+
+        data.forEach(inspection => {
+            const option = document.createElement('option');
+            option.value = inspection.insp_id;
+            option.textContent = [
+                inspection.doc_no,
+                inspection.item_name,
+                inspection.product_lot
+            ].filter(hasText).join(' | ');
+            selectTag.appendChild(option);
+        });
+
+        selectTag.dataset.loaded = 'Y';
+    };
+
+    if (inspectionDocOptions) {
+        applyOptions(inspectionDocOptions);
+        return;
+    }
+
+    fetchJson(appContextPath + '/quality/inspection/option?searchType=docNo&optionSize=100')
+        .then(data => {
+            inspectionDocOptions = data;
+            applyOptions(data);
+        });
+}
+
+function loadActionEmpOptions(selectTag, dept) {
+    if (!selectTag) {
+        return;
+    }
+
+    if (!hasText(dept)) {
+        addDefaultOption(selectTag);
+        return;
+    }
+
+    if (selectTag.dataset.loadedDept === dept) {
+        return;
+    }
+
+    const applyOptions = data => {
+        addDefaultOption(selectTag);
+
+        data.forEach(emp => {
+            const option = document.createElement('option');
+            option.value = emp.action_emp_id;
+            option.textContent = emp.action_ename;
+            selectTag.appendChild(option);
+        });
+
+        selectTag.dataset.loadedDept = dept;
+    };
+
+    if (actionEmpCache[dept]) {
+        applyOptions(actionEmpCache[dept]);
+        return;
+    }
+
+    fetchJson(appContextPath + '/quality/defect/action/empOption?dept=' + encodeURIComponent(dept))
+        .then(data => {
+            actionEmpCache[dept] = data;
+            applyOptions(data);
+        });
+}
+
+document.querySelectorAll('select[name="prod_id"]').forEach(select => {
+    select.addEventListener('focus', function () {
+        loadProductionOptions(select);
+    });
+    select.addEventListener('click', function () {
+        loadProductionOptions(select);
+    });
+});
+
+document.querySelectorAll('select[name="defect_id"]').forEach(select => {
+    select.addEventListener('focus', function () {
+        loadDefectOptions(select);
+    });
+    select.addEventListener('click', function () {
+        loadDefectOptions(select);
+    });
+});
+
+document.querySelectorAll('select[name="insp_id"]').forEach(select => {
+    select.addEventListener('focus', function () {
+        loadInspectionDocOptions(select);
+    });
+    select.addEventListener('click', function () {
+        loadInspectionDocOptions(select);
+    });
+});
+
+const hasDefect = document.getElementById('hasDefect');
+const inspectionDefectArea = document.getElementById('inspectionDefectArea');
+const inspectionDefectId = document.getElementById('inspectionDefectId');
+const inspectionActionDept = document.getElementById('inspectionActionDept');
+const inspectionActionEmpId = document.getElementById('inspectionActionEmpId');
+
+function toggleInspectionDefectArea() {
+    if (!hasDefect || !inspectionDefectArea) {
+        return;
+    }
+
+    const isChecked = hasDefect.checked;
+    inspectionDefectArea.style.display = isChecked ? '' : 'none';
+
+    inspectionDefectArea.querySelectorAll('.defectRequired').forEach(input => {
+        input.required = isChecked;
+    });
+
+    if (isChecked && inspectionDefectId) {
+        loadDefectOptions(inspectionDefectId);
+    }
+}
+
+function updateInspectionActionDept() {
+    if (!inspectionDefectId) {
+        return;
+    }
+
+    const selectedOption = inspectionDefectId.options[inspectionDefectId.selectedIndex];
+    const dept = selectedOption ? selectedOption.dataset.dept : '';
+
+    if (inspectionActionDept) {
+        inspectionActionDept.value = dept || '';
+    }
+
+    if (inspectionActionEmpId) {
+        inspectionActionEmpId.dataset.loadedDept = '';
+        loadActionEmpOptions(inspectionActionEmpId, dept);
+    }
+}
+
+if (hasDefect) {
+    hasDefect.addEventListener('change', toggleInspectionDefectArea);
+    toggleInspectionDefectArea();
+}
+
+if (inspectionDefectId) {
+    inspectionDefectId.addEventListener('change', updateInspectionActionDept);
+}
+
+if (inspectionActionEmpId) {
+    inspectionActionEmpId.addEventListener('focus', function () {
+        loadActionEmpOptions(inspectionActionEmpId, inspectionActionDept ? inspectionActionDept.value : '');
+    });
+    inspectionActionEmpId.addEventListener('click', function () {
+        loadActionEmpOptions(inspectionActionEmpId, inspectionActionDept ? inspectionActionDept.value : '');
+    });
+}
+
+const actionEmpId = document.querySelector('#actionEmpId');
+
+if (actionEmpId) {
+    actionEmpId.addEventListener('focus', function () {
+        loadActionEmpOptions(actionEmpId, actionEmpId.dataset.dept);
+    });
+    actionEmpId.addEventListener('click', function () {
+        loadActionEmpOptions(actionEmpId, actionEmpId.dataset.dept);
     });
 }
 
 function changeEditMode(isEdit) {
-		var detailTexts = document.querySelectorAll('.detailText');
-		var detailInputs = document.querySelectorAll('.detailInput');
+    const detailTexts = document.querySelectorAll('.detailText');
+    const detailInputs = document.querySelectorAll('.detailInput');
+    const editBtn = document.querySelector('#editBtn');
+    const saveBtn = document.querySelector('#saveBtn');
+    const cancelBtn = document.querySelector('#cancelBtn');
+    const defectForm = document.querySelector('#defectDetailForm');
 
-		var editBtn = document.querySelector('#editBtn');
-		var saveBtn = document.querySelector('#saveBtn');
-		var cancelBtn = document.querySelector('#cancelBtn');
+    detailTexts.forEach(function (text) {
+        text.style.display = isEdit ? 'none' : '';
+    });
 
-		detailTexts.forEach(function(text) {
-			text.style.display = isEdit ? 'none' : '';
-		});
+    detailInputs.forEach(function (input) {
+        input.style.display = isEdit ? 'inline-block' : 'none';
 
-		detailInputs.forEach(function(input) {
-			input.style.display = isEdit ? 'inline-block' : 'none';
-		});
+        if (isEdit && input.name === 'defect_id') {
+            loadDefectOptions(input);
+        }
+    });
 
-		editBtn.style.display = isEdit ? 'none' : 'inline-block';
-		saveBtn.style.display = isEdit ? 'inline-block' : 'none';
-		cancelBtn.style.display = isEdit ? 'inline-block' : 'none';
-	}
-
-//--불량 관리--
-// 불량명 select
-const defectId = document.querySelector('.modal_form [name="defect_id"]');
-
-let defectNameLoaded = false;
-
-// 불량명 목록 DB에서 불러오기
-function loadDefectNameOptions() {
-    if (!defectId || defectNameLoaded) {
-        return;
+    if (editBtn) {
+        editBtn.style.display = isEdit ? 'none' : 'inline-flex';
     }
 
-    fetch(contextPath + '/quality/defect/option')
-        .then(response => response.json())
-        .then(data => {
-            console.log('defect option data:', data);
-
-            addDefaultOption(defectId);
-
-            data.forEach(defect => {
-                defectId.innerHTML += `<option value="${defect.defect_id}">${defect.defect_name}</option>`;
-            });
-
-            defectNameLoaded = true;
-        });
-}
-
-if (defectId) {
-    defectId.addEventListener('focus', loadDefectNameOptions);
-    defectId.addEventListener('click', loadDefectNameOptions);
-}
-
-//검사번호 DB에서 불러오기(불량 등록 모달)
-const defectInspId = document.querySelector('.modal_form [name="insp_id"]');
-
-let defectInspLoaded = false;
-
-function loadDefectInspOptions() {
-    if (!defectInspId || defectInspLoaded) {
-        return;
+    if (saveBtn) {
+        saveBtn.style.display = isEdit ? 'inline-flex' : 'none';
     }
 
-    fetch(contextPath + '/quality/inspection/option?searchType=docNo')
-        .then(response => response.json())
-        .then(data => {
-            console.log('inspection docNo option data:', data);
+    if (cancelBtn) {
+        cancelBtn.style.display = isEdit ? 'inline-flex' : 'none';
+    }
 
-            addDefaultOption(defectInspId);
-
-            data.forEach(inspection => {
-                defectInspId.innerHTML += `<option value="${inspection.insp_id}">${inspection.doc_no}</option>`;
-            });
-
-            defectInspLoaded = true;
-        });
+    if (!isEdit && defectForm) {
+        defectForm.reset();
+    }
 }
 
-if (defectInspId) {
-    defectInspId.addEventListener('focus', loadDefectInspOptions);
-    defectInspId.addEventListener('click', loadDefectInspOptions);
-}
+window.changeEditMode = changeEditMode;
 
-// 테이블 컬럼에서 선택 클릭 시 전체 체크 / 전체 해제
 const checkAllHeaders = document.querySelectorAll('.checkAllHeader');
 
 checkAllHeaders.forEach(header => {
@@ -217,37 +419,3 @@ checkAllHeaders.forEach(header => {
         });
     });
 });
-//불량관리 상세 모달 emp 옵션
-const actionEmpId = document.querySelector('#actionEmpId');
-
-let actionEmpLoaded = false;
-
-function loadActionEmpOptions() {
-	if (!actionEmpId || actionEmpLoaded) {
-		return;
-	}
-
-	const dept = actionEmpId.dataset.dept;
-
-	if (!dept) {
-		addDefaultOption(actionEmpId);
-		return;
-	}
-
-	fetch(contextPath + '/quality/defect/action/empOption?dept=' + encodeURIComponent(dept))
-		.then(response => response.json())
-		.then(data => {
-			addDefaultOption(actionEmpId);
-
-			data.forEach(emp => {
-				actionEmpId.innerHTML += `<option value="${emp.action_emp_id}">${emp.action_ename}</option>`;
-			});
-
-			actionEmpLoaded = true;
-		});
-}
-
-if (actionEmpId) {
-	actionEmpId.addEventListener('focus', loadActionEmpOptions);
-	actionEmpId.addEventListener('click', loadActionEmpOptions);
-}

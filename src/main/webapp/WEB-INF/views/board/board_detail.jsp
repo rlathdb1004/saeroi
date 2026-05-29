@@ -90,20 +90,40 @@
 	box-sizing: border-box;
 }
 
+.board_comment_submit_btn {
+	height: 42px;
+	min-width: 76px;
+	padding: 0 18px;
+	border: 0;
+	border-radius: 7px;
+	background: #2f8568;
+	color: #fff;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+	flex-shrink: 0;
+}
+
 .board_comment_list {
 	margin-top: 18px;
 	border-top: 1px solid #d9e2dd;
 }
 
 .board_comment_item {
-	padding: 14px 0;
+	padding: 18px 0;
 	border-bottom: 1px solid #d9e2dd;
+}
+
+.board_comment_child {
+	padding-left: 22px;
+	border-left: 2px solid #b8c7bf;
 }
 
 .board_comment_meta {
 	display: flex;
 	justify-content: space-between;
-	align-items: center;
+	align-items: flex-start;
+	gap: 14px;
 	margin-bottom: 8px;
 	font-size: 13px;
 	color: #647067;
@@ -111,20 +131,70 @@
 
 .board_comment_writer {
 	font-weight: 700;
-	color: #12362b;
+	color: #2f8568;
 }
 
 .board_comment_content {
 	white-space: pre-line;
 	line-height: 1.6;
+	color: #10231d;
 }
 
 .board_comment_delete_form {
 	margin: 0;
 }
-.board_comment_write .search-btn {
-	height: 36px;
+
+.board_comment_actions {
+	display: flex;
+	align-items: center;
+	gap: 6px;
 	flex-shrink: 0;
+}
+
+.board_comment_action_split {
+	color: #9aa7a1;
+}
+
+.board_comment_text_btn, .board_comment_reply_btn {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: #596862;
+	font-size: 12px;
+	font-family: inherit;
+	cursor: pointer;
+}
+
+.board_comment_text_btn:hover, .board_comment_reply_btn:hover {
+	color: #12362b;
+	text-decoration: underline;
+}
+
+.board_comment_cancel_btn {
+	height: 42px;
+	min-width: 70px;
+	padding: 0 16px;
+	border: 1px solid #c9d4cf;
+	border-radius: 7px;
+	background: #fff;
+	color: #10231d;
+	font-size: 14px;
+	font-weight: 700;
+	font-family: inherit;
+	cursor: pointer;
+}
+
+.board_reply_form, .board_comment_edit_form {
+	display: none;
+	margin-top: 12px;
+}
+
+.board_reply_form.active, .board_comment_edit_form.active {
+	display: block;
+}
+
+.board_reply_textarea, .board_comment_edit_textarea {
+	min-height: 64px;
 }
 </style>
 
@@ -154,19 +224,20 @@
 					수정
 				</button>
 
-				<button type="submit" class="search-btn search-btn-sub">
+				<button type="button" class="search-btn search-btn-sub"
+					onclick="if(confirm('삭제하시겠습니까?')) document.getElementById('boardDeleteForm').submit()">
 					<svg viewBox="0 0 24 24" fill="none">
-		<path d="M4 7H20" stroke="currentColor" stroke-width="2"
+        <path d="M4 7H20" stroke="currentColor" stroke-width="2"
 							stroke-linecap="round"></path>
-		<path d="M10 11V17" stroke="currentColor" stroke-width="2"
+        <path d="M10 11V17" stroke="currentColor" stroke-width="2"
 							stroke-linecap="round"></path>
-		<path d="M14 11V17" stroke="currentColor" stroke-width="2"
+        <path d="M14 11V17" stroke="currentColor" stroke-width="2"
 							stroke-linecap="round"></path>
-		<path d="M6 7L7 21H17L18 7" stroke="currentColor" stroke-width="2"
+        <path d="M6 7L7 21H17L18 7" stroke="currentColor"
+							stroke-width="2" stroke-linejoin="round"></path>
+        <path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
 							stroke-linejoin="round"></path>
-		<path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
-							stroke-linejoin="round"></path>
-	</svg>
+    </svg>
 					삭제
 				</button>
 			</c:if>
@@ -327,15 +398,8 @@
 								placeholder="댓글을 입력하세요." required></textarea>
 						</div>
 
-						<button type="submit" class="search-btn search-btn-main">
-							<svg viewBox="0 0 24 24" fill="none">
-								<path d="M12 5V19" stroke="currentColor" stroke-width="2"
-									stroke-linecap="round"></path>
-								<path d="M5 12H19" stroke="currentColor" stroke-width="2"
-									stroke-linecap="round"></path>
-							</svg>
-							등록
-						</button>
+						<button type="submit" class="board_comment_submit_btn">
+							등록</button>
 					</div>
 				</form>
 			</c:when>
@@ -349,45 +413,110 @@
 
 		<div class="board_comment_list">
 			<c:forEach var="comment" items="${commentList}">
-				<c:set var="canDeleteComment"
+				<c:set var="canModifyComment"
 					value="${sessionScope.loginUser.role eq 'ADMIN'
 						or sessionScope.loginUser.empno eq comment.empno}" />
+				<c:set var="commentDepthClass" value="" />
+				<c:if test="${comment.comment_level > 0}">
+					<c:set var="commentDepthClass" value="board_comment_child" />
+				</c:if>
 
-				<div class="board_comment_item">
+				<div class="board_comment_item ${commentDepthClass}"
+					style="margin-left: ${comment.comment_indent}px;">
 					<div class="board_comment_meta">
 						<div>
-							<span class="board_comment_writer">${comment.ename}</span> <span>${comment.created_date}</span>
+							<span class="board_comment_writer">${comment.dept}</span> <span>작성일
+								${comment.created_date}</span>
 						</div>
 
-						<c:if test="${canDeleteComment}">
-							<form class="board_comment_delete_form" method="post"
-								action="${pageContext.request.contextPath}/board/suggestion/comment/delete"
-								onsubmit="return confirm('댓글을 삭제하시겠습니까?');">
+						<div class="board_comment_actions">
+							<c:if test="${not empty sessionScope.loginUser}">
+								<button type="button" class="board_comment_reply_btn"
+									onclick="toggleReplyForm('${comment.comment_id}');">
+									답글</button>
 
-								<input type="hidden" name="board_id" value="${board.board_id}">
-								<input type="hidden" name="comment_id"
-									value="${comment.comment_id}">
+								<c:if test="${canModifyComment}">
+									<span class="board_comment_action_split">|</span>
+								</c:if>
+							</c:if>
 
-								<button type="submit" class="search-btn search-btn-sub">
-									<svg viewBox="0 0 24 24" fill="none">
-										<path d="M4 7H20" stroke="currentColor" stroke-width="2"
-											stroke-linecap="round"></path>
-										<path d="M10 11V17" stroke="currentColor" stroke-width="2"
-											stroke-linecap="round"></path>
-										<path d="M14 11V17" stroke="currentColor" stroke-width="2"
-											stroke-linecap="round"></path>
-										<path d="M6 7L7 21H17L18 7" stroke="currentColor"
-											stroke-width="2" stroke-linejoin="round"></path>
-										<path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
-											stroke-linejoin="round"></path>
-									</svg>
-									삭제
-								</button>
-							</form>
-						</c:if>
+							<c:if test="${canModifyComment}">
+								<button type="button" class="board_comment_text_btn"
+									onclick="toggleCommentEditForm('${comment.comment_id}');">
+									수정</button>
+
+								<span class="board_comment_action_split">|</span>
+
+								<form class="board_comment_delete_form" method="post"
+									action="${pageContext.request.contextPath}/board/suggestion/comment/delete"
+									onsubmit="return confirm('댓글을 삭제하시겠습니까?');">
+
+									<input type="hidden" name="board_id" value="${board.board_id}">
+									<input type="hidden" name="comment_id"
+										value="${comment.comment_id}">
+
+									<button type="submit" class="board_comment_text_btn">
+										삭제</button>
+								</form>
+							</c:if>
+						</div>
 					</div>
 
-					<div class="board_comment_content">${comment.content}</div>
+					<div id="commentView_${comment.comment_id}"
+						class="board_comment_content">${comment.content}</div>
+
+					<c:if test="${canModifyComment}">
+						<form id="commentEditForm_${comment.comment_id}"
+							class="board_comment_edit_form" method="post"
+							accept-charset="UTF-8"
+							action="${pageContext.request.contextPath}/board/suggestion/comment/update">
+
+							<input type="hidden" name="board_id" value="${board.board_id}">
+							<input type="hidden" name="comment_id"
+								value="${comment.comment_id}">
+
+							<div class="board_comment_write">
+								<div class="board_file_area board_comment_input_area">
+									<textarea name="content"
+										class="board_comment_textarea board_comment_edit_textarea"
+										required>${comment.content}</textarea>
+								</div>
+
+								<button type="submit" class="board_comment_submit_btn">
+									저장</button>
+
+								<button type="button" class="board_comment_cancel_btn"
+									onclick="toggleCommentEditForm('${comment.comment_id}');">
+									취소</button>
+							</div>
+						</form>
+					</c:if>
+
+					<c:if test="${not empty sessionScope.loginUser}">
+						<form id="replyForm_${comment.comment_id}"
+							class="board_reply_form" method="post" accept-charset="UTF-8"
+							action="${pageContext.request.contextPath}/board/suggestion/comment/add">
+
+							<input type="hidden" name="board_id" value="${board.board_id}">
+							<input type="hidden" name="parent_comment_id"
+								value="${comment.comment_id}">
+
+							<div class="board_comment_write">
+								<div class="board_file_area board_comment_input_area">
+									<textarea name="content"
+										class="board_comment_textarea board_reply_textarea"
+										placeholder="답글을 입력하세요." required></textarea>
+								</div>
+
+								<button type="submit" class="board_comment_submit_btn">
+									등록</button>
+
+								<button type="button" class="board_comment_cancel_btn"
+									onclick="toggleReplyForm('${comment.comment_id}');">
+									취소</button>
+							</div>
+						</form>
+					</c:if>
 				</div>
 			</c:forEach>
 
@@ -402,6 +531,29 @@
 </div>
 
 <script>
+	function toggleReplyForm(commentId) {
+		const replyForm = document.getElementById('replyForm_' + commentId);
+
+		if (!replyForm) {
+			return;
+		}
+
+		replyForm.classList.toggle('active');
+	}
+
+	function toggleCommentEditForm(commentId) {
+		const commentView = document.getElementById('commentView_' + commentId);
+		const editForm = document
+				.getElementById('commentEditForm_' + commentId);
+
+		if (!commentView || !editForm) {
+			return;
+		}
+
+		const isActive = editForm.classList.toggle('active');
+		commentView.style.display = isActive ? 'none' : '';
+	}
+
 	document.addEventListener('DOMContentLoaded', function() {
 		const editBtn = document.getElementById('editBtn');
 		const form = document.getElementById('boardDetailForm');

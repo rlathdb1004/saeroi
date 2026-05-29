@@ -48,6 +48,22 @@ public class CommentImplDAO implements CommentDAO {
 	}
 
 	@Override
+	public int _dao_update_Comment(int comment_id, String empno, String role, String content) {
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("comment_id", comment_id);
+		param.put("empno", empno);
+		param.put("role", role);
+		param.put("content", content);
+
+		int update_comment =
+				sqlSession.update("mapper.comment._update_comment", param);
+
+		System.out.println("update_comment 실행 건수: " + update_comment);
+
+		return update_comment;
+	}
+
+	@Override
 	public int _dao_delete_Comment(int comment_id, String empno, String role) {
 		Map<String, Object> param = new HashMap<String, Object>();
 		param.put("comment_id", comment_id);

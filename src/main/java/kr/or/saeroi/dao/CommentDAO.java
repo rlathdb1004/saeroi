@@ -12,6 +12,9 @@ public interface CommentDAO {
 	// 댓글 등록
 	int _dao_insert_Comment(int board_id, Integer parent_comment_id, String empno, String content);
 
+	// 댓글 수정
+	int _dao_update_Comment(int comment_id, String empno, String role, String content);
+
 	// 댓글 삭제
 	int _dao_delete_Comment(int comment_id, String empno, String role);
 

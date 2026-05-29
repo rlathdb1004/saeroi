@@ -61,5 +61,5 @@ public interface BoardDAO {
 
 	// 게시판 수정
 	int _dao_update_Board(String board_id, String title, String content,
-			String status, String remark, String role, String empno);
+			String status, String use_yn, String remark, String role, String empno);
 }
