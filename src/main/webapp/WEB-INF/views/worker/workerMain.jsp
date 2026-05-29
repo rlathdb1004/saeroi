@@ -165,43 +165,43 @@
 
 		</div>
 
-	<button type="button"
-	class="workerLogoutBtn"
-	onclick="location.href='${pageContext.request.contextPath}/logout'">
+		<button type="button"
+			class="workerLogoutBtn"
+			onclick="location.href='${pageContext.request.contextPath}/logout'">
 
-	<svg viewBox="0 0 24 24"
-		class="workerLogoutSvg"
-		fill="none"
-		xmlns="http://www.w3.org/2000/svg">
+			<svg viewBox="0 0 24 24"
+				class="workerLogoutSvg"
+				fill="none"
+				xmlns="http://www.w3.org/2000/svg">
 
-		<path
-			d="M14 7V5C14 3.9 13.1 3 12 3H6C4.9 3 4 3.9 4 5V19C4 20.1 4.9 21 6 21H12C13.1 21 14 20.1 14 19V17"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"
-			stroke-linejoin="round" />
+				<path
+					d="M14 7V5C14 3.9 13.1 3 12 3H6C4.9 3 4 3.9 4 5V19C4 20.1 4.9 21 6 21H12C13.1 21 14 20.1 14 19V17"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round" />
 
-		<path
-			d="M9 12H20"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"
-			stroke-linejoin="round" />
+				<path
+					d="M9 12H20"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round" />
 
-		<path
-			d="M17 8L21 12L17 16"
-			stroke="currentColor"
-			stroke-width="2"
-			stroke-linecap="round"
-			stroke-linejoin="round" />
+				<path
+					d="M17 8L21 12L17 16"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+					stroke-linejoin="round" />
 
-	</svg>
+			</svg>
 
-	<span>
-		로그아웃
-	</span>
+			<span>
+				로그아웃
+			</span>
 
-</button>
+		</button>
 
 	</div>
 
@@ -483,6 +483,41 @@
 						class="workerTodayTimeBtn"
 						onclick="updateTodayStandardTime()">
 
+						<svg viewBox="0 0 24 24"
+							class="workerTodayRefreshSvg"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg">
+
+							<path
+								d="M20 11C19.76 8.65 18.32 6.57 16.18 5.54C13.14 4.08 9.48 5.05 7.57 7.82"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round" />
+
+							<path
+								d="M7 4V8H11"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round" />
+
+							<path
+								d="M4 13C4.24 15.35 5.68 17.43 7.82 18.46C10.86 19.92 14.52 18.95 16.43 16.18"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round" />
+
+							<path
+								d="M17 20V16H13"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round" />
+
+						</svg>
+
 						<span id="workerTodayTime"></span>
 						<span>기준</span>
 
@@ -493,6 +528,19 @@
 				<div class="workerTodayGrid">
 
 					<div class="workerTodayItem">
+
+						<div class="workerTodayIcon">
+
+							<svg viewBox="0 0 24 24"
+								class="workerTodayItemSvg">
+
+								<path
+									d="M7 2H17V4H21V22H3V4H7V2ZM5 6V20H19V6H5ZM8 9H16V11H8V9ZM8 13H16V15H8V13Z"
+									fill="currentColor" />
+
+							</svg>
+
+						</div>
 
 						<p>
 							오늘 작업지시
@@ -525,6 +573,21 @@
 					</div>
 
 					<div class="workerTodayItem">
+
+						<div class="workerTodayIcon workerTodayAlertIcon">
+
+							<svg viewBox="0 0 24 24"
+								class="workerTodayItemSvg">
+
+								<path
+									d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.36 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.63 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16Z"
+									fill="currentColor" />
+
+							</svg>
+
+							<span class="workerAlertDot"></span>
+
+						</div>
 
 						<p>
 							최근 알림

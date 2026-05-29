@@ -112,7 +112,7 @@
 						<th>검사번호</th>
 						<td>${inspection.doc_no}</td>
 
-						<th>검사일시</th>
+						<th>검사일자</th>
 						<td>
 							<span class="viewMode">${inspection.insp_date}</span>
 							<input type="date" name="insp_date"
@@ -121,22 +121,22 @@
 								required>
 						</td>
 
-						<th>품목명</th>
-						<td>${inspection.item_name}</td>
+						<th>검사상태</th>
+						<td>${inspection.insp_status}</td>
 					</tr>
 
 					<tr>
-						<th>LOT번호</th>
-						<td>${inspection.product_lot}</td>
-
 						<th>검사자</th>
 						<td>${inspection.ename}</td>
+
+						<th>부서</th>
+						<td>${inspection.dept}</td>
 
 						<th>검사결과</th>
 						<td>
 							<span class="viewMode">
 								<c:choose>
-									<c:when test="${inspection.result == '조건부'}">
+									<c:when test="${inspection.result == '조건부' or inspection.result == '불합격'}">
 										<span class="coStatus coStatusStop">${inspection.result}</span>
 									</c:when>
 									<c:otherwise>
@@ -148,11 +148,11 @@
 							<select name="result" class="detailInput editMode"
 								style="display: none;" required>
 								<option value="합격"
-									<c:if test="${inspection.result == '합격'}">selected</c:if>>
-									합격</option>
+									<c:if test="${inspection.result == '합격'}">selected</c:if>>합격</option>
 								<option value="조건부"
-									<c:if test="${inspection.result == '조건부'}">selected</c:if>>
-									조건부</option>
+									<c:if test="${inspection.result == '조건부'}">selected</c:if>>조건부</option>
+								<option value="불합격"
+									<c:if test="${inspection.result == '불합격'}">selected</c:if>>불합격</option>
 							</select>
 						</td>
 					</tr>
@@ -163,15 +163,20 @@
 							<span class="viewMode">${inspection.insp_type}</span>
 							<select name="insp_type" class="detailInput editMode"
 								style="display: none;" required>
+								<option value="외관검사"
+									<c:if test="${inspection.insp_type == '외관검사'}">selected</c:if>>외관검사</option>
+								<option value="치수검사"
+									<c:if test="${inspection.insp_type == '치수검사'}">selected</c:if>>치수검사</option>
+								<option value="품질판정"
+									<c:if test="${inspection.insp_type == '품질판정'}">selected</c:if>>품질판정</option>
+								<option value="재검사"
+									<c:if test="${inspection.insp_type == '재검사'}">selected</c:if>>재검사</option>
 								<option value="수입검사"
-									<c:if test="${inspection.insp_type == '수입검사'}">selected</c:if>>
-									수입검사</option>
+									<c:if test="${inspection.insp_type == '수입검사'}">selected</c:if>>수입검사</option>
 								<option value="공정검사"
-									<c:if test="${inspection.insp_type == '공정검사'}">selected</c:if>>
-									공정검사</option>
+									<c:if test="${inspection.insp_type == '공정검사'}">selected</c:if>>공정검사</option>
 								<option value="최종검사"
-									<c:if test="${inspection.insp_type == '최종검사'}">selected</c:if>>
-									최종검사</option>
+									<c:if test="${inspection.insp_type == '최종검사'}">selected</c:if>>최종검사</option>
 							</select>
 						</td>
 
@@ -207,6 +212,78 @@
 			</table>
 
 		</form>
+	</div>
+
+	<div class="detail_card">
+		<div class="detail_card_title">생산 및 품목 정보</div>
+
+		<table class="detail_info_table">
+			<colgroup>
+				<col style="width: 12%;">
+				<col style="width: 21%;">
+				<col style="width: 12%;">
+				<col style="width: 21%;">
+				<col style="width: 12%;">
+				<col style="width: 22%;">
+			</colgroup>
+
+			<tbody>
+				<tr>
+					<th>품목코드</th>
+					<td>${inspection.item_code}</td>
+
+					<th>품목명</th>
+					<td>${inspection.item_name}</td>
+
+					<th>단위</th>
+					<td>${inspection.item_unit}</td>
+				</tr>
+
+				<tr>
+					<th>LOT번호</th>
+					<td>${inspection.product_lot}</td>
+
+					<th>생산문서번호</th>
+					<td>${inspection.prod_doc_no}</td>
+
+					<th>작업지시번호</th>
+					<td>${inspection.work_order_doc_no}</td>
+				</tr>
+
+				<tr>
+					<th>생산일자</th>
+					<td>${inspection.prod_date}</td>
+
+					<th>생산수량</th>
+					<td>${inspection.prod_qty}</td>
+
+					<th>손실수량</th>
+					<td>${inspection.loss_qty}</td>
+				</tr>
+
+				<tr>
+					<th>생산상태</th>
+					<td>${inspection.prod_status}</td>
+
+					<th>지시수량</th>
+					<td>${inspection.order_qty}</td>
+
+					<th>지시일자</th>
+					<td>${inspection.order_date}</td>
+				</tr>
+
+				<tr>
+					<th>등록일</th>
+					<td>${inspection.created_date}</td>
+
+					<th>수정일</th>
+					<td>${inspection.updated_date}</td>
+
+					<th>사용여부</th>
+					<td>${inspection.use_yn}</td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 
 </div>

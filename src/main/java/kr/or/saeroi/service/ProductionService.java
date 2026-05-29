@@ -95,6 +95,48 @@ public class ProductionService {
 
 		return productionDAO.insertProductionPlan(productionDTO);
 	}
+	
+	// 생산계획을 선택 삭제한다.
+	// 작업지시가 생성된 생산계획은 LOT/자재투입/생산실적 이력과 연결될 수 있으므로 삭제하지 않는다.
+	@Transactional
+	public int deleteProductionPlanList(List<Integer> prodPlanIds) {
+
+		if (prodPlanIds == null || prodPlanIds.isEmpty()) {
+			throw new IllegalArgumentException("삭제할 생산계획을 선택해주세요.");
+		}
+
+		// 1. 먼저 전체 삭제 가능 여부를 검사한다.
+		// 하나라도 작업지시가 연결되어 있으면 전체 삭제를 중단한다.
+		for (Integer prodPlanId : prodPlanIds) {
+
+			if (prodPlanId == null || prodPlanId <= 0) {
+				throw new IllegalArgumentException("삭제할 생산계획 정보가 올바르지 않습니다.");
+			}
+
+			int workOrderCount =
+					productionDAO.selectWorkOrderCountByProdPlanId(prodPlanId);
+
+			if (workOrderCount > 0) {
+				throw new IllegalArgumentException(
+						"선택한 생산계획 중 작업지시가 생성된 항목이 있어 삭제할 수 없습니다.\n"
+						+ "작업지시가 생성된 생산계획은 LOT/자재투입/생산실적 이력과 연결될 수 있으므로 삭제가 제한됩니다."
+				);
+			}
+		}
+
+		// 2. 전체 삭제 가능할 때만 실제 삭제한다.
+		int deleteCount = 0;
+
+		for (Integer prodPlanId : prodPlanIds) {
+			deleteCount += productionDAO.deleteProductionPlan(prodPlanId);
+		}
+
+		if (deleteCount <= 0) {
+			throw new IllegalArgumentException("삭제된 생산계획이 없습니다.");
+		}
+
+		return deleteCount;
+	}
 
 
 	// =========================================================

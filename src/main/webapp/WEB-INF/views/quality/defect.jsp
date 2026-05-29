@@ -6,29 +6,37 @@
 		and (sessionScope.loginUser.role eq 'ADMIN'
 		or sessionScope.loginUser.role eq 'MANAGER')}" />
 
+<style>
+.quality_search_error {
+	margin: 10px 0 0;
+	color: #c62828;
+	font-size: 13px;
+	font-weight: 600;
+}
+</style>
+
 <div class="coPageWrap">
 
 	<form class="search-form" method="get"
-		action="${pageContext.request.contextPath}/quality/defect">
+		action="${pageContext.request.contextPath}/quality/defect"
+		onsubmit="return validateDateRange(this);">
 
 		<div class="search-box">
 			<div class="search-row">
 
 				<div class="search-item">
-					<label class="search-label">시작일</label>
-					<input type="date" name="startDate" class="search-date"
-						value="${startDate}">
+					<label class="search-label">시작일</label> <input type="date"
+						name="startDate" class="search-date" value="${startDate}">
 				</div>
 
 				<div class="search-item">
-					<label class="search-label">종료일</label>
-					<input type="date" name="endDate" class="search-date"
-						value="${endDate}">
+					<label class="search-label">종료일</label> <input type="date"
+						name="endDate" class="search-date" value="${endDate}">
 				</div>
 
 				<div class="search-item">
-					<label class="search-label">구분</label>
-					<select name="searchType" class="search-select">
+					<label class="search-label">구분</label> <select name="searchType"
+						class="search-select">
 						<option value="">전체</option>
 						<option value="defectCode"
 							<c:if test="${searchType == 'defectCode'}">selected</c:if>>불량코드</option>
@@ -44,9 +52,9 @@
 				</div>
 
 				<div class="search-item">
-					<label class="search-label">검색어</label>
-					<input type="text" name="keyword" class="search-input"
-						placeholder="검색키워드" value="${keyword}">
+					<label class="search-label">검색어</label> <input type="text"
+						name="keyword" class="search-input" placeholder="검색키워드"
+						value="${keyword}">
 				</div>
 
 				<div class="search-btn-wrap">
@@ -75,6 +83,10 @@
 				</div>
 
 			</div>
+
+			<c:if test="${not empty dateError}">
+				<div class="quality_search_error">${dateError}</div>
+			</c:if>
 		</div>
 	</form>
 
@@ -86,18 +98,18 @@
 			<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
 
 			<c:if test="${canManageQuality}">
-				<div class="search-btn-right">
-					<button type="button"
-						class="search-btn search-btn-main modal_open_btn"
-						data_modal_target="#modal_insert">
-						<svg viewBox="0 0 24 24" fill="none">
-							<path d="M12 5V19" stroke="currentColor" stroke-width="2"
-								stroke-linecap="round"></path>
-							<path d="M5 12H19" stroke="currentColor" stroke-width="2"
-								stroke-linecap="round"></path>
-						</svg>
-						등록
-					</button>
+<!-- 				<div class="search-btn-right"> -->
+<!-- 					<button type="button" -->
+<!-- 						class="search-btn search-btn-main modal_open_btn" -->
+<!-- 						data_modal_target="#modal_insert"> -->
+<!-- 						<svg viewBox="0 0 24 24" fill="none"> -->
+<!-- 							<path d="M12 5V19" stroke="currentColor" stroke-width="2" -->
+<!-- 								stroke-linecap="round"></path> -->
+<!-- 							<path d="M5 12H19" stroke="currentColor" stroke-width="2" -->
+<!-- 								stroke-linecap="round"></path> -->
+<!-- 						</svg> -->
+<!-- 						등록 -->
+<!-- 					</button> -->
 
 					<button type="submit" class="search-btn search-btn-sub">
 						<svg viewBox="0 0 24 24" fill="none">
@@ -136,27 +148,22 @@
 				<tbody>
 					<c:forEach var="defect" items="${list}">
 						<tr>
-							<td class="mobile_show">
-<%-- 								<c:if test="${canManageQuality}"> --%>
-									<input type="checkbox" name="defect_list_id"
-										value="${defect.defect_list_id}">
-<%-- 								</c:if> --%>
+							<td class="mobile_show"><input type="checkbox"
+								name="defect_list_id" value="${defect.defect_list_id}">
 							</td>
 
 							<td class="mobile_hidden">${defect.defect_code}</td>
 							<td class="mobile_show">${defect.defect_date}</td>
 							<td class="coTextLeft mobile_show">${defect.item_name}</td>
 							<td class="mobile_hidden">${defect.product_lot}</td>
-							<td class="mobile_show">
-								<span class="coStatus coStatusStop">${defect.defect_name}</span>
+							<td class="mobile_show"><span class="coStatus coStatusStop">${defect.defect_name}</span>
 							</td>
 							<td class="mobile_hidden">${defect.ename}</td>
 
 							<td class="mobile_show">
 								<button type="button" class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${defect.defect_list_id}'">
-									보기
-								</button>
+									보기</button>
 							</td>
 						</tr>
 					</c:forEach>
@@ -184,28 +191,27 @@
 			</div>
 
 			<form class="modal_form" method="post" accept-charset="UTF-8"
+				enctype="multipart/form-data"
 				action="${pageContext.request.contextPath}/quality/defect/add">
 
 				<div class="modal_body modal_body_2col">
 
 					<div class="modal_item">
 						<label class="modal_label">발생일시<span
-							class="modal_required">*</span></label>
-						<input type="date" name="defect_date"
-							class="modal_input modal_today" required>
+							class="modal_required">*</span></label> <input type="date"
+							name="defect_date" class="modal_input modal_today" required>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">검사번호<span
-							class="modal_required">*</span></label>
-						<select name="insp_id" class="modal_select" required>
+							class="modal_required">*</span></label> <select name="insp_id"
+							class="modal_select" required>
 							<option value="">선택</option>
 						</select>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">불량명<span
-							class="modal_required">*</span></label>
+						<label class="modal_label">불량명<span class="modal_required">*</span></label>
 						<select name="defect_id" class="modal_select" required>
 							<option value="">선택</option>
 						</select>
@@ -213,14 +219,18 @@
 
 					<div class="modal_item">
 						<label class="modal_label">불량수량<span
-							class="modal_required">*</span></label>
-						<input type="number" name="defect_qty"
-							class="modal_input" min="0" required>
+							class="modal_required">*</span></label> <input type="number"
+							name="defect_qty" class="modal_input" min="0" required>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">비고</label>
-						<input type="text" name="remark" class="modal_input">
+						<label class="modal_label">불량사진</label> <input type="file"
+							name="defect_photo_file" class="modal_input" accept="image/*">
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">비고</label> <input type="text"
+							name="remark" class="modal_input">
 					</div>
 
 				</div>
@@ -246,7 +256,7 @@
 			return false;
 		}
 
-		return confirm('삭제하시겠습니까?');
+		return confirm('선택한 불량 내역을 삭제하시겠습니까?');
 	}
 </script>
 

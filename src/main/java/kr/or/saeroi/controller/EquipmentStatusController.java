@@ -73,7 +73,7 @@ public class EquipmentStatusController {
             @RequestParam(required = false) String mode,
             Model model) {
 
-        EquipmentStatusDTO dto = service.get_equipment_status_detail(history_id);
+        EquipmentStatusDTO dto = service.equipment_status_detail(history_id);
 
         List<EquipmentMaintenanceDTO> maintenanceList =
                 service.maintenance_history(dto.getEquip_id(),

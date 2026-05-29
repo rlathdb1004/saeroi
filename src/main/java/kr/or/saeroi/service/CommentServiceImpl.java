@@ -34,6 +34,15 @@ public class CommentServiceImpl implements CommentService{
 		
 	}
 
+	//댓글 수정
+	@Override
+	public int _ser_update_Comment(int comment_id, String empno, String role, String content) {
+		System.out.println("_ser_update_comment 실행 됨");
+
+		int update_list = commentDAO._dao_update_Comment(comment_id, empno, role, content);
+		return update_list;
+	}
+
 	//댓글 삭제
 	@Override
 	public int _ser_delete_Comment(int comment_id, String empno, String role) {
