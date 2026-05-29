@@ -99,7 +99,6 @@ if (inspectionResult) {
     inspectionResult.innerHTML += '<option value="">선택</option>';
     inspectionResult.innerHTML += '<option value="합격">합격</option>';
     inspectionResult.innerHTML += '<option value="조건부">조건부</option>';
-    inspectionResult.innerHTML += '<option value="불합격">불합격</option>';
 }
 
 let productionOptions = null;
@@ -126,11 +125,13 @@ function loadProductionOptions(selectTag) {
 
             const option = document.createElement('option');
             option.value = item.prod_id;
+            option.dataset.prodQty = hasText(item.prod_qty) ? item.prod_qty : '';
             option.textContent = textParts.join(' | ');
             selectTag.appendChild(option);
         });
 
         selectTag.dataset.loaded = 'Y';
+        applySelectedProductionQty(selectTag);
     };
 
     if (productionOptions) {
@@ -267,6 +268,9 @@ document.querySelectorAll('select[name="prod_id"]').forEach(select => {
     select.addEventListener('click', function () {
         loadProductionOptions(select);
     });
+    select.addEventListener('change', function () {
+        applySelectedProductionQty(select);
+    });
 });
 
 document.querySelectorAll('select[name="defect_id"]').forEach(select => {
@@ -292,14 +296,86 @@ const inspectionDefectArea = document.getElementById('inspectionDefectArea');
 const inspectionDefectId = document.getElementById('inspectionDefectId');
 const inspectionActionDept = document.getElementById('inspectionActionDept');
 const inspectionActionEmpId = document.getElementById('inspectionActionEmpId');
+const inspectionInsertForm = document.querySelector('#modal_insert form');
+const inspectionProdQty = document.getElementById('inspectionProdQty');
+const inspectionGoodQty = document.getElementById('inspectionGoodQty');
+const inspectionDefectQty = document.getElementById('inspectionDefectQty');
+const inspectionQtyError = document.getElementById('inspectionQtyError');
+const inspectionSubmitBtn = document.querySelector('#modal_insert .modal_btn_submit');
+
+function toNumber(input) {
+    if (!input || !hasText(input.value)) {
+        return 0;
+    }
+
+    const value = Number(input.value);
+    return Number.isFinite(value) ? value : 0;
+}
+
+function applySelectedProductionQty(selectTag) {
+    if (!selectTag || !inspectionProdQty) {
+        return;
+    }
+
+    const selectedOption = selectTag.options[selectTag.selectedIndex];
+    const prodQty = selectedOption ? selectedOption.dataset.prodQty : '';
+
+    inspectionProdQty.value = hasText(prodQty) ? prodQty : '';
+    validateInspectionQuantity();
+}
+
+function isPassResult() {
+    return inspectionResult && inspectionResult.value === '합격';
+}
+
+function validateInspectionQuantity() {
+    if (!inspectionProdQty || !inspectionGoodQty) {
+        return true;
+    }
+
+    const prodQty = toNumber(inspectionProdQty);
+    const goodQty = toNumber(inspectionGoodQty);
+    const defectQty = hasDefect && hasDefect.checked && !hasDefect.disabled ? toNumber(inspectionDefectQty) : 0;
+    const isExceeded = prodQty > 0 && goodQty + defectQty > prodQty;
+
+    if (inspectionQtyError) {
+        inspectionQtyError.style.display = isExceeded ? '' : 'none';
+    }
+
+    if (inspectionSubmitBtn) {
+        inspectionSubmitBtn.disabled = isExceeded;
+    }
+
+    return !isExceeded;
+}
+
+function updateDefectCheckboxByResult() {
+    if (!hasDefect) {
+        return;
+    }
+
+    if (isPassResult()) {
+        hasDefect.checked = false;
+        hasDefect.disabled = true;
+    } else {
+        hasDefect.disabled = false;
+    }
+
+    toggleInspectionDefectArea();
+    validateInspectionQuantity();
+}
 
 function toggleInspectionDefectArea() {
     if (!hasDefect || !inspectionDefectArea) {
         return;
     }
 
-    const isChecked = hasDefect.checked;
+    const isChecked = hasDefect.checked && !hasDefect.disabled && !isPassResult();
     inspectionDefectArea.style.display = isChecked ? '' : 'none';
+
+    inspectionDefectArea.querySelectorAll('input, select, textarea').forEach(input => {
+        input.disabled = !isChecked;
+    });
 
     inspectionDefectArea.querySelectorAll('.defectRequired').forEach(input => {
         input.required = isChecked;
@@ -308,6 +384,8 @@ function toggleInspectionDefectArea() {
     if (isChecked && inspectionDefectId) {
         loadDefectOptions(inspectionDefectId);
     }
+
+    validateInspectionQuantity();
 }
 
 function updateInspectionActionDept() {
@@ -331,6 +409,35 @@ function updateInspectionActionDept() {
 if (hasDefect) {
     hasDefect.addEventListener('change', toggleInspectionDefectArea);
     toggleInspectionDefectArea();
+}
+
+if (inspectionResult) {
+    inspectionResult.addEventListener('change', updateDefectCheckboxByResult);
+    updateDefectCheckboxByResult();
+}
+
+if (inspectionGoodQty) {
+    inspectionGoodQty.addEventListener('input', validateInspectionQuantity);
+}
+
+if (inspectionDefectQty) {
+    inspectionDefectQty.addEventListener('input', validateInspectionQuantity);
+}
+
+if (inspectionInsertForm) {
+    inspectionInsertForm.addEventListener('submit', function (event) {
+        if (!validateInspectionQuantity()) {
+            event.preventDefault();
+
+            if (inspectionQtyError) {
+                inspectionQtyError.style.display = '';
+            }
+
+            if (inspectionGoodQty) {
+                inspectionGoodQty.focus();
+            }
+        }
+    });
 }
 
 if (inspectionDefectId) {

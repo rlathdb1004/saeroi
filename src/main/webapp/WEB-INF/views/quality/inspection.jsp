@@ -263,8 +263,7 @@
 							<td class="mobile_hidden">${inspection.ename}</td>
 
 							<td class="mobile_show"><c:choose>
-									<c:when
-										test="${inspection.result == '조건부' or inspection.result == '불합격'}">
+									<c:when test="${inspection.result == '조건부'}">
 										<span class="coStatus coStatusStop">${inspection.result}</span>
 									</c:when>
 									<c:otherwise>
@@ -346,27 +345,29 @@
 					</div>
 					<div class="modal_item">
 						<label class="modal_label">생산수량<span
-							class="modal_required">*</span></label> <input type="text"
-							name="prod_qty" class="modal_input">
-					</div>
-
-					<div class="modal_item">
-						<label class="modal_label">검사수량<span
 							class="modal_required">*</span></label> <input type="number"
-							name="inspection_qty" class="modal_input" min="0" required>
+							id="inspectionProdQty" name="inspection_qty"
+							class="modal_input" min="0" readonly required>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">양품수량<span
 							class="modal_required">*</span></label> <input type="number"
-							name="good_qty" class="modal_input" min="0" required>
+							id="inspectionGoodQty" name="good_qty"
+							class="modal_input" min="0" required>
+					</div>
+
+					<div class="modal_item modal_item_full">
+						<div id="inspectionQtyError"
+							style="display: none; color: #dc2626; font-size: 13px;">
+							생산 수량을 초과 할 수 없습니다.</div>
 					</div>
 					
 
-					<div class="modal_item">
-						<label class="modal_label">비고</label> <input type="text"
-							name="remark" class="modal_input">
-					</div>
+<!-- 					<div class="modal_item"> -->
+<!-- 						<label class="modal_label">비고</label> <input type="text" -->
+<!-- 							name="remark" class="modal_input"> -->
+<!-- 					</div> -->
 
 					<div class="quality_modal_section">
 						<div class="quality_modal_section_title">
@@ -395,7 +396,8 @@
 							<div class="modal_item">
 								<label class="modal_label">불량수량<span
 									class="modal_required">*</span></label> <input type="number"
-									name="defect_qty" class="modal_input defectRequired" min="0">
+									id="inspectionDefectQty" name="defect_qty"
+									class="modal_input defectRequired" min="0">
 							</div>
 
 							<div class="modal_item">
@@ -410,10 +412,10 @@
 								</div>
 							</div>
 
-							<div class="modal_item modal_item_full">
-								<label class="modal_label">불량 비고</label> <input type="text"
-									name="defect_remark" class="modal_input">
-							</div>
+<!-- 							<div class="modal_item modal_item_full"> -->
+<!-- 								<label class="modal_label">불량 비고</label> <input type="text" -->
+<!-- 									name="defect_remark" class="modal_input"> -->
+<!-- 							</div> -->
 
 							<div class="modal_item">
 								<label class="modal_label">조치일시<span

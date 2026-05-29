@@ -365,6 +365,35 @@
 		</foreach>
 	</update>
 
+	<update id="_delete_Defect_Action_By_Inspection" parameterType="map">
+		UPDATE defect_action
+		SET use_yn = 'N',
+			updated_date = SYSDATE
+		WHERE defect_list_id IN (
+			SELECT dl.defect_list_id
+			FROM defect_list dl
+			WHERE dl.insp_id IN
+			<foreach collection="insp_id" item="id" open="(" separator=","
+				close=")">
+				TO_NUMBER(#{id})
+			</foreach>
+			AND NVL(dl.use_yn, 'Y') = 'Y'
+		)
+		AND NVL(use_yn, 'Y') = 'Y'
+	</update>
+
+	<update id="_delete_Defect_By_Inspection" parameterType="map">
+		UPDATE defect_list
+		SET use_yn = 'N',
+			updated_date = SYSDATE
+		WHERE insp_id IN
+		<foreach collection="insp_id" item="id" open="(" separator=","
+			close=")">
+			TO_NUMBER(#{id})
+		</foreach>
+		AND NVL(use_yn, 'Y') = 'Y'
+	</update>
+
 	<select id="_select_Inspection_detail"
 		resultType="kr.or.saeroi.dto.InspectionDTO">
 		SELECT
@@ -514,6 +543,53 @@
 			</choose>
 		</if>
 
+		ORDER BY dl.defect_list_id DESC
+	</select>
+
+	<select id="_select_Defect_By_Inspection"
+		resultType="kr.or.saeroi.dto.DefectDTO">
+		SELECT
+			dl.defect_list_id,
+			dl.doc_no,
+			d.defect_id,
+			dl.insp_id,
+			i.doc_no AS insp_doc_no,
+			d.defect_code,
+			d.defect_type,
+			TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS defect_date,
+			it.item_code,
+			it.item_name,
+			it.item_unit,
+			CASE
+				WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
+				THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date, 'YYYYMMDD'), 1, 1)
+				ELSE w.product_lot
+			END AS product_lot,
+			d.defect_name,
+			d.action_dept,
+			d.action_dept AS dept,
+			e.ename,
+			NVL(dl.defect_qty, 0) AS defect_qty,
+			dl.remark,
+			NVL(dl.use_yn, 'Y') AS use_yn
+		FROM defect_list dl,
+			defect d,
+			inspection i,
+			production p,
+			work_order w,
+			production_plan pr,
+			item it,
+			emp e
+		WHERE dl.defect_id = d.defect_id
+		AND dl.insp_id = i.insp_id
+		AND i.prod_id = p.prod_id
+		AND p.order_id = w.order_id
+		AND w.prod_plan_id = pr.prod_plan_id
+		AND pr.item_id = it.item_id
+		AND i.emp_id = e.emp_id
+		AND dl.insp_id = TO_NUMBER(#{insp_id})
+		AND NVL(dl.use_yn, 'Y') = 'Y'
+		AND NVL(i.use_yn, 'Y') = 'Y'
 		ORDER BY dl.defect_list_id DESC
 	</select>
 
@@ -708,6 +784,65 @@
 			defect_action_id ASC
 	</select>
 
+	<select id="_select_Defect_Action_By_Inspection"
+		resultType="kr.or.saeroi.dto.DefectDTO">
+		SELECT
+			NVL(defect_action_id, 0) AS defect_action_id,
+			action_type,
+			defect_list_id,
+			defect_name,
+			NVL(sort_no, 0) AS sort_no,
+			action_date,
+			dept,
+			NVL(action_emp_id, 0) AS action_emp_id,
+			action_ename,
+			action_content
+		FROM (
+			SELECT
+				NVL(da.defect_action_id, 0) AS defect_action_id,
+				da.action_type,
+				dl.defect_list_id,
+				d.defect_name,
+				NVL(da.sort_no, 999) AS sort_no,
+				TO_CHAR(NVL(da.action_date, dl.defect_date), 'YYYY-MM-DD') AS action_date,
+				d.action_dept AS dept,
+				NVL(da.emp_id, 0) AS action_emp_id,
+				NVL(e.ename, '-') AS action_ename,
+				da.action_content,
+				CASE
+					WHEN da.defect_list_id = dl.defect_list_id THEN 2
+					ELSE 1
+				END AS sort_group
+			FROM defect_list dl,
+				defect d,
+				defect_action da,
+				emp e
+			WHERE dl.defect_id = d.defect_id
+			AND da.emp_id = e.emp_id(+)
+			AND dl.insp_id = TO_NUMBER(#{insp_id})
+			AND NVL(dl.use_yn, 'Y') = 'Y'
+			AND NVL(da.use_yn, 'Y') = 'Y'
+			AND (
+				da.defect_list_id = dl.defect_list_id
+				OR (
+					da.defect_id = dl.defect_id
+					AND da.defect_list_id IS NULL
+					AND NOT EXISTS (
+						SELECT 1 FROM defect_action
+						WHERE defect_list_id = dl.defect_list_id
+						AND action_type = 'DIRECT'
+						AND NVL(use_yn, 'Y') = 'Y'
+					)
+				)
+			)
+		)
+		ORDER BY
+			defect_list_id DESC,
+			sort_group ASC,
+			sort_no ASC,
+			defect_action_id ASC
+	</select>
+
 	<insert id="_insert_Defect_action" parameterType="map">
 		INSERT INTO defect_action (
 			defect_action_id,
@@ -753,4 +888,42 @@
 			END,
 			e.ename
 	</select>
+	
+	<!-- 대시보드 최근 7일 불량유형별 수량 TOP5 조회 -->
+<select id="_select_Dashboard_DefectTop5"
+	resultType="kr.or.saeroi.dto.DefectDTO">
+	SELECT
+		defect_type,
+		defect_qty,
+		sort_no
+	FROM (
+		SELECT
+			top_data.*,
+			ROW_NUMBER() OVER (
+				ORDER BY top_data.defect_qty DESC, top_data.defect_type ASC
+			) AS rn
+		FROM (
+			SELECT
+				NVL(d.defect_type, d.defect_name) AS defect_type,
+				SUM(NVL(dl.defect_qty, 0)) AS defect_qty,
+				CASE
+					WHEN MAX(SUM(NVL(dl.defect_qty, 0))) OVER () = 0 THEN 0
+					ELSE ROUND(
+						SUM(NVL(dl.defect_qty, 0))
+						/ MAX(SUM(NVL(dl.defect_qty, 0))) OVER ()
+						* 100
+					)
+				END AS sort_no
+			FROM defect_list dl,
+				defect d
+			WHERE dl.defect_id = d.defect_id
+			AND NVL(dl.use_yn, 'Y') = 'Y'
+			AND dl.defect_date &gt;= TRUNC(SYSDATE) - 6
+			AND dl.defect_date &lt; TRUNC(SYSDATE) + 1
+			GROUP BY NVL(d.defect_type, d.defect_name)
+		) top_data
+	)
+	WHERE rn &lt;= 5
+	ORDER BY defect_qty DESC, defect_type ASC
+</select>
 </mapper>

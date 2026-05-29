@@ -22,8 +22,8 @@
 	--dash-orange-strong: #BC6F1E;
 	--dash-orange-soft: #FFF7ED;
 
-	--dash-blue: #3F7FB5;
-	--dash-blue-soft: #EFF6FF;
+	--dash-blue: #111827;
+	--dash-blue-soft: #F7F8FA;
 
 	width: 100%;
 	max-width: 100%;
@@ -60,6 +60,7 @@
 .dashboard-page .dash-kpi-card,
 .dashboard-page .dash-time-card,
 .dashboard-page .dash-alert-panel,
+.dashboard-page .dash-chart-panel,
 .dashboard-page .dash-flow-card {
 	background-color: var(--dash-card-bg);
 	border: 1px solid var(--dash-border);
@@ -361,8 +362,8 @@
 
 /* 파란 아이콘이다. */
 .dashboard-page .dash-blue-icon {
-	background-color: var(--dash-blue-soft);
-	color: var(--dash-blue);
+	background-color: #F7F8FA;
+	color: var(--dash-text);
 }
 
 /* 주황 아이콘이다. */
@@ -455,13 +456,20 @@
 
 /* 파란 텍스트이다. */
 .dashboard-page .dash-blue-text {
-	color: var(--dash-blue);
+	color: var(--dash-text);
 }
 
 /* 현장 이슈와 LOT 현황 전체 패널이다. */
 .dashboard-page .dash-alert-panel {
+	display: grid;
+	grid-template-columns: minmax(240px, 0.9fr) minmax(0, 3.1fr);
+	grid-template-areas:
+		"head head"
+		"main items"
+		"lot lot";
+	gap: 14px 16px;
 	margin-bottom: 12px;
-	padding: 22px 26px;
+	padding: 14px 16px 16px;
 	background-color: var(--dash-card-bg);
 	border: 1px solid var(--dash-border);
 	border-radius: 12px;
@@ -470,36 +478,38 @@
 
 /* 현장 이슈와 LOT 현황 제목 영역이다. */
 .dashboard-page .dash-alert-panel-head {
-	margin-bottom: 18px;
+	grid-area: head;
+	margin-bottom: 0;
 }
 
 /* 현장 이슈와 LOT 현황 제목이다. */
 .dashboard-page .dash-alert-panel-head h3 {
 	margin: 0;
 	color: var(--dash-text);
-	font-size: 18px;
+	font-size: 16px;
 	font-weight: 900;
 	letter-spacing: -0.3px;
 }
 
 /* 현장 이슈와 LOT 현황 설명이다. */
 .dashboard-page .dash-alert-panel-head p {
-	margin: 6px 0 0;
+	margin: 4px 0 0;
 	color: var(--dash-muted-text);
-	font-size: 13px;
+	font-size: 12px;
 	font-weight: 800;
 }
 
 /* 긴급 알림 대표 카드이다. */
 .dashboard-page .dash-alert-main {
+	grid-area: main;
 	display: grid;
-	grid-template-columns: 48px minmax(0, 1fr) 72px;
+	grid-template-columns: 42px minmax(0, 1fr) 58px;
 	align-items: center;
-	column-gap: 14px;
+	column-gap: 12px;
 	min-width: 0;
-	min-height: 74px;
-	margin-bottom: 14px;
-	padding: 0 22px;
+	min-height: 76px;
+	margin-bottom: 0;
+	padding: 0 18px;
 	border: 1px solid #F1D5D5;
 	border-radius: 10px;
 	background-color: #FFFBFB;
@@ -511,8 +521,8 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 42px;
-	height: 42px;
+	width: 38px;
+	height: 38px;
 	border-radius: 50%;
 	background-color: var(--dash-red-soft);
 	color: var(--dash-red);
@@ -520,14 +530,14 @@
 
 /* 긴급 알림 벨 SVG이다. */
 .dashboard-page .dash-alert-bell svg {
-	width: 22px;
-	height: 22px;
+	width: 21px;
+	height: 21px;
 }
 
 /* 긴급 알림 제목이다. */
 .dashboard-page .dash-alert-main strong {
 	overflow: hidden;
-	font-size: 18px;
+	font-size: 16px;
 	font-weight: 900;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -538,12 +548,12 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	height: 36px;
+	height: 34px;
 	border: 1px solid #EABDBD;
-	border-radius: 8px;
+	border-radius: 7px;
 	background-color: #FFF7F7;
 	color: var(--dash-red);
-	font-size: 18px;
+	font-size: 16px;
 	font-style: normal;
 	font-weight: 900;
 	white-space: nowrap;
@@ -551,11 +561,12 @@
 
 /* 긴급 알림 카드 목록이다. */
 .dashboard-page .dash-alert-items {
+	grid-area: items;
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 14px;
+	gap: 16px;
 	min-width: 0;
-	margin-bottom: 16px;
+	margin-bottom: 0;
 }
 
 /* 긴급 알림 카드이다. */
@@ -563,8 +574,8 @@
 	display: flex;
 	align-items: center;
 	min-width: 0;
-	min-height: 88px;
-	padding: 18px 24px;
+	min-height: 76px;
+	padding: 0 22px;
 	border: 1px solid #E8DDDD;
 	border-radius: 10px;
 	background-color: #FFFFFF;
@@ -588,7 +599,7 @@
 	content: "";
 	position: absolute;
 	left: 0;
-	top: 8px;
+	top: 7px;
 	width: 8px;
 	height: 8px;
 	border-radius: 50%;
@@ -605,8 +616,8 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 16px;
-	margin-bottom: 10px;
+	gap: 14px;
+	margin-bottom: 8px;
 	min-width: 0;
 }
 
@@ -614,7 +625,7 @@
 .dashboard-page .dash-alert-title-row strong {
 	display: block;
 	overflow: hidden;
-	font-size: 15px;
+	font-size: 14px;
 	font-weight: 900;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -623,7 +634,7 @@
 /* 긴급 알림 시간이다. */
 .dashboard-page .dash-alert-title-row time {
 	color: var(--dash-text);
-	font-size: 14px;
+	font-size: 13px;
 	font-weight: 900;
 	white-space: nowrap;
 }
@@ -633,29 +644,37 @@
 	display: block;
 	overflow: hidden;
 	color: var(--dash-sub-text);
-	font-size: 13px;
+	font-size: 12px;
 	font-weight: 800;
 	line-height: 1.35;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
+/* PC에서 긴급 알림 기준 문구를 같은 줄에 붙인다. */
+.dashboard-page .dash-alert-text .dash-alert-desc-sub {
+	display: inline;
+	margin-left: 4px;
+}
+
 /* LOT 현황 행이다. */
 .dashboard-page .dash-lot-row {
+	grid-area: lot;
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: 14px;
+	gap: 16px;
+	min-width: 0;
 }
 
 /* LOT 현황 박스이다. */
 .dashboard-page .dash-lot-box {
 	display: grid;
-	grid-template-columns: 58px minmax(0, 1fr) 18px;
+	grid-template-columns: 54px minmax(0, 1fr) 18px;
 	align-items: center;
 	column-gap: 16px;
 	min-width: 0;
-	min-height: 110px;
-	padding: 20px 24px;
+	min-height: 96px;
+	padding: 18px 24px;
 	border: 1px solid var(--dash-border);
 	border-radius: 10px;
 	background-color: #FFFFFF;
@@ -675,8 +694,8 @@
 
 /* 출하대기 LOT 박스이다. */
 .dashboard-page .dash-lot-box:nth-child(3) {
-	background-color: #FBFDFF;
-	border-color: #DCE6F1;
+	background-color: #FFFFFF;
+	border-color: var(--dash-border);
 }
 
 /* LOT 아이콘 원형이다. */
@@ -684,16 +703,16 @@
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 58px;
-	height: 58px;
+	width: 54px;
+	height: 54px;
 	border-radius: 50%;
 	flex-shrink: 0;
 }
 
 /* LOT 아이콘 SVG이다. */
 .dashboard-page .dash-lot-icon svg {
-	width: 29px;
-	height: 29px;
+	width: 27px;
+	height: 27px;
 }
 
 /* 지연 LOT 아이콘이다. */
@@ -710,8 +729,8 @@
 
 /* 출하대기 LOT 아이콘이다. */
 .dashboard-page .dash-lot-blue-icon {
-	background-color: var(--dash-blue-soft);
-	color: var(--dash-blue);
+	background-color: #F7F8FA;
+	color: var(--dash-text);
 }
 
 /* LOT 정보 영역이다. */
@@ -723,9 +742,9 @@
 .dashboard-page .dash-lot-info span {
 	display: block;
 	overflow: hidden;
-	margin-bottom: 8px;
+	margin-bottom: 7px;
 	color: var(--dash-text);
-	font-size: 16px;
+	font-size: 15px;
 	font-weight: 900;
 	text-overflow: ellipsis;
 	white-space: nowrap;
@@ -734,7 +753,7 @@
 /* LOT 건수이다. */
 .dashboard-page .dash-lot-info strong {
 	display: block;
-	font-size: 36px;
+	font-size: 32px;
 	font-weight: 900;
 	line-height: 1;
 	white-space: nowrap;
@@ -743,18 +762,92 @@
 /* LOT 화살표이다. */
 .dashboard-page .dash-lot-arrow {
 	color: #B8C0C7;
-	font-size: 30px;
+	font-size: 28px;
 	font-style: normal;
 	font-weight: 300;
+	line-height: 1;
+}
+
+/* 주요 운영 지표 추이 부모 카드이다. */
+.dashboard-page .dash-chart-panel {
+	display: block;
+	min-width: 0;
+	margin-bottom: 12px;
+	padding: 20px 24px 18px;
+	overflow: hidden;
+}
+
+/* 주요 운영 지표 추이 제목 영역이다. */
+.dashboard-page .dash-chart-panel-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 14px;
+	margin-bottom: 18px;
+}
+
+/* 주요 운영 지표 추이 제목이다. */
+.dashboard-page .dash-chart-panel-head h3 {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	min-width: 0;
+	margin: 0;
+	color: var(--dash-text);
+	font-size: 16px;
+	font-weight: 900;
+	letter-spacing: -0.5px;
+	white-space: nowrap;
+}
+
+/* 주요 운영 지표 추이 기간 배지이다. */
+.dashboard-page .dash-chart-period {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	height: 36px;
+	padding: 0 16px;
+	border: 1px solid #BFD9CB;
+	border-radius: 999px;
+	background-color: var(--dash-green-soft);
+	color: var(--dash-green-strong);
+	font-size: 14px;
+	font-weight: 900;
+	white-space: nowrap;
+	box-shadow: 0 4px 12px rgba(31, 122, 87, 0.06);
+}
+
+/* 주요 운영 지표 추이 기간 배지 아이콘이다. */
+.dashboard-page .dash-chart-period-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 17px;
+	height: 17px;
+	color: var(--dash-green-strong);
+	flex-shrink: 0;
+}
+
+/* 주요 운영 지표 추이 기간 배지 화살표이다. */
+.dashboard-page .dash-chart-period-arrow {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	margin-left: 2px;
+	color: var(--dash-green-strong);
+	font-size: 15px;
+	font-style: normal;
+	font-weight: 900;
 	line-height: 1;
 }
 
 /* 차트 그리드이다. */
 .dashboard-page .dash-chart-grid {
 	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 	gap: 10px;
-	margin-bottom: 12px;
+	margin-bottom: 0;
 }
 
 /* 차트 카드이다. */
@@ -1165,9 +1258,9 @@
 
 /* 대기 파란 상태이다. */
 .dashboard-page .dash-state-blue {
-	border: 1px solid #A8C8E8;
-	background-color: var(--dash-blue-soft);
-	color: var(--dash-blue);
+	border: 1px solid #D9DEE6;
+	background-color: #F7F8FA;
+	color: var(--dash-text);
 }
 
 /* 공지사항 목록이다. */
@@ -1344,12 +1437,22 @@
 	}
 
 	.dashboard-page .dash-alert-panel {
+		display: block;
 		padding: 20px;
+	}
+
+	.dashboard-page .dash-alert-panel-head {
+		margin-bottom: 14px;
+	}
+
+	.dashboard-page .dash-alert-main {
+		margin-bottom: 12px;
 	}
 
 	.dashboard-page .dash-alert-items {
 		grid-template-columns: repeat(3, minmax(0, 1fr));
 		gap: 10px;
+		margin-bottom: 12px;
 	}
 
 	.dashboard-page .dash-lot-row {
@@ -1605,48 +1708,93 @@
 	}
 
 	.dashboard-page .dash-alert-items {
-		grid-template-columns: 1fr;
-		gap: 12px;
-		margin-bottom: 14px;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 8px;
+		margin-bottom: 12px;
 	}
 
 	.dashboard-page .dash-alert-card {
-		min-height: 82px;
-		padding: 16px 18px;
+		min-height: 72px;
+		padding: 10px;
+	}
+
+	.dashboard-page .dash-alert-text {
+		padding-left: 12px;
+	}
+
+	.dashboard-page .dash-alert-text::before {
+		top: 6px;
+		width: 7px;
+		height: 7px;
+	}
+
+	.dashboard-page .dash-alert-title-row {
+		align-items: flex-start;
+		gap: 6px;
+		margin-bottom: 6px;
+	}
+
+	.dashboard-page .dash-alert-title-row strong {
+		font-size: 12px;
+		line-height: 1.2;
+		white-space: normal;
+		word-break: keep-all;
+	}
+
+	.dashboard-page .dash-alert-title-row time {
+		font-size: 11px;
+		flex-shrink: 0;
+	}
+
+	.dashboard-page .dash-alert-text span {
+		font-size: 10px;
+		line-height: 1.35;
+		white-space: normal;
+		word-break: keep-all;
+	}
+
+	.dashboard-page .dash-alert-text .dash-alert-desc-sub {
+		display: block;
+		margin-top: 2px;
+		margin-left: 0;
 	}
 
 	.dashboard-page .dash-lot-row {
-		grid-template-columns: 1fr;
-		gap: 12px;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 8px;
 	}
 
 	.dashboard-page .dash-lot-box {
-		grid-template-columns: 54px minmax(0, 1fr) 14px;
-		min-height: 96px;
-		padding: 18px;
-		column-gap: 14px;
+		grid-template-columns: 38px minmax(0, 1fr) 10px;
+		min-height: 82px;
+		padding: 12px 10px;
+		column-gap: 8px;
 	}
 
 	.dashboard-page .dash-lot-icon {
-		width: 54px;
-		height: 54px;
+		width: 38px;
+		height: 38px;
 	}
 
 	.dashboard-page .dash-lot-icon svg {
-		width: 28px;
-		height: 28px;
+		width: 20px;
+		height: 20px;
 	}
 
 	.dashboard-page .dash-lot-info span {
-		font-size: 15px;
+		margin-bottom: 4px;
+		font-size: 11px;
+		white-space: normal;
+		word-break: keep-all;
+		line-height: 1.25;
 	}
 
 	.dashboard-page .dash-lot-info strong {
-		font-size: 32px;
+		font-size: 20px;
 	}
 
 	.dashboard-page .dash-lot-arrow {
-		font-size: 28px;
+		font-size: 18px;
 	}
 
 	.dashboard-page .dash-chart-card,
@@ -1667,6 +1815,49 @@
 		flex-direction: row;
 		justify-content: center;
 		gap: 14px;
+	}
+
+	/* 모바일에서 주요 운영 지표 추이 부모 박스 여백을 줄인다. */
+	.dashboard-page .dash-chart-panel {
+		padding: 16px;
+	}
+
+	/* 모바일에서 주요 운영 지표 추이 제목 영역을 정리한다. */
+	.dashboard-page .dash-chart-panel-head {
+		align-items: flex-start;
+		gap: 10px;
+		margin-bottom: 12px;
+	}
+
+	/* 모바일에서 주요 운영 지표 추이 제목 크기를 줄인다. */
+	.dashboard-page .dash-chart-panel-head h3 {
+		gap: 8px;
+		font-size: 16px;
+	}
+
+	/* 모바일에서 주요 운영 지표 추이 기간 배지를 줄인다. */
+	.dashboard-page .dash-chart-period {
+		height: 30px;
+		padding: 0 10px;
+		font-size: 11px;
+		gap: 5px;
+	}
+
+	/* 모바일에서 주요 운영 지표 추이 기간 배지 아이콘을 줄인다. */
+	.dashboard-page .dash-chart-period-icon {
+		width: 14px;
+		height: 14px;
+	}
+
+	/* 모바일에서 주요 운영 지표 추이 기간 배지 화살표를 줄인다. */
+	.dashboard-page .dash-chart-period-arrow {
+		font-size: 12px;
+	}
+
+	/* 모바일에서 그래프 카드는 한 개씩 내려보낸다. */
+	.dashboard-page .dash-chart-grid {
+		grid-template-columns: 1fr;
+		gap: 10px;
 	}
 
 	/* 모바일에서 MES 운영 흐름 부모 테이블 여백을 줄인다. */
@@ -1745,4 +1936,566 @@
 	.dashboard-page .dash-bottom-card {
 		padding: 16px;
 	}
+}
+
+/* 주요 운영 지표 추이 개선 스타일이다. */
+.dashboard-page .dash-chart-card,
+.dashboard-page .dash-facility-card {
+	display: flex;
+	flex-direction: column;
+	min-height: 390px;
+	padding: 18px 18px 16px;
+}
+
+/* 카드 상단 우측 메타 영역이다. */
+.dashboard-page .dash-card-head-right {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 4px;
+	margin-left: auto;
+	min-width: 0;
+}
+
+/* 설비 카드 상단 우측 메타는 한 줄로 보이게 한다. */
+.dashboard-page .dash-card-head-right-inline {
+	flex-direction: row;
+	align-items: center;
+	gap: 12px;
+}
+
+/* 카드 단위 텍스트이다. */
+.dashboard-page .dash-unit-text,
+.dashboard-page .dash-total-text {
+	color: var(--dash-muted-text);
+	font-size: 12px;
+	font-weight: 800;
+	white-space: nowrap;
+}
+
+/* 차트 높이를 키운다. */
+.dashboard-page .dash-chart-box.dash-chart-box-lg {
+	height: 240px;
+}
+
+/* 요약 영역이다. */
+.dashboard-page .dash-chart-summary {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	margin-top: 14px;
+	border: 1px solid #E6EEEA;
+	border-radius: 14px;
+	background-color: #F7FBF8;
+	overflow: hidden;
+}
+
+/* 빨간 톤 요약 영역이다. */
+.dashboard-page .dash-chart-summary-red {
+	border-color: #F2DCDC;
+	background-color: #FFF7F7;
+}
+
+/* 중립 톤 요약 영역이다. */
+.dashboard-page .dash-chart-summary-neutral {
+	border-color: #E7EBF0;
+	background-color: #FAFBFC;
+}
+
+/* 요약 한 칸이다. */
+.dashboard-page .dash-summary-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: 72px;
+	padding: 14px 16px;
+	text-align: center;
+}
+
+/* 요약 칸 사이 구분선이다. */
+.dashboard-page .dash-summary-item + .dash-summary-item {
+	border-left: 1px solid #E6EEEA;
+}
+
+/* 빨간 요약 칸 구분선이다. */
+.dashboard-page .dash-chart-summary-red .dash-summary-item + .dash-summary-item {
+	border-left-color: #F2DCDC;
+}
+
+/* 중립 요약 칸 구분선이다. */
+.dashboard-page .dash-chart-summary-neutral .dash-summary-item + .dash-summary-item {
+	border-left-color: #E7EBF0;
+}
+
+/* 요약 라벨이다. */
+.dashboard-page .dash-summary-label {
+	color: var(--dash-sub-text);
+	font-size: 13px;
+	font-weight: 800;
+	line-height: 1.2;
+	white-space: nowrap;
+}
+
+/* 요약 값이다. */
+.dashboard-page .dash-summary-value {
+	margin-top: 8px;
+	font-size: 17px;
+	font-weight: 900;
+	line-height: 1.2;
+	white-space: nowrap;
+}
+
+/* 설비 영역 정렬이다. */
+.dashboard-page .dash-facility-body {
+	display: grid;
+	grid-template-columns: minmax(0, 1.2fr) minmax(200px, 0.8fr);
+	align-items: center;
+	gap: 18px;
+}
+
+/* 설비 차트 높이를 늘린다. */
+.dashboard-page .dash-facility-chart {
+	position: relative;
+	width: 100%;
+	height: 210px;
+}
+
+/* 설비 차트 캔버스 높이를 늘린다. */
+.dashboard-page .dash-facility-chart canvas {
+	width: 100% !important;
+	height: 210px !important;
+}
+
+/* 설비 중앙 텍스트 위치를 정리한다. */
+.dashboard-page .dash-facility-center {
+	top: 70%;
+}
+
+/* 설비 중앙 숫자이다. */
+.dashboard-page .dash-facility-center strong {
+	font-size: 32px;
+}
+
+/* 설비 우측 리스트이다. */
+.dashboard-page .dash-facility-list {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+/* 설비 우측 리스트 카드이다. */
+.dashboard-page .dash-facility-list li {
+	display: grid;
+	grid-template-columns: 12px 1fr auto;
+	align-items: center;
+	gap: 10px;
+	padding: 14px 16px;
+	border: 1px solid var(--dash-border);
+	border-radius: 14px;
+	background-color: #FFFFFF;
+	box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+}
+
+/* 설비 우측 리스트 값 영역이다. */
+.dashboard-page .dash-facility-meta {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 4px;
+	min-width: 0;
+}
+
+/* 설비 우측 리스트 숫자이다. */
+.dashboard-page .dash-facility-meta strong {
+	color: var(--dash-text);
+	font-size: 18px;
+	font-weight: 900;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+/* 설비 우측 리스트 비율이다. */
+.dashboard-page .dash-facility-meta em {
+	color: var(--dash-muted-text);
+	font-size: 12px;
+	font-style: normal;
+	font-weight: 900;
+	line-height: 1;
+	white-space: nowrap;
+}
+
+/* 기존 설비 총 텍스트는 사용하지 않는다. */
+.dashboard-page .dash-facility-total {
+	display: none;
+}
+
+/* 모바일에서 요약 영역을 가로 3칸으로 유지한다. */
+@media (max-width: 768px) {
+	.dashboard-page .dash-chart-summary {
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.dashboard-page .dash-summary-item + .dash-summary-item {
+		border-top: 0;
+		border-left: 1px solid #E6EEEA;
+	}
+
+	.dashboard-page .dash-chart-summary-red .dash-summary-item + .dash-summary-item {
+		border-top-color: transparent;
+		border-left-color: #F2DCDC;
+	}
+
+	.dashboard-page .dash-chart-summary-neutral .dash-summary-item + .dash-summary-item {
+		border-top-color: transparent;
+		border-left-color: #E7EBF0;
+	}
+
+	.dashboard-page .dash-card-head-right-inline {
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 6px 10px;
+	}
+
+	.dashboard-page .dash-facility-body {
+		grid-template-columns: 1fr;
+		gap: 14px;
+	}
+
+	.dashboard-page .dash-facility-list li {
+		padding: 12px 14px;
+	}
+
+	.dashboard-page .dash-summary-item {
+		min-height: 62px;
+		padding: 10px 6px;
+	}
+
+	.dashboard-page .dash-summary-label {
+		font-size: 10px;
+		line-height: 1.2;
+		white-space: nowrap;
+	}
+
+	.dashboard-page .dash-summary-value {
+		margin-top: 6px;
+		font-size: 13px;
+		white-space: nowrap;
+	}
+}
+
+/* 설비 가동 현황 상단 우측 영역이다. */
+.dashboard-page .dash-facility-head-right {
+	align-items: flex-end;
+	gap: 8px;
+}
+
+/* 설비 가동 현황 단위와 전체 대수 영역이다. */
+.dashboard-page .dash-facility-head-meta {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 12px;
+}
+
+/* 설비 가동 현황 토글 버튼 영역이다. */
+.dashboard-page .dash-facility-toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 6px;
+}
+
+/* 설비 가동 현황 토글 버튼이다. */
+.dashboard-page .dash-facility-toggle-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	height: 26px;
+	padding: 0 10px;
+	border: 1px solid var(--dash-border);
+	border-radius: 999px;
+	background-color: #FFFFFF;
+	color: var(--dash-sub-text);
+	font-size: 11px;
+	font-weight: 900;
+	line-height: 1;
+	white-space: nowrap;
+	cursor: pointer;
+	transition: background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease, opacity 0.16s ease;
+}
+
+/* 설비 가동 현황 활성 버튼이다. */
+.dashboard-page .dash-facility-toggle-btn.is-active {
+	border-color: #BFD9CB;
+	background-color: var(--dash-green-soft);
+	color: var(--dash-green-strong);
+}
+
+/* 설비 가동 현황 비활성 버튼이다. */
+.dashboard-page .dash-facility-toggle-btn:not(.is-active) {
+	opacity: 0.45;
+}
+
+/* 설비 가동 현황 토글 버튼 점이다. */
+.dashboard-page .dash-facility-toggle-dot {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	flex-shrink: 0;
+}
+
+/* 설비 가동 현황 가동 점이다. */
+.dashboard-page .dash-facility-toggle-green {
+	background-color: var(--dash-green);
+}
+
+/* 설비 가동 현황 비가동 점이다. */
+.dashboard-page .dash-facility-toggle-gray {
+	background-color: #D1D5DB;
+}
+
+/* 설비 가동 현황 차트 캔버스가 중앙 텍스트보다 위에 오게 한다. */
+.dashboard-page .dash-facility-chart canvas {
+	position: relative;
+	z-index: 2;
+}
+
+/* 설비 가동 현황 중앙 텍스트이다. */
+.dashboard-page .dash-facility-center {
+	z-index: 1;
+}
+
+/* 모바일에서 설비 상단 버튼이 줄바꿈되게 한다. */
+@media (max-width: 768px) {
+	.dashboard-page .dash-facility-head-right {
+		align-items: flex-end;
+	}
+
+	.dashboard-page .dash-facility-head-meta,
+	.dashboard-page .dash-facility-toggle {
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+
+	.dashboard-page .dash-facility-toggle-btn {
+		height: 24px;
+		padding: 0 8px;
+		font-size: 10px;
+	}
+}
+
+
+/* 의미 기반 색상 규칙이다. */
+/* 초록색은 정상, 달성, 개선에 사용한다. */
+/* 빨간색은 위험, 불량 증가, 나빠진 변화에 사용한다. */
+/* 검정색은 기본 수치, 제목, 일반 아이콘에 사용한다. */
+/* 주황색은 주의, 대기, 지연 상태에 사용한다. */
+/* 회색은 기준선, 목표선, 비활성 보조 정보에만 최소 사용한다. */
+.dashboard-page .dash-positive-text {
+	color: var(--dash-green);
+}
+
+.dashboard-page .dash-negative-text {
+	color: var(--dash-red);
+}
+
+.dashboard-page .dash-warning-text {
+	color: var(--dash-orange);
+}
+
+.dashboard-page .dash-neutral-text {
+	color: var(--dash-text);
+}
+
+.dashboard-page .dash-subtle-text {
+	color: var(--dash-muted-text);
+}
+
+/* 범례 주황 점이다. */
+.dashboard-page .dash-legend-orange {
+	background-color: var(--dash-orange);
+}
+
+/* 범례 빨간 점이다. */
+.dashboard-page .dash-legend-red {
+	background-color: var(--dash-red);
+}
+
+/* 의미 없는 색상 증가를 막기 위해 기본 보조 아이콘은 검정 계열로 정리한다. */
+.dashboard-page .dash-neutral-icon {
+	background-color: #F7F8FA;
+	color: var(--dash-text);
+}
+
+
+/* 색감 재정리 최종 덮어쓰기이다. */
+.dashboard-page {
+	--dash-blue: #111827;
+	--dash-blue-soft: #F7F8FA;
+}
+
+.dashboard-page .dash-blue-icon {
+	background-color: #F7F8FA;
+	color: var(--dash-text);
+}
+
+.dashboard-page .dash-blue-text {
+	color: var(--dash-text);
+}
+
+.dashboard-page .dash-state-blue {
+	border-color: #D9DEE6;
+	background-color: #F7F8FA;
+	color: var(--dash-text);
+}
+
+.dashboard-page .dash-lot-blue-icon {
+	background-color: #F7F8FA;
+	color: var(--dash-text);
+}
+
+.dashboard-page .dash-lot-box:nth-child(3) {
+	background-color: #FFFFFF;
+	border-color: var(--dash-border);
+}
+
+
+/* 기본 검정 텍스트이다. */
+.dashboard-page .dash-black-text {
+	color: var(--dash-text);
+}
+
+/* 기본 검정 아이콘이다. */
+.dashboard-page .dash-black-icon {
+	background-color: #F7F8FA;
+	color: var(--dash-text);
+}
+
+/* 보조 회색 텍스트이다. */
+.dashboard-page .dash-gray-text {
+	color: var(--dash-muted-text);
+}
+
+
+/* 설비 상태 비율은 의미 색상 클래스가 우선 적용되게 한다. */
+.dashboard-page .dash-facility-meta em.dash-green-text {
+	color: var(--dash-green);
+}
+
+.dashboard-page .dash-facility-meta em.dash-orange-text {
+	color: var(--dash-orange);
+}
+
+.dashboard-page .dash-facility-meta em.dash-red-text {
+	color: var(--dash-red);
+}
+
+
+/* KPI 기본 수치와 아이콘을 검정 기준으로 정리한다. */
+.dashboard-page .dash-black-text {
+	color: var(--dash-text);
+}
+
+.dashboard-page .dash-black-icon {
+	background-color: #F7F8FA;
+	color: var(--dash-text);
+}
+/* 모바일에서 차트 요약 박스만 가로 3칸으로 유지한다. */
+@media (max-width: 768px) {
+	.dashboard-page .dash-chart-summary {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+	}
+
+	.dashboard-page .dash-summary-item {
+		min-height: 62px;
+		padding: 10px 6px;
+	}
+
+	.dashboard-page .dash-summary-item + .dash-summary-item {
+		border-top: 0;
+		border-left: 1px solid #E6EEEA;
+	}
+
+	.dashboard-page .dash-chart-summary-red .dash-summary-item + .dash-summary-item {
+		border-left-color: #F2DCDC;
+	}
+
+	.dashboard-page .dash-chart-summary-neutral .dash-summary-item + .dash-summary-item {
+		border-left-color: #E7EBF0;
+	}
+
+	.dashboard-page .dash-summary-label {
+		font-size: 10px;
+		line-height: 1.2;
+		white-space: nowrap;
+	}
+
+	.dashboard-page .dash-summary-value {
+		margin-top: 6px;
+		font-size: 13px;
+		white-space: nowrap;
+	}
+}
+
+/* 모바일에서 설비 가동 상태만 가로 3칸으로 유지한다. */
+@media (max-width: 768px) {
+	.dashboard-page .dash-facility-list {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		gap: 8px;
+		width: 100%;
+	}
+
+	.dashboard-page .dash-facility-list li {
+		display: grid;
+		grid-template-columns: 8px minmax(0, 1fr);
+		grid-template-rows: auto auto;
+		align-items: center;
+		gap: 6px 6px;
+		min-width: 0;
+		padding: 10px 8px;
+	}
+
+	.dashboard-page .dash-facility-list li > span {
+		overflow: hidden;
+		font-size: 11px;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.dashboard-page .dash-facility-meta {
+		grid-column: 1 / 3;
+		align-items: center;
+		margin-top: 4px;
+	}
+
+	.dashboard-page .dash-facility-meta strong {
+		font-size: 16px;
+	}
+
+	.dashboard-page .dash-facility-meta em {
+		font-size: 10px;
+	}
+}
+/* 대시보드 최근 작업지시 상태 뱃지 크기 조정 */
+.dash-simple-table .coStatus {
+	min-width: 42px;
+	height: 22px;
+	padding: 0 10px;
+	font-size: 11px;
+	line-height: 20px;
+	border-radius: 6px;
+	box-sizing: border-box;
+}
+
+.dash-simple-table .coStatusUse,
+.dash-simple-table .coStatusStop {
+	font-size: 11px;
+	line-height: 20px;
 }

@@ -98,87 +98,86 @@
 			<p class="coTotalCount">총 ${pageInfo.totalCount}건</p>
 
 			<c:if test="${canManageQuality}">
-<!-- 				<div class="search-btn-right"> -->
-<!-- 					<button type="button" -->
-<!-- 						class="search-btn search-btn-main modal_open_btn" -->
-<!-- 						data_modal_target="#modal_insert"> -->
-<!-- 						<svg viewBox="0 0 24 24" fill="none"> -->
-<!-- 							<path d="M12 5V19" stroke="currentColor" stroke-width="2" -->
-<!-- 								stroke-linecap="round"></path> -->
-<!-- 							<path d="M5 12H19" stroke="currentColor" stroke-width="2" -->
-<!-- 								stroke-linecap="round"></path> -->
-<!-- 						</svg> -->
-<!-- 						등록 -->
-<!-- 					</button> -->
+				<!-- 				<div class="search-btn-right"> -->
+				<!-- 					<button type="button" -->
+				<!-- 						class="search-btn search-btn-main modal_open_btn" -->
+				<!-- 						data_modal_target="#modal_insert"> -->
+				<!-- 						<svg viewBox="0 0 24 24" fill="none"> -->
+				<!-- 							<path d="M12 5V19" stroke="currentColor" stroke-width="2" -->
+				<!-- 								stroke-linecap="round"></path> -->
+				<!-- 							<path d="M5 12H19" stroke="currentColor" stroke-width="2" -->
+				<!-- 								stroke-linecap="round"></path> -->
+				<!-- 						</svg> -->
+				<!-- 						등록 -->
+				<!-- 					</button> -->
 
-					<button type="submit" class="search-btn search-btn-sub">
-						<svg viewBox="0 0 24 24" fill="none">
+				<button type="submit" class="search-btn search-btn-sub">
+					<svg viewBox="0 0 24 24" fill="none">
 							<path d="M4 7H20" stroke="currentColor" stroke-width="2"
-								stroke-linecap="round"></path>
+							stroke-linecap="round"></path>
 							<path d="M10 11V17" stroke="currentColor" stroke-width="2"
-								stroke-linecap="round"></path>
+							stroke-linecap="round"></path>
 							<path d="M14 11V17" stroke="currentColor" stroke-width="2"
-								stroke-linecap="round"></path>
+							stroke-linecap="round"></path>
 							<path d="M6 7L7 21H17L18 7" stroke="currentColor"
-								stroke-width="2" stroke-linejoin="round"></path>
+							stroke-width="2" stroke-linejoin="round"></path>
 							<path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
-								stroke-linejoin="round"></path>
+							stroke-linejoin="round"></path>
 						</svg>
-						선택 삭제
-					</button>
-				</div>
+					선택 삭제
+				</button>
+		</div>
+		</c:if>
+</div>
+
+<div class="coTableWrap">
+	<table class="coTable">
+		<thead>
+			<tr>
+				<th class="mobile_show checkAllHeader" style="cursor: pointer;">선택</th>
+				<th class="mobile_hidden">불량코드</th>
+				<th class="mobile_show">발생일시</th>
+				<th class="mobile_show">품목명</th>
+				<th class="mobile_hidden">LOT번호</th>
+				<th class="mobile_show">불량명</th>
+				<th class="mobile_hidden">검사자</th>
+				<th class="mobile_show">상세</th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<c:forEach var="defect" items="${list}">
+				<tr>
+					<td class="mobile_show"><input type="checkbox"
+						name="defect_list_id" value="${defect.defect_list_id}"></td>
+
+					<td class="mobile_hidden">${defect.defect_code}</td>
+					<td class="mobile_show">${defect.defect_date}</td>
+					<td class="coTextLeft mobile_show">${defect.item_name}</td>
+					<td class="mobile_hidden">${defect.product_lot}</td>
+					<td class="mobile_show"><span class="coStatus coStatusStop">${defect.defect_name}</span>
+					</td>
+					<td class="mobile_hidden">${defect.ename}</td>
+
+					<td class="mobile_show">
+						<button type="button" class="coDetailBtn"
+							onclick="location.href='${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${defect.defect_list_id}'">
+							보기</button>
+					</td>
+				</tr>
+			</c:forEach>
+
+			<c:if test="${empty list}">
+				<tr>
+					<td colspan="8">조회된 불량 내역이 없습니다.</td>
+				</tr>
 			</c:if>
-		</div>
+		</tbody>
+	</table>
+</div>
+</form>
 
-		<div class="coTableWrap">
-			<table class="coTable">
-				<thead>
-					<tr>
-						<th class="mobile_show checkAllHeader" style="cursor: pointer;">선택</th>
-						<th class="mobile_hidden">불량코드</th>
-						<th class="mobile_show">발생일시</th>
-						<th class="mobile_show">품목명</th>
-						<th class="mobile_hidden">LOT번호</th>
-						<th class="mobile_show">불량명</th>
-						<th class="mobile_hidden">검사자</th>
-						<th class="mobile_show">상세</th>
-					</tr>
-				</thead>
-
-				<tbody>
-					<c:forEach var="defect" items="${list}">
-						<tr>
-							<td class="mobile_show"><input type="checkbox"
-								name="defect_list_id" value="${defect.defect_list_id}">
-							</td>
-
-							<td class="mobile_hidden">${defect.defect_code}</td>
-							<td class="mobile_show">${defect.defect_date}</td>
-							<td class="coTextLeft mobile_show">${defect.item_name}</td>
-							<td class="mobile_hidden">${defect.product_lot}</td>
-							<td class="mobile_show"><span class="coStatus coStatusStop">${defect.defect_name}</span>
-							</td>
-							<td class="mobile_hidden">${defect.ename}</td>
-
-							<td class="mobile_show">
-								<button type="button" class="coDetailBtn"
-									onclick="location.href='${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${defect.defect_list_id}'">
-									보기</button>
-							</td>
-						</tr>
-					</c:forEach>
-
-					<c:if test="${empty list}">
-						<tr>
-							<td colspan="8">조회된 불량 내역이 없습니다.</td>
-						</tr>
-					</c:if>
-				</tbody>
-			</table>
-		</div>
-	</form>
-
-	<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+<jsp:include page="/WEB-INF/views/common/paging.jsp" />
 
 </div>
 

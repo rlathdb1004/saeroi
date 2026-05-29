@@ -88,6 +88,24 @@ public class QualityDAOImpl implements QualityDAO {
 		return delete_list;
 	}
 
+	@Override
+	public int _dao_delete_Defect_by_Inspection(String[] insp_id) {
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("insp_id", insp_id);
+
+		return sqlSession.update("mapper.quality._delete_Defect_By_Inspection", param);
+	}
+
+	@Override
+	public int _dao_delete_Defect_action_by_Inspection(String[] insp_id) {
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("insp_id", insp_id);
+
+		return sqlSession.update("mapper.quality._delete_Defect_Action_By_Inspection", param);
+	}
+
 	// 검사 상세 목록
 	@Override
 	public InspectionDTO _dao_Insepection_detail(String insp_id, String insp_date, String prod_id, String emp_id,
@@ -144,6 +162,15 @@ public class QualityDAOImpl implements QualityDAO {
 		System.out.println("defect_list 실행 건수: " + defect_list.size());
 
 		return defect_list;
+	}
+
+	@Override
+	public List<DefectDTO> _dao_select_Defect_by_Inspection(String insp_id) {
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("insp_id", insp_id);
+
+		return sqlSession.selectList("mapper.quality._select_Defect_By_Inspection", param);
 	}
 
 	// 불량 등록
@@ -229,6 +256,15 @@ public class QualityDAOImpl implements QualityDAO {
 		return defect_action_list;
 	}
 
+	@Override
+	public List<DefectDTO> _dao_select_Defect_action_by_Inspection(String insp_id) {
+
+		Map<String, Object> param = new HashMap<String, Object>();
+		param.put("insp_id", insp_id);
+
+		return sqlSession.selectList("mapper.quality._select_Defect_Action_By_Inspection", param);
+	}
+
 	// 불량 조치 내역 등록
 	@Override
 	public int _dao_insert_Defect_action(String defect_list_id, String action_date, String emp_id,
@@ -255,5 +291,14 @@ public class QualityDAOImpl implements QualityDAO {
 		List<DefectDTO> empList = sqlSession.selectList("mapper.quality._select_Defect_action_emp_option", param);
 
 		return empList;
+	}
+	
+	// 대시보드 최근 7일 불량유형별 수량 TOP5를 조회한다.
+	@Override
+	public List<DefectDTO> _dao_select_Dashboard_DefectTop5() {
+		List<DefectDTO> dashDefectTopList =
+				sqlSession.selectList("mapper.quality._select_Dashboard_DefectTop5");
+
+		return dashDefectTopList;
 	}
 }
