@@ -17,6 +17,10 @@ public interface QualityDAO {
 
 	int _dao_delete_Inspection(String[] insp_id);
 
+	int _dao_delete_Defect_by_Inspection(String[] insp_id);
+
+	int _dao_delete_Defect_action_by_Inspection(String[] insp_id);
+
 	InspectionDTO _dao_Insepection_detail(String insp_id, String insp_date, String prod_id, String emp_id,
 			String insp_type, String result, String inspection_qty, String good_qty, String remark);
 
@@ -24,6 +28,8 @@ public interface QualityDAO {
 			String good_qty, String remark);
 
 	List<DefectDTO> _dao_select_Defect(String startDate, String endDate, String searchType, String keyword);
+
+	List<DefectDTO> _dao_select_Defect_by_Inspection(String insp_id);
 
 	int _dao_insert_defect(String defect_date, String insp_id, String defect_id, String defect_qty, String defect_photo,
 			String remark);
@@ -38,6 +44,8 @@ public interface QualityDAO {
 			String remark);
 
 	List<DefectDTO> _dao_select_Defect_action(String defect_list_id);
+
+	List<DefectDTO> _dao_select_Defect_action_by_Inspection(String insp_id);
 
 	int _dao_insert_Defect_action(String defect_list_id, String action_date, String emp_id, String action_content);
 
