@@ -8,6 +8,44 @@
 	value="${sessionScope.loginUser.role eq 'ADMIN'
 		or sessionScope.loginUser.role eq 'MANAGER'}" />
 
+<style>
+.inspection_related_grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 16px;
+	margin-top: 16px;
+}
+
+.inspection_related_table {
+	width: 100%;
+	border-collapse: collapse;
+	border: 1px solid #E1E8E3;
+}
+
+.inspection_related_table th, .inspection_related_table td {
+	border: 1px solid #E1E8E3;
+	padding: 11px 10px;
+	text-align: center;
+	font-size: 14px;
+}
+
+.inspection_related_table th {
+	background: #F4F8F5;
+	font-weight: 700;
+	white-space: nowrap;
+}
+
+.inspection_related_table .coTextLeft {
+	text-align: left;
+}
+
+@media ( max-width : 1100px) {
+	.inspection_related_grid {
+		grid-template-columns: 1fr;
+	}
+}
+</style>
+
 <div class="detail_page">
 
 	<div class="detail_header">
@@ -136,7 +174,7 @@
 						<td>
 							<span class="viewMode">
 								<c:choose>
-									<c:when test="${inspection.result == '조건부' or inspection.result == '불합격'}">
+									<c:when test="${inspection.result == '조건부'}">
 										<span class="coStatus coStatusStop">${inspection.result}</span>
 									</c:when>
 									<c:otherwise>
@@ -151,8 +189,6 @@
 									<c:if test="${inspection.result == '합격'}">selected</c:if>>합격</option>
 								<option value="조건부"
 									<c:if test="${inspection.result == '조건부'}">selected</c:if>>조건부</option>
-								<option value="불합격"
-									<c:if test="${inspection.result == '불합격'}">selected</c:if>>불합격</option>
 							</select>
 						</td>
 					</tr>
@@ -284,6 +320,78 @@
 				</tr>
 			</tbody>
 		</table>
+	</div>
+
+	<div class="inspection_related_grid">
+		<div class="detail_card">
+			<div class="detail_card_title">불량 정보</div>
+
+			<table class="inspection_related_table">
+				<thead>
+					<tr>
+						<th>불량코드</th>
+						<th>발생일시</th>
+						<th>품목명</th>
+						<th>LOT번호</th>
+						<th>불량명</th>
+						<th>검사자</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					<c:forEach var="defect" items="${inspectionDefectList}">
+						<tr>
+							<td>${defect.defect_code}</td>
+							<td>${defect.defect_date}</td>
+							<td class="coTextLeft">${defect.item_name}</td>
+							<td>${defect.product_lot}</td>
+							<td>${defect.defect_name}</td>
+							<td>${defect.ename}</td>
+						</tr>
+					</c:forEach>
+
+					<c:if test="${empty inspectionDefectList}">
+						<tr>
+							<td colspan="6">등록된 불량 정보가 없습니다.</td>
+						</tr>
+					</c:if>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="detail_card">
+			<div class="detail_card_title">조치 및 처리내역</div>
+
+			<table class="inspection_related_table">
+				<thead>
+					<tr>
+						<th>불량명</th>
+						<th>조치일시</th>
+						<th>조치부서</th>
+						<th>조치담당자</th>
+						<th>조치내용</th>
+					</tr>
+				</thead>
+
+				<tbody>
+					<c:forEach var="action" items="${inspectionActionList}">
+						<tr>
+							<td>${action.defect_name}</td>
+							<td>${action.action_date}</td>
+							<td>${action.dept}</td>
+							<td>${action.action_ename}</td>
+							<td class="coTextLeft">${action.action_content}</td>
+						</tr>
+					</c:forEach>
+
+					<c:if test="${empty inspectionActionList}">
+						<tr>
+							<td colspan="5">등록된 조치 및 처리내역이 없습니다.</td>
+						</tr>
+					</c:if>
+				</tbody>
+			</table>
+		</div>
 	</div>
 
 </div>

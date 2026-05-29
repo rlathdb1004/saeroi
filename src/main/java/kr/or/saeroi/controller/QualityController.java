@@ -102,6 +102,18 @@ public class QualityController {
 			return "redirect:/quality/inspection";
 		}
 
+		if ("합격".equals(result)) {
+			has_defect = null;
+		}
+
+		double inspectionQtyValue = toNumber(inspection_qty);
+		double goodQtyValue = toNumber(good_qty);
+		double defectQtyValue = "Y".equals(has_defect) ? toNumber(defect_qty) : 0;
+
+		if (inspectionQtyValue > 0 && goodQtyValue + defectQtyValue > inspectionQtyValue) {
+			return "redirect:/quality/inspection";
+		}
+
 		int inspId = qualityService._ser_insert_Inspection(insp_date, prod_id, emp_id, insp_type, result, inspection_qty,
 				good_qty, remark);
 
@@ -141,8 +153,12 @@ public class QualityController {
 
 		InspectionDTO inspection = qualityService._ser_select_Inspection_detail(insp_id, insp_date, prod_id, emp_id,
 				insp_type, result, inspection_qty, good_qty, remark);
+		List<DefectDTO> inspectionDefectList = qualityService._ser_select_Defect_by_Inspection(insp_id);
+		List<DefectDTO> inspectionActionList = qualityService._ser_select_Defect_action_by_Inspection(insp_id);
 
 		model.addAttribute("inspection", inspection);
+		model.addAttribute("inspectionDefectList", inspectionDefectList);
+		model.addAttribute("inspectionActionList", inspectionActionList);
 		model.addAttribute("insp_id", insp_id);
 		model.addAttribute("insp_date", insp_date);
 		model.addAttribute("prod_id", prod_id);
@@ -372,5 +388,17 @@ public class QualityController {
 
 	private boolean hasText(String value) {
 		return value != null && value.trim().length() > 0;
+	}
+
+	private double toNumber(String value) {
+		if (!hasText(value)) {
+			return 0;
+		}
+
+		try {
+			return Double.parseDouble(value.trim());
+		} catch (NumberFormatException e) {
+			return 0;
+		}
 	}
 }
