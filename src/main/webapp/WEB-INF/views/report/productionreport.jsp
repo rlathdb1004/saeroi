@@ -30,7 +30,6 @@
 						<option value="week">주별</option>
 						<option value="month" selected>월별</option>
 						<option value="year_sum">년별(합)</option>
-						<option value="year_avg">년별(평균)</option>
 					</select>
 				</div>
 

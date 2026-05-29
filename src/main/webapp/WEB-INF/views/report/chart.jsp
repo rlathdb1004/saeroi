@@ -104,8 +104,6 @@
 							${empty searchType || searchType == 'month' ? 'selected' : ''}>월별</option>
 						<option value="year_sum"
 							${searchType == 'year_sum' ? 'selected' : ''}>년별(합)</option>
-						<option value="year_avg"
-							${searchType == 'year_avg' ? 'selected' : ''}>년별(평균)</option>
 					</select>
 				</div>
 
