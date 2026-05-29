@@ -10,10 +10,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import kr.or.saeroi.dto.BoradDTO;
+import kr.or.saeroi.dto.DefectDTO;
 import kr.or.saeroi.dto.LoginDTO;
 import kr.or.saeroi.dto.ProductionDTO;
 import kr.or.saeroi.service.BoardService;
 import kr.or.saeroi.service.ProductionService;
+import kr.or.saeroi.service.QualityService;
+
 
 @Controller
 public class DashboardController {
@@ -23,21 +26,26 @@ public class DashboardController {
 
 	@Autowired
 	private ProductionService productionService;
+	
+	@Autowired
+	QualityService qualityService;
 
-	@GetMapping("/")
+	@GetMapping("/dashboard")
 	public String main(Model model, HttpSession session) {
 		// 첫 화면 대시보드에 공지사항과 작업지시 최근 5개를 조회한다.
 		setDashboardNotice(model, session);
 		setDashboardWorkOrder(model);
+		setDashboardDefectTop5(model);
 
 		return "dashboard.tiles";
 	}
 
-	@GetMapping("/dashboard")
+	@GetMapping("/")
 	public String dashboard(Model model, HttpSession session) {
 		// 대시보드 메뉴 진입 시 공지사항과 작업지시 최근 5개를 조회한다.
 		setDashboardNotice(model, session);
 		setDashboardWorkOrder(model);
+		setDashboardDefectTop5(model);
 
 		return "dashboard.tiles";
 	}
@@ -72,5 +80,15 @@ public class DashboardController {
 				productionService.selectWorkOrderList(productionDTO);
 
 		model.addAttribute("dashWorkOrderList", dashWorkOrderList);
+	}
+	
+	// 대시보드 최근 7일 불량유형별 수량 TOP5를 조회한다.
+	private void setDashboardDefectTop5(Model model) {
+		List<DefectDTO> dashDefectTopList =
+				qualityService._ser_select_Dashboard_DefectTop5();
+
+		System.out.println("대시보드 불량 TOP5 건수 : " + dashDefectTopList.size());
+
+		model.addAttribute("dashDefectTopList", dashDefectTopList);
 	}
 }

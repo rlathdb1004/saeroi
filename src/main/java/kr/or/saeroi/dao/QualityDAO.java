@@ -50,4 +50,7 @@ public interface QualityDAO {
 	int _dao_insert_Defect_action(String defect_list_id, String action_date, String emp_id, String action_content);
 
 	List<DefectDTO> _dao_select_Defect_action_emp_option(String dept);
+	
+	// 대시보드 최근 7일 불량유형별 수량 TOP5를 조회한다.
+	List<DefectDTO> _dao_select_Dashboard_DefectTop5();
 }

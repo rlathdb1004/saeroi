@@ -137,4 +137,10 @@ public class QualityServiceImpl implements QualityService {
 	private boolean hasText(String value) {
 		return value != null && value.trim().length() > 0;
 	}
+	
+	// 대시보드 최근 7일 불량유형별 수량 TOP5를 조회한다.
+	@Override
+	public List<DefectDTO> _ser_select_Dashboard_DefectTop5() {
+		return qualityDAO._dao_select_Dashboard_DefectTop5();
+	}
 }

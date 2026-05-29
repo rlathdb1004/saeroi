@@ -292,4 +292,13 @@ public class QualityDAOImpl implements QualityDAO {
 
 		return empList;
 	}
+	
+	// 대시보드 최근 7일 불량유형별 수량 TOP5를 조회한다.
+	@Override
+	public List<DefectDTO> _dao_select_Dashboard_DefectTop5() {
+		List<DefectDTO> dashDefectTopList =
+				sqlSession.selectList("mapper.quality._select_Dashboard_DefectTop5");
+
+		return dashDefectTopList;
+	}
 }
