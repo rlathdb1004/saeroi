@@ -153,7 +153,7 @@
 				<table class="coTable" id="reportTable">
 					<thead>
 						<tr>
-							<th >일자/기간</th>
+							<th style="width: 180px !important;" >일자/기간</th>
 							<th class="mobile_hidden">품목명</th>
 							<th>계획량</th>
 							<th>작업량</th>

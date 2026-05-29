@@ -327,9 +327,21 @@ function getLocalDateFromWeek(weekStr, isEnd) {
 
       		let detailUrl = "${pageContext.request.contextPath}/report/chart"
       					  + "?searchType=" + encodeURIComponent(searchType)
-      				   	  + "&searchItem=" + encodeURIComponent(item.품목명 || searchItem)
-      					  + "&startDate=" + encodeURIComponent(startDate || "")
-      					  + "&endDate=" + encodeURIComponent(endDate || "");
+      				   	  + "&searchItem=" + encodeURIComponent(item.품목명 || searchItem);
+      						if(searchType==="month"){
+      							detailUrl += "&startDate=" + encodeURIComponent(item.계획일자+"-01" || "")
+      	      					detailUrl += "&endDate=" + encodeURIComponent(item.계획일자+"-01" || "");
+      						} else if (searchType === 'year_sum' || searchType === 'year_avg'){
+      							detailUrl += "&startDate=" + encodeURIComponent(item.계획일자+"-01-01" || "")
+          	      				detailUrl += "&endDate=" + encodeURIComponent(item.계획일자+"-12-31" || "");
+      						} else if (searchType === 'day') {
+      							detailUrl += "&startDate=" + encodeURIComponent(item.계획일자 || "")
+          	      				detailUrl += "&endDate=" + encodeURIComponent(item.계획일자|| "");
+      						} else if(searchType === 'week'){
+      							detailUrl += "&startDate=" + getLocalDateFromWeek(startDate, false);
+      							detailUrl += "&endDate=" + getLocalDateFromWeek(startDate, false);
+      						}
+      					 
 
       		row.innerHTML = ''
       			+ '<td><input type="checkbox" name="orderIds" class="check_btn" value="' + escapeHtml(item.계획일자) + '"></td>'
