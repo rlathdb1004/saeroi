@@ -6,10 +6,126 @@
 		and (sessionScope.loginUser.role eq 'ADMIN'
 		or sessionScope.loginUser.role eq 'MANAGER')}" />
 
+<style>
+.insp_file_area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid #D6DEE0;
+    border-radius: 6px;
+    background-color: #ffffff;
+    box-sizing: border-box;
+}
+
+.insp_file_input {
+	display: none;
+}
+
+.insp_file_btn {
+    height: 28px;
+    padding: 0 12px;
+    border: 1px solid #C9CFD1;
+    border-radius: 5px;
+    background-color: #F7F9F8;
+    color: #1F2933;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 26px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+
+.insp_file_btn:hover {
+	background-color: #eaf4ef;
+}
+
+.insp_file_name {
+	color: #111827;
+	font-size: 13px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.quality_search_error {
+	margin: 10px 0 0;
+	color: #c62828;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.quality_modal_section {
+	grid-column: 1/-1;
+	margin-top: 4px;
+	padding: 14px;
+	border: 1px solid #d9e2dd;
+	border-radius: 8px;
+	background: #f8fffb;
+}
+
+.quality_modal_section_title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 12px;
+	font-size: 15px;
+	font-weight: 700;
+	color: #12362b;
+}
+
+.insp_file_area {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	height: 42px;
+	padding: 0 12px;
+	border: 1px solid #4f8068;
+	border-radius: 6px;
+	background-color: #fffff;
+	box-sizing: border-box;
+}
+
+.insp_file_input {
+	display: none;
+}
+
+.insp_file_btn {
+	height: 28px;
+	padding: 0 12px;
+	border: 1px solid #4f8068;
+	border-radius: 5px;
+	background-color: #ffffff;
+	color: #12362b;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 26px;
+	cursor: pointer;
+	box-sizing: border-box;
+}
+
+.insp_file_btn:hover {
+	background-color: #eaf4ef;
+}
+
+.insp_file_name {
+	color: #111827;
+	font-size: 13px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+</style>
+
 <div class="coPageWrap">
 
 	<form class="search-form" method="get"
-		action="${pageContext.request.contextPath}/quality/inspection">
+		action="${pageContext.request.contextPath}/quality/inspection"
+		onsubmit="return validateDateRange(this);">
 
 		<div class="search-box">
 			<div class="search-row">
@@ -73,6 +189,10 @@
 				</div>
 
 			</div>
+
+			<c:if test="${not empty dateError}">
+				<div class="quality_search_error">${dateError}</div>
+			</c:if>
 		</div>
 	</form>
 
@@ -122,7 +242,7 @@
 					<tr>
 						<th class="mobile_show checkAllHeader" style="cursor: pointer;">선택</th>
 						<th class="mobile_show">검사번호</th>
-						<th class="mobile_hidden">검사일시</th>
+						<th class="mobile_hidden">검사일자</th>
 						<th class="mobile_show">품목명</th>
 						<th class="mobile_hidden">LOT번호</th>
 						<th class="mobile_hidden">검사자</th>
@@ -134,11 +254,8 @@
 				<tbody>
 					<c:forEach var="inspection" items="${list}">
 						<tr>
-							<td class="mobile_show">
-								<%-- 								<c:if test="${canManageQuality}"> --%> <input
-								type="checkbox" name="insp_id" value="${inspection.insp_id}">
-								<%-- 								</c:if> --%>
-							</td>
+							<td class="mobile_show"><input type="checkbox"
+								name="insp_id" value="${inspection.insp_id}"></td>
 
 							<td class="mobile_show">${inspection.doc_no}</td>
 							<td class="mobile_hidden">${inspection.insp_date}</td>
@@ -147,7 +264,8 @@
 							<td class="mobile_hidden">${inspection.ename}</td>
 
 							<td class="mobile_show"><c:choose>
-									<c:when test="${inspection.result == '조건부'}">
+									<c:when
+										test="${inspection.result == '조건부' or inspection.result == '불합격'}">
 										<span class="coStatus coStatusStop">${inspection.result}</span>
 									</c:when>
 									<c:otherwise>
@@ -186,19 +304,21 @@
 			</div>
 
 			<form class="modal_form" method="post" accept-charset="UTF-8"
+				enctype="multipart/form-data"
 				action="${pageContext.request.contextPath}/quality/inspection/add">
 
 				<div class="modal_body modal_body_2col">
 
 					<div class="modal_item">
-						<label class="modal_label">검사일시<span
+						<label class="modal_label">검사일자<span
 							class="modal_required">*</span></label> <input type="date"
 							name="insp_date" class="modal_input modal_today" required>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">품목명<span class="modal_required">*</span></label>
-						<select name="prod_id" class="modal_select" required>
+						<label class="modal_label">생산실적 선택<span
+							class="modal_required">*</span></label> <select name="prod_id"
+							id="inspectionProdId" class="modal_select" required>
 							<option value="">선택</option>
 						</select>
 					</div>
@@ -242,6 +362,83 @@
 						<label class="modal_label">비고</label> <input type="text"
 							name="remark" class="modal_input">
 					</div>
+
+					<div class="quality_modal_section">
+						<div class="quality_modal_section_title">
+							<label> <input type="checkbox" id="hasDefect"
+								name="has_defect" value="Y"> 불량 정보 및 조치 함께 등록
+							</label>
+						</div>
+
+						<div id="inspectionDefectArea" class="modal_body modal_body_2col"
+							style="display: none; padding: 0;">
+							<div class="modal_item">
+								<label class="modal_label">불량발생일시<span
+									class="modal_required">*</span></label> <input type="date"
+									name="defect_date"
+									class="modal_input modal_today defectRequired">
+							</div>
+
+							<div class="modal_item">
+								<label class="modal_label">불량명<span
+									class="modal_required">*</span></label> <select name="defect_id"
+									id="inspectionDefectId" class="modal_select defectRequired">
+									<option value="">선택</option>
+								</select>
+							</div>
+
+							<div class="modal_item">
+								<label class="modal_label">불량수량<span
+									class="modal_required">*</span></label> <input type="number"
+									name="defect_qty" class="modal_input defectRequired" min="0">
+							</div>
+
+							<div class="modal_item">
+								<label class="modal_label">불량사진</label>
+								<div class="insp_file_area">
+									<label for="defectPhotoFile" class="insp_file_btn">파일
+										선택</label> <span id="defectPhotoFileName" class="insp_file_name">선택된
+										파일 없음</span> <input type="file" id="defectPhotoFile"
+										name="defect_photo_file" class="insp_file_input"
+										accept="image/*"
+										onchange="document.getElementById('defectPhotoFileName').innerText = this.files.length > 0 ? this.files[0].name : '선택된 파일 없음';">
+								</div>
+							</div>
+
+							<div class="modal_item modal_item_full">
+								<label class="modal_label">불량 비고</label> <input type="text"
+									name="defect_remark" class="modal_input">
+							</div>
+
+							<div class="modal_item">
+								<label class="modal_label">조치일시<span
+									class="modal_required">*</span></label> <input type="date"
+									name="action_date"
+									class="modal_input modal_today defectRequired">
+							</div>
+
+							<div class="modal_item">
+								<label class="modal_label">조치 부서</label> <input type="text"
+									id="inspectionActionDept" class="modal_input" readonly>
+							</div>
+
+							<div class="modal_item">
+								<label class="modal_label">조치 담당자<span
+									class="modal_required">*</span></label> <select name="action_emp_id"
+									id="inspectionActionEmpId" class="modal_select defectRequired">
+									<option value="">선택</option>
+								</select>
+							</div>
+
+							<div class="modal_item modal_item_full">
+								<label class="modal_label">조치 내역<span
+									class="modal_required">*</span></label>
+								<textarea name="action_content"
+									class="modal_textarea defectRequired" rows="4"
+									placeholder="조치 내역을 입력하세요."></textarea>
+							</div>
+						</div>
+					</div>
 				</div>
 
 				<div class="modal_footer">
@@ -265,7 +462,7 @@
 			return false;
 		}
 
-		return confirm('삭제하시겠습니까?');
+		return confirm('선택한 검사 내역을 삭제하시겠습니까?');
 	}
 </script>
 

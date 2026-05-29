@@ -149,19 +149,20 @@ public class QualityDAOImpl implements QualityDAO {
 	// 불량 등록
 	@Override
 	public int _dao_insert_defect(String defect_date, String insp_id, String defect_id, String defect_qty,
-			String remark) {
+	        String defect_photo, String remark) {
 
-		Map<String, Object> param = new HashMap<String, Object>();
+	    Map<String, Object> param = new HashMap<String, Object>();
 
-		param.put("defect_date", defect_date);
-		param.put("insp_id", insp_id);
-		param.put("defect_id", defect_id);
-		param.put("defect_qty", defect_qty);
-		param.put("remark", remark);
+	    param.put("defect_date", defect_date);
+	    param.put("insp_id", insp_id);
+	    param.put("defect_id", defect_id);
+	    param.put("defect_qty", defect_qty);
+	    param.put("defect_photo", defect_photo);
+	    param.put("remark", remark);
 
-		int insert_result = sqlSession.insert("mapper.quality._insert_defect", param);
+	    sqlSession.insert("mapper.quality._insert_defect", param);
 
-		return insert_result;
+	    return (Integer) param.get("defect_list_id");
 	}
 
 	// 불량 모달 옵션

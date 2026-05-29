@@ -6,10 +6,20 @@
 		and (sessionScope.loginUser.role eq 'ADMIN'
 		or sessionScope.loginUser.role eq 'MANAGER')}" />
 
+<style>
+.quality_search_error {
+	margin: 10px 0 0;
+	color: #c62828;
+	font-size: 13px;
+	font-weight: 600;
+}
+</style>
+
 <div class="coPageWrap">
 
 	<form class="search-form" method="get"
-		action="${pageContext.request.contextPath}/quality/defect">
+		action="${pageContext.request.contextPath}/quality/defect"
+		onsubmit="return validateDateRange(this);">
 
 		<div class="search-box">
 			<div class="search-row">
@@ -75,6 +85,10 @@
 				</div>
 
 			</div>
+
+			<c:if test="${not empty dateError}">
+				<div class="quality_search_error">${dateError}</div>
+			</c:if>
 		</div>
 	</form>
 
@@ -137,10 +151,8 @@
 					<c:forEach var="defect" items="${list}">
 						<tr>
 							<td class="mobile_show">
-<%-- 								<c:if test="${canManageQuality}"> --%>
-									<input type="checkbox" name="defect_list_id"
-										value="${defect.defect_list_id}">
-<%-- 								</c:if> --%>
+								<input type="checkbox" name="defect_list_id"
+									value="${defect.defect_list_id}">
 							</td>
 
 							<td class="mobile_hidden">${defect.defect_code}</td>
@@ -184,6 +196,7 @@
 			</div>
 
 			<form class="modal_form" method="post" accept-charset="UTF-8"
+				enctype="multipart/form-data"
 				action="${pageContext.request.contextPath}/quality/defect/add">
 
 				<div class="modal_body modal_body_2col">
@@ -219,6 +232,12 @@
 					</div>
 
 					<div class="modal_item">
+						<label class="modal_label">불량사진</label>
+						<input type="file" name="defect_photo_file"
+							class="modal_input" accept="image/*">
+					</div>
+
+					<div class="modal_item">
 						<label class="modal_label">비고</label>
 						<input type="text" name="remark" class="modal_input">
 					</div>
@@ -246,7 +265,7 @@
 			return false;
 		}
 
-		return confirm('삭제하시겠습니까?');
+		return confirm('선택한 불량 내역을 삭제하시겠습니까?');
 	}
 </script>
 
