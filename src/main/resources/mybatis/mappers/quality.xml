@@ -889,7 +889,7 @@
 			e.ename
 	</select>
 	
-	<!-- 대시보드 최근 7일 불량유형별 수량 TOP5 조회 -->
+<!-- 대시보드 최근 7일 불량유형별 수량 TOP5 조회 -->
 <select id="_select_Dashboard_DefectTop5"
 	resultType="kr.or.saeroi.dto.DefectDTO">
 	SELECT
@@ -904,23 +904,20 @@
 			) AS rn
 		FROM (
 			SELECT
-				NVL(d.defect_type, d.defect_name) AS defect_type,
+				d.defect_type AS defect_type,
 				SUM(NVL(dl.defect_qty, 0)) AS defect_qty,
-				CASE
-					WHEN MAX(SUM(NVL(dl.defect_qty, 0))) OVER () = 0 THEN 0
-					ELSE ROUND(
-						SUM(NVL(dl.defect_qty, 0))
-						/ MAX(SUM(NVL(dl.defect_qty, 0))) OVER ()
-						* 100
-					)
-				END AS sort_no
+				ROUND(
+					SUM(NVL(dl.defect_qty, 0))
+					/ SUM(SUM(NVL(dl.defect_qty, 0))) OVER ()
+					* 100
+				) AS sort_no
 			FROM defect_list dl,
 				defect d
 			WHERE dl.defect_id = d.defect_id
 			AND NVL(dl.use_yn, 'Y') = 'Y'
 			AND dl.defect_date &gt;= TRUNC(SYSDATE) - 6
 			AND dl.defect_date &lt; TRUNC(SYSDATE) + 1
-			GROUP BY NVL(d.defect_type, d.defect_name)
+			GROUP BY d.defect_type
 		) top_data
 	)
 	WHERE rn &lt;= 5
