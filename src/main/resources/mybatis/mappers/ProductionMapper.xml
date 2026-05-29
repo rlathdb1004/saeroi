@@ -3,21 +3,12 @@
 	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<!--
-	생산관리 Mapper이다.
-	ProductionDAO.java의 NAMESPACE와 반드시 동일해야 한다.
-
-	DAO 기준:
-	private static final String NAMESPACE =
-		"kr.or.saeroi.mapper.ProductionMapper.";
--->
+<!-- 생산관리 Mapper이다. ProductionDAO.java의 NAMESPACE와 반드시 동일해야 한다. DAO 기준: private 
+	static final String NAMESPACE = "kr.or.saeroi.mapper.ProductionMapper."; -->
 <mapper namespace="kr.or.saeroi.mapper.ProductionMapper">
 
-	<!--
-		생산계획 조회 결과를 ProductionDTO에 매핑한다.
-		DB 컬럼명은 대문자 스네이크 케이스이고,
-		DTO 필드명은 카멜 케이스라서 resultMap으로 명확하게 연결한다.
-	-->
+	<!-- 생산계획 조회 결과를 ProductionDTO에 매핑한다. DB 컬럼명은 대문자 스네이크 케이스이고, DTO 필드명은 카멜 
+		케이스라서 resultMap으로 명확하게 연결한다. -->
 	<resultMap id="productionPlanResultMap"
 		type="kr.or.saeroi.dto.ProductionDTO">
 
@@ -42,22 +33,21 @@
 	</resultMap>
 
 
-	<!--
-		생산계획 검색 조건이다.
-		count 쿼리와 list 쿼리에서 공통으로 사용한다.
-	-->
+	<!-- 생산계획 검색 조건이다. count 쿼리와 list 쿼리에서 공통으로 사용한다. -->
 	<sql id="productionPlanSearchCondition">
 
 		<where>
 
 			<!-- 시작일 검색 조건이다. -->
 			<if test="startDate != null and startDate != ''">
-				AND PP.PROD_PLAN_DATE <![CDATA[>=]]> TO_DATE(#{startDate}, 'YYYY-MM-DD')
+				AND PP.PROD_PLAN_DATE <![CDATA[>=]]>
+				TO_DATE(#{startDate}, 'YYYY-MM-DD')
 			</if>
 
 			<!-- 종료일 검색 조건이다. 종료일 당일까지 포함한다. -->
 			<if test="endDate != null and endDate != ''">
-				AND PP.PROD_PLAN_DATE <![CDATA[<]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+				AND PP.PROD_PLAN_DATE <![CDATA[<]]>
+				TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
 			</if>
 
 			<!-- 품목 구분 검색 조건이다. -->
@@ -65,19 +55,46 @@
 				AND I.ITEM_TYPE = #{itemType}
 			</if>
 
-			<!-- 검색어 조건이다. -->
+			<!-- 검색어 조건이다. 품목코드/품명 검색은 대소문자와 공백 차이를 줄이기 위해 UPPER + REPLACE 기준으로 비교한다. -->
 			<if test="keyword != null and keyword != ''">
 				AND (
-					PP.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
-					OR TO_CHAR(PP.PROD_PLAN_ID) LIKE '%' || REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
-					OR TO_CHAR(PP.PROD_PLAN_QTY, 'FM9999999999999990') LIKE '%' || REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
-					OR TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') LIKE '%' || TRIM(#{keyword}) || '%'
-					OR TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') LIKE '%' || TRIM(#{keyword}) || '%'
-					OR TO_CHAR(PP.DOC_SEQ) LIKE '%' || REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
-					OR I.ITEM_CODE LIKE '%' || TRIM(#{keyword}) || '%'
-					OR I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
-					OR I.ITEM_TYPE LIKE '%' || TRIM(#{keyword}) || '%'
-					OR I.ITEM_UNIT LIKE '%' || TRIM(#{keyword}) || '%'
+				UPPER(PP.DOC_NO) LIKE '%' || UPPER(TRIM(#{keyword}))
+				|| '%'
+
+				OR TO_CHAR(PP.PROD_PLAN_ID) LIKE '%' ||
+				REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
+
+				OR
+				TO_CHAR(PP.PROD_PLAN_QTY, 'FM9999999999999990') LIKE '%' ||
+				REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
+
+				OR
+				TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') LIKE '%' ||
+				TRIM(#{keyword}) || '%'
+
+				OR TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') LIKE
+				'%' || TRIM(#{keyword}) ||
+				'%'
+
+				OR TO_CHAR(PP.DOC_SEQ) LIKE '%' ||
+				REPLACE(REPLACE(TRIM(#{keyword}),
+				',', ''), ' ', '') || '%'
+
+				OR
+				UPPER(REPLACE(I.ITEM_CODE, ' ', '')) LIKE '%' ||
+				UPPER(REPLACE(TRIM(#{keyword}), ' ', '')) || '%'
+
+				OR
+				UPPER(REPLACE(I.ITEM_NAME, ' ', '')) LIKE '%' ||
+				UPPER(REPLACE(TRIM(#{keyword}), ' ', '')) || '%'
+
+				OR
+				UPPER(REPLACE(I.ITEM_TYPE, ' ', '')) LIKE '%' ||
+				UPPER(REPLACE(TRIM(#{keyword}), ' ', '')) || '%'
+
+				OR
+				UPPER(REPLACE(I.ITEM_UNIT, ' ', '')) LIKE '%' ||
+				UPPER(REPLACE(TRIM(#{keyword}), ' ', '')) || '%'
 				)
 			</if>
 
@@ -88,13 +105,13 @@
 
 	<!-- 생산계획 목록 총 건수를 조회한다. -->
 	<select id="selectProductionPlanCount"
-		parameterType="kr.or.saeroi.dto.ProductionDTO"
-		resultType="int">
+		parameterType="kr.or.saeroi.dto.ProductionDTO" resultType="int">
 
 		SELECT COUNT(*)
 		FROM PRODUCTION_PLAN PP
 		JOIN ITEM I
-		  ON PP.ITEM_ID = I.ITEM_ID
+		ON PP.ITEM_ID =
+		I.ITEM_ID
 
 		<include refid="productionPlanSearchCondition" />
 
@@ -108,45 +125,52 @@
 
 		SELECT *
 		FROM (
-			SELECT PLAN_LIST.*,
-				   ROWNUM AS RN
-			FROM (
-				SELECT
-					PP.PROD_PLAN_ID,
-					PP.PROD_PLAN_QTY,
-					TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS PROD_PLAN_DATE,
-					TO_CHAR(PP.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
-					TO_CHAR(PP.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
-					PP.REMARK,
-					PP.ITEM_ID,
-					TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
-					PP.DOC_NO,
-					PP.DOC_SEQ,
-					I.ITEM_CODE,
-					I.ITEM_NAME,
-					I.ITEM_TYPE,
-					I.ITEM_UNIT
-				FROM PRODUCTION_PLAN PP
-				JOIN ITEM I
-				  ON PP.ITEM_ID = I.ITEM_ID
+		SELECT PLAN_LIST.*,
+		ROWNUM AS RN
+		FROM (
+		SELECT
+		PP.PROD_PLAN_ID,
+		PP.PROD_PLAN_QTY,
+		TO_CHAR(PP.PROD_PLAN_DATE,
+		'YYYY-MM-DD') AS PROD_PLAN_DATE,
+		TO_CHAR(PP.CREATED_DATE, 'YYYY-MM-DD')
+		AS CREATED_DATE,
+		TO_CHAR(PP.UPDATED_DATE, 'YYYY-MM-DD') AS
+		UPDATED_DATE,
+		PP.REMARK,
+		PP.ITEM_ID,
+		TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD')
+		AS DUE_DATE,
+		PP.DOC_NO,
+		PP.DOC_SEQ,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT
+		FROM PRODUCTION_PLAN PP
+		JOIN ITEM I
+		ON PP.ITEM_ID = I.ITEM_ID
 
-				<include refid="productionPlanSearchCondition" />
+		<include refid="productionPlanSearchCondition" />
 
-				ORDER BY PP.PROD_PLAN_DATE DESC,
-						 PP.PROD_PLAN_ID DESC
-			) PLAN_LIST
-			WHERE ROWNUM <![CDATA[<=]]> #{endRow}
+		ORDER BY PP.PROD_PLAN_DATE DESC,
+		PP.PROD_PLAN_ID DESC
+		) PLAN_LIST
+		WHERE
+		ROWNUM <![CDATA[<=]]>
+		#{endRow}
 		)
-		WHERE RN <![CDATA[>=]]> #{startRow}
+		WHERE RN <![CDATA[>=]]>
+		#{startRow}
 
 	</select>
 
 
 	<!-- 검색 조건 select box에 사용할 품목 구분 목록을 조회한다. -->
-	<select id="selectItemTypeList"
-		resultType="string">
+	<select id="selectItemTypeList" resultType="string">
 
-		SELECT DISTINCT ITEM_TYPE
+		SELECT DISTINCT
+		ITEM_TYPE
 		FROM ITEM
 		WHERE ITEM_TYPE IS NOT NULL
 		ORDER BY ITEM_TYPE ASC
@@ -155,29 +179,30 @@
 
 
 	<!-- 생산계획 상세 정보를 조회한다. -->
-	<select id="selectProductionPlanDetail"
-		parameterType="int"
+	<select id="selectProductionPlanDetail" parameterType="int"
 		resultMap="productionPlanResultMap">
 
 		SELECT
-			PP.PROD_PLAN_ID,
-			PP.PROD_PLAN_QTY,
-			TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS PROD_PLAN_DATE,
-			TO_CHAR(PP.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
-			TO_CHAR(PP.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
-			PP.REMARK,
-			PP.ITEM_ID,
-			TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
-			PP.DOC_NO,
-			PP.DOC_SEQ,
-			I.ITEM_CODE,
-			I.ITEM_NAME,
-			I.ITEM_TYPE,
-			I.ITEM_UNIT
-		FROM PRODUCTION_PLAN PP
+		PP.PROD_PLAN_ID,
+		PP.PROD_PLAN_QTY,
+		TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS PROD_PLAN_DATE,
+		TO_CHAR(PP.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
+		TO_CHAR(PP.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
+		PP.REMARK,
+		PP.ITEM_ID,
+		TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
+		PP.DOC_NO,
+		PP.DOC_SEQ,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT
+		FROM
+		PRODUCTION_PLAN PP
 		JOIN ITEM I
-		  ON PP.ITEM_ID = I.ITEM_ID
-		WHERE PP.PROD_PLAN_ID = #{prodPlanId}
+		ON PP.ITEM_ID = I.ITEM_ID
+		WHERE
+		PP.PROD_PLAN_ID = #{prodPlanId}
 
 	</select>
 
@@ -188,38 +213,43 @@
 
 		UPDATE PRODUCTION_PLAN
 		SET
-			PROD_PLAN_QTY = #{prodPlanQty},
-			PROD_PLAN_DATE = TO_DATE(#{prodPlanDate}, 'YYYY-MM-DD'),
-			DUE_DATE = TO_DATE(#{dueDate}, 'YYYY-MM-DD'),
-			REMARK = #{remark},
-			UPDATED_DATE = SYSDATE
+		PROD_PLAN_QTY = #{prodPlanQty},
+		PROD_PLAN_DATE = TO_DATE(#{prodPlanDate}, 'YYYY-MM-DD'),
+		DUE_DATE =
+		TO_DATE(#{dueDate}, 'YYYY-MM-DD'),
+		REMARK = #{remark},
+		UPDATED_DATE =
+		SYSDATE
 		WHERE PROD_PLAN_ID = #{prodPlanId}
 
 	</update>
 
 
 	<!-- 생산계획 등록 모달에서 사용할 품목 목록을 조회한다. -->
-	<select id="selectItemList"
-		resultMap="productionPlanResultMap">
+	<select id="selectItemList" resultMap="productionPlanResultMap">
 
 		SELECT
-			NULL AS PROD_PLAN_ID,
-			NULL AS PROD_PLAN_QTY,
-			NULL AS PROD_PLAN_DATE,
-			NULL AS CREATED_DATE,
-			NULL AS UPDATED_DATE,
-			NULL AS REMARK,
-			I.ITEM_ID,
-			NULL AS DUE_DATE,
-			NULL AS DOC_NO,
-			NULL AS DOC_SEQ,
-			I.ITEM_CODE,
-			I.ITEM_NAME,
-			I.ITEM_TYPE,
-			I.ITEM_UNIT
+		NULL AS
+		PROD_PLAN_ID,
+		NULL AS PROD_PLAN_QTY,
+		NULL AS PROD_PLAN_DATE,
+		NULL AS
+		CREATED_DATE,
+		NULL AS UPDATED_DATE,
+		NULL AS REMARK,
+		I.ITEM_ID,
+		NULL AS
+		DUE_DATE,
+		NULL AS DOC_NO,
+		NULL AS DOC_SEQ,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT
 		FROM ITEM I
 		WHERE I.ITEM_TYPE = 'FG'
-		ORDER BY I.ITEM_CODE ASC
+		ORDER BY
+		I.ITEM_CODE ASC
 
 	</select>
 
@@ -229,47 +259,58 @@
 		parameterType="kr.or.saeroi.dto.ProductionDTO">
 
 		INSERT INTO PRODUCTION_PLAN (
-			PROD_PLAN_ID,
-			PROD_PLAN_QTY,
-			PROD_PLAN_DATE,
-			CREATED_DATE,
-			UPDATED_DATE,
-			REMARK,
-			ITEM_ID,
-			DUE_DATE,
-			DOC_NO,
-			DOC_SEQ
+		PROD_PLAN_ID,
+		PROD_PLAN_QTY,
+		PROD_PLAN_DATE,
+		CREATED_DATE,
+		UPDATED_DATE,
+		REMARK,
+		ITEM_ID,
+		DUE_DATE,
+		DOC_NO,
+		DOC_SEQ
 		)
 		SELECT
-			(SELECT NVL(MAX(PROD_PLAN_ID), 0) + 1
-			 FROM PRODUCTION_PLAN),
+		(SELECT NVL(MAX(PROD_PLAN_ID),
+		0) + 1
+		FROM PRODUCTION_PLAN),
 
-			#{prodPlanQty},
+		#{prodPlanQty},
 
-			TO_DATE(#{prodPlanDate}, 'YYYY-MM-DD'),
+		TO_DATE(#{prodPlanDate},
+		'YYYY-MM-DD'),
 
-			SYSDATE,
+		SYSDATE,
 
-			SYSDATE,
+		SYSDATE,
 
-			#{remark},
+		#{remark},
 
-			#{itemId},
+		#{itemId},
 
-			TO_DATE(#{dueDate}, 'YYYY-MM-DD'),
+		TO_DATE(#{dueDate},
+		'YYYY-MM-DD'),
 
-			'PP-' || TO_CHAR(TO_DATE(#{prodPlanDate}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
-			LPAD(
-				(SELECT NVL(MAX(DOC_SEQ), 0) + 1
-				 FROM PRODUCTION_PLAN
-				 WHERE TRUNC(PROD_PLAN_DATE) = TRUNC(TO_DATE(#{prodPlanDate}, 'YYYY-MM-DD'))),
-				4,
-				'0'
-			),
+		'PP-' || TO_CHAR(TO_DATE(#{prodPlanDate}, 'YYYY-MM-DD'),
+		'YYYYMMDD') || '-'
+		||
+		LPAD(
+		(SELECT NVL(MAX(DOC_SEQ), 0) + 1
+		FROM
+		PRODUCTION_PLAN
+		WHERE TRUNC(PROD_PLAN_DATE) =
+		TRUNC(TO_DATE(#{prodPlanDate},
+		'YYYY-MM-DD'))),
+		4,
+		'0'
+		),
 
-			(SELECT NVL(MAX(DOC_SEQ), 0) + 1
-			 FROM PRODUCTION_PLAN
-			 WHERE TRUNC(PROD_PLAN_DATE) = TRUNC(TO_DATE(#{prodPlanDate}, 'YYYY-MM-DD')))
+		(SELECT
+		NVL(MAX(DOC_SEQ), 0) + 1
+		FROM PRODUCTION_PLAN
+		WHERE
+		TRUNC(PROD_PLAN_DATE) = TRUNC(TO_DATE(#{prodPlanDate},
+		'YYYY-MM-DD')))
 
 		FROM DUAL
 
@@ -294,6 +335,10 @@
 		<result property="docNo" column="DOC_NO" />
 		<result property="prodPlanDocNo" column="PROD_PLAN_DOC_NO" />
 		<result property="docSeq" column="DOC_SEQ" />
+		<result property="orderedQty" column="ORDERED_QTY" />
+		<result property="remainQty" column="REMAIN_QTY" />
+		<result property="qrUrl" column="QR_URL" />
+		<result property="qrImagePath" column="QR_IMAGE_PATH" />
 
 		<!-- production_plan 테이블 컬럼이다. -->
 		<result property="prodPlanQty" column="PROD_PLAN_QTY" />
@@ -311,6 +356,13 @@
 		<result property="lineCode" column="LINE_CODE" />
 		<result property="lineName" column="LINE_NAME" />
 
+		<!-- equipment 테이블 조인 컬럼이다. -->
+		<result property="equipId" column="EQUIP_ID" />
+		<result property="equipCode" column="EQUIP_CODE" />
+		<result property="equipName" column="EQUIP_NAME" />
+		<result property="equipStatus" column="EQUIP_STATUS" />
+		<result property="equipLoc" column="EQUIP_LOC" />
+
 		<!-- emp 테이블 조인 컬럼이다. -->
 		<result property="empno" column="EMPNO" />
 		<result property="ename" column="ENAME" />
@@ -319,6 +371,39 @@
 
 		<!-- production 테이블 조인 컬럼이다. -->
 		<result property="prodStatus" column="PROD_STATUS" />
+
+		<!-- BOM 마스터 컬럼이다. -->
+		<result property="bomId" column="BOM_ID" />
+		<result property="bomCode" column="BOM_CODE" />
+		<result property="bomVersion" column="BOM_VERSION" />
+		<result property="bomUseYn" column="BOM_USE_YN" />
+
+		<!-- BOM 상세 컬럼이다. -->
+		<result property="bomDetailId" column="BOM_DETAIL_ID" />
+		<result property="bomQty" column="BOM_QTY" />
+		<result property="requiredQty" column="REQUIRED_QTY" />
+
+		<!-- 투입 원자재 품목 컬럼이다. -->
+		<result property="materialItemId" column="MATERIAL_ITEM_ID" />
+		<result property="materialItemCode" column="MATERIAL_ITEM_CODE" />
+		<result property="materialItemName" column="MATERIAL_ITEM_NAME" />
+		<result property="materialItemType" column="MATERIAL_ITEM_TYPE" />
+		<result property="materialItemUnit" column="MATERIAL_ITEM_UNIT" />
+
+		<!-- material_inout 컬럼이다. -->
+		<result property="inoutId" column="INOUT_ID" />
+		<result property="inoutType" column="INOUT_TYPE" />
+		<result property="materialLot" column="MATERIAL_LOT" />
+		<result property="inoutQty" column="INOUT_QTY" />
+		<result property="inoutDate" column="INOUT_DATE" />
+		<result property="inoutStatus" column="INOUT_STATUS" />
+		<result property="useYn" column="USE_YN" />
+		<result property="inoutRemark" column="INOUT_REMARK" />
+
+		<!-- 화면 표시 보조 컬럼이다. -->
+		<result property="availableQty" column="AVAILABLE_QTY" />
+		<result property="shortageYn" column="SHORTAGE_YN" />
+		<result property="rowNo" column="ROW_NO" />
 
 	</resultMap>
 
@@ -330,12 +415,14 @@
 
 			<!-- 시작일 검색 조건이다. -->
 			<if test="startDate != null and startDate != ''">
-				AND WO.ORDER_DATE <![CDATA[>=]]> TO_DATE(#{startDate}, 'YYYY-MM-DD')
+				AND WO.ORDER_DATE <![CDATA[>=]]>
+				TO_DATE(#{startDate}, 'YYYY-MM-DD')
 			</if>
 
 			<!-- 종료일 검색 조건이다. 종료일 당일까지 포함한다. -->
 			<if test="endDate != null and endDate != ''">
-				AND WO.ORDER_DATE <![CDATA[<]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+				AND WO.ORDER_DATE <![CDATA[<]]>
+				TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
 			</if>
 
 			<!-- 작업상태 검색 조건이다. 생산실적이 없으면 대기로 판단한다. -->
@@ -346,12 +433,20 @@
 			<!-- 검색어 조건이다. -->
 			<if test="keyword != null and keyword != ''">
 				AND (
-					WO.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
-					OR WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
-					OR I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
-					OR I.ITEM_CODE LIKE '%' || TRIM(#{keyword}) || '%'
-					OR TO_CHAR(WO.ORDER_QTY, 'FM9999999999999990') LIKE '%' || REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
-					OR TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') LIKE '%' || TRIM(#{keyword}) || '%'
+				WO.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+				OR
+				WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
+				OR I.ITEM_NAME
+				LIKE '%' || TRIM(#{keyword}) || '%'
+				OR I.ITEM_CODE LIKE '%' ||
+				TRIM(#{keyword}) || '%'
+				OR TO_CHAR(WO.ORDER_QTY,
+				'FM9999999999999990') LIKE '%' ||
+				REPLACE(REPLACE(TRIM(#{keyword}),
+				',', ''), ' ', '') || '%'
+				OR TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD')
+				LIKE '%' || TRIM(#{keyword})
+				|| '%'
 				)
 			</if>
 
@@ -362,31 +457,32 @@
 
 	<!-- 작업지시 목록 총 건수를 조회한다. -->
 	<select id="selectWorkOrderCount"
-		parameterType="kr.or.saeroi.dto.ProductionDTO"
-		resultType="int">
+		parameterType="kr.or.saeroi.dto.ProductionDTO" resultType="int">
 
 		SELECT COUNT(*)
 		FROM WORK_ORDER WO
 		JOIN PRODUCTION_PLAN PP
-		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		ON
+		WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
 		JOIN ITEM I
-		  ON PP.ITEM_ID = I.ITEM_ID
+		ON PP.ITEM_ID = I.ITEM_ID
 		LEFT JOIN (
-			SELECT
-				P1.ORDER_ID,
-				P1.PROD_STATUS
-			FROM PRODUCTION P1
-			JOIN (
-				SELECT
-					ORDER_ID,
-					MAX(PROD_ID) AS PROD_ID
-				FROM PRODUCTION
-				GROUP BY ORDER_ID
-			) PM
-			  ON P1.ORDER_ID = PM.ORDER_ID
-			 AND P1.PROD_ID = PM.PROD_ID
+		SELECT
+		P1.ORDER_ID,
+		P1.PROD_STATUS
+		FROM PRODUCTION P1
+		JOIN (
+		SELECT
+		ORDER_ID,
+		MAX(PROD_ID) AS PROD_ID
+		FROM PRODUCTION
+		GROUP BY ORDER_ID
+		) PM
+		ON P1.ORDER_ID = PM.ORDER_ID
+		AND P1.PROD_ID = PM.PROD_ID
 		) P
-		  ON WO.ORDER_ID = P.ORDER_ID
+		ON
+		WO.ORDER_ID = P.ORDER_ID
 
 		<include refid="workOrderSearchCondition" />
 
@@ -400,140 +496,277 @@
 
 		SELECT *
 		FROM (
-			SELECT WORK_ORDER_LIST.*,
-				   ROWNUM AS RN
-			FROM (
-				SELECT
-					WO.ORDER_ID,
-					WO.PROD_PLAN_ID,
-					WO.LINE_ID,
-					WO.EMP_ID,
-					WO.PRODUCT_LOT,
-					WO.ORDER_QTY,
-					TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
-					TO_CHAR(WO.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
-					TO_CHAR(WO.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
-					WO.REMARK,
-					WO.DOC_NO,
-					WO.DOC_SEQ,
-					I.ITEM_ID,
-					I.ITEM_CODE,
-					I.ITEM_NAME,
-					I.ITEM_TYPE,
-					I.ITEM_UNIT,
-					NVL(P.PROD_STATUS, '대기') AS PROD_STATUS
-				FROM WORK_ORDER WO
-				JOIN PRODUCTION_PLAN PP
-				  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
-				JOIN ITEM I
-				  ON PP.ITEM_ID = I.ITEM_ID
-				LEFT JOIN (
-					SELECT
-						P1.ORDER_ID,
-						P1.PROD_STATUS
-					FROM PRODUCTION P1
-					JOIN (
-						SELECT
-							ORDER_ID,
-							MAX(PROD_ID) AS PROD_ID
-						FROM PRODUCTION
-						GROUP BY ORDER_ID
-					) PM
-					  ON P1.ORDER_ID = PM.ORDER_ID
-					 AND P1.PROD_ID = PM.PROD_ID
-				) P
-				  ON WO.ORDER_ID = P.ORDER_ID
+		SELECT WORK_ORDER_LIST.*,
+		ROWNUM AS RN
+		FROM (
+		SELECT
+		WO.ORDER_ID,
+		WO.PROD_PLAN_ID,
+		WO.LINE_ID,
+		WO.EMP_ID,
+		WO.PRODUCT_LOT,
+		WO.ORDER_QTY,
+		TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+		TO_CHAR(WO.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
+		TO_CHAR(WO.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
+		WO.REMARK,
+		WO.DOC_NO,
+		WO.DOC_SEQ,
+		WO.QR_URL,
+		WO.QR_IMAGE_PATH,
+		I.ITEM_ID,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT,
+		NVL(P.PROD_STATUS,
+		'대기') AS PROD_STATUS
+		FROM WORK_ORDER WO
+		JOIN PRODUCTION_PLAN PP
+		ON
+		WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		JOIN ITEM I
+		ON PP.ITEM_ID = I.ITEM_ID
+		LEFT JOIN (
+		SELECT
+		P1.ORDER_ID,
+		P1.PROD_STATUS
+		FROM PRODUCTION P1
+		JOIN (
+		SELECT
+		ORDER_ID,
+		MAX(PROD_ID) AS PROD_ID
+		FROM PRODUCTION
+		GROUP BY ORDER_ID
+		) PM
+		ON P1.ORDER_ID = PM.ORDER_ID
+		AND P1.PROD_ID = PM.PROD_ID
+		) P
+		ON
+		WO.ORDER_ID = P.ORDER_ID
 
-				<include refid="workOrderSearchCondition" />
+		<include refid="workOrderSearchCondition" />
 
-				ORDER BY WO.ORDER_DATE DESC,
-						 WO.ORDER_ID DESC
-			) WORK_ORDER_LIST
-			WHERE ROWNUM <![CDATA[<=]]> #{endRow}
+		ORDER BY WO.ORDER_DATE DESC,
+		WO.ORDER_ID DESC
+		) WORK_ORDER_LIST
+		WHERE
+		ROWNUM <![CDATA[<=]]>
+		#{endRow}
 		)
-		WHERE RN <![CDATA[>=]]> #{startRow}
+		WHERE RN <![CDATA[>=]]>
+		#{startRow}
+
+	</select>
+
+
+	<!-- 작업지시 검색조건에 맞는 전체 인쇄용 목록을 조회한다. -->
+	<select id="selectWorkOrderPrintList"
+		parameterType="kr.or.saeroi.dto.ProductionDTO"
+		resultMap="workOrderResultMap">
+
+		SELECT
+		WO.ORDER_ID,
+		WO.PROD_PLAN_ID,
+		WO.LINE_ID,
+		WO.EMP_ID,
+		WO.PRODUCT_LOT,
+		WO.ORDER_QTY,
+		TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS
+		ORDER_DATE,
+		TO_CHAR(WO.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
+		TO_CHAR(WO.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
+		WO.REMARK,
+		WO.DOC_NO,
+		WO.DOC_SEQ,
+		WO.QR_URL,
+		WO.QR_IMAGE_PATH,
+
+		PP.DOC_NO AS
+		PROD_PLAN_DOC_NO,
+		PP.PROD_PLAN_QTY,
+		TO_CHAR(PP.PROD_PLAN_DATE,
+		'YYYY-MM-DD') AS PROD_PLAN_DATE,
+		TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS
+		DUE_DATE,
+
+		I.ITEM_ID,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT,
+
+		L.LINE_CODE,
+		L.LINE_NAME,
+
+		E.EMPNO,
+		E.ENAME,
+		E.DEPT,
+		E.JOB,
+
+		NVL(P.PROD_STATUS, '대기') AS PROD_STATUS
+
+		FROM WORK_ORDER WO
+
+		JOIN
+		PRODUCTION_PLAN PP
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+		JOIN ITEM I
+		ON
+		PP.ITEM_ID = I.ITEM_ID
+
+		LEFT JOIN LINE L
+		ON WO.LINE_ID = L.LINE_ID
+
+		LEFT
+		JOIN EMP E
+		ON WO.EMP_ID = E.EMP_ID
+
+		LEFT JOIN (
+		SELECT
+		P1.ORDER_ID,
+		P1.PROD_STATUS
+		FROM PRODUCTION P1
+		JOIN (
+		SELECT
+		ORDER_ID,
+		MAX(PROD_ID) AS
+		PROD_ID
+		FROM PRODUCTION
+		GROUP BY ORDER_ID
+		) PM
+		ON P1.ORDER_ID =
+		PM.ORDER_ID
+		AND P1.PROD_ID = PM.PROD_ID
+		) P
+		ON WO.ORDER_ID = P.ORDER_ID
+
+		<include refid="workOrderSearchCondition" />
+
+		ORDER BY WO.ORDER_DATE DESC,
+		WO.ORDER_ID DESC
 
 	</select>
 
 
 	<!-- 작업지시 검색 select box에 사용할 작업상태 목록을 조회한다. -->
-	<select id="selectWorkOrderStatusList"
-		resultType="string">
+	<select id="selectWorkOrderStatusList" resultType="string">
 
-		SELECT STATUS_NAME
+		SELECT
+		STATUS_NAME
 		FROM (
-			SELECT '대기' AS STATUS_NAME
-			FROM DUAL
+		SELECT '대기' AS STATUS_NAME
+		FROM DUAL
 
-			UNION
+		UNION
 
-			SELECT DISTINCT PROD_STATUS AS STATUS_NAME
-			FROM PRODUCTION
-			WHERE PROD_STATUS IS NOT NULL
+		SELECT
+		DISTINCT PROD_STATUS AS STATUS_NAME
+		FROM PRODUCTION
+		WHERE PROD_STATUS IS
+		NOT NULL
 		)
 		ORDER BY
-			CASE STATUS_NAME
-				WHEN '대기' THEN 1
-				WHEN '진행중' THEN 2
-				WHEN '완료' THEN 3
-				ELSE 4
-			END,
-			STATUS_NAME ASC
+		CASE STATUS_NAME
+		WHEN '대기' THEN 1
+		WHEN '진행중' THEN 2
+		WHEN '완료' THEN 3
+		ELSE 4
+		END,
+		STATUS_NAME ASC
 
 	</select>
 
 
 	<!-- 작업지시 등록 모달에서 사용할 생산계획 목록을 조회한다. -->
+	<!-- 기본은 잔여수량이 있고 생산계획일자가 오늘 이후인 계획만 보여준다. -->
+	<!-- includePastPlan = Y 이면 지난 생산계획도 포함한다. -->
 	<select id="selectWorkOrderPlanList"
+		parameterType="kr.or.saeroi.dto.ProductionDTO"
 		resultMap="workOrderResultMap">
 
 		SELECT
-			PP.PROD_PLAN_ID,
-			PP.PROD_PLAN_QTY,
-			TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS PROD_PLAN_DATE,
-			TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
-			PP.DOC_NO,
-			I.ITEM_ID,
-			I.ITEM_CODE,
-			I.ITEM_NAME,
-			I.ITEM_TYPE,
-			I.ITEM_UNIT
+		PLAN.PROD_PLAN_ID,
+		PLAN.PROD_PLAN_QTY,
+		PLAN.ORDERED_QTY,
+		PLAN.REMAIN_QTY,
+		TO_CHAR(PLAN.PROD_PLAN_DATE, 'YYYY-MM-DD') AS
+		PROD_PLAN_DATE,
+		TO_CHAR(PLAN.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
+		PLAN.DOC_NO,
+		PLAN.ITEM_ID,
+		PLAN.ITEM_CODE,
+		PLAN.ITEM_NAME,
+		PLAN.ITEM_TYPE,
+		PLAN.ITEM_UNIT
+		FROM (
+		SELECT
+		PP.PROD_PLAN_ID,
+		PP.PROD_PLAN_QTY,
+		NVL(WO_SUM.ORDERED_QTY, 0) AS ORDERED_QTY,
+		PP.PROD_PLAN_QTY - NVL(WO_SUM.ORDERED_QTY, 0) AS REMAIN_QTY,
+		PP.PROD_PLAN_DATE,
+		PP.DUE_DATE,
+		PP.DOC_NO,
+
+		I.ITEM_ID,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT
+
 		FROM PRODUCTION_PLAN PP
+
 		JOIN ITEM I
-		  ON PP.ITEM_ID = I.ITEM_ID
-		ORDER BY PP.PROD_PLAN_DATE DESC,
-				 PP.PROD_PLAN_ID DESC
+		ON PP.ITEM_ID = I.ITEM_ID
+
+		LEFT JOIN (
+		SELECT
+		PROD_PLAN_ID,
+		SUM(NVL(ORDER_QTY, 0)) AS ORDERED_QTY
+		FROM WORK_ORDER
+		GROUP BY
+		PROD_PLAN_ID
+		) WO_SUM
+		ON PP.PROD_PLAN_ID = WO_SUM.PROD_PLAN_ID
+		) PLAN
+		WHERE PLAN.REMAIN_QTY > 0
+		<if
+			test="_parameter == null or includePastPlan == null or includePastPlan != 'Y'">
+			AND TRUNC(PLAN.PROD_PLAN_DATE) <![CDATA[>=]]>
+			TRUNC(SYSDATE)
+		</if>
+		ORDER BY PLAN.PROD_PLAN_DATE DESC,
+		PLAN.PROD_PLAN_ID DESC
 
 	</select>
 
-
 	<!-- 작업지시 등록 모달에서 사용할 라인 목록을 조회한다. -->
-	<select id="selectLineList"
-		resultMap="workOrderResultMap">
+	<select id="selectLineList" resultMap="workOrderResultMap">
 
 		SELECT
-			LINE_ID,
-			LINE_CODE,
-			LINE_NAME
+		LINE_ID,
+		LINE_CODE,
+		LINE_NAME
 		FROM LINE
-		ORDER BY LINE_ID ASC
+		ORDER BY LINE_CODE ASC
 
 	</select>
 
 
 	<!-- 작업지시 등록 모달에서 사용할 담당자 목록을 조회한다. -->
-	<select id="selectWorkOrderEmpList"
-		resultMap="workOrderResultMap">
+	<select id="selectEmpList" resultMap="workOrderResultMap">
 
 		SELECT
-			EMP_ID,
-			EMPNO,
-			ENAME,
-			DEPT,
-			JOB
+		EMP_ID,
+		EMPNO,
+		ENAME,
+		DEPT,
+		JOB
 		FROM EMP
 		WHERE STATUS = '재직'
-		ORDER BY EMP_ID ASC
+		ORDER BY EMPNO ASC
 
 	</select>
 
@@ -542,53 +775,67 @@
 	<insert id="insertWorkOrder"
 		parameterType="kr.or.saeroi.dto.ProductionDTO">
 
+		<!-- 작업지시 등록 후 Service에서 생성된 orderId를 사용해야 하므로 selectKey로 ORDER_ID를 먼저 
+			생성해 DTO에 세팅한다. -->
+		<selectKey keyProperty="orderId" resultType="int"
+			order="BEFORE">
+
+			SELECT NVL(MAX(ORDER_ID), 0) + 1
+			FROM WORK_ORDER
+
+		</selectKey>
+
 		INSERT INTO WORK_ORDER (
-			ORDER_ID,
-			PROD_PLAN_ID,
-			LINE_ID,
-			EMP_ID,
-			PRODUCT_LOT,
-			ORDER_QTY,
-			ORDER_DATE,
-			CREATED_DATE,
-			UPDATED_DATE,
-			REMARK,
-			DOC_NO,
-			DOC_SEQ
+		ORDER_ID,
+		PROD_PLAN_ID,
+		LINE_ID,
+		EMP_ID,
+		PRODUCT_LOT,
+		ORDER_QTY,
+		ORDER_DATE,
+		CREATED_DATE,
+		UPDATED_DATE,
+		REMARK,
+		DOC_NO,
+		DOC_SEQ
 		)
 		WITH NEXT_INFO AS (
-			SELECT
-				NVL(MAX(DOC_SEQ), 0) + 1 AS NEXT_DOC_SEQ
-			FROM WORK_ORDER
-			WHERE TRUNC(ORDER_DATE) = TRUNC(TO_DATE(#{orderDate}, 'YYYY-MM-DD'))
+		SELECT
+		NVL(MAX(DOC_SEQ), 0) + 1 AS
+		NEXT_DOC_SEQ
+		FROM WORK_ORDER
+		WHERE TRUNC(ORDER_DATE) =
+		TRUNC(TO_DATE(#{orderDate}, 'YYYY-MM-DD'))
 		)
 		SELECT
-			(SELECT NVL(MAX(ORDER_ID), 0) + 1
-			 FROM WORK_ORDER),
+		#{orderId},
 
-			#{prodPlanId},
+		#{prodPlanId},
 
-			#{lineId},
+		#{lineId},
 
-			#{empId},
+		#{empId},
 
-			'FGLOT-' || TO_CHAR(TO_DATE(#{orderDate}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
-			LPAD(NEXT_DOC_SEQ, 4, '0'),
+		'FGLOT-' ||
+		TO_CHAR(TO_DATE(#{orderDate}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
+		LPAD(NEXT_DOC_SEQ, 4, '0'),
 
-			#{orderQty},
+		#{orderQty},
 
-			TO_DATE(#{orderDate}, 'YYYY-MM-DD'),
+		TO_DATE(#{orderDate},
+		'YYYY-MM-DD'),
 
-			SYSDATE,
+		SYSDATE,
 
-			SYSDATE,
+		SYSDATE,
 
-			#{remark},
+		#{remark},
 
-			'WO-' || TO_CHAR(TO_DATE(#{orderDate}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
-			LPAD(NEXT_DOC_SEQ, 4, '0'),
+		'WO-' ||
+		TO_CHAR(TO_DATE(#{orderDate}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
+		LPAD(NEXT_DOC_SEQ, 4, '0'),
 
-			NEXT_DOC_SEQ
+		NEXT_DOC_SEQ
 
 		FROM NEXT_INFO
 
@@ -596,79 +843,104 @@
 
 
 	<!-- 작업지시 상세 정보를 조회한다. -->
-	<select id="selectWorkOrderDetail"
-		parameterType="int"
+	<select id="selectWorkOrderDetail" parameterType="int"
 		resultMap="workOrderResultMap">
 
 		SELECT
-			WO.ORDER_ID,
-			WO.PROD_PLAN_ID,
-			WO.LINE_ID,
-			WO.EMP_ID,
-			WO.PRODUCT_LOT,
-			WO.ORDER_QTY,
-			TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
-			TO_CHAR(WO.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
-			TO_CHAR(WO.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
-			WO.REMARK,
-			WO.DOC_NO,
-			WO.DOC_SEQ,
+		WO.ORDER_ID,
+		WO.PROD_PLAN_ID,
+		WO.LINE_ID,
+		WO.EMP_ID,
+		WO.PRODUCT_LOT,
+		WO.ORDER_QTY,
+		TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS
+		ORDER_DATE,
+		TO_CHAR(WO.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
+		TO_CHAR(WO.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
+		WO.REMARK,
+		WO.DOC_NO,
+		WO.DOC_SEQ,
+		WO.QR_URL,
+		WO.QR_IMAGE_PATH,
 
-			PP.DOC_NO AS PROD_PLAN_DOC_NO,
-			PP.PROD_PLAN_QTY,
-			TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS PROD_PLAN_DATE,
-			TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
+		PP.DOC_NO AS
+		PROD_PLAN_DOC_NO,
+		PP.PROD_PLAN_QTY,
+		TO_CHAR(PP.PROD_PLAN_DATE,
+		'YYYY-MM-DD') AS PROD_PLAN_DATE,
+		TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS
+		DUE_DATE,
 
-			I.ITEM_ID,
-			I.ITEM_CODE,
-			I.ITEM_NAME,
-			I.ITEM_TYPE,
-			I.ITEM_UNIT,
+		I.ITEM_ID,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT,
 
-			L.LINE_CODE,
-			L.LINE_NAME,
+		L.LINE_CODE,
+		L.LINE_NAME,
 
-			E.EMPNO,
-			E.ENAME,
-			E.DEPT,
-			E.JOB,
+		E.EMPNO,
+		E.ENAME,
+		E.DEPT,
+		E.JOB,
 
-			NVL(P.PROD_STATUS, '대기') AS PROD_STATUS
+		NVL(P.PROD_STATUS, '대기') AS PROD_STATUS
 
 		FROM WORK_ORDER WO
 
-		JOIN PRODUCTION_PLAN PP
-		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		JOIN
+		PRODUCTION_PLAN PP
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
 
 		JOIN ITEM I
-		  ON PP.ITEM_ID = I.ITEM_ID
+		ON
+		PP.ITEM_ID = I.ITEM_ID
 
 		LEFT JOIN LINE L
-		  ON WO.LINE_ID = L.LINE_ID
+		ON WO.LINE_ID = L.LINE_ID
 
-		LEFT JOIN EMP E
-		  ON WO.EMP_ID = E.EMP_ID
+		LEFT
+		JOIN EMP E
+		ON WO.EMP_ID = E.EMP_ID
 
 		LEFT JOIN (
-			SELECT
-				P1.ORDER_ID,
-				P1.PROD_STATUS
-			FROM PRODUCTION P1
-			JOIN (
-				SELECT
-					ORDER_ID,
-					MAX(PROD_ID) AS PROD_ID
-				FROM PRODUCTION
-				GROUP BY ORDER_ID
-			) PM
-			  ON P1.ORDER_ID = PM.ORDER_ID
-			 AND P1.PROD_ID = PM.PROD_ID
+		SELECT
+		P1.ORDER_ID,
+		P1.PROD_STATUS
+		FROM PRODUCTION P1
+		JOIN (
+		SELECT
+		ORDER_ID,
+		MAX(PROD_ID) AS
+		PROD_ID
+		FROM PRODUCTION
+		GROUP BY ORDER_ID
+		) PM
+		ON P1.ORDER_ID =
+		PM.ORDER_ID
+		AND P1.PROD_ID = PM.PROD_ID
 		) P
-		  ON WO.ORDER_ID = P.ORDER_ID
+		ON WO.ORDER_ID = P.ORDER_ID
 
 		WHERE WO.ORDER_ID = #{orderId}
 
 	</select>
+
+
+	<!-- 작업지시 등록 후 생성된 QR 정보를 저장한다. -->
+	<update id="updateWorkOrderQr"
+		parameterType="kr.or.saeroi.dto.ProductionDTO">
+
+		UPDATE WORK_ORDER
+		SET
+		QR_URL = #{qrUrl},
+		QR_IMAGE_PATH =
+		#{qrImagePath},
+		UPDATED_DATE = SYSDATE
+		WHERE ORDER_ID = #{orderId}
+
+	</update>
 
 
 	<!-- 작업지시 정보를 수정한다. -->
@@ -677,14 +949,237 @@
 
 		UPDATE WORK_ORDER
 		SET
-			LINE_ID = #{lineId},
-			EMP_ID = #{empId},
-			ORDER_QTY = #{orderQty},
-			REMARK = #{remark},
-			UPDATED_DATE = SYSDATE
-		WHERE ORDER_ID = #{orderId}
+		LINE_ID = #{lineId},
+		EMP_ID =
+		#{empId},
+		ORDER_QTY = #{orderQty},
+		ORDER_DATE = TO_DATE(#{orderDate},
+		'YYYY-MM-DD'),
+		REMARK = #{remark},
+		UPDATED_DATE = SYSDATE
+		WHERE ORDER_ID
+		= #{orderId}
 
 	</update>
+
+
+	<!-- 작업지시 상세에서 BOM 기준 자재 소요량을 조회한다. -->
+	<select id="selectWorkOrderMaterialList" parameterType="int"
+		resultMap="workOrderResultMap">
+
+		SELECT
+		B.BOM_ID,
+		B.BOM_CODE,
+		B.VERSION AS BOM_VERSION,
+		B.USE_YN AS
+		BOM_USE_YN,
+
+		BD.BOM_DETAIL_ID,
+		BD.QTY AS BOM_QTY,
+		(WO.ORDER_QTY * BD.QTY)
+		AS REQUIRED_QTY,
+
+		MI.ITEM_ID AS MATERIAL_ITEM_ID,
+		MI.ITEM_CODE AS
+		MATERIAL_ITEM_CODE,
+		MI.ITEM_NAME AS MATERIAL_ITEM_NAME,
+		MI.ITEM_TYPE AS
+		MATERIAL_ITEM_TYPE,
+		MI.ITEM_UNIT AS MATERIAL_ITEM_UNIT,
+
+		INOUT.INOUT_ID,
+		INOUT.INOUT_TYPE,
+		INOUT.MATERIAL_LOT,
+		INOUT.INOUT_QTY,
+		TO_CHAR(INOUT.INOUT_DATE, 'YYYY-MM-DD') AS INOUT_DATE,
+		INOUT.STATUS AS
+		INOUT_STATUS,
+		INOUT.USE_YN,
+		INOUT.REMARK AS INOUT_REMARK,
+
+		NVL(INV.AVAILABLE_QTY, 0) AS AVAILABLE_QTY,
+
+		CASE
+		WHEN
+		NVL(INV.AVAILABLE_QTY, 0) <![CDATA[<]]>
+		(WO.ORDER_QTY * BD.QTY)
+		THEN 'Y'
+		ELSE 'N'
+		END AS SHORTAGE_YN,
+
+		ROW_NUMBER() OVER (ORDER BY BD.BOM_DETAIL_ID) AS ROW_NO
+
+		FROM WORK_ORDER
+		WO
+
+		JOIN PRODUCTION_PLAN PP
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+		JOIN BOM
+		B
+		ON PP.ITEM_ID = B.ITEM_ID
+		AND NVL(B.USE_YN, 'Y') = 'Y'
+
+		JOIN BOM_DETAIL
+		BD
+		ON B.BOM_ID = BD.BOM_ID
+
+		JOIN ITEM MI
+		ON BD.ITEM_ID = MI.ITEM_ID
+
+		LEFT
+		JOIN (
+		SELECT
+		ITEM_ID,
+		SUM(NVL(INVENTORY_STOCK, 0)) AS AVAILABLE_QTY
+		FROM
+		INVENTORY
+		WHERE STOCK_LOCATION NOT LIKE 'WH-HOLD%'
+		AND STOCK_LOCATION
+		NOT LIKE 'WH-DIS%'
+		GROUP BY ITEM_ID
+		) INV
+		ON MI.ITEM_ID = INV.ITEM_ID
+
+		LEFT JOIN MATERIAL_INOUT INOUT
+		ON INOUT.ORDER_ID = WO.ORDER_ID
+		AND
+		INOUT.ITEM_ID = MI.ITEM_ID
+		AND INOUT.INOUT_TYPE = 'MO-PROD'
+
+		WHERE
+		WO.ORDER_ID = #{orderId}
+
+		ORDER BY BD.BOM_DETAIL_ID ASC
+
+	</select>
+
+
+	<!-- 작업지시 등록 시 BOM 기준으로 자동 투입할 자재 목록을 조회한다. -->
+	<select id="selectBomMaterialForWorkOrder"
+		parameterType="kr.or.saeroi.dto.ProductionDTO"
+		resultMap="workOrderResultMap">
+
+		SELECT
+		B.BOM_ID,
+		B.BOM_CODE,
+		B.VERSION AS BOM_VERSION,
+
+		BD.BOM_DETAIL_ID,
+		BD.QTY AS BOM_QTY,
+		(#{orderQty} * BD.QTY) AS REQUIRED_QTY,
+
+		MI.ITEM_ID AS
+		MATERIAL_ITEM_ID,
+		MI.ITEM_CODE AS MATERIAL_ITEM_CODE,
+		MI.ITEM_NAME AS
+		MATERIAL_ITEM_NAME,
+		MI.ITEM_TYPE AS MATERIAL_ITEM_TYPE,
+		MI.ITEM_UNIT AS
+		MATERIAL_ITEM_UNIT,
+
+		NVL(INV.AVAILABLE_QTY, 0) AS AVAILABLE_QTY,
+
+		CASE
+		WHEN NVL(INV.AVAILABLE_QTY, 0) <![CDATA[<]]>
+		(#{orderQty} * BD.QTY)
+		THEN 'Y'
+		ELSE 'N'
+		END AS SHORTAGE_YN
+
+		FROM
+		PRODUCTION_PLAN PP
+
+		JOIN BOM B
+		ON PP.ITEM_ID = B.ITEM_ID
+		AND NVL(B.USE_YN,
+		'Y') = 'Y'
+
+		JOIN BOM_DETAIL BD
+		ON B.BOM_ID = BD.BOM_ID
+
+		JOIN ITEM MI
+		ON
+		BD.ITEM_ID = MI.ITEM_ID
+
+		LEFT JOIN (
+		SELECT
+		ITEM_ID,
+		SUM(NVL(INVENTORY_STOCK, 0)) AS AVAILABLE_QTY
+		FROM INVENTORY
+		WHERE
+		STOCK_LOCATION NOT LIKE 'WH-HOLD%'
+		AND STOCK_LOCATION NOT LIKE
+		'WH-DIS%'
+		GROUP BY ITEM_ID
+		) INV
+		ON MI.ITEM_ID = INV.ITEM_ID
+
+		WHERE
+		PP.PROD_PLAN_ID = #{prodPlanId}
+
+		ORDER BY BD.BOM_DETAIL_ID ASC
+
+	</select>
+
+
+	<!-- 작업지시 등록 시 BOM 기준 자재 투입 이력을 자동 생성한다. -->
+	<insert id="insertMaterialOutByWorkOrder"
+		parameterType="kr.or.saeroi.dto.ProductionDTO">
+
+		INSERT INTO MATERIAL_INOUT (
+		INOUT_ID,
+		EMP_ID,
+		INOUT_TYPE,
+		MATERIAL_LOT,
+		INOUT_QTY,
+		INOUT_DATE,
+		REMARK,
+		CREATED_DATE,
+		UPDATED_DATE,
+		USE_YN,
+		STATUS,
+		ORDER_ID,
+		ITEM_ID
+		)
+		SELECT
+		(SELECT NVL(MAX(INOUT_ID), 0) + 1
+		FROM MATERIAL_INOUT),
+
+		#{empId},
+
+		'MO-PROD',
+
+		(
+		SELECT MIN(MI.MATERIAL_LOT)
+		FROM MATERIAL_INOUT MI
+		WHERE MI.ITEM_ID = #{materialItemId}
+		AND
+		MI.INOUT_TYPE = 'MI'
+		AND MI.MATERIAL_LOT IS NOT NULL
+		),
+
+		#{requiredQty},
+
+		TO_DATE(#{orderDate}, 'YYYY-MM-DD'),
+
+		'작업지시 자동투입',
+
+		SYSDATE,
+
+		SYSDATE,
+
+		'Y',
+
+		'완료',
+
+		#{orderId},
+
+		#{materialItemId}
+
+		FROM DUAL
+
+	</insert>
 
 
 	<!-- 생산실적 조회 결과를 ProductionDTO에 매핑한다. -->
@@ -696,6 +1191,7 @@
 		<result property="empId" column="EMP_ID" />
 		<result property="orderId" column="ORDER_ID" />
 		<result property="prodDate" column="PROD_DATE" />
+		<result property="orderQty" column="ORDER_QTY" />
 		<result property="prodQty" column="PROD_QTY" />
 		<result property="lossQty" column="LOSS_QTY" />
 		<result property="prodStatus" column="PROD_STATUS" />
@@ -705,13 +1201,22 @@
 		<result property="docNo" column="DOC_NO" />
 		<result property="docSeq" column="DOC_SEQ" />
 
-		<!-- production_plan 테이블 조인 컬럼이다. -->
+		<!-- 수량 검증 컬럼이다. -->
+		<result property="goodQty" column="GOOD_QTY" />
+		<result property="defectQty" column="DEFECT_QTY" />
+		<result property="qtyCheckYn" column="QTY_CHECK_YN" />
+		<result property="qtyDiff" column="QTY_DIFF" />
+
+		<!-- production_plan 테이블 컬럼이다. -->
+		<result property="prodPlanId" column="PROD_PLAN_ID" />
+		<result property="prodPlanQty" column="PROD_PLAN_QTY" />
+		<result property="prodPlanDate" column="PROD_PLAN_DATE" />
+		<result property="dueDate" column="DUE_DATE" />
 		<result property="prodPlanDocNo" column="PROD_PLAN_DOC_NO" />
 
-		<!-- work_order 테이블 조인 컬럼이다. -->
-		<result property="workOrderDocNo" column="WORK_ORDER_DOC_NO" />
+		<!-- work_order 테이블 컬럼이다. -->
 		<result property="productLot" column="PRODUCT_LOT" />
-		<result property="orderQty" column="ORDER_QTY" />
+		<result property="workOrderDocNo" column="WORK_ORDER_DOC_NO" />
 		<result property="orderDate" column="ORDER_DATE" />
 
 		<!-- item 테이블 조인 컬럼이다. -->
@@ -737,12 +1242,14 @@
 
 			<!-- 시작일 검색 조건이다. -->
 			<if test="startDate != null and startDate != ''">
-				AND P.PROD_DATE <![CDATA[>=]]> TO_DATE(#{startDate}, 'YYYY-MM-DD')
+				AND P.PROD_DATE <![CDATA[>=]]>
+				TO_DATE(#{startDate}, 'YYYY-MM-DD')
 			</if>
 
 			<!-- 종료일 검색 조건이다. 종료일 당일까지 포함한다. -->
 			<if test="endDate != null and endDate != ''">
-				AND P.PROD_DATE <![CDATA[<]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+				AND P.PROD_DATE <![CDATA[<]]>
+				TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
 			</if>
 
 			<!-- 생산상태 검색 조건이다. -->
@@ -753,14 +1260,23 @@
 			<!-- 검색어 조건이다. -->
 			<if test="keyword != null and keyword != ''">
 				AND (
-					P.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
-					OR WO.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
-					OR WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
-					OR I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
-					OR I.ITEM_CODE LIKE '%' || TRIM(#{keyword}) || '%'
-					OR TO_CHAR(P.PROD_QTY, 'FM9999999999999990') LIKE '%' || REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
-					OR TO_CHAR(P.PROD_DATE, 'YYYY-MM-DD') LIKE '%' || TRIM(#{keyword}) || '%'
-					OR P.PROD_STATUS LIKE '%' || TRIM(#{keyword}) || '%'
+				P.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+				OR
+				WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
+				OR I.ITEM_NAME
+				LIKE '%' || TRIM(#{keyword}) || '%'
+				OR I.ITEM_CODE LIKE '%' ||
+				TRIM(#{keyword}) || '%'
+				OR TO_CHAR(P.PROD_QTY, 'FM9999999999999990')
+				LIKE '%' ||
+				REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') ||
+				'%'
+				OR TO_CHAR(P.LOSS_QTY, 'FM9999999999999990') LIKE '%' ||
+				REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
+				OR
+				TO_CHAR(P.PROD_DATE, 'YYYY-MM-DD') LIKE '%' || TRIM(#{keyword})
+				||
+				'%'
 				)
 			</if>
 
@@ -771,23 +1287,20 @@
 
 	<!-- 생산실적 목록 총 건수를 조회한다. -->
 	<select id="selectProductionResultCount"
-		parameterType="kr.or.saeroi.dto.ProductionDTO"
-		resultType="int">
+		parameterType="kr.or.saeroi.dto.ProductionDTO" resultType="int">
 
 		SELECT COUNT(*)
 		FROM PRODUCTION P
 
 		JOIN WORK_ORDER WO
-		  ON P.ORDER_ID = WO.ORDER_ID
+		ON P.ORDER_ID =
+		WO.ORDER_ID
 
 		JOIN PRODUCTION_PLAN PP
-		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
 
 		JOIN ITEM I
-		  ON PP.ITEM_ID = I.ITEM_ID
-
-		LEFT JOIN EMP E
-		  ON P.EMP_ID = E.EMP_ID
+		ON PP.ITEM_ID = I.ITEM_ID
 
 		<include refid="productionResultSearchCondition" />
 
@@ -801,63 +1314,72 @@
 
 		SELECT *
 		FROM (
-			SELECT PRODUCTION_RESULT_LIST.*,
-				   ROWNUM AS RN
-			FROM (
-				SELECT
-					P.PROD_ID,
-					P.EMP_ID,
-					P.ORDER_ID,
-					TO_CHAR(P.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
-					P.PROD_QTY,
-					P.LOSS_QTY,
-					P.PROD_STATUS,
-					TO_CHAR(P.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
-					TO_CHAR(P.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
-					P.REMARK,
-					P.DOC_NO,
-					P.DOC_SEQ,
+		SELECT RESULT_LIST.*,
+		ROWNUM AS RN
+		FROM (
+		SELECT
+		P.PROD_ID,
+		P.EMP_ID,
+		P.ORDER_ID,
+		TO_CHAR(P.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
+		WO.ORDER_QTY,
+		P.PROD_QTY,
+		P.LOSS_QTY,
+		P.PROD_STATUS,
+		TO_CHAR(P.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
+		TO_CHAR(P.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
+		P.REMARK,
+		P.DOC_NO,
+		P.DOC_SEQ,
 
-					PP.DOC_NO AS PROD_PLAN_DOC_NO,
+		PP.PROD_PLAN_ID,
+		PP.DOC_NO AS PROD_PLAN_DOC_NO,
+		PP.PROD_PLAN_QTY,
+		TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS
+		PROD_PLAN_DATE,
+		TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
 
-					WO.DOC_NO AS WORK_ORDER_DOC_NO,
-					WO.PRODUCT_LOT,
-					WO.ORDER_QTY,
-					TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+		WO.PRODUCT_LOT,
+		WO.DOC_NO AS WORK_ORDER_DOC_NO,
+		TO_CHAR(WO.ORDER_DATE,
+		'YYYY-MM-DD') AS ORDER_DATE,
 
-					I.ITEM_ID,
-					I.ITEM_CODE,
-					I.ITEM_NAME,
-					I.ITEM_TYPE,
-					I.ITEM_UNIT,
+		I.ITEM_ID,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT,
 
-					E.EMPNO,
-					E.ENAME,
-					E.DEPT,
-					E.JOB
+		E.EMPNO,
+		E.ENAME,
+		E.DEPT,
+		E.JOB
 
-				FROM PRODUCTION P
+		FROM PRODUCTION P
 
-				JOIN WORK_ORDER WO
-				  ON P.ORDER_ID = WO.ORDER_ID
+		JOIN WORK_ORDER WO
+		ON P.ORDER_ID = WO.ORDER_ID
 
-				JOIN PRODUCTION_PLAN PP
-				  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		JOIN PRODUCTION_PLAN PP
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
 
-				JOIN ITEM I
-				  ON PP.ITEM_ID = I.ITEM_ID
+		JOIN ITEM I
+		ON PP.ITEM_ID =
+		I.ITEM_ID
 
-				LEFT JOIN EMP E
-				  ON P.EMP_ID = E.EMP_ID
+		LEFT JOIN EMP E
+		ON P.EMP_ID = E.EMP_ID
 
-				<include refid="productionResultSearchCondition" />
+		<include refid="productionResultSearchCondition" />
 
-				ORDER BY P.PROD_DATE DESC,
-						 P.PROD_ID DESC
-			) PRODUCTION_RESULT_LIST
-			WHERE ROWNUM <![CDATA[<=]]> #{endRow}
+		ORDER BY P.PROD_DATE DESC,
+		P.PROD_ID DESC
+		) RESULT_LIST
+		WHERE ROWNUM <![CDATA[<=]]>
+		#{endRow}
 		)
-		WHERE RN <![CDATA[>=]]> #{startRow}
+		WHERE RN <![CDATA[>=]]>
+		#{startRow}
 
 	</select>
 
@@ -866,35 +1388,12 @@
 	<select id="selectProductionResultStatusList"
 		resultType="string">
 
-		SELECT STATUS_NAME
-		FROM (
-			SELECT '진행중' AS STATUS_NAME
-			FROM DUAL
-
-			UNION
-
-			SELECT '완료' AS STATUS_NAME
-			FROM DUAL
-
-			UNION
-
-			SELECT '보류' AS STATUS_NAME
-			FROM DUAL
-
-			UNION
-
-			SELECT DISTINCT PROD_STATUS AS STATUS_NAME
-			FROM PRODUCTION
-			WHERE PROD_STATUS IS NOT NULL
-		)
-		ORDER BY
-			CASE STATUS_NAME
-				WHEN '진행중' THEN 1
-				WHEN '완료' THEN 2
-				WHEN '보류' THEN 3
-				ELSE 4
-			END,
-			STATUS_NAME ASC
+		SELECT DISTINCT
+		PROD_STATUS
+		FROM PRODUCTION
+		WHERE PROD_STATUS
+		IS NOT NULL
+		ORDER BY PROD_STATUS ASC
 
 	</select>
 
@@ -904,29 +1403,68 @@
 		resultMap="productionResultResultMap">
 
 		SELECT
-			WO.ORDER_ID,
-			PP.DOC_NO AS PROD_PLAN_DOC_NO,
-			WO.DOC_NO AS WORK_ORDER_DOC_NO,
-			WO.PRODUCT_LOT,
-			WO.ORDER_QTY,
-			TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+		WO.ORDER_ID,
+		WO.EMP_ID,
+		PP.DOC_NO AS PROD_PLAN_DOC_NO,
+		PP.PROD_PLAN_QTY,
+		WO.DOC_NO AS WORK_ORDER_DOC_NO,
+		WO.PRODUCT_LOT,
+		WO.ORDER_QTY,
+		TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
 
-			I.ITEM_ID,
-			I.ITEM_CODE,
-			I.ITEM_NAME,
-			I.ITEM_TYPE,
-			I.ITEM_UNIT
+		I.ITEM_ID,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT
 
 		FROM WORK_ORDER WO
 
 		JOIN PRODUCTION_PLAN PP
-		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
 
 		JOIN ITEM I
-		  ON PP.ITEM_ID = I.ITEM_ID
+		ON PP.ITEM_ID = I.ITEM_ID
 
 		ORDER BY WO.ORDER_DATE DESC,
-				 WO.ORDER_ID DESC
+		WO.ORDER_ID DESC
+
+	</select>
+
+
+	<!-- QR 스캔 진입 시 자동입력할 작업지시 정보를 조회한다. -->
+	<select id="selectProductionResultOrderByQr"
+		parameterType="kr.or.saeroi.dto.ProductionDTO"
+		resultMap="productionResultResultMap">
+
+		SELECT
+		WO.ORDER_ID,
+		WO.EMP_ID,
+		PP.DOC_NO AS PROD_PLAN_DOC_NO,
+		PP.PROD_PLAN_QTY,
+		WO.DOC_NO AS WORK_ORDER_DOC_NO,
+		WO.PRODUCT_LOT,
+		WO.ORDER_QTY,
+		TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+
+		I.ITEM_ID,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT
+
+		FROM WORK_ORDER WO
+
+		JOIN PRODUCTION_PLAN PP
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+		JOIN ITEM I
+		ON PP.ITEM_ID = I.ITEM_ID
+
+		WHERE WO.ORDER_ID = #{orderId}
+		<if test="productLot != null and productLot != ''">
+			AND WO.PRODUCT_LOT = #{productLot}
+		</if>
 
 	</select>
 
@@ -936,109 +1474,174 @@
 		parameterType="kr.or.saeroi.dto.ProductionDTO">
 
 		INSERT INTO PRODUCTION (
-			PROD_ID,
-			EMP_ID,
-			ORDER_ID,
-			PROD_DATE,
-			PROD_QTY,
-			LOSS_QTY,
-			PROD_STATUS,
-			CREATED_DATE,
-			UPDATED_DATE,
-			REMARK,
-			DOC_NO,
-			DOC_SEQ
+		PROD_ID,
+		EMP_ID,
+		ORDER_ID,
+		PROD_DATE,
+		ORDER_QTY,
+		PROD_QTY,
+		LOSS_QTY,
+		PROD_STATUS,
+		CREATED_DATE,
+		UPDATED_DATE,
+		REMARK,
+		DOC_NO,
+		DOC_SEQ
 		)
 		WITH NEXT_INFO AS (
-			SELECT
-				NVL(MAX(DOC_SEQ), 0) + 1 AS NEXT_DOC_SEQ
-			FROM PRODUCTION
-			WHERE TRUNC(PROD_DATE) = TRUNC(TO_DATE(#{prodDate}, 'YYYY-MM-DD'))
+		SELECT
+		NVL(MAX(PROD_ID), 0) + 1 AS NEXT_PROD_ID,
+		(
+		SELECT NVL(MAX(DOC_SEQ), 0)
+		+ 1
+		FROM PRODUCTION
+		WHERE TRUNC(PROD_DATE) = TRUNC(TO_DATE(#{prodDate},
+		'YYYY-MM-DD'))
+		) AS NEXT_DOC_SEQ
+		FROM PRODUCTION
 		)
 		SELECT
-			(SELECT NVL(MAX(PROD_ID), 0) + 1
-			 FROM PRODUCTION),
+		NEXT_PROD_ID,
 
-			#{empId},
+		#{empId},
 
-			#{orderId},
+		#{orderId},
 
-			TO_DATE(#{prodDate}, 'YYYY-MM-DD'),
+		TO_DATE(#{prodDate}, 'YYYY-MM-DD'),
 
-			#{prodQty},
+		#{orderQty},
 
-			NVL(#{lossQty}, 0),
+		#{prodQty},
 
-			#{prodStatus},
+		NVL(#{lossQty}, 0),
 
-			SYSDATE,
+		#{prodStatus},
 
-			SYSDATE,
+		SYSDATE,
 
-			#{remark},
+		SYSDATE,
 
-			'PRD-' || TO_CHAR(TO_DATE(#{prodDate}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
-			LPAD(NEXT_DOC_SEQ, 4, '0'),
+		#{remark},
 
-			NEXT_DOC_SEQ
+		'PR-' || TO_CHAR(TO_DATE(#{prodDate}, 'YYYY-MM-DD'),
+		'YYYYMMDD') || '-' ||
+		LPAD(NEXT_DOC_SEQ, 4, '0'),
 
-		FROM NEXT_INFO
+		NEXT_DOC_SEQ
+
+		FROM
+		NEXT_INFO
 
 	</insert>
 
 
 	<!-- 생산실적 상세 정보를 조회한다. -->
-	<select id="selectProductionResultDetail"
-		parameterType="int"
+	<select id="selectProductionResultDetail" parameterType="int"
 		resultMap="productionResultResultMap">
 
 		SELECT
-			P.PROD_ID,
-			P.EMP_ID,
-			P.ORDER_ID,
-			TO_CHAR(P.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
-			P.PROD_QTY,
-			P.LOSS_QTY,
-			P.PROD_STATUS,
-			TO_CHAR(P.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
-			TO_CHAR(P.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
-			P.REMARK,
-			P.DOC_NO,
-			P.DOC_SEQ,
+		P.PROD_ID,
+		P.EMP_ID,
+		P.ORDER_ID,
+		TO_CHAR(P.PROD_DATE,
+		'YYYY-MM-DD') AS PROD_DATE,
+		P.ORDER_QTY,
+		P.PROD_QTY,
+		P.LOSS_QTY,
+		P.PROD_STATUS,
+		TO_CHAR(P.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE,
+		TO_CHAR(P.UPDATED_DATE, 'YYYY-MM-DD') AS UPDATED_DATE,
+		P.REMARK,
+		P.DOC_NO,
+		P.DOC_SEQ,
 
-			PP.DOC_NO AS PROD_PLAN_DOC_NO,
+		NVL(INSP.GOOD_QTY, 0) AS GOOD_QTY,
+		NVL(DEFECT_SUM.DEFECT_QTY, 0) AS DEFECT_QTY,
 
-			WO.DOC_NO AS WORK_ORDER_DOC_NO,
-			WO.PRODUCT_LOT,
-			WO.ORDER_QTY,
-			TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+		CASE
+		WHEN NVL(P.PROD_QTY,
+		0) =
+		NVL(INSP.GOOD_QTY, 0)
+		+ NVL(DEFECT_SUM.DEFECT_QTY, 0)
+		+
+		NVL(P.LOSS_QTY, 0)
+		THEN 'Y'
+		ELSE 'N'
+		END AS QTY_CHECK_YN,
 
-			I.ITEM_ID,
-			I.ITEM_CODE,
-			I.ITEM_NAME,
-			I.ITEM_TYPE,
-			I.ITEM_UNIT,
+		NVL(P.PROD_QTY,
+		0) - (
+		NVL(INSP.GOOD_QTY, 0)
+		+ NVL(DEFECT_SUM.DEFECT_QTY, 0)
+		+
+		NVL(P.LOSS_QTY, 0)
+		) AS QTY_DIFF,
 
-			E.EMPNO,
-			E.ENAME,
-			E.DEPT,
-			E.JOB
+		PP.PROD_PLAN_ID,
+		PP.DOC_NO AS
+		PROD_PLAN_DOC_NO,
+		PP.PROD_PLAN_QTY,
+		TO_CHAR(PP.PROD_PLAN_DATE,
+		'YYYY-MM-DD') AS PROD_PLAN_DATE,
+		TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS
+		DUE_DATE,
+
+		WO.PRODUCT_LOT,
+		WO.DOC_NO AS WORK_ORDER_DOC_NO,
+		TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+
+		I.ITEM_ID,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT,
+
+		E.EMPNO,
+		E.ENAME,
+		E.DEPT,
+		E.JOB
 
 		FROM PRODUCTION P
 
 		JOIN WORK_ORDER WO
-		  ON P.ORDER_ID = WO.ORDER_ID
+		ON P.ORDER_ID =
+		WO.ORDER_ID
 
 		JOIN PRODUCTION_PLAN PP
-		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
 
 		JOIN ITEM I
-		  ON PP.ITEM_ID = I.ITEM_ID
+		ON PP.ITEM_ID = I.ITEM_ID
 
 		LEFT JOIN EMP E
-		  ON P.EMP_ID = E.EMP_ID
+		ON P.EMP_ID =
+		E.EMP_ID
 
-		WHERE P.PROD_ID = #{prodId}
+		LEFT JOIN (
+		SELECT
+		PROD_ID,
+		SUM(NVL(GOOD_QTY, 0)) AS GOOD_QTY
+		FROM INSPECTION
+		GROUP BY PROD_ID
+		) INSP
+		ON P.PROD_ID = INSP.PROD_ID
+
+		LEFT
+		JOIN (
+		SELECT
+		I2.PROD_ID,
+		SUM(NVL(DL.DEFECT_QTY, 0)) AS DEFECT_QTY
+		FROM
+		INSPECTION I2
+		JOIN DEFECT_LIST DL
+		ON I2.INSP_ID = DL.INSP_ID
+		GROUP BY
+		I2.PROD_ID
+		) DEFECT_SUM
+		ON P.PROD_ID = DEFECT_SUM.PROD_ID
+
+		WHERE P.PROD_ID
+		= #{prodId}
 
 	</select>
 
@@ -1049,56 +1652,60 @@
 
 		UPDATE PRODUCTION
 		SET
-			EMP_ID = #{empId},
-			PROD_QTY = #{prodQty},
-			LOSS_QTY = NVL(#{lossQty}, 0),
-			PROD_STATUS = #{prodStatus},
-			REMARK = #{remark},
-			UPDATED_DATE = SYSDATE
+		EMP_ID = #{empId},
+		PROD_QTY =
+		#{prodQty},
+		LOSS_QTY = NVL(#{lossQty}, 0),
+		PROD_STATUS = #{prodStatus},
+		REMARK = #{remark},
+		UPDATED_DATE = SYSDATE
 		WHERE PROD_ID = #{prodId}
 
 	</update>
+
 
 	<!-- 공정진행 현황 조회 결과를 ProductionDTO에 매핑한다. -->
 	<resultMap id="processProgressResultMap"
 		type="kr.or.saeroi.dto.ProductionDTO">
 
-		<!-- work_order 테이블 컬럼이다. -->
 		<result property="orderId" column="ORDER_ID" />
-		<result property="docNo" column="DOC_NO" />
+		<result property="prodPlanId" column="PROD_PLAN_ID" />
 		<result property="productLot" column="PRODUCT_LOT" />
 		<result property="orderQty" column="ORDER_QTY" />
 		<result property="orderDate" column="ORDER_DATE" />
+		<result property="workOrderDocNo" column="WORK_ORDER_DOC_NO" />
 
-		<!-- item 테이블 조인 컬럼이다. -->
+		<result property="prodPlanQty" column="PROD_PLAN_QTY" />
+		<result property="prodPlanDate" column="PROD_PLAN_DATE" />
+		<result property="dueDate" column="DUE_DATE" />
+		<result property="prodPlanDocNo" column="PROD_PLAN_DOC_NO" />
+
 		<result property="itemId" column="ITEM_ID" />
 		<result property="itemCode" column="ITEM_CODE" />
 		<result property="itemName" column="ITEM_NAME" />
 		<result property="itemType" column="ITEM_TYPE" />
 		<result property="itemUnit" column="ITEM_UNIT" />
 
-		<!-- line 테이블 조인 컬럼이다. -->
 		<result property="lineId" column="LINE_ID" />
 		<result property="lineCode" column="LINE_CODE" />
 		<result property="lineName" column="LINE_NAME" />
 
-		<!-- 공정진행 계산 컬럼이다. -->
+		<result property="empId" column="EMP_ID" />
+		<result property="empno" column="EMPNO" />
+		<result property="ename" column="ENAME" />
+		<result property="dept" column="DEPT" />
+		<result property="job" column="JOB" />
+
+		<result property="prodId" column="PROD_ID" />
+		<result property="prodDate" column="PROD_DATE" />
+		<result property="prodQty" column="PROD_QTY" />
+		<result property="lossQty" column="LOSS_QTY" />
+		<result property="prodStatus" column="PROD_STATUS" />
+
 		<result property="totalProdQty" column="TOTAL_PROD_QTY" />
 		<result property="totalLossQty" column="TOTAL_LOSS_QTY" />
 		<result property="progressRate" column="PROGRESS_RATE" />
 		<result property="progressStatus" column="PROGRESS_STATUS" />
-		
-		<!-- 최신 생산실적 수정용 컬럼이다. -->
-		<result property="prodId" column="PROD_ID" />
-		<result property="empId" column="EMP_ID" />
-		<result property="prodDate" column="PROD_DATE" />
-		<result property="prodQty" column="PROD_QTY" />
-		<result property="lossQty" column="LOSS_QTY" />
-		<result property="remark" column="REMARK" />
-
-		<!-- 담당자 표시용 컬럼이다. -->
-		<result property="ename" column="ENAME" />
-		<result property="dept" column="DEPT" />
 
 	</resultMap>
 
@@ -1108,32 +1715,33 @@
 
 		<where>
 
-			<!-- 시작일 검색 조건이다. 작업지시일 기준이다. -->
 			<if test="startDate != null and startDate != ''">
-				AND WO.ORDER_DATE <![CDATA[>=]]> TO_DATE(#{startDate}, 'YYYY-MM-DD')
+				AND WO.ORDER_DATE <![CDATA[>=]]>
+				TO_DATE(#{startDate}, 'YYYY-MM-DD')
 			</if>
 
-			<!-- 종료일 검색 조건이다. 종료일 당일까지 포함한다. -->
 			<if test="endDate != null and endDate != ''">
-				AND WO.ORDER_DATE <![CDATA[<]]> TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+				AND WO.ORDER_DATE <![CDATA[<]]>
+				TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
 			</if>
 
-			<!-- 진행상태 검색 조건이다. -->
-			<if test="progressStatus != null and progressStatus != ''">
-				AND NVL(LPS.PROD_STATUS, '대기') = #{progressStatus}
+			<if test="prodStatus != null and prodStatus != ''">
+				AND NVL(PG.PROGRESS_STATUS, '대기') = #{prodStatus}
 			</if>
 
-			<!-- 검색어 조건이다. -->
 			<if test="keyword != null and keyword != ''">
 				AND (
-					WO.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
-					OR WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
-					OR I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
-					OR I.ITEM_CODE LIKE '%' || TRIM(#{keyword}) || '%'
-					OR L.LINE_NAME LIKE '%' || TRIM(#{keyword}) || '%'
-					OR TO_CHAR(WO.ORDER_QTY, 'FM9999999999999990') LIKE '%' || REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
-					OR TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') LIKE '%' || TRIM(#{keyword}) || '%'
-					OR NVL(LPS.PROD_STATUS, '대기') LIKE '%' || TRIM(#{keyword}) || '%'
+				WO.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+				OR
+				WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
+				OR I.ITEM_NAME
+				LIKE '%' || TRIM(#{keyword}) || '%'
+				OR I.ITEM_CODE LIKE '%' ||
+				TRIM(#{keyword}) || '%'
+				OR L.LINE_NAME LIKE '%' || TRIM(#{keyword})
+				|| '%'
+				OR TO_CHAR(WO.ORDER_QTY, 'FM9999999999999990') LIKE '%' ||
+				REPLACE(REPLACE(TRIM(#{keyword}), ',', ''), ' ', '') || '%'
 				)
 			</if>
 
@@ -1144,37 +1752,33 @@
 
 	<!-- 공정진행 현황 목록 총 건수를 조회한다. -->
 	<select id="selectProcessProgressCount"
-		parameterType="kr.or.saeroi.dto.ProductionDTO"
-		resultType="int">
+		parameterType="kr.or.saeroi.dto.ProductionDTO" resultType="int">
 
 		SELECT COUNT(*)
+
 		FROM WORK_ORDER WO
 
 		JOIN PRODUCTION_PLAN PP
-		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		ON
+		WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
 
 		JOIN ITEM I
-		  ON PP.ITEM_ID = I.ITEM_ID
+		ON PP.ITEM_ID = I.ITEM_ID
 
 		LEFT JOIN LINE L
-		  ON WO.LINE_ID = L.LINE_ID
+		ON WO.LINE_ID = L.LINE_ID
 
 		LEFT JOIN (
-			SELECT
-				P1.ORDER_ID,
-				P1.PROD_STATUS
-			FROM PRODUCTION P1
-			JOIN (
-				SELECT
-					ORDER_ID,
-					MAX(PROD_ID) AS PROD_ID
-				FROM PRODUCTION
-				GROUP BY ORDER_ID
-			) PM
-			  ON P1.ORDER_ID = PM.ORDER_ID
-			 AND P1.PROD_ID = PM.PROD_ID
-		) LPS
-		  ON WO.ORDER_ID = LPS.ORDER_ID
+		SELECT
+		ORDER_ID,
+		SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
+		SUM(NVL(LOSS_QTY, 0)) AS
+		TOTAL_LOSS_QTY,
+		MAX(PROD_STATUS) AS PROGRESS_STATUS
+		FROM PRODUCTION
+		GROUP BY ORDER_ID
+		) PG
+		ON WO.ORDER_ID = PG.ORDER_ID
 
 		<include refid="processProgressSearchCondition" />
 
@@ -1188,226 +1792,325 @@
 
 		SELECT *
 		FROM (
-			SELECT PROCESS_PROGRESS_LIST.*,
-				   ROWNUM AS RN
-			FROM (
-				SELECT
-					WO.ORDER_ID,
-					WO.DOC_NO,
-					WO.PRODUCT_LOT,
-					WO.ORDER_QTY,
-					TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
-
-					I.ITEM_ID,
-					I.ITEM_CODE,
-					I.ITEM_NAME,
-					I.ITEM_TYPE,
-					I.ITEM_UNIT,
-
-					L.LINE_ID,
-					L.LINE_CODE,
-					L.LINE_NAME,
-
-					NVL(PA.TOTAL_PROD_QTY, 0) AS TOTAL_PROD_QTY,
-					NVL(PA.TOTAL_LOSS_QTY, 0) AS TOTAL_LOSS_QTY,
-
-					CASE
-						WHEN NVL(WO.ORDER_QTY, 0) = 0 THEN 0
-						ELSE LEAST(
-							100,
-							ROUND((NVL(PA.TOTAL_PROD_QTY, 0) / WO.ORDER_QTY) * 100)
-						)
-					END AS PROGRESS_RATE,
-
-					NVL(LPS.PROD_STATUS, '대기') AS PROGRESS_STATUS
-
-				FROM WORK_ORDER WO
-
-				JOIN PRODUCTION_PLAN PP
-				  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
-
-				JOIN ITEM I
-				  ON PP.ITEM_ID = I.ITEM_ID
-
-				LEFT JOIN LINE L
-				  ON WO.LINE_ID = L.LINE_ID
-
-				LEFT JOIN (
-					SELECT
-						ORDER_ID,
-						SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
-						SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
-					FROM PRODUCTION
-					GROUP BY ORDER_ID
-				) PA
-				  ON WO.ORDER_ID = PA.ORDER_ID
-
-				LEFT JOIN (
-					SELECT
-						P1.ORDER_ID,
-						P1.PROD_STATUS
-					FROM PRODUCTION P1
-					JOIN (
-						SELECT
-							ORDER_ID,
-							MAX(PROD_ID) AS PROD_ID
-						FROM PRODUCTION
-						GROUP BY ORDER_ID
-					) PM
-					  ON P1.ORDER_ID = PM.ORDER_ID
-					 AND P1.PROD_ID = PM.PROD_ID
-				) LPS
-				  ON WO.ORDER_ID = LPS.ORDER_ID
-
-				<include refid="processProgressSearchCondition" />
-
-				ORDER BY WO.ORDER_DATE DESC,
-						 WO.ORDER_ID DESC
-			) PROCESS_PROGRESS_LIST
-			WHERE ROWNUM <![CDATA[<=]]> #{endRow}
-		)
-		WHERE RN <![CDATA[>=]]> #{startRow}
-
-	</select>
-
-
-	<!-- 공정진행 현황 검색 select box에 사용할 진행상태 목록을 조회한다. -->
-	<select id="selectProcessProgressStatusList"
-		resultType="string">
-
-		SELECT STATUS_NAME
+		SELECT PROGRESS_LIST.*,
+		ROWNUM AS RN
 		FROM (
-			SELECT '대기' AS STATUS_NAME
-			FROM DUAL
+		SELECT
+		WO.ORDER_ID,
+		WO.PROD_PLAN_ID,
+		WO.PRODUCT_LOT,
+		WO.ORDER_QTY,
+		TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+		WO.DOC_NO AS
+		WORK_ORDER_DOC_NO,
 
-			UNION
+		PP.DOC_NO AS PROD_PLAN_DOC_NO,
+		PP.PROD_PLAN_QTY,
+		TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS PROD_PLAN_DATE,
+		TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
 
-			SELECT '진행중' AS STATUS_NAME
-			FROM DUAL
+		I.ITEM_ID,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT,
 
-			UNION
+		L.LINE_ID,
+		L.LINE_CODE,
+		L.LINE_NAME,
 
-			SELECT '완료' AS STATUS_NAME
-			FROM DUAL
+		NVL(PG.TOTAL_PROD_QTY, 0) AS TOTAL_PROD_QTY,
+		NVL(PG.TOTAL_LOSS_QTY, 0) AS TOTAL_LOSS_QTY,
 
-			UNION
+		CASE
+		WHEN NVL(WO.ORDER_QTY,
+		0) = 0 THEN 0
+		ELSE LEAST(100, ROUND(NVL(PG.TOTAL_PROD_QTY, 0) /
+		WO.ORDER_QTY * 100))
+		END AS PROGRESS_RATE,
 
-			SELECT '보류' AS STATUS_NAME
-			FROM DUAL
+		CASE
+		WHEN
+		NVL(PG.TOTAL_PROD_QTY, 0) = 0 THEN '대기'
+		WHEN NVL(PG.TOTAL_PROD_QTY, 0) <![CDATA[<]]>
+		WO.ORDER_QTY THEN '진행중'
+		ELSE '완료'
+		END AS PROGRESS_STATUS
 
-			UNION
+		FROM WORK_ORDER
+		WO
 
-			SELECT DISTINCT PROD_STATUS AS STATUS_NAME
-			FROM PRODUCTION
-			WHERE PROD_STATUS IS NOT NULL
+		JOIN PRODUCTION_PLAN PP
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+		JOIN ITEM
+		I
+		ON PP.ITEM_ID = I.ITEM_ID
+
+		LEFT JOIN LINE L
+		ON WO.LINE_ID = L.LINE_ID
+
+		LEFT JOIN (
+		SELECT
+		ORDER_ID,
+		SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
+		SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY,
+		MAX(PROD_STATUS) AS
+		PROGRESS_STATUS
+		FROM PRODUCTION
+		GROUP BY ORDER_ID
+		) PG
+		ON WO.ORDER_ID =
+		PG.ORDER_ID
+
+		<include refid="processProgressSearchCondition" />
+
+		ORDER BY WO.ORDER_DATE DESC,
+		WO.ORDER_ID DESC
+		) PROGRESS_LIST
+		WHERE
+		ROWNUM <![CDATA[<=]]>
+		#{endRow}
 		)
-		ORDER BY
-			CASE STATUS_NAME
-				WHEN '대기' THEN 1
-				WHEN '진행중' THEN 2
-				WHEN '완료' THEN 3
-				WHEN '보류' THEN 4
-				ELSE 5
-			END,
-			STATUS_NAME ASC
+		WHERE RN <![CDATA[>=]]>
+		#{startRow}
 
 	</select>
-	
-			<!-- 공정진행 상세 정보를 조회한다. -->
-	<select id="selectProcessProgressDetail"
-		parameterType="int"
+
+
+	<!-- 공정진행 현황 상세 정보를 조회한다. -->
+	<select id="selectProcessProgressDetail" parameterType="int"
 		resultMap="processProgressResultMap">
 
 		SELECT
-			WO.ORDER_ID,
-			WO.DOC_NO,
-			WO.PRODUCT_LOT,
-			WO.ORDER_QTY,
-			TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+		WO.ORDER_ID,
+		WO.PROD_PLAN_ID,
+		WO.PRODUCT_LOT,
+		WO.ORDER_QTY,
+		TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+		WO.DOC_NO AS
+		WORK_ORDER_DOC_NO,
 
-			I.ITEM_ID,
-			I.ITEM_CODE,
-			I.ITEM_NAME,
-			I.ITEM_TYPE,
-			I.ITEM_UNIT,
+		PP.DOC_NO AS PROD_PLAN_DOC_NO,
+		PP.PROD_PLAN_QTY,
+		TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS PROD_PLAN_DATE,
+		TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
 
-			L.LINE_ID,
-			L.LINE_CODE,
-			L.LINE_NAME,
+		I.ITEM_ID,
+		I.ITEM_CODE,
+		I.ITEM_NAME,
+		I.ITEM_TYPE,
+		I.ITEM_UNIT,
 
-			NVL(PA.TOTAL_PROD_QTY, 0) AS TOTAL_PROD_QTY,
-			NVL(PA.TOTAL_LOSS_QTY, 0) AS TOTAL_LOSS_QTY,
+		L.LINE_ID,
+		L.LINE_CODE,
+		L.LINE_NAME,
 
-			CASE
-				WHEN NVL(WO.ORDER_QTY, 0) = 0 THEN 0
-				ELSE LEAST(
-					100,
-					ROUND((NVL(PA.TOTAL_PROD_QTY, 0) / WO.ORDER_QTY) * 100)
-				)
-			END AS PROGRESS_RATE,
+		E.EMP_ID,
+		E.EMPNO,
+		E.ENAME,
+		E.DEPT,
+		E.JOB,
 
-			NVL(LPD.PROD_STATUS, '대기') AS PROGRESS_STATUS,
+		P.PROD_ID,
+		TO_CHAR(P.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
+		NVL(P.PROD_QTY, 0) AS
+		PROD_QTY,
+		NVL(P.LOSS_QTY, 0) AS LOSS_QTY,
+		NVL(P.PROD_STATUS, '대기') AS
+		PROD_STATUS,
 
-			LPD.PROD_ID,
-			LPD.EMP_ID,
-			TO_CHAR(LPD.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
-			LPD.PROD_QTY,
-			LPD.LOSS_QTY,
-			LPD.REMARK,
+		NVL(PG.TOTAL_PROD_QTY, 0) AS TOTAL_PROD_QTY,
+		NVL(PG.TOTAL_LOSS_QTY, 0) AS TOTAL_LOSS_QTY,
 
-			E.ENAME,
-			E.DEPT
+		CASE
+		WHEN NVL(WO.ORDER_QTY,
+		0) = 0 THEN 0
+		ELSE LEAST(100, ROUND(NVL(PG.TOTAL_PROD_QTY, 0) /
+		WO.ORDER_QTY * 100))
+		END AS PROGRESS_RATE,
 
-		FROM WORK_ORDER WO
+		CASE
+		WHEN
+		NVL(PG.TOTAL_PROD_QTY, 0) = 0 THEN '대기'
+		WHEN NVL(PG.TOTAL_PROD_QTY, 0) <![CDATA[<]]>
+		WO.ORDER_QTY THEN '진행중'
+		ELSE '완료'
+		END AS PROGRESS_STATUS
+
+		FROM WORK_ORDER
+		WO
 
 		JOIN PRODUCTION_PLAN PP
-		  ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
 
-		JOIN ITEM I
-		  ON PP.ITEM_ID = I.ITEM_ID
+		JOIN ITEM
+		I
+		ON PP.ITEM_ID = I.ITEM_ID
 
 		LEFT JOIN LINE L
-		  ON WO.LINE_ID = L.LINE_ID
-
-		LEFT JOIN (
-			SELECT
-				ORDER_ID,
-				SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
-				SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
-			FROM PRODUCTION
-			GROUP BY ORDER_ID
-		) PA
-		  ON WO.ORDER_ID = PA.ORDER_ID
-
-		LEFT JOIN (
-			SELECT
-				P1.PROD_ID,
-				P1.ORDER_ID,
-				P1.EMP_ID,
-				P1.PROD_DATE,
-				P1.PROD_QTY,
-				P1.LOSS_QTY,
-				P1.PROD_STATUS,
-				P1.REMARK
-			FROM PRODUCTION P1
-			JOIN (
-				SELECT
-					ORDER_ID,
-					MAX(PROD_ID) AS PROD_ID
-				FROM PRODUCTION
-				GROUP BY ORDER_ID
-			) PM
-			  ON P1.ORDER_ID = PM.ORDER_ID
-			 AND P1.PROD_ID = PM.PROD_ID
-		) LPD
-		  ON WO.ORDER_ID = LPD.ORDER_ID
+		ON WO.LINE_ID = L.LINE_ID
 
 		LEFT JOIN EMP E
-		  ON LPD.EMP_ID = E.EMP_ID
+		ON WO.EMP_ID = E.EMP_ID
+
+		LEFT JOIN (
+		SELECT
+		P1.*
+		FROM
+		PRODUCTION P1
+		JOIN (
+		SELECT
+		ORDER_ID,
+		MAX(PROD_ID) AS PROD_ID
+		FROM
+		PRODUCTION
+		GROUP BY ORDER_ID
+		) PM
+		ON P1.ORDER_ID = PM.ORDER_ID
+		AND
+		P1.PROD_ID = PM.PROD_ID
+		) P
+		ON WO.ORDER_ID = P.ORDER_ID
+
+		LEFT JOIN (
+		SELECT
+		ORDER_ID,
+		SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
+		SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
+		FROM PRODUCTION
+		GROUP BY
+		ORDER_ID
+		) PG
+		ON WO.ORDER_ID = PG.ORDER_ID
 
 		WHERE WO.ORDER_ID = #{orderId}
 
 	</select>
-	
+
+	<!-- 작업지시서 인쇄용 BOM / 자재 LOT 확인 목록을 조회한다. -->
+	<select id="selectWorkOrderPrintMaterialList"
+		parameterType="int" resultMap="workOrderResultMap">
+
+		SELECT
+		ROW_NUMBER() OVER (
+		ORDER BY BD.BOM_DETAIL_ID ASC, MI.INOUT_ID ASC
+		) AS ROW_NO,
+
+		WO.ORDER_ID,
+		WO.ORDER_QTY,
+
+		B.BOM_ID,
+		B.BOM_CODE,
+		B.VERSION AS BOM_VERSION,
+		B.USE_YN AS BOM_USE_YN,
+
+		BD.BOM_DETAIL_ID,
+		BD.QTY AS BOM_QTY,
+		(WO.ORDER_QTY * BD.QTY) AS
+		REQUIRED_QTY,
+
+		I.ITEM_ID AS MATERIAL_ITEM_ID,
+		I.ITEM_CODE AS MATERIAL_ITEM_CODE,
+		I.ITEM_NAME AS
+		MATERIAL_ITEM_NAME,
+		I.ITEM_TYPE AS MATERIAL_ITEM_TYPE,
+		I.ITEM_UNIT AS
+		MATERIAL_ITEM_UNIT,
+
+		MI.INOUT_ID,
+		MI.INOUT_TYPE,
+		MI.MATERIAL_LOT,
+		MI.INOUT_QTY,
+		TO_CHAR(MI.INOUT_DATE,
+		'YYYY-MM-DD') AS INOUT_DATE,
+		MI.STATUS AS INOUT_STATUS,
+		MI.USE_YN,
+		MI.REMARK AS INOUT_REMARK
+
+		FROM WORK_ORDER WO
+
+		JOIN PRODUCTION_PLAN PP
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+		JOIN BOM B
+		ON B.ITEM_ID = PP.ITEM_ID
+		AND NVL(B.USE_YN, 'Y') = 'Y'
+
+		JOIN BOM_DETAIL BD
+		ON B.BOM_ID = BD.BOM_ID
+
+		JOIN ITEM I
+		ON BD.ITEM_ID = I.ITEM_ID
+
+		LEFT JOIN MATERIAL_INOUT MI
+		ON MI.ORDER_ID = WO.ORDER_ID
+		AND MI.ITEM_ID =
+		BD.ITEM_ID
+		AND MI.INOUT_TYPE = 'MO-PROD'
+		AND NVL(MI.USE_YN, 'Y') = 'Y'
+
+		WHERE WO.ORDER_ID = #{orderId}
+
+		ORDER BY BD.BOM_DETAIL_ID ASC,
+		MI.INOUT_ID ASC
+
+	</select>
+
+	<!-- 작업지시서 인쇄용 라인 / 설비 확인 목록을 조회한다. -->
+	<select id="selectWorkOrderPrintEquipmentList"
+		parameterType="int" resultMap="workOrderResultMap">
+
+		SELECT
+		ROW_NUMBER() OVER (
+		ORDER BY E.EQUIP_ID ASC
+		) AS ROW_NO,
+
+		WO.ORDER_ID,
+		WO.LINE_ID,
+
+		L.LINE_CODE,
+		L.LINE_NAME,
+		L.LINE_STATUS,
+
+		E.EQUIP_ID,
+		E.EQUIP_CODE,
+		E.EQUIP_NAME,
+		E.EQUIP_STATUS,
+		E.EQUIP_LOC
+
+		FROM WORK_ORDER WO
+
+		LEFT JOIN LINE L
+		ON WO.LINE_ID = L.LINE_ID
+
+		LEFT JOIN EQUIPMENT E
+		ON E.LINE_ID = L.LINE_ID
+		AND NVL(E.USE_YN, 'Y') = 'Y'
+
+		WHERE WO.ORDER_ID = #{orderId}
+
+		ORDER BY E.EQUIP_ID ASC
+
+	</select>
+
+	<!-- 생산계획 삭제 전 연결된 작업지시 건수를 확인한다. -->
+	<select id="selectWorkOrderCountByProdPlanId"
+		parameterType="int" resultType="int">
+
+		SELECT COUNT(*)
+		FROM WORK_ORDER
+		WHERE PROD_PLAN_ID = #{prodPlanId}
+
+	</select>
+
+
+	<!-- 작업지시가 연결되지 않은 생산계획을 삭제한다. -->
+	<delete id="deleteProductionPlan" parameterType="int">
+
+		DELETE FROM PRODUCTION_PLAN
+		WHERE PROD_PLAN_ID = #{prodPlanId}
+
+	</delete>
 
 </mapper>

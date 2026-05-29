@@ -21,6 +21,7 @@ public class ProductionDAO {
 	private static final String NAMESPACE =
 			"kr.or.saeroi.mapper.ProductionMapper.";
 
+
 	// =========================================================
 	// 1. 생산계획 관리
 	// =========================================================
@@ -78,6 +79,25 @@ public class ProductionDAO {
 				NAMESPACE + "insertProductionPlan",
 				productionDTO);
 	}
+	
+	// 생산계획 삭제 전 연결된 작업지시 건수를 확인한다.
+	public int selectWorkOrderCountByProdPlanId(Integer prodPlanId) {
+
+		return sqlSession.selectOne(
+				NAMESPACE + "selectWorkOrderCountByProdPlanId",
+				prodPlanId
+		);
+	}
+
+
+	// 작업지시가 연결되지 않은 생산계획을 삭제한다.
+	public int deleteProductionPlan(Integer prodPlanId) {
+
+		return sqlSession.delete(
+				NAMESPACE + "deleteProductionPlan",
+				prodPlanId
+		);
+	}
 
 
 	// =========================================================
@@ -94,10 +114,37 @@ public class ProductionDAO {
 
 	// 작업지시 목록을 조회한다.
 	public List<ProductionDTO> selectWorkOrderList(ProductionDTO productionDTO) {
-
+		
 		return sqlSession.selectList(
 				NAMESPACE + "selectWorkOrderList",
 				productionDTO);
+	}
+
+	// 작업지시 검색조건에 맞는 전체 인쇄용 목록을 조회한다.
+	public List<ProductionDTO> selectWorkOrderPrintList(ProductionDTO productionDTO) {
+
+		return sqlSession.selectList(
+				NAMESPACE + "selectWorkOrderPrintList",
+				productionDTO);
+	}
+	
+	// 작업지시서 인쇄용 BOM / 자재 LOT 확인 목록을 조회한다.
+	public List<ProductionDTO> selectWorkOrderPrintMaterialList(Integer orderId) {
+
+		return sqlSession.selectList(
+				NAMESPACE + "selectWorkOrderPrintMaterialList",
+				orderId
+		);
+	}
+
+
+	// 작업지시서 인쇄용 라인 / 설비 확인 목록을 조회한다.
+	public List<ProductionDTO> selectWorkOrderPrintEquipmentList(Integer orderId) {
+
+		return sqlSession.selectList(
+				NAMESPACE + "selectWorkOrderPrintEquipmentList",
+				orderId
+		);
 	}
 
 	// 작업지시 검색 select box에 사용할 작업상태 목록을 조회한다.
@@ -108,10 +155,23 @@ public class ProductionDAO {
 	}
 
 	// 작업지시 등록 모달에서 사용할 생산계획 목록을 조회한다.
+	// 기존 Service/Controller 호환용 기본 메서드이다.
 	public List<ProductionDTO> selectWorkOrderPlanList() {
 
+		ProductionDTO productionDTO = new ProductionDTO();
+
 		return sqlSession.selectList(
-				NAMESPACE + "selectWorkOrderPlanList");
+				NAMESPACE + "selectWorkOrderPlanList",
+				productionDTO);
+	}
+
+	// 작업지시 등록 모달에서 사용할 생산계획 목록을 조회한다.
+	// includePastPlan 값에 따라 지난 생산계획 포함 여부를 제어한다.
+	public List<ProductionDTO> selectWorkOrderPlanList(ProductionDTO productionDTO) {
+
+		return sqlSession.selectList(
+				NAMESPACE + "selectWorkOrderPlanList",
+				productionDTO);
 	}
 
 	// 작업지시 등록 모달에서 사용할 라인 목록을 조회한다.
@@ -122,16 +182,24 @@ public class ProductionDAO {
 	}
 
 	// 작업지시 등록 모달에서 사용할 담당자 목록을 조회한다.
+	// 기존 Controller/Service 메서드명을 유지한다.
 	public List<ProductionDTO> selectWorkOrderEmpList() {
 
 		return sqlSession.selectList(
-				NAMESPACE + "selectWorkOrderEmpList");
+				NAMESPACE + "selectEmpList");
+	}
+
+	// 작업지시 등록 모달에서 사용할 담당자 목록을 조회한다.
+	public List<ProductionDTO> selectEmpList() {
+
+		return sqlSession.selectList(
+				NAMESPACE + "selectEmpList");
 	}
 
 	// 작업지시를 등록한다.
 	// Mapper의 selectKey에서 orderId가 DTO에 세팅되어야 한다.
 	public int insertWorkOrder(ProductionDTO productionDTO) {
-
+		
 		return sqlSession.insert(
 				NAMESPACE + "insertWorkOrder",
 				productionDTO);
@@ -143,6 +211,14 @@ public class ProductionDAO {
 		return sqlSession.selectOne(
 				NAMESPACE + "selectWorkOrderDetail",
 				orderId);
+	}
+
+	// 작업지시 등록 후 생성된 QR 정보를 저장한다.
+	public int updateWorkOrderQr(ProductionDTO productionDTO) {
+
+		return sqlSession.update(
+				NAMESPACE + "updateWorkOrderQr",
+				productionDTO);
 	}
 
 	// 작업지시 정보를 수정한다.
@@ -158,47 +234,120 @@ public class ProductionDAO {
 	// 3. 작업지시 BOM / 원자재 자동투입
 	// =========================================================
 
-	// 작업지시에 적용될 BOM 마스터 정보를 조회한다.
-	// 작업지시 → 생산계획 → 완제품 item_id → 사용중 BOM 순서로 조회한다.
-	public ProductionDTO selectWorkOrderAppliedBom(Integer orderId) {
+	// 작업지시 상세에서 BOM 기준 자재 소요량과 투입 이력을 함께 조회한다.
+	public List<ProductionDTO> selectWorkOrderMaterialList(Integer orderId) {
 
-		return sqlSession.selectOne(
-				NAMESPACE + "selectWorkOrderAppliedBom",
+		return sqlSession.selectList(
+				NAMESPACE + "selectWorkOrderMaterialList",
 				orderId);
 	}
 
+	// 작업지시에 적용될 BOM 마스터 정보를 조회한다.
+	// 기존 Service 호환용이다. 자재 목록 첫 번째 행의 BOM 정보를 사용한다.
+	public ProductionDTO selectWorkOrderAppliedBom(Integer orderId) {
+
+		List<ProductionDTO> materialList = sqlSession.selectList(
+				NAMESPACE + "selectWorkOrderMaterialList",
+				orderId);
+
+		if (materialList == null || materialList.isEmpty()) {
+			return null;
+		}
+
+		return materialList.get(0);
+	}
+
 	// 작업지시 기준 BOM 상세 원자재 목록을 조회한다.
-	// 작업지시 수량 * BOM 소요량으로 필요수량을 계산해 조회한다.
+	// 기존 Service 호환용이다.
 	public List<ProductionDTO> selectWorkOrderBomMaterialList(Integer orderId) {
 
 		return sqlSession.selectList(
-				NAMESPACE + "selectWorkOrderBomMaterialList",
+				NAMESPACE + "selectWorkOrderMaterialList",
 				orderId);
 	}
 
 	// 작업지시에 이미 자동 생성된 자재투입 이력이 있는지 확인한다.
-	// 중복 자동투입 방지용이다.
+	// 기존 Service 호환용이다.
 	public int selectWorkOrderMaterialInoutCount(Integer orderId) {
 
-		return sqlSession.selectOne(
-				NAMESPACE + "selectWorkOrderMaterialInoutCount",
+		List<ProductionDTO> materialList = sqlSession.selectList(
+				NAMESPACE + "selectWorkOrderMaterialList",
 				orderId);
+
+		if (materialList == null || materialList.isEmpty()) {
+			return 0;
+		}
+
+		int count = 0;
+
+		for (ProductionDTO material : materialList) {
+			if (material != null && material.getInoutId() != null) {
+				count++;
+			}
+		}
+
+		return count;
 	}
 
-	// 작업지시 등록 후 BOM 기준으로 MATERIAL_INOUT에 원자재 출고/투입 이력을 자동 생성한다.
-	// inout_type은 MO-PROD로 저장한다.
-	public int insertWorkOrderMaterialInoutByBom(ProductionDTO productionDTO) {
+	// 작업지시 등록 시 BOM 기준으로 자동 투입할 자재 목록을 조회한다.
+	public List<ProductionDTO> selectBomMaterialForWorkOrder(ProductionDTO productionDTO) {
 
-		return sqlSession.insert(
-				NAMESPACE + "insertWorkOrderMaterialInoutByBom",
+		return sqlSession.selectList(
+				NAMESPACE + "selectBomMaterialForWorkOrder",
 				productionDTO);
 	}
 
+	// 작업지시 등록 시 BOM 기준 자재 투입 이력을 1건 생성한다.
+	public int insertMaterialOutByWorkOrder(ProductionDTO productionDTO) {
+
+		return sqlSession.insert(
+				NAMESPACE + "insertMaterialOutByWorkOrder",
+				productionDTO);
+	}
+
+	// 작업지시 등록 후 BOM 기준으로 MATERIAL_INOUT에 원자재 출고/투입 이력을 자동 생성한다.
+	// 기존 Service 호환용이다.
+	public int insertWorkOrderMaterialInoutByBom(ProductionDTO productionDTO) {
+
+		List<ProductionDTO> materialList = sqlSession.selectList(
+				NAMESPACE + "selectBomMaterialForWorkOrder",
+				productionDTO);
+
+		if (materialList == null || materialList.isEmpty()) {
+			return 0;
+		}
+
+		int result = 0;
+
+		for (ProductionDTO material : materialList) {
+
+			if (material == null) {
+				continue;
+			}
+
+			ProductionDTO insertDTO = new ProductionDTO();
+
+			insertDTO.setOrderId(productionDTO.getOrderId());
+			insertDTO.setEmpId(productionDTO.getEmpId());
+			insertDTO.setOrderDate(productionDTO.getOrderDate());
+
+			insertDTO.setMaterialItemId(material.getMaterialItemId());
+			insertDTO.setRequiredQty(material.getRequiredQty());
+
+			result += sqlSession.insert(
+					NAMESPACE + "insertMaterialOutByWorkOrder",
+					insertDTO);
+		}
+
+		return result;
+	}
+
 	// 작업지시 상세 화면에서 보여줄 원자재 투입 이력 목록을 조회한다.
+	// 기존 Service 호환용이다.
 	public List<ProductionDTO> selectWorkOrderMaterialInoutList(Integer orderId) {
 
 		return sqlSession.selectList(
-				NAMESPACE + "selectWorkOrderMaterialInoutList",
+				NAMESPACE + "selectWorkOrderMaterialList",
 				orderId);
 	}
 
@@ -235,6 +384,14 @@ public class ProductionDAO {
 
 		return sqlSession.selectList(
 				NAMESPACE + "selectProductionResultOrderList");
+	}
+
+	// QR 스캔 진입 시 자동입력할 작업지시 정보를 조회한다.
+	public ProductionDTO selectProductionResultOrderByQr(ProductionDTO productionDTO) {
+
+		return sqlSession.selectOne(
+				NAMESPACE + "selectProductionResultOrderByQr",
+				productionDTO);
 	}
 
 	// 생산실적을 등록한다.
@@ -283,10 +440,11 @@ public class ProductionDAO {
 	}
 
 	// 공정진행 현황 검색 select box에 사용할 진행상태 목록을 조회한다.
+	// 현재 Mapper에는 별도 상태 목록 쿼리가 없으므로 작업지시 상태 목록을 재사용한다.
 	public List<String> selectProcessProgressStatusList() {
 
 		return sqlSession.selectList(
-				NAMESPACE + "selectProcessProgressStatusList");
+				NAMESPACE + "selectWorkOrderStatusList");
 	}
 
 	// 공정진행 상세 정보를 조회한다.

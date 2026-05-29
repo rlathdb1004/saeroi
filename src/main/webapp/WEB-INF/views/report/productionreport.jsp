@@ -4,15 +4,15 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <style>
-	.reportPage .search-form {
-		margin-bottom: 30px;
-		/* 검색 박스와 총 건수 영역 사이 간격이다. */
-	}
+.reportPage .search-form {
+	margin-bottom: 30px;
+	/* 검색 박스와 총 건수 영역 사이 간격이다. */
+}
 
-	.reportPage .coTableTop {
-		margin-bottom: 14px;
-		/* 총 건수와 테이블 사이 간격이다. */
-	}
+.reportPage .coTableTop {
+	margin-bottom: 14px;
+	/* 총 건수와 테이블 사이 간격이다. */
+}
 </style>
 
 <!-- 라이브러리 -->
@@ -58,9 +58,12 @@
 	</form>
 
 	<div class="coTableTop">
-	<p class="coTotalCount">총 0건</p>
+		<p class="coTotalCount">총 0건</p>
+		<div class="search-btn-right">
+			<button type="button" class="search-btn search-btn-main"
+				id="chart_detail">차트보기</button>
+		</div>
 	</div>
-
 
 	<div class="coTableWrap">
 		<table class="coTable" id="reportTable">
@@ -87,6 +90,40 @@
 </div>
 
 <script>
+
+function getLocalDateFromWeek(weekStr, isEnd) {
+    if (!weekStr) return "";
+    // 문자열에서 숫자만 추출 (예: "2026-W22" 또는 "2026-22" -> ["2026", "22"])
+    let matches = weekStr.match(/\d+/g);
+    if (!matches || matches.length < 2) return weekStr; // 형식이 안 맞으면 원본 반환
+    
+    let year = parseInt(matches[0], 10);
+    let week = parseInt(matches[1], 10);
+    
+    // 해당 연도의 1월 4일 기준(ISO 주차 기준점)으로 첫 주를 잡고 계산
+    let thurs = new Date(year, 0, 4);
+    let dayN = thurs.getDay();
+    let daynum = dayN === 0 ? 7 : dayN;
+    
+    // 주차의 시작일(월요일) 구하기
+    let memoDay = new Date(thurs.getTime() + (week - 1) * 7 * 24 * 60 * 60 * 1000);
+    memoDay.setDate(memoDay.getDate() - daynum + 1);
+    
+    // 만약 종료일(endDate) 변환이고 주차의 마지막일(일요일)을 구하고 싶다면 6일을 더함
+    if (isEnd) {
+        memoDay.setDate(memoDay.getDate() + 6);
+    }
+    
+    // YYYY-MM-DD 형식으로 리턴
+    let yyyy = memoDay.getFullYear();
+    let mm = String(memoDay.getMonth() + 1).padStart(2, '0');
+    let dd = String(memoDay.getDate()).padStart(2, '0');
+    
+    return yyyy + "-" + mm + "-" + dd;
+}
+
+
+
 	let chart = null;
 	let ochart = null;
 	document.addEventListener('DOMContentLoaded', function(){
@@ -115,6 +152,73 @@
 			let type = document.querySelector('#select_type').value || 'month';
 		    loadChartData(type,this.value);
 		});
+		
+		let chart_btn = document.querySelector('#chart_detail');
+		if(chart_btn){
+			chart_btn.addEventListener('click',function(){
+				let type = document.querySelector('#select_type').value || 'month';
+	            let item = document.querySelector('#select_item').value || 'all';
+	            let startDate = document.querySelector('#startDate').value || '';
+	            let endDate = document.querySelector('#endDate').value || '';
+	            
+	            let checkedBoxes = document.querySelectorAll('.check_btn:checked');
+	            
+	            if(checkedBoxes.length > 0){
+	            	let checkedDates = [];
+	            	
+	            	checkedBoxes.forEach(box => {
+	            		let date_val =box.value
+	            		
+	            		if(date_val){
+	            			checkedDates.push(date_val);
+	            		}
+	            	})
+	            	
+	            	if(checkedDates.length > 0){
+	            		checkedDates.sort();
+	            		if(checkedDates.length === 1){
+	            			startDate = checkedDates[0];
+	            	        endDate = checkedDates[0];
+	            		} else{
+	            			startDate = checkedDates[0];
+	            	        endDate = checkedDates[checkedDates.length - 1];
+	            		}
+	            	}
+	            	
+	            }
+	            
+	            
+	            
+	            if (startDate) {
+	                if(type === 'week'){
+	                	startDate = getLocalDateFromWeek(startDate, false);
+	                } else if (type === 'month' && startDate.length === 7) {
+	                    startDate += "-01";
+	                } else if ((type === 'year_sum' || type === 'year_avg') && startDate.length === 4) {
+	                    startDate += "-01-01";
+	                }
+	            }
+	            
+	            if (endDate) {
+					if(type === 'week'){
+						endDate = getLocalDateFromWeek(endDate, true);
+	                } else if (type === 'month' && endDate.length === 7) {
+	                    endDate += "-01";
+	                } else if ((type === 'year_sum' || type === 'year_avg') && endDate.length === 4) {
+	                    // 종료일은 연말(12-31)로 닫아주는 센스!
+	                    endDate += "-12-31"; 
+	                }
+	            }
+	            
+	            let detailUrl = "${pageContext.request.contextPath}/report/chart"
+					  + "?searchType=" + encodeURIComponent(type)
+				   	  + "&searchItem=" + encodeURIComponent(item.품목명 || item)
+					  + "&startDate=" + encodeURIComponent(startDate || "")
+					  + "&endDate=" + encodeURIComponent(endDate || "");
+	            
+	            window.location.href = detailUrl;
+			})
+		}
 		
 	});
 	
@@ -159,11 +263,21 @@
         			if (startMonth && targetDate < startMonth) return false;
         			if (endMonth && targetDate > endMonth) return false;
         		} else if(searchType === 'week'){
-        			let targetYear = targetDate.substring(0, 4);
-        			let startYear = startDate ? startDate.substring(0, 4) : "0000";
-        			let endYear = endDate ? endDate.substring(0, 4) : "9999";
+        			// 1. DB에서 온 targetDate(예: "2026-22")를 헬퍼 함수를 통해 실제 월요일 날짜(YYYY-MM-DD)로 변환 🎯
+        	        let realTarget = targetDate.includes('-') && targetDate.length <= 8 
+        	                         ? getLocalDateFromWeek(targetDate, false) 
+        	                         : targetDate; 
+        	                         
+        	        // 2. 검색 조건(startDate, endDate)이 월별(YYYY-MM)이나 년별(YYYY) 포맷일 수 있으므로 안전하게 YYYY-MM-DD로 채우기
+        	        let realStart = startDate || "0000-00-00";
+        	        let realEnd = endDate || "9999-12-31";
+        	        
+        	        if (realStart.length === 7) realStart += "-01";
+        	        if (realStart.length === 4) realStart += "-01-01";
+        	        if (realEnd.length === 7) realEnd += "-01";
+        	        if (realEnd.length === 4) realEnd += "-12-31";
         			
-        			if (targetYear < startYear || targetYear > endYear) return false;
+        			if (realTarget < realStart || realTarget > realEnd) return false;
         		} else if(searchType === 'year_sum' || searchType === 'year_avg'){
         			let startYear = startDate ? startDate.substring(0, 4) : "";
         			let endYear = endDate ? endDate.substring(0, 4) : "";
@@ -212,13 +326,13 @@
       		let achievementRate = planQty > 0 ? ((orderQty / planQty) * 100).toFixed(1) + '%' : '-';
 
       		let detailUrl = "${pageContext.request.contextPath}/report/chart"
-      				+ "?searchType=" + encodeURIComponent(searchType)
-      				+ "&searchItem=" + encodeURIComponent(item.품목명 || searchItem)
-      				+ "&startDate=" + encodeURIComponent(startDate || "")
-      				+ "&endDate=" + encodeURIComponent(endDate || "");
+      					  + "?searchType=" + encodeURIComponent(searchType)
+      				   	  + "&searchItem=" + encodeURIComponent(item.품목명 || searchItem)
+      					  + "&startDate=" + encodeURIComponent(startDate || "")
+      					  + "&endDate=" + encodeURIComponent(endDate || "");
 
       		row.innerHTML = ''
-      			+ '<td><input type="checkbox" name="orderIds" value="' + escapeHtml(item.계획일자) + '"></td>'
+      			+ '<td><input type="checkbox" name="orderIds" class="check_btn" value="' + escapeHtml(item.계획일자) + '"></td>'
       			+ '<td>' + escapeHtml(item.계획일자) + '</td>'
       			+ '<td class="mobile_hidden">' + escapeHtml(item.품목명) + '</td>'
       			+ '<td>' + planQty.toLocaleString() + '</td>'
@@ -376,4 +490,5 @@
 			.replace(/"/g, '&quot;')
 			.replace(/'/g, '&#039;');
 	}
+	
 </script>

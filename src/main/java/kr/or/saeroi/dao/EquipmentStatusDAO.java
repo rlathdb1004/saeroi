@@ -1,6 +1,7 @@
 package kr.or.saeroi.dao;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -11,8 +12,9 @@ import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import kr.or.saeroi.dto.EquipmentDTO;
+import kr.or.saeroi.dto.EquipmentMaintenanceDTO;
 import kr.or.saeroi.dto.EquipmentStatusDTO;
+import kr.or.saeroi.dto.EquipmentTroubleDTO;
 
 @Repository
 public class EquipmentStatusDAO {
@@ -342,13 +344,127 @@ public class EquipmentStatusDAO {
 	        for(int i=0;i<ids.size();i++) {
 	            ps.setInt(i + 1, ids.get(i));
 	        }
-
 	        result = ps.executeUpdate();
-
+	        
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
-
 	    return result;
+	}
+	
+	
+	public List<EquipmentMaintenanceDTO> maintenance_history(
+	        int equip_id,
+	        Date operation_date) {
+
+	    List<EquipmentMaintenanceDTO> list = new ArrayList<>();
+
+	    String sql =
+	            "SELECT " +
+	            "    EM.EQUIP_MAIN_ID, " +
+	            "    EM.EQUIP_ID, " +
+	            "    EM.EMP_ID, " +
+	            "    E.ENAME, " +
+	            "    EM.EQUIP_MAIN_DATE, " +
+	            "    EM.EQUIP_MAIN_TYPE, " +
+	            "    EM.EQUIP_MAIN_CONTENT, " +
+	            "    EM.EQUIP_MAIN_TIME, " +
+	            "    EM.REMARK " +
+	            "FROM EQUIPMENT_MAINTENANCE EM " +
+	            "LEFT JOIN EMP E " +
+	            "ON EM.EMP_ID = E.EMP_ID " +
+	            "WHERE EM.EQUIP_ID = ? " +
+	            "AND EM.EQUIP_MAIN_DATE >= ? " +
+	            "AND EM.EQUIP_MAIN_DATE < ? + 1 ";
+
+	        try (
+	            Connection conn = dataSource.getConnection();
+	            PreparedStatement ps = conn.prepareStatement(sql)
+	        ) {
+	            ps.setInt(1, equip_id);
+	            ps.setDate(2, operation_date);	            
+	            ps.setDate(3, operation_date);	            
+
+	            ResultSet rs = ps.executeQuery();
+
+	            while (rs.next()) {
+
+	                EquipmentMaintenanceDTO dto = new EquipmentMaintenanceDTO();
+
+	                dto.setEquip_main_id(rs.getInt("EQUIP_MAIN_ID"));
+	                dto.setEquip_id(rs.getInt("EQUIP_ID"));
+	                dto.setEmp_id(rs.getInt("EMP_ID"));
+	                dto.setEname(rs.getString("ENAME"));
+	                dto.setEquip_main_date(rs.getDate("EQUIP_MAIN_DATE"));
+	                dto.setEquip_main_type(rs.getString("EQUIP_MAIN_TYPE"));
+	                dto.setEquip_main_content(rs.getString("EQUIP_MAIN_CONTENT"));
+	                dto.setEquip_main_time(rs.getInt("EQUIP_MAIN_TIME"));
+	                dto.setRemark(rs.getString("REMARK"));
+	                
+	                list.add(dto);
+	            }
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	        return list;
+	}
+	
+	public List<EquipmentTroubleDTO> trouble_history(
+	        int equip_id,
+	        Date operation_date) {
+
+	    List<EquipmentTroubleDTO> list = new ArrayList<>();
+
+	    String sql =
+	        "SELECT " +
+	        "    ET.TROUBLE_ID, " +
+	        "    ET.EQUIP_ID, " +
+	        "    ET.EMP_ID, " +
+	        "    E.ENAME, " +
+	        "    ET.TROUBLE_CONTENT, " +
+	        "    ET.TROUBLE_DATE, " +
+	        "    ET.TROUBLE_RESOLVE, " +
+	        "    ET.RESOLVE_DATE, " +
+	        "    ET.REMARK " +
+	        "FROM EQUIPMENT_TROUBLE ET " +
+	        "LEFT JOIN EMP E " +
+	        "ON ET.EMP_ID = E.EMP_ID " +
+	        "WHERE ET.EQUIP_ID = ? " +
+	        "AND ET.TROUBLE_DATE < ?+1 " +
+	        "AND ( ET.RESOLVE_DATE IS NULL "+ 
+	        "    OR ET.RESOLVE_DATE >= ?) ";
+
+	    try (
+	        Connection conn = dataSource.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql)
+	    ) {
+
+	        ps.setInt(1, equip_id);
+	        ps.setDate(2, operation_date);
+	        ps.setDate(3, operation_date);
+
+	        ResultSet rs = ps.executeQuery();
+
+	        while (rs.next()) {
+
+	            EquipmentTroubleDTO dto = new EquipmentTroubleDTO();
+
+	            dto.setTrouble_id(rs.getInt("TROUBLE_ID"));
+	            dto.setEquip_id(rs.getInt("EQUIP_ID"));
+	            dto.setEmp_id(rs.getInt("EMP_ID"));
+	            dto.setEname(rs.getString("ENAME"));
+	            dto.setTrouble_content(rs.getString("TROUBLE_CONTENT"));
+	            dto.setTrouble_date(rs.getDate("TROUBLE_DATE"));
+	            dto.setTrouble_resolve(rs.getString("TROUBLE_RESOLVE"));
+	            dto.setResolve_date(rs.getDate("RESOLVE_DATE"));
+	            dto.setRemark(rs.getString("REMARK"));
+
+	            list.add(dto);
+	        }
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return list;
 	}
 }

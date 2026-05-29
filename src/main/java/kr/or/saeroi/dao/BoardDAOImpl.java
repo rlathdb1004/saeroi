@@ -219,14 +219,16 @@ public class BoardDAOImpl implements BoardDAO {
 
 	// 게시판 수정
 	@Override
-	public int _dao_update_Board(String board_id, String title, String content, String status, String remark,
-			String role, String empno) {
+	public int _dao_update_Board(String board_id, String title, String content,
+			String status, String use_yn, String remark, String role, String empno) {
+
 		Map<String, Object> param = new HashMap<String, Object>();
 
 		param.put("board_id", board_id);
 		param.put("title", title);
 		param.put("content", content);
 		param.put("status", status);
+		param.put("use_yn", use_yn);
 		param.put("remark", remark);
 		param.put("role", role);
 		param.put("empno", empno);

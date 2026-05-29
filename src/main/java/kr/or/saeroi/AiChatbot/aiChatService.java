@@ -2,6 +2,8 @@ package kr.or.saeroi.AiChatbot;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,21 +26,26 @@ public class aiChatService {
 	@Value("${gemini.api.key}")
 	private String apikey;
 	
-	ChatMemory chatMemory = MessageWindowChatMemory.withMaxMessages(10); //질문내용 전역변수로 고정
+	private final Map<String, MesAssistant> assistantCache = new ConcurrentHashMap<>();
+	
 	
 	MesAssistant assistant;
 	
-	@Autowired
-    public void init() {
-		
-		this.assistant = AiServices.builder(MesAssistant.class)
-						.chatLanguageModel(geminiModel)
-						.chatMemory(chatMemory)
-						.tools(dbTool)
-						.build();
+    public MesAssistant assistanUser(String empno) {
+		MesAssistant assistant = assistantCache.get(empno);
+		if(assistant == null) {
+			ChatMemory userChatMemory = MessageWindowChatMemory.withMaxMessages(10);
+			assistant = AiServices.builder(MesAssistant.class)
+	                .chatLanguageModel(geminiModel)
+	                .chatMemory(userChatMemory)
+	                .tools(dbTool)
+	                .build();
+			assistantCache.put(empno, assistant);
+		}
+		return assistant;
     }
 	
-	public String getChatResponse(List<aiChatContents> history) {
+	public String getChatResponse(List<aiChatContents> history, String empno, String ename) {
 //		System.out.println("현재 사용 중인 키: " + (apikey != null ? apikey.substring(0, 4) + "****" : "null"));
 		//langchain4j방식으로 전환해서 주석 궁금하면 LangChain4j파일로
 //		String url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent";
@@ -64,11 +71,15 @@ public class aiChatService {
 		        return "보낸 메시지가 없습니다.";
 		    }
 			
+			MesAssistant assistant = assistanUser(empno);
+			
 			String lastUserMsg = history.get(history.size()-1).getParts().get(0).getText();
 			
 			String today = LocalDate.now().toString();
 			
-			String prompt ="[시스템 알림: 오늘의 실제 날짜는 " + today + "입니다. 이 날짜를 기준으로 '오늘', '어제', '내일' 등을 계산하세요.]\n" + lastUserMsg;
+			String prompt ="오늘의 실제 날짜는 " + today + "입니다."
+							+ " 이 날짜를 기준으로 '오늘', '어제', '내일' 등을 계산하세요." + lastUserMsg 
+							+"현재 대화 중인 관리자의 이름은'"+ename +"' 사원번호는'"+empno+"'입니다";
 			
 			return assistant.chat(prompt);
 		} catch (org.springframework.web.client.HttpClientErrorException e) {

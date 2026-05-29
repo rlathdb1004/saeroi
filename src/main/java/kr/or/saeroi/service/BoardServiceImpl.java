@@ -123,8 +123,10 @@ public class BoardServiceImpl implements BoardService {
 
 	// 게시판 수정
 	@Override
-	public int _ser_update_Board(String board_id, String title, String content, String status, String remark,
-			String role, String empno) {
-		return boardDAO._dao_update_Board(board_id, title, content, status, remark, role, empno);
+	public int _ser_update_Board(String board_id, String title, String content,
+			String status, String use_yn, String remark, String role, String empno) {
+
+		return boardDAO._dao_update_Board(board_id, title, content, status,
+				use_yn, remark, role, empno);
 	}
 }
