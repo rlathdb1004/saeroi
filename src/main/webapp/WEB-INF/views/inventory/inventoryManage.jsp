@@ -356,7 +356,7 @@
 									</c:when>
 
 									<c:when test="${inventory.itemType eq 'SM'}">
-										원자재
+										부자재
 									</c:when>
 
 									<c:otherwise>
@@ -443,6 +443,24 @@
 				<div class="modal_body modal_body_2col">
 
 					<%-- =================================================
+						재고번호
+						INVENTORY_ID는 DB 시퀀스로 자동 생성되므로 화면에서는 자동생성 안내만 표시한다.
+					================================================= --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							재고번호
+						</label>
+
+						<input type="text"
+							class="modal_input"
+							value="자동생성"
+							readonly>
+
+					</div>
+
+
+					<%-- =================================================
 						품목명
 					================================================= --%>
 					<div class="modal_item">
@@ -485,6 +503,23 @@
 							품목명을 선택해주세요.
 
 						</div>
+
+					</div>
+
+					<%-- =================================================
+						품목ID
+						ITEM_ID는 품목명 선택 시 자동 표시하고, 실제 저장은 품목명 select의 itemId로 처리한다.
+					================================================= --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							품목ID
+						</label>
+
+						<input type="text"
+							id="insertInventoryItemIdView"
+							class="modal_input"
+							readonly>
 
 					</div>
 
@@ -559,6 +594,36 @@
 						<input type="text"
 							name="remark"
 							class="modal_input">
+
+					</div>
+
+					<%-- =================================================
+						생성일 / 수정일
+						DB의 CREATED_DATE / UPDATED_DATE는 등록 시 SYSDATE로 자동 저장된다.
+					================================================= --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							생성일
+						</label>
+
+						<input type="text"
+							class="modal_input"
+							value="등록 시 자동 저장"
+							readonly>
+
+					</div>
+
+					<div class="modal_item">
+
+						<label class="modal_label">
+							수정일
+						</label>
+
+						<input type="text"
+							class="modal_input"
+							value="등록 시 자동 저장"
+							readonly>
 
 					</div>
 
@@ -785,5 +850,14 @@
 		document.getElementById(
 			"insertStockLocation").value =
 				stockLocation;
+
+		var itemIdView =
+			document.getElementById("insertInventoryItemIdView");
+
+		if (itemIdView != null) {
+
+			itemIdView.value =
+				this.value;
+		}
 	});
 </script>

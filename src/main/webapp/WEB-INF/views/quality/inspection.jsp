@@ -8,16 +8,16 @@
 
 <style>
 .insp_file_area {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    width: 100%;
-    height: 42px;
-    padding: 0 12px;
-    border: 1px solid #D6DEE0;
-    border-radius: 6px;
-    background-color: #ffffff;
-    box-sizing: border-box;
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	height: 42px;
+	padding: 0 12px;
+	border: 1px solid #D6DEE0;
+	border-radius: 6px;
+	background-color: #ffffff;
+	box-sizing: border-box;
 }
 
 .insp_file_input {
@@ -25,19 +25,18 @@
 }
 
 .insp_file_btn {
-    height: 28px;
-    padding: 0 12px;
-    border: 1px solid #C9CFD1;
-    border-radius: 5px;
-    background-color: #F7F9F8;
-    color: #1F2933;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 26px;
-    cursor: pointer;
-    flex-shrink: 0;
+	height: 28px;
+	padding: 0 12px;
+	border: 1px solid #C9CFD1;
+	border-radius: 5px;
+	background-color: #F7F9F8;
+	color: #1F2933;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 26px;
+	cursor: pointer;
+	flex-shrink: 0;
 }
-
 
 .insp_file_btn:hover {
 	background-color: #eaf4ef;
@@ -330,13 +329,13 @@
 							value="${sessionScope.loginUser.empno}">
 					</div>
 
-					<div class="modal_item">
-						<label class="modal_label">검사구분<span
-							class="modal_required">*</span></label> <select name="insp_type"
-							class="modal_select" required>
-							<option value="">선택</option>
-						</select>
-					</div>
+<!-- 					<div class="modal_item"> -->
+<!-- 						<label class="modal_label">검사구분<span -->
+<!-- 							class="modal_required">*</span></label> <select name="insp_type" -->
+<!-- 							class="modal_select" required> -->
+<!-- 							<option value="">선택</option> -->
+<!-- 						</select> -->
+<!-- 					</div> -->
 
 					<div class="modal_item">
 						<label class="modal_label">검사결과<span
@@ -344,6 +343,11 @@
 							class="modal_select" required>
 							<option value="">선택</option>
 						</select>
+					</div>
+					<div class="modal_item">
+						<label class="modal_label">생산수량<span
+							class="modal_required">*</span></label> <input type="text"
+							name="prod_qty" class="modal_input">
 					</div>
 
 					<div class="modal_item">
@@ -357,6 +361,7 @@
 							class="modal_required">*</span></label> <input type="number"
 							name="good_qty" class="modal_input" min="0" required>
 					</div>
+					
 
 					<div class="modal_item">
 						<label class="modal_label">비고</label> <input type="text"

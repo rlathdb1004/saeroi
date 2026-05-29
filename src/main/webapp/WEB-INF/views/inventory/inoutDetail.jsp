@@ -5,6 +5,7 @@
 
 <%-- =========================================================
 	상세페이지 공통 CSS
+	공통 파일은 건드리지 않고 기존 detail.css 그대로 사용
 ========================================================= --%>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
@@ -30,16 +31,13 @@
 
 		<%-- =====================================================
 			버튼 영역
-			재고조회 상세페이지 버튼 코드 그대로 적용
+			기존 공통 버튼 클래스 그대로 유지
 		===================================================== --%>
 		<div class="detail_btn_area">
 
 			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
 				or sessionScope.loginUser.role eq 'MANAGER'}">
 
-				<%-- =================================================
-					조회모드 수정 버튼
-				================================================= --%>
 				<c:if test="${mode ne 'edit'}">
 
 					<button type="button"
@@ -70,14 +68,8 @@
 
 				</c:if>
 
-				<%-- =================================================
-					수정모드 저장 / 취소 버튼
-				================================================= --%>
 				<c:if test="${mode eq 'edit'}">
 
-					<%-- =============================================
-						저장 버튼
-					============================================= --%>
 					<button type="submit"
 						id="saveBtn"
 						class="detail_btn_green"
@@ -107,9 +99,6 @@
 
 					</button>
 
-					<%-- =============================================
-						취소 버튼
-					============================================= --%>
 					<button type="button"
 						id="cancelBtn"
 						class="detail_btn_line"
@@ -140,9 +129,6 @@
 
 			</c:if>
 
-			<%-- =================================================
-				목록 버튼
-			================================================= --%>
 			<button type="button"
 				class="detail_btn_line"
 				onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
@@ -187,6 +173,8 @@
 
 		<%-- =====================================================
 			수정모드
+			거래처 정보와 창고 정보는 별도 카드로 빼지 않고
+			기본 정보 테이블 안에 같이 출력한다.
 		===================================================== --%>
 		<c:when test="${mode eq 'edit'}">
 
@@ -197,6 +185,34 @@
 				<input type="hidden"
 					name="inoutId"
 					value="${inout.inoutId}">
+
+				<input type="hidden"
+					name="empId"
+					value="${inout.empId}">
+
+				<input type="hidden"
+					name="itemId"
+					value="${inout.itemId}">
+
+				<input type="hidden"
+					name="orderId"
+					value="${inout.orderId}">
+
+				<input type="hidden"
+					name="docNo"
+					value="${inout.docNo}">
+
+				<input type="hidden"
+					name="docSeq"
+					value="${inout.docSeq}">
+
+				<input type="hidden"
+					name="useYn"
+					value="${inout.useYn}">
+
+				<input type="hidden"
+					name="status"
+					value="${inout.status}">
 
 				<div class="detail_card">
 
@@ -231,8 +247,16 @@
 
 							<tr>
 
-								<th>LOT번호</th>
-								<td>${inout.materialLot}</td>
+								<th>자재 LOT번호</th>
+
+								<td>
+
+									<input type="text"
+										name="materialLot"
+										class="search-input"
+										value="${inout.materialLot}">
+
+								</td>
 
 								<th>입출고구분</th>
 
@@ -243,16 +267,12 @@
 
 										<option value="MI"
 											<c:if test="${inout.inoutType eq 'MI'}">selected</c:if>>
-
 											입고
-
 										</option>
 
 										<option value="MO-PROD"
 											<c:if test="${inout.inoutType eq 'MO-PROD'}">selected</c:if>>
-
 											출고
-
 										</option>
 
 									</select>
@@ -308,6 +328,40 @@
 
 							</tr>
 
+							<%-- =====================================================
+								거래처 정보
+								입고는 공급처, 출고는 납품처 기준으로 DAO에서 조회한다.
+							===================================================== --%>
+							<tr>
+
+								<th>거래처명</th>
+								<td>${inout.clientName}</td>
+
+								<th>담당자</th>
+								<td>${inout.clientManager}</td>
+
+								<th>사원번호</th>
+								<td>${inout.empId}</td>
+
+							</tr>
+
+							<%-- =====================================================
+								창고 정보
+								창고위치와 현재재고도 기본 정보 안에 같이 출력한다.
+							===================================================== --%>
+							<tr>
+
+								<th>창고위치</th>
+								<td>${inout.stockLocation}</td>
+
+								<th>현재재고</th>
+								<td>${inout.inventoryStock}</td>
+
+								<th>재고단위</th>
+								<td>${inout.itemUnit}</td>
+
+							</tr>
+
 							<tr>
 
 								<th>비고</th>
@@ -331,10 +385,57 @@
 
 			</form>
 
+			<%-- =====================================================
+				입출고 내역서
+			===================================================== --%>
+			<div class="detail_card">
+
+				<div class="detail_card_title">
+					입출고 내역서
+				</div>
+
+				<table class="detail_info_table">
+
+					<tbody>
+
+						<tr>
+
+							<th>입출고번호</th>
+							<td>${inout.docNo}</td>
+
+							<th>상태</th>
+							<td>${inout.status}</td>
+
+							<th>입출고일자</th>
+							<td>${inout.inoutDate}</td>
+
+						</tr>
+
+						<tr>
+
+							<th>사용여부</th>
+							<td>${inout.useYn}</td>
+
+							<th>등록일</th>
+							<td>${inout.createdDate}</td>
+
+							<th>수정일</th>
+							<td>${inout.updatedDate}</td>
+
+						</tr>
+
+					</tbody>
+
+				</table>
+
+			</div>
+
 		</c:when>
 
 		<%-- =====================================================
 			조회모드
+			거래처 정보와 창고 정보는 별도 카드로 빼지 않고
+			기본 정보 테이블 안에 같이 출력한다.
 		===================================================== --%>
 		<c:otherwise>
 
@@ -363,7 +464,7 @@
 
 						<tr>
 
-							<th>LOT번호</th>
+							<th>자재 LOT번호</th>
 							<td>${inout.materialLot}</td>
 
 							<th>입출고구분</th>
@@ -429,6 +530,40 @@
 
 						</tr>
 
+						<%-- =====================================================
+							거래처 정보
+							입고는 공급처, 출고는 납품처 기준으로 DAO에서 조회한다.
+						===================================================== --%>
+						<tr>
+
+							<th>거래처명</th>
+							<td>${inout.clientName}</td>
+
+							<th>담당자</th>
+							<td>${inout.clientManager}</td>
+
+							<th>사원번호</th>
+							<td>${inout.empId}</td>
+
+						</tr>
+
+						<%-- =====================================================
+							창고 정보
+							창고위치와 현재재고도 기본 정보 안에 같이 출력한다.
+						===================================================== --%>
+						<tr>
+
+							<th>창고위치</th>
+							<td>${inout.stockLocation}</td>
+
+							<th>현재재고</th>
+							<td>${inout.inventoryStock}</td>
+
+							<th>재고단위</th>
+							<td>${inout.itemUnit}</td>
+
+						</tr>
+
 						<tr>
 
 							<th>비고</th>
@@ -436,6 +571,51 @@
 							<td colspan="5">
 								${inout.remark}
 							</td>
+
+						</tr>
+
+					</tbody>
+
+				</table>
+
+			</div>
+
+			<%-- =====================================================
+				입출고 내역서
+			===================================================== --%>
+			<div class="detail_card">
+
+				<div class="detail_card_title">
+					입출고 내역서
+				</div>
+
+				<table class="detail_info_table">
+
+					<tbody>
+
+						<tr>
+
+							<th>입출고번호</th>
+							<td>${inout.docNo}</td>
+
+							<th>상태</th>
+							<td>${inout.status}</td>
+
+							<th>입출고일자</th>
+							<td>${inout.inoutDate}</td>
+
+						</tr>
+
+						<tr>
+
+							<th>사용여부</th>
+							<td>${inout.useYn}</td>
+
+							<th>등록일</th>
+							<td>${inout.createdDate}</td>
+
+							<th>수정일</th>
+							<td>${inout.updatedDate}</td>
 
 						</tr>
 
