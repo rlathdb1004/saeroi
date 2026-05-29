@@ -118,6 +118,10 @@
 										<td>
 											<input type="text" name="down_reason" value="${eqp.down_reason}">
 										</td>
+
+										<th>DOC 번호</th>
+										<td>${eqp.doc_no}</td>
+
 										<th>비고</th>
 										<td><input type="text" name="remark" value="${eqp.remark}">
 										</td>
@@ -134,8 +138,10 @@
 								<tr>
 									<th>설비코드</th>
 									<td>${eqp.equip_code}</td>
+
 									<th>설비명</th>
 									<td>${eqp.equip_name}</td>
+
 									<th>작동 일자</th>
 									<td>${eqp.operation_date}</td>
 								</tr>
@@ -143,8 +149,10 @@
 								<tr>
 									<th>계획 가동 시간</th>
 									<td>${eqp.plan_time_min}</td>
+
 									<th>가동 시간</th>
 									<td>${eqp.runtime_min}</td>
+
 									<th>비가동 시간</th>
 									<td>${eqp.downtime_min}</td>
 								</tr>
@@ -152,6 +160,10 @@
 								<tr>
 									<th>비가동 원인</th>
 									<td>${eqp.down_reason}</td>
+
+									<th>DOC 번호</th>
+									<td>${eqp.doc_no}</td>
+
 									<th>비고</th>
 									<td>${eqp.remark}</td>
 								</tr>
@@ -186,7 +198,7 @@
 							<table class="detail_info_table">
 								<c:choose>
 									<c:when test="${not empty maintenanceList}">
-										<tr>											
+										<tr>
 											<th>정비 종류</th>
 											<th>정비 내용</th>
 											<th>정비 시간</th>
@@ -194,7 +206,7 @@
 										</tr>
 
 										<c:forEach var="m" items="${maintenanceList}">
-											<tr>												
+											<tr>
 												<td>${m.equip_main_type}</td>
 												<td>${m.equip_main_content}</td>
 												<td>${m.equip_main_time}</td>
@@ -245,15 +257,15 @@
 							<table class="detail_info_table">
 								<c:choose>
 									<c:when test="${not empty troubleList}">
-										<tr>											
+										<tr>
 											<th>고장원인</th>
 											<th>고장일시</th>
 											<th>해결방법</th>
-											<th>해결일시</th>											
+											<th>해결일시</th>
 											<th>상세</th>
 										</tr>
 										<c:forEach var="t" items="${troubleList}">
-											<tr>												
+											<tr>
 												<td>${t.trouble_content}</td>
 												<td>
 													<fmt:formatDate value="${t.trouble_date}"
@@ -263,7 +275,7 @@
 												<td>
 													<fmt:formatDate value="${t.resolve_date}"
 														pattern="yyyy-MM-dd HH:mm" />
-												</td>												
+												</td>
 												<td>
 													<button type="button" class="coDetailBtn"
 														onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/trouble_detail?trouble_id=${eqp.trouble_id}'">
