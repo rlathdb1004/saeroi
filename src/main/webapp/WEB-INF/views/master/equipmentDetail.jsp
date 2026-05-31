@@ -85,7 +85,7 @@
 							action="${pageContext.request.contextPath}/equipment/update">
 
 							<input type="hidden" name="equip_id" value="${eqp.equip_id}">
-							
+
 
 							<div class="detail_card">
 
@@ -96,7 +96,7 @@
 										<td>${eqp.equip_code}</td>
 
 										<th>설비명</th>
-										<td><input type="text" name="equip_name" value="${eqp.equip_name}"></td>
+										<td>${eqp.equip_name}</td>
 
 										<th>상태</th>
 										<td><input type="text" name="equip_status" value="${eqp.equip_status}"></td>
@@ -104,42 +104,34 @@
 
 									<tr>
 										<th>제조사</th>
-										<td><select name="client_id">
-												<c:forEach var="client" items="${clientList}">
-													<option value="${client.client_id}"
-														${client.client_id==eqp.client_id ? 'selected' : '' }>
-														${client.client_name}</option>
-												</c:forEach>
-											</select></td>
+										<td>${eqp.client_name}</td>
 
 										<th>설비 가격</th>
-										<td><input type="number" name="equip_price" value="${eqp.equip_price}"></td>
-
-										<th>구매일</th>
-										<td><input type="date" name="buy_date" value="${eqp.buy_date}"></td>
-									</tr>
-
-									<tr>
-										<th>위치</th>
 										<td>
-											<select name="line_id">
-												<c:forEach var="line" items="${lineList}">
-													<option value="${line.line_id}" ${line.line_id==eqp.line_id
-														? 'selected' : '' }>
-														${line.line_name}
-													</option>
-												</c:forEach>
-											</select>
+											<fmt:formatNumber value="${eqp.equip_price}" pattern="#,###" /> 원
 										</td>
 
-										<th>수정일</th>
-										<td><fmt:formatDate value="${eqp.updated_date}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
+										<th>구매일</th>
+										<td>${eqp.buy_date}</td>
+									</tr>
+
+									<tr>										
+										<th>설비 위치</th>
+										<td>${eqp.equip_loc}</td>
 
 										<th>비고</th>
 										<td><input type="text" name="remark" value="${eqp.remark}">
 										</td>
+
+										<th>수정일</th>
+										<td>
+											<fmt:formatDate value="${eqp.updated_date}" pattern="yyyy-MM-dd HH:mm:ss" />
+										</td>
 									</tr>
 
+									<tr>
+										
+									</tr>
 								</table>
 							</div>
 						</form>
@@ -158,7 +150,18 @@
 									<td>${eqp.equip_name}</td>
 
 									<th>상태</th>
-									<td>${eqp.equip_status}</td>
+									<td>
+										<c:choose>
+											<c:when test="${eqp.equip_status == '가동'}">
+												<span class="coStatus coStatusUse">가동</span>
+											</c:when>
+											<c:otherwise>
+												<span class="coStatus coStatusStop">
+													${eqp.equip_status}
+												</span>
+											</c:otherwise>
+										</c:choose>
+									</td>
 								</tr>
 
 								<tr>
@@ -167,7 +170,7 @@
 
 									<th>설비 가격</th>
 									<td>
-										<fmt:formatNumber value="${eqp.equip_price}" pattern="#,###" />
+										<fmt:formatNumber value="${eqp.equip_price}" pattern="#,###" /> 원
 									</td>
 
 									<th>구매일</th>
@@ -175,19 +178,24 @@
 								</tr>
 
 								<tr>
+									
 									<th>설비 위치</th>
 									<td>${eqp.equip_loc}</td>
 
-									<th>수정일</th>
-									<td><fmt:formatDate value="${eqp.updated_date}" pattern="yyyy-MM-dd HH:mm:ss"/></td>
-									
 									<th>비고</th>
 									<td>${eqp.remark}</td>
+
+									<th>수정일</th>
+									<td>
+										<fmt:formatDate value="${eqp.updated_date}" pattern="yyyy-MM-dd HH:mm:ss" />
+									</td>
+								</tr>
+
+								<tr>
+									
 								</tr>
 							</table>
 						</div>
 					</c:otherwise>
-
 				</c:choose>
-
 			</div>

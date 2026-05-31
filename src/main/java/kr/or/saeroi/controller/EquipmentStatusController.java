@@ -16,7 +16,9 @@ import kr.or.saeroi.dao.EquipmentStatusDAO;
 import kr.or.saeroi.dto.EquipmentMaintenanceDTO;
 import kr.or.saeroi.dto.EquipmentStatusDTO;
 import kr.or.saeroi.dto.EquipmentTroubleDTO;
+import kr.or.saeroi.dto.LoginDTO;
 import kr.or.saeroi.service.EquipmentStatusService;
+import kr.or.saeroi.service.LoginService;
 
 @Controller
 public class EquipmentStatusController {
@@ -26,6 +28,9 @@ public class EquipmentStatusController {
 	
 	@Autowired
 	private EquipmentStatusDAO dao;
+	
+	@Autowired
+	private LoginService loginService;
 	
 	@GetMapping("/equipment/equipmentstatus")
 	public String equipmentStatus(
@@ -73,7 +78,7 @@ public class EquipmentStatusController {
             @RequestParam(required = false) String mode,
             Model model) {
 
-        EquipmentStatusDTO dto = service.get_equipment_status_detail(history_id);
+        EquipmentStatusDTO dto = service.equipment_status_detail(history_id);
 
         List<EquipmentMaintenanceDTO> maintenanceList =
                 service.maintenance_history(dto.getEquip_id(),
@@ -83,9 +88,12 @@ public class EquipmentStatusController {
                 service.trouble_history(dto.getEquip_id(),
                         				dto.getOperation_date());
 
+        List<LoginDTO> empList = loginService.emp_list();
+        
         model.addAttribute("eqp", dto);
         model.addAttribute("maintenanceList",maintenanceList);
         model.addAttribute("troubleList",troubleList);
+        model.addAttribute("empList",empList);
         model.addAttribute("mode", mode);
 
         return "master/equipmentStatusDetail.tiles";
@@ -105,5 +113,15 @@ public class EquipmentStatusController {
         return "redirect:/equipment/equipmentstatus";
     }
     
+    @PostMapping("/equipment_trouble/insert")
+    public String trouble_insert(EquipmentStatusDTO dto) {
+        service.trouble_insert(dto);
+        return "redirect:/equipment/equipmentstatus/detail?history_id=\" + dto.getHistory_id()";
+    }
     
+    @PostMapping("/equipment_trouble/update")
+    public String update_trouble(EquipmentStatusDTO dto) {
+        service.trouble_update(dto);
+        return "redirect:/equipment/equipmentstatus/detail?history_id=" + dto.getHistory_id();
+    }
 }

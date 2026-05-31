@@ -84,6 +84,8 @@ document.querySelectorAll('.modal_today').forEach(input => {
 
 const inspectionType = document.querySelector('#modal_insert [name="insp_type"]');
 const inspectionResult = document.querySelector('#modal_insert [name="result"]');
+const RESULT_PASS = '합격';
+const RESULT_CONDITIONAL = '조건부';
 
 if (inspectionType) {
     inspectionType.innerHTML = '';
@@ -97,9 +99,8 @@ if (inspectionType) {
 if (inspectionResult) {
     inspectionResult.innerHTML = '';
     inspectionResult.innerHTML += '<option value="">선택</option>';
-    inspectionResult.innerHTML += '<option value="합격">합격</option>';
-    inspectionResult.innerHTML += '<option value="조건부">조건부</option>';
-    inspectionResult.innerHTML += '<option value="불합격">불합격</option>';
+    inspectionResult.innerHTML += '<option value="' + RESULT_PASS + '">' + RESULT_PASS + '</option>';
+    inspectionResult.innerHTML += '<option value="' + RESULT_CONDITIONAL + '">' + RESULT_CONDITIONAL + '</option>';
 }
 
 let productionOptions = null;
@@ -126,11 +127,13 @@ function loadProductionOptions(selectTag) {
 
             const option = document.createElement('option');
             option.value = item.prod_id;
+            option.dataset.prodQty = hasText(item.prod_qty) ? item.prod_qty : '';
             option.textContent = textParts.join(' | ');
             selectTag.appendChild(option);
         });
 
         selectTag.dataset.loaded = 'Y';
+        applySelectedProductionQty(selectTag);
     };
 
     if (productionOptions) {
@@ -267,6 +270,9 @@ document.querySelectorAll('select[name="prod_id"]').forEach(select => {
     select.addEventListener('click', function () {
         loadProductionOptions(select);
     });
+    select.addEventListener('change', function () {
+        applySelectedProductionQty(select);
+    });
 });
 
 document.querySelectorAll('select[name="defect_id"]').forEach(select => {
@@ -292,14 +298,119 @@ const inspectionDefectArea = document.getElementById('inspectionDefectArea');
 const inspectionDefectId = document.getElementById('inspectionDefectId');
 const inspectionActionDept = document.getElementById('inspectionActionDept');
 const inspectionActionEmpId = document.getElementById('inspectionActionEmpId');
+const inspectionInsertForm = document.querySelector('#modal_insert form');
+const inspectionProdQty = document.getElementById('inspectionProdQty');
+const inspectionGoodQty = document.getElementById('inspectionGoodQty');
+const inspectionDefectQty = document.getElementById('inspectionDefectQty');
+const inspectionQtyError = document.getElementById('inspectionQtyError');
+const inspectionSubmitBtn = document.querySelector('#modal_insert .modal_btn_submit');
+
+function toNumber(input) {
+    if (!input || !hasText(input.value)) {
+        return 0;
+    }
+
+    const value = Number(input.value);
+    return Number.isFinite(value) ? value : 0;
+}
+
+function applySelectedProductionQty(selectTag) {
+    if (!selectTag || !inspectionProdQty) {
+        return;
+    }
+
+    const selectedOption = selectTag.options[selectTag.selectedIndex];
+    const prodQty = selectedOption ? selectedOption.dataset.prodQty : '';
+
+    inspectionProdQty.value = hasText(prodQty) ? prodQty : '';
+    validateInspectionQuantity();
+}
+
+function isPassResult() {
+    return inspectionResult && inspectionResult.value === RESULT_PASS;
+}
+
+function isConditionalResult() {
+    return inspectionResult && inspectionResult.value === RESULT_CONDITIONAL;
+}
+
+function setInspectionQtyError(message) {
+    if (!inspectionQtyError) {
+        return;
+    }
+
+    if (message) {
+        inspectionQtyError.textContent = message;
+        inspectionQtyError.style.display = '';
+        return;
+    }
+
+    inspectionQtyError.style.display = 'none';
+}
+
+function validateInspectionQuantity() {
+    if (!inspectionProdQty || !inspectionGoodQty) {
+        return true;
+    }
+
+    const prodQty = toNumber(inspectionProdQty);
+    const goodQty = toNumber(inspectionGoodQty);
+    const defectQty = hasDefect && hasDefect.checked && !hasDefect.disabled ? toNumber(inspectionDefectQty) : 0;
+    let errorMessage = '';
+
+    if (prodQty > 0 && goodQty + defectQty > prodQty) {
+        errorMessage = '생산 수량을 초과 할 수 없습니다.';
+    } else if (isPassResult() && prodQty > 0 && goodQty !== prodQty) {
+        errorMessage = '합격은 생산수량 전체가 양품수량이어야 합니다.';
+    } else if (isConditionalResult()) {
+        if (!hasDefect || !hasDefect.checked) {
+            errorMessage = '조건부는 불량 정보 및 조치를 함께 등록해야 합니다.';
+        } else if (defectQty <= 0) {
+            errorMessage = '조건부는 불량수량을 1개 이상 입력해야 합니다.';
+        } else if (prodQty > 0 && goodQty + defectQty !== prodQty) {
+            errorMessage = '조건부는 양품수량과 불량수량의 합계가 생산수량과 같아야 합니다.';
+        }
+    }
+
+    setInspectionQtyError(errorMessage);
+
+    if (inspectionSubmitBtn) {
+        inspectionSubmitBtn.disabled = !!errorMessage;
+    }
+
+    return !errorMessage;
+}
+
+function updateDefectCheckboxByResult() {
+    if (!hasDefect) {
+        return;
+    }
+
+    if (isPassResult()) {
+        hasDefect.checked = false;
+        hasDefect.disabled = true;
+    } else if (isConditionalResult()) {
+        hasDefect.checked = true;
+        hasDefect.disabled = false;
+    } else {
+        hasDefect.disabled = false;
+    }
+
+    toggleInspectionDefectArea();
+    validateInspectionQuantity();
+}
 
 function toggleInspectionDefectArea() {
     if (!hasDefect || !inspectionDefectArea) {
         return;
     }
 
-    const isChecked = hasDefect.checked;
+    const isChecked = hasDefect.checked && !hasDefect.disabled && !isPassResult();
     inspectionDefectArea.style.display = isChecked ? '' : 'none';
+
+    inspectionDefectArea.querySelectorAll('input, select, textarea').forEach(input => {
+        input.disabled = !isChecked;
+    });
 
     inspectionDefectArea.querySelectorAll('.defectRequired').forEach(input => {
         input.required = isChecked;
@@ -308,6 +419,8 @@ function toggleInspectionDefectArea() {
     if (isChecked && inspectionDefectId) {
         loadDefectOptions(inspectionDefectId);
     }
+
+    validateInspectionQuantity();
 }
 
 function updateInspectionActionDept() {
@@ -331,6 +444,35 @@ function updateInspectionActionDept() {
 if (hasDefect) {
     hasDefect.addEventListener('change', toggleInspectionDefectArea);
     toggleInspectionDefectArea();
+}
+
+if (inspectionResult) {
+    inspectionResult.addEventListener('change', updateDefectCheckboxByResult);
+    updateDefectCheckboxByResult();
+}
+
+if (inspectionGoodQty) {
+    inspectionGoodQty.addEventListener('input', validateInspectionQuantity);
+}
+
+if (inspectionDefectQty) {
+    inspectionDefectQty.addEventListener('input', validateInspectionQuantity);
+}
+
+if (inspectionInsertForm) {
+    inspectionInsertForm.addEventListener('submit', function (event) {
+        if (!validateInspectionQuantity()) {
+            event.preventDefault();
+
+            if (inspectionQtyError) {
+                inspectionQtyError.style.display = '';
+            }
+
+            if (inspectionGoodQty) {
+                inspectionGoodQty.focus();
+            }
+        }
+    });
 }
 
 if (inspectionDefectId) {

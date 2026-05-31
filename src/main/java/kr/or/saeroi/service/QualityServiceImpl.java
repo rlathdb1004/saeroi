@@ -36,8 +36,11 @@ public class QualityServiceImpl implements QualityService {
 				remark);
 	}
 
+	@Transactional
 	@Override
 	public int _ser_delete_Inspection(String[] insp_id) {
+		qualityDAO._dao_delete_Defect_action_by_Inspection(insp_id);
+		qualityDAO._dao_delete_Defect_by_Inspection(insp_id);
 		return qualityDAO._dao_delete_Inspection(insp_id);
 	}
 
@@ -59,6 +62,11 @@ public class QualityServiceImpl implements QualityService {
 	public List<DefectDTO> _ser_select_Defect(String startDate, String endDate, String searchType, String keyword) {
 		System.out.println("defect_list 실행 됨");
 		return qualityDAO._dao_select_Defect(startDate, endDate, searchType, keyword);
+	}
+
+	@Override
+	public List<DefectDTO> _ser_select_Defect_by_Inspection(String insp_id) {
+		return qualityDAO._dao_select_Defect_by_Inspection(insp_id);
 	}
 
 	@Override
@@ -111,6 +119,11 @@ public class QualityServiceImpl implements QualityService {
 	}
 
 	@Override
+	public List<DefectDTO> _ser_select_Defect_action_by_Inspection(String insp_id) {
+		return qualityDAO._dao_select_Defect_action_by_Inspection(insp_id);
+	}
+
+	@Override
 	public int _ser_insert_Defect_action(String defect_list_id, String action_date, String emp_id,
 			String action_content) {
 		return qualityDAO._dao_insert_Defect_action(defect_list_id, action_date, emp_id, action_content);
@@ -123,5 +136,11 @@ public class QualityServiceImpl implements QualityService {
 
 	private boolean hasText(String value) {
 		return value != null && value.trim().length() > 0;
+	}
+	
+	// 대시보드 최근 7일 불량유형별 수량 TOP5를 조회한다.
+	@Override
+	public List<DefectDTO> _ser_select_Dashboard_DefectTop5() {
+		return qualityDAO._dao_select_Dashboard_DefectTop5();
 	}
 }

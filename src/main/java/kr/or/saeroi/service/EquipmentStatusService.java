@@ -29,8 +29,8 @@ public class EquipmentStatusService {
 		return dao.insert(dto);		
 	}
 	
-	public EquipmentStatusDTO get_equipment_status_detail(int history_id) {
-	    return dao.get_equipment_status_detail(history_id);
+	public EquipmentStatusDTO equipment_status_detail(int history_id) {
+	    return dao.equipment_status_detail(history_id);
 	}
 
 	public int update(EquipmentStatusDTO dto) {
@@ -51,6 +51,16 @@ public class EquipmentStatusService {
 	        int equip_id, Date operation_date) {
 
 	    return dao.trouble_history(equip_id, operation_date);
+	}
+
+	public int trouble_update(EquipmentStatusDTO dto) {
+		return dao.truoble_update(dto);
+		
+	}
+
+	public int trouble_insert(EquipmentStatusDTO dto) {
+		return dao.trouble_insert(dto);	
+		
 	}
 
 	

@@ -26,11 +26,10 @@
 				<div class="search-item">
 					<label class="search-label">차트구분</label> <select name="searchType"
 						class="search-select" id="select_type">
+						<option value="month" selected>월별</option>
 						<option value="day">일별</option>
 						<option value="week">주별</option>
-						<option value="month" selected>월별</option>
 						<option value="year_sum">년별(합)</option>
-						<option value="year_avg">년별(평균)</option>
 					</select>
 				</div>
 
@@ -53,6 +52,13 @@
 						</c:forEach>
 					</select>
 				</div>
+				  <div class="search-btn-wrap">
+				 <button type="button"
+                    class="search-btn search-btn-sub search-reset-btn">
+                   
+                    초기화
+                </button>
+                </div>
 			</div>
 		</div>
 	</form>
@@ -152,6 +158,22 @@ function getLocalDateFromWeek(weekStr, isEnd) {
 			let type = document.querySelector('#select_type').value || 'month';
 		    loadChartData(type,this.value);
 		});
+		
+		let resetBtn = document.querySelector('.search-reset-btn');
+
+		if (resetBtn) {
+		    resetBtn.addEventListener('click', function() {
+		    	
+		        document.querySelector('#select_type').value = 'month'; 
+		        document.querySelector('#select_item').value = 'all';   
+		        document.querySelector('#startDate').value = '';       
+		        document.querySelector('#endDate').value = '';         
+		        
+		        currentPage = 1;
+		        
+		        loadChartData('month', 'all');
+		    });
+		}
 		
 		let chart_btn = document.querySelector('#chart_detail');
 		if(chart_btn){
@@ -327,9 +349,21 @@ function getLocalDateFromWeek(weekStr, isEnd) {
 
       		let detailUrl = "${pageContext.request.contextPath}/report/chart"
       					  + "?searchType=" + encodeURIComponent(searchType)
-      				   	  + "&searchItem=" + encodeURIComponent(item.품목명 || searchItem)
-      					  + "&startDate=" + encodeURIComponent(startDate || "")
-      					  + "&endDate=" + encodeURIComponent(endDate || "");
+      				   	  + "&searchItem=" + encodeURIComponent(item.품목명 || searchItem);
+      						if(searchType==="month"){
+      							detailUrl += "&startDate=" + encodeURIComponent(item.계획일자+"-01" || "")
+      	      					detailUrl += "&endDate=" + encodeURIComponent(item.계획일자+"-01" || "");
+      						} else if (searchType === 'year_sum' || searchType === 'year_avg'){
+      							detailUrl += "&startDate=" + encodeURIComponent(item.계획일자+"-01-01" || "")
+          	      				detailUrl += "&endDate=" + encodeURIComponent(item.계획일자+"-12-31" || "");
+      						} else if (searchType === 'day') {
+      							detailUrl += "&startDate=" + encodeURIComponent(item.계획일자 || "")
+          	      				detailUrl += "&endDate=" + encodeURIComponent(item.계획일자|| "");
+      						} else if(searchType === 'week'){
+      							detailUrl += "&startDate=" + getLocalDateFromWeek(startDate, false);
+      							detailUrl += "&endDate=" + getLocalDateFromWeek(startDate, false);
+      						}
+      					 
 
       		row.innerHTML = ''
       			+ '<td><input type="checkbox" name="orderIds" class="check_btn" value="' + escapeHtml(item.계획일자) + '"></td>'

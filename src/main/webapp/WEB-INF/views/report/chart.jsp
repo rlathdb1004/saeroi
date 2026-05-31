@@ -83,7 +83,10 @@
 .dashboard-container {
 	flex-direction: column; /* 가로 배열을 세로 배열로 변경 ✨ */
 }
-
+.apexcharts-toolbar {
+    top: 30px !important;    /* 🔴 원래 0px 근처인 값을 아래로 내림 (원하는 만큼 수정 가능) */
+    right: 10px !important;  /* 우측 여백 조정 */
+}
 
 </style>
 </head>
@@ -98,14 +101,12 @@
 				<div class="search-item">
 					<label class="search-label">차트구분</label> <select name="searchType"
 						class="search-select" id="select_type">
-						<option value="day" ${searchType == 'day' ? 'selected' : ''}>일별</option>
-						<option value="week" ${searchType == 'week' ? 'selected' : ''}>주별</option>
 						<option value="month"
 							${empty searchType || searchType == 'month' ? 'selected' : ''}>월별</option>
+						<option value="day" ${searchType == 'day' ? 'selected' : ''}>일별</option>
+						<option value="week" ${searchType == 'week' ? 'selected' : ''}>주별</option>
 						<option value="year_sum"
 							${searchType == 'year_sum' ? 'selected' : ''}>년별(합)</option>
-						<option value="year_avg"
-							${searchType == 'year_avg' ? 'selected' : ''}>년별(평균)</option>
 					</select>
 				</div>
 
@@ -132,6 +133,13 @@
 						</c:forEach>
 					</select>
 				</div>
+				 <div class="search-btn-wrap">
+				 <button type="button"
+                    class="search-btn search-btn-sub search-reset-btn">
+                   
+                    초기화
+                </button>
+                </div>
 			</div>
 		</div>
 	</form>
@@ -143,7 +151,7 @@
 
 		<div class="right-panel">
 			<div class="chart-box">
-				<h4 class="box-title">불량 원인</h4>
+				<h4 class="box-title" id="boxTitle">불량 원인</h4>
 				<div id="oChart"></div>
 			</div>
 			<div class="coTableTop">
@@ -153,7 +161,7 @@
 				<table class="coTable" id="reportTable">
 					<thead>
 						<tr>
-							<th >일자/기간</th>
+							<th style="width: 180px !important;" >일자/기간</th>
 							<th class="mobile_hidden">품목명</th>
 							<th>계획량</th>
 							<th>작업량</th>
@@ -237,6 +245,22 @@
 		    loadChartData(type,this.value);
 		});
 		
+		let resetBtn = document.querySelector('.search-reset-btn');
+		
+		if (resetBtn) {
+		    resetBtn.addEventListener('click', function() {
+		    	
+		        document.querySelector('#select_type').value = 'month'; 
+		        document.querySelector('#select_item').value = 'all';   
+		        document.querySelector('#startDate').value = '';       
+		        document.querySelector('#endDate').value = '';         
+		        
+		        currentPage = 1;
+		        
+		        loadChartData('month', 'all');
+		    });
+		}
+		
 	});
 	
 	async function loadChartData(searchType,searchItem){
@@ -309,6 +333,15 @@
         let totalCount = chartList.length;
         document.querySelector('.coTotalCount').innerText = '총 ' + totalCount + '건';
 
+        let boxTitleEl = document.querySelector('#boxTitle');
+        if (boxTitleEl) {
+            if (searchType === 'year_sum' || searchType === 'year_avg') {
+                boxTitleEl.innerText = '불량 원인 TOP3';
+            } else {
+                boxTitleEl.innerText = '불량 원인';
+            }
+        }
+        
          // 2. 페이징 계산 (JavaScript 버전)
          let totalPage = Math.ceil(totalCount / pageSize) || 1;
          if (currentPage > totalPage) currentPage = totalPage;
@@ -356,7 +389,6 @@
       			+ '<td>' + orderQty.toLocaleString() + '</td>'
       			+ '<td class="mobile_hidden" style="color: #FF4560; font-weight: bold;">' + defectQty.toLocaleString() + '</td>'
       			+ '<td class="mobile_hidden">' + escapeHtml(achievementRate) + '</td>'
-      			+ '<td><a href="' + escapeHtml(detailUrl) + '" class="coDetailBtn">보기</a></td>';
       		tableBody.appendChild(row);
       		
       		totalPlan += Number(item.생산계획량 || 0);
@@ -446,7 +478,7 @@
       	chart: {
       		height: 480,
       		type: 'line',
-      		toolbar: {show:false},
+      		toolbar: {show:true},
       	events: {
       		zoomed:function(chartContext,{xaxis,yaxis}){
       			

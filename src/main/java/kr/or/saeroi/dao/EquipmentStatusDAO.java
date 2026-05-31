@@ -70,7 +70,9 @@ public class EquipmentStatusDAO {
 		    return list;
 	}
 	
-	public List<EquipmentStatusDTO> eqp_status_search(String searchType, String keyword) {
+	public List<EquipmentStatusDTO> eqp_status_search(
+	        String searchType,
+	        String keyword) {
 
 	    List<EquipmentStatusDTO> list = new ArrayList<>();
 
@@ -82,48 +84,57 @@ public class EquipmentStatusDAO {
 	        "       e.EQUIP_CODE, " +
 	        "       e.EQUIP_NAME, " +
 	        "       h.OPERATION_DATE, " +
+	        "       h.PLAN_TIME_MIN, " +
 	        "       h.RUNTIME_MIN, " +
 	        "       h.DOWNTIME_MIN, " +
 	        "       h.DOWN_REASON, " +
-	        "       h.REMARK " +
+	        "       h.REMARK, " +
+	        "       h.DOC_NO " +	              
 	        "FROM EQUIPMENT_HISTORY h " +
-	        "JOIN EQUIPMENT e ON h.EQUIP_ID = e.EQUIP_ID " +
+	        "JOIN EQUIPMENT e " +
+	        "ON h.EQUIP_ID = e.EQUIP_ID " +
 	        "WHERE 1=1 "
 	    );
 
-	    boolean hasKeyword =
-	            keyword != null &&
-	            !keyword.trim().isEmpty();
+	    boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
 
-	    if(hasKeyword) {
-
-	        switch(searchType) {
-
+	    if (hasKeyword) {
+	    	
+	        switch (searchType) {
+	        
 	            case "equip_code":
-	                sql.append(" AND e.EQUIP_CODE LIKE ? ");
+	                sql.append(" AND UPPER(e.EQUIP_CODE) " + "LIKE UPPER(?) ");
 	                break;
 	            case "equip_name":
-	                sql.append(" AND e.EQUIP_NAME LIKE ? ");
+	                sql.append(" AND UPPER(e.EQUIP_NAME) " + "LIKE UPPER(?) ");
 	                break;
 	            case "operation_date":
-	                sql.append(" AND TO_CHAR(h.OPERATION_DATE,'YYYY-MM-DD') LIKE ? ");
+	                sql.append(" AND TO_CHAR(h.OPERATION_DATE,'YYYY-MM-DD') " +
+	                    "LIKE ? ");
 	                break;
 	            case "down_reason":
-	                sql.append(" AND h.DOWN_REASON LIKE ? ");
+	                sql.append(" AND UPPER(h.DOWN_REASON) " + "LIKE UPPER(?) ");
 	                break;
+
 	            case "all":
 	            default:
 	                sql.append(
 	                    " AND ( " +
-	                    " e.EQUIP_CODE LIKE ? " +
-	                    " OR e.EQUIP_NAME LIKE ? " +
+	                    " UPPER(e.EQUIP_CODE) LIKE UPPER(?) " +
+	                    " OR UPPER(e.EQUIP_NAME) LIKE UPPER(?) " +
 	                    " OR TO_CHAR(h.OPERATION_DATE,'YYYY-MM-DD') LIKE ? " +
-	                    " OR h.DOWN_REASON LIKE ? " +
+	                    " OR TO_CHAR(h.PLAN_TIME_MIN) LIKE ? " +
+	                    " OR TO_CHAR(h.RUNTIME_MIN) LIKE ? " +
+	                    " OR TO_CHAR(h.DOWNTIME_MIN) LIKE ? " +
+	                    " OR UPPER(h.DOWN_REASON) LIKE UPPER(?) " +
+	                    " OR UPPER(h.REMARK) LIKE UPPER(?) " +
+	                    " OR UPPER(h.DOC_NO) LIKE UPPER(?) " +	                    
 	                    " ) "
 	                );
 	                break;
 	        }
 	    }
+
 	    sql.append(" ORDER BY h.HISTORY_ID DESC ");
 
 	    try (
@@ -131,24 +142,32 @@ public class EquipmentStatusDAO {
 	        PreparedStatement ps = conn.prepareStatement(sql.toString())
 	    ) {
 
-	        if(hasKeyword) {
+	        if (hasKeyword) {
 
 	            String param = "%" + keyword.trim() + "%";
 
-	            if("all".equals(searchType)) {
-	                ps.setString(1, param);
-	                ps.setString(2, param);
-	                ps.setString(3, param);
-	                ps.setString(4, param);
+	            if ("all".equals(searchType)
+	                    || searchType == null
+	                    || searchType.isEmpty()) {
+
+	            	ps.setString(1, param);
+	            	ps.setString(2, param);
+	            	ps.setString(3, param);
+	            	ps.setString(4, param);
+	            	ps.setString(5, param);
+	            	ps.setString(6, param);
+	            	ps.setString(7, param);
+	            	ps.setString(8, param);
+	            	ps.setString(9, param);	            	
+
 	            } else {
 	                ps.setString(1, param);
 	            }
 	        }
 
-	        try(ResultSet rs = ps.executeQuery()) {
+	        try (ResultSet rs = ps.executeQuery()) {
 
-	            while(rs.next()) {
-
+	            while (rs.next()) {
 	                EquipmentStatusDTO dto = new EquipmentStatusDTO();
 
 	                dto.setHistory_id(rs.getInt("HISTORY_ID"));
@@ -156,16 +175,19 @@ public class EquipmentStatusDAO {
 	                dto.setEquip_code(rs.getString("EQUIP_CODE"));
 	                dto.setEquip_name(rs.getString("EQUIP_NAME"));
 	                dto.setOperation_date(rs.getDate("OPERATION_DATE"));
+	                dto.setPlan_time_min(rs.getInt("PLAN_TIME_MIN"));
 	                dto.setRuntime_min(rs.getInt("RUNTIME_MIN"));
 	                dto.setDowntime_min(rs.getInt("DOWNTIME_MIN"));
 	                dto.setDown_reason(rs.getString("DOWN_REASON"));
 	                dto.setRemark(rs.getString("REMARK"));
+	                dto.setDoc_no(rs.getString("DOC_NO"));	                
 
 	                list.add(dto);
 	            }
 	        }
+
 	    } catch (Exception e) {
-	        e.printStackTrace();
+	        throw new RuntimeException("설비 상태 검색 실패", e);
 	    }
 	    return list;
 	}
@@ -210,41 +232,45 @@ public class EquipmentStatusDAO {
 	    return result;
 	}
 	
-	public EquipmentStatusDTO detail(int history_id) {
-
-	    EquipmentStatusDTO dto = null;
+	public int trouble_insert(EquipmentStatusDTO dto) {
+		int result = 0;
 
 	    String sql =
-	        "SELECT * " +
-	        "FROM equipment_history h " +
-	        "JOIN equipment e ON h.equip_id = e.equip_id " +
-	        "WHERE history_id = ?";
+	        "INSERT INTO EQUIPMENT_TROUBLE (" +
+	        "TROUBLE_ID, EQUIP_ID, "+
+	        "EMP_ID, TROUBLE_CONTENT, TROUBLE_DATE, " +
+	        "TROUBLE_RESOLVE, RESOLVE_DATE, REMARK, " +
+	        "CREATED_DATE, UPDATED_DATE) " +
+	        "VALUES (" +
+	        "EQUIPMENT_HISTORY_SEQ.NEXTVAL, ?, "+
+	        "?, ?, ?, ?, " +
+	        "?, ?, ?, " +
+	        "SYSDATE, SYSDATE)";
 
 	    try (
 	        Connection conn = dataSource.getConnection();
 	        PreparedStatement ps = conn.prepareStatement(sql)
 	    ) {
 
-	        ps.setInt(1, history_id);
+	        ps.setInt(1, dto.getEquip_id());
+	        ps.setDate(2, dto.getOperation_date());
+	        ps.setDate(3, dto.getOperation_date());
+	        ps.setDate(4, dto.getOperation_date());
+	        ps.setInt(5, dto.getPlan_time_min());
+	        ps.setInt(6, dto.getRuntime_min());
+	        ps.setInt(7, dto.getDowntime_min());
+	        ps.setString(8, dto.getDown_reason());
+	        ps.setString(9, dto.getRemark());
 
-	        ResultSet rs = ps.executeQuery();
+	        result = ps.executeUpdate();
 
-	        if(rs.next()) {
-
-	            dto = new EquipmentStatusDTO();
-
-	            dto.setHistory_id(rs.getInt("history_id"));	            
-	            dto.setEquip_name(rs.getString("equip_name"));
-	            dto.setDown_reason(rs.getString("down_reason"));
-	            dto.setRemark(rs.getString("remark"));
-	        }
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
-	    return dto;
+	    return result;
 	}
 	
-	public EquipmentStatusDTO get_equipment_status_detail(int history_id) {
+	public EquipmentStatusDTO equipment_status_detail(int history_id) {
 
 	    EquipmentStatusDTO dto = null;
 
@@ -252,7 +278,7 @@ public class EquipmentStatusDAO {
 	        "SELECT " +
 	        "EH.HISTORY_ID, EH.EQUIP_ID, E.EQUIP_CODE, E.EQUIP_NAME, " +
 	        "EH.OPERATION_DATE, EH.PLAN_TIME_MIN, EH.RUNTIME_MIN, EH.DOWNTIME_MIN, " +
-	        "EH.DOWN_REASON, EH.REMARK " +	        
+	        "EH.DOWN_REASON, EH.DOC_NO, EH.REMARK " +	        
 	        "FROM EQUIPMENT_HISTORY EH " +
 	        "LEFT JOIN EQUIPMENT E ON EH.EQUIP_ID = E.EQUIP_ID " +	        
 	        "WHERE EH.HISTORY_ID = ?";
@@ -277,6 +303,7 @@ public class EquipmentStatusDAO {
 	        	    dto.setRuntime_min(rs.getInt("RUNTIME_MIN"));
 	        	    dto.setDowntime_min(rs.getInt("DOWNTIME_MIN"));
 	        	    dto.setDown_reason(rs.getString("DOWN_REASON"));
+	        	    dto.setDoc_no(rs.getString("DOC_NO"));
 	        	    dto.setRemark(rs.getString("REMARK"));
 	        	}
 	        }
@@ -293,6 +320,35 @@ public class EquipmentStatusDAO {
 
 	    String sql =
 	        "UPDATE EQUIPMENT_HISTORY " +
+	        "SET RUNTIME_MIN = ?, " +
+	        "    DOWNTIME_MIN = ?, " +
+	        "    DOWN_REASON = ?, " +
+	        "    REMARK = ? " +	          
+	        "WHERE HISTORY_ID = ?";
+
+	    try (
+	        Connection conn = dataSource.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql)
+	    ) {
+
+	        ps.setInt(1, dto.getRuntime_min());
+	        ps.setInt(2, dto.getDowntime_min());
+	        ps.setString(3, dto.getDown_reason());
+	        ps.setString(4, dto.getRemark());
+	        ps.setInt(5, dto.getHistory_id());
+
+	        result = ps.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return result;
+	}
+	
+	public int truoble_update(EquipmentStatusDTO dto) {
+		int result = 0;
+
+	    String sql =
+	        "UPDATE EQUIPMENT_TROUBLE " +
 	        "SET RUNTIME_MIN = ?, " +
 	        "    DOWNTIME_MIN = ?, " +
 	        "    DOWN_REASON = ?, " +
@@ -455,9 +511,9 @@ public class EquipmentStatusDAO {
 	            dto.setEmp_id(rs.getInt("EMP_ID"));
 	            dto.setEname(rs.getString("ENAME"));
 	            dto.setTrouble_content(rs.getString("TROUBLE_CONTENT"));
-	            dto.setTrouble_date(rs.getDate("TROUBLE_DATE"));
+	            dto.setTrouble_date(rs.getTimestamp("TROUBLE_DATE"));
 	            dto.setTrouble_resolve(rs.getString("TROUBLE_RESOLVE"));
-	            dto.setResolve_date(rs.getDate("RESOLVE_DATE"));
+	            dto.setResolve_date(rs.getTimestamp("RESOLVE_DATE"));
 	            dto.setRemark(rs.getString("REMARK"));
 
 	            list.add(dto);
@@ -467,4 +523,8 @@ public class EquipmentStatusDAO {
 	    }
 	    return list;
 	}
+
+	
+
+	
 }
