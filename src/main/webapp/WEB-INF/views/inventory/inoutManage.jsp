@@ -302,21 +302,30 @@
 				onsubmit="return checkInoutInsert();">
 
 				<%-- =====================================================
-					화면에서 제거한 DB 저장용 값
-					사용여부 / 작업지시번호 / 문서번호 / 문서순번은 화면에는 보이지 않게 유지한다.
-					Controller가 해당 값을 받더라도 등록이 깨지지 않도록 hidden 기본값만 전송한다.
+					사용여부
+					화면에는 표시하지 않지만 DB 저장 시 기본값 Y가 필요해서 hidden으로 보낸다.
 				===================================================== --%>
-				<input type="hidden" name="useYn" value="Y">
-				<input type="hidden" name="orderId" value="0">
-				<input type="hidden" name="docNo" value="">
-				<input type="hidden" name="docSeq" value="0">
+				<input type="hidden"
+					name="useYn"
+					value="Y">
 
 				<div class="modal_body modal_body_2col">
 
 					<%-- =====================================================
 						사원번호
-						화면에서는 로그인 사용자 사원번호를 자동 표시한다.
-						실제 저장은 Controller에서 session 로그인 정보 기준으로 한 번 더 처리한다.
+						화면에는 DB 저장용 EMP_ID 숫자값이 아니라
+						EMP 테이블의 사번 EMPNO를 보여준다.
+
+						예)
+						화면 표시 : E2026004
+						DB 저장   : EMP_ID = 4
+
+						주의:
+						이 input에는 name을 넣지 않는다.
+						실제 저장은 Controller에서 session 로그인 정보로
+						getLoginEmpId(session)을 호출해서 처리한다.
+						그래서 화면에는 E2026004가 보여도
+						MATERIAL_INOUT.EMP_ID에는 4가 저장된다.
 					===================================================== --%>
 					<div class="modal_item">
 
@@ -325,11 +334,10 @@
 							<span class="modal_required">*</span>
 						</label>
 
-						<input type="number"
-							name="empId"
-							id="insertEmpId"
+						<input type="text"
+							id="insertEmpNo"
 							class="modal_input"
-							value="${loginEmpId}"
+							value="${loginEmpNo}"
 							readonly>
 
 					</div>
@@ -619,6 +627,8 @@
 	// =========================================================
 	// 등록 모달 필수값 방어코딩
 	// 공통 JS는 건드리지 않고 현재 JSP 안에서만 검증한다.
+	// 입고(MI)일 때 LOT번호가 비어 있으면 등록 직전에 한 번 더 자동 생성한다.
+	// 출고(MO-PROD)일 때는 select 박스에서 고른 LOT번호를 hidden 값에 복사한다.
 	// =========================================================
 	function checkInoutInsert() {
 
@@ -636,6 +646,12 @@
 
 		var materialLot =
 			document.getElementById("insertMaterialLot");
+
+		var materialLotInput =
+			document.getElementById("insertMaterialLotInput");
+
+		var materialLotSelect =
+			document.getElementById("insertMaterialLotSelect");
 
 		var inoutTypeError =
 			document.getElementById("inoutTypeError");
@@ -688,6 +704,49 @@
 			inoutDate.classList.add("input_error");
 			dateError.style.display = "block";
 			isValid = false;
+		}
+
+		// =====================================================
+		// LOT번호 최종 방어코딩
+		// 이벤트가 꼬여도 입고는 등록 직전에 자동 생성되게 한다.
+		// =====================================================
+		if (materialLot != null
+			&& inoutType.value == "MI"
+			&& materialLot.value == "") {
+
+			var lotNo =
+				createInsertMaterialLot();
+
+			materialLot.value =
+				lotNo;
+
+			if (materialLotInput != null) {
+
+				materialLotInput.value =
+					lotNo;
+
+				materialLotInput.style.display =
+					"";
+			}
+
+			if (materialLotSelect != null) {
+
+				materialLotSelect.style.display =
+					"none";
+			}
+		}
+
+		// =====================================================
+		// 출고는 select 박스 선택값을 hidden materialLot에 복사한다.
+		// =====================================================
+		if (materialLot != null
+			&& inoutType.value == "MO-PROD") {
+
+			if (materialLotSelect != null) {
+
+				materialLot.value =
+					materialLotSelect.value;
+			}
 		}
 
 		if (materialLot != null
@@ -754,12 +813,12 @@
 			&& dateInput.value != "") {
 
 			dateText =
-				dateInput.value.replaceAll("-", "");
+				dateInput.value.split("-").join("");
 
 		} else {
 
 			dateText =
-				formatDateForInput(new Date()).replaceAll("-", "");
+				formatDateForInput(new Date()).split("-").join("");
 		}
 
 		var randomNo =
@@ -1097,26 +1156,26 @@
 					option.value =
 						list[i].materialLot || "";
 
-					var remainQty =
-						0;
-
-					if (list[i].remainQty != null) {
-
-						remainQty =
-							list[i].remainQty;
-
-					} else if (list[i].inoutQty != null) {
-
-						remainQty =
-							list[i].inoutQty;
-					}
-
 					option.text =
 						(list[i].materialLot || "")
 						+ " / 잔량 "
-						+ remainQty;
+						+ (list[i].remainQty == null ? 0 : list[i].remainQty);
 
 					insertMaterialLotSelect.appendChild(option);
+				}
+
+				// =================================================
+				// 출고 가능한 LOT가 1개뿐이면 자동 선택해서 hidden 값까지 넣어준다.
+				// =================================================
+				if (list.length == 1) {
+
+					insertMaterialLotSelect.selectedIndex = 1;
+
+					if (insertMaterialLot != null) {
+
+						insertMaterialLot.value =
+							insertMaterialLotSelect.value;
+					}
 				}
 			});
 		}
@@ -1166,6 +1225,28 @@
 
 					refreshMaterialLotArea();
 				}
+			});
+		}
+
+
+		// =====================================================
+		// 모달을 다시 열 때도 현재 선택값 기준으로 LOT 영역을 다시 맞춘다.
+		// 공통 모달 스크립트는 건드리지 않고 이 JSP 안에서만 보완한다.
+		// =====================================================
+		var modalOpenBtns =
+			document.querySelectorAll(".modal_open_btn[data_modal_target='#modal_insert']");
+
+		for (var i = 0; i < modalOpenBtns.length; i++) {
+
+			modalOpenBtns[i].addEventListener("click", function() {
+
+				setTimeout(function() {
+
+					loadItemInfo();
+					loadStockLocations();
+					refreshMaterialLotArea();
+
+				}, 0);
 			});
 		}
 	});

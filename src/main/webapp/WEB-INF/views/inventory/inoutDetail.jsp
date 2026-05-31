@@ -3,6 +3,9 @@
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
+<%@ taglib prefix="fmt"
+	uri="http://java.sun.com/jsp/jstl/fmt"%>
+
 <%-- =========================================================
 	상세페이지 공통 CSS
 	공통 파일은 건드리지 않고 기존 detail.css 그대로 사용
@@ -398,29 +401,80 @@
 
 					<tbody>
 
+						<%-- =====================================================
+							팀장님 피드백 반영
+							입출고번호, 특정 날짜, 창고정보가 한눈에 보이도록
+							내역서 형태로 다시 정리한다.
+							문서순번과 사용여부는 화면에서 제외한다.
+						===================================================== --%>
 						<tr>
 
 							<th>입출고번호</th>
 							<td>${inout.docNo}</td>
 
-							<th>상태</th>
-							<td>${inout.status}</td>
-
 							<th>입출고일자</th>
 							<td>${inout.inoutDate}</td>
+
+							<th>상태</th>
+							<td>${inout.status}</td>
 
 						</tr>
 
 						<tr>
 
-							<th>사용여부</th>
-							<td>${inout.useYn}</td>
+							<th>입출고구분</th>
+							<td>
+								<c:choose>
+									<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
+									<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
+									<c:otherwise>${inout.inoutType}</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>창고위치</th>
+							<td>${inout.stockLocation}</td>
+
+							<th>LOT번호</th>
+							<td>${inout.materialLot}</td>
+
+						</tr>
+
+						<tr>
+
+							<th>품목명</th>
+							<td>${inout.itemName}</td>
+
+							<th>입출고수량/단위</th>
+							<td><fmt:formatNumber value="${inout.inoutQty}" pattern="#,###" /> ${inout.itemUnit}</td>
+
+							<th>현재재고/단위</th>
+							<td><fmt:formatNumber value="${inout.inventoryStock}" pattern="#,###" /> ${inout.itemUnit}</td>
+
+						</tr>
+
+						<tr>
+
+							<th>거래처명</th>
+							<td>${inout.clientName}</td>
+
+							<th>담당자</th>
+							<td>${inout.clientManager}</td>
+
+							<th>사원번호</th>
+							<td>${inout.empId}</td>
+
+						</tr>
+
+						<tr>
 
 							<th>등록일</th>
 							<td>${inout.createdDate}</td>
 
 							<th>수정일</th>
 							<td>${inout.updatedDate}</td>
+
+							<th>비고</th>
+							<td>${inout.remark}</td>
 
 						</tr>
 
@@ -523,7 +577,7 @@
 							</td>
 
 							<th>입출고수량</th>
-							<td>${inout.inoutQty}</td>
+							<td><fmt:formatNumber value="${inout.inoutQty}" pattern="#,###" /> ${inout.itemUnit}</td>
 
 							<th>단위</th>
 							<td>${inout.itemUnit}</td>
@@ -556,11 +610,11 @@
 							<th>창고위치</th>
 							<td>${inout.stockLocation}</td>
 
-							<th>현재재고</th>
-							<td>${inout.inventoryStock}</td>
+							<th>현재재고/단위</th>
+							<td><fmt:formatNumber value="${inout.inventoryStock}" pattern="#,###" /> ${inout.itemUnit}</td>
 
-							<th>재고단위</th>
-							<td>${inout.itemUnit}</td>
+							<th>창고정보</th>
+							<td>${inout.stockLocation}</td>
 
 						</tr>
 
@@ -593,29 +647,80 @@
 
 					<tbody>
 
+						<%-- =====================================================
+							팀장님 피드백 반영
+							입출고번호, 특정 날짜, 창고정보가 한눈에 보이도록
+							내역서 형태로 다시 정리한다.
+							문서순번과 사용여부는 화면에서 제외한다.
+						===================================================== --%>
 						<tr>
 
 							<th>입출고번호</th>
 							<td>${inout.docNo}</td>
 
-							<th>상태</th>
-							<td>${inout.status}</td>
-
 							<th>입출고일자</th>
 							<td>${inout.inoutDate}</td>
+
+							<th>상태</th>
+							<td>${inout.status}</td>
 
 						</tr>
 
 						<tr>
 
-							<th>사용여부</th>
-							<td>${inout.useYn}</td>
+							<th>입출고구분</th>
+							<td>
+								<c:choose>
+									<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
+									<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
+									<c:otherwise>${inout.inoutType}</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>창고위치</th>
+							<td>${inout.stockLocation}</td>
+
+							<th>LOT번호</th>
+							<td>${inout.materialLot}</td>
+
+						</tr>
+
+						<tr>
+
+							<th>품목명</th>
+							<td>${inout.itemName}</td>
+
+							<th>입출고수량/단위</th>
+							<td><fmt:formatNumber value="${inout.inoutQty}" pattern="#,###" /> ${inout.itemUnit}</td>
+
+							<th>현재재고/단위</th>
+							<td><fmt:formatNumber value="${inout.inventoryStock}" pattern="#,###" /> ${inout.itemUnit}</td>
+
+						</tr>
+
+						<tr>
+
+							<th>거래처명</th>
+							<td>${inout.clientName}</td>
+
+							<th>담당자</th>
+							<td>${inout.clientManager}</td>
+
+							<th>사원번호</th>
+							<td>${inout.empId}</td>
+
+						</tr>
+
+						<tr>
 
 							<th>등록일</th>
 							<td>${inout.createdDate}</td>
 
 							<th>수정일</th>
 							<td>${inout.updatedDate}</td>
+
+							<th>비고</th>
+							<td>${inout.remark}</td>
 
 						</tr>
 

@@ -63,9 +63,12 @@ public class InventoryDAOImpl implements InventoryDAO {
 			sql += " WHERE 1=1 ";
 
 			// =============================================================
-			// 원자재(RM), 완제품(FG)만 조회
+			// 재고조회는 INVENTORY DB에 있는 데이터를 기준으로 조회한다.
+			// 기존에는 RM / FG만 조회했지만,
+			// DB에 있는 SM 재고도 재고조회에 보여야 하므로
+			// 품목유형 제한 조건은 넣지 않는다.
+			// 단, 우리 프로젝트 기준으로 SM은 화면에서 '완제품'으로 표시한다.
 			// =============================================================
-			sql += " AND I.ITEM_TYPE IN ('RM', 'FG') ";
 
 			// =============================================================
 			// 날짜 검색
@@ -95,7 +98,12 @@ public class InventoryDAOImpl implements InventoryDAO {
 				// =========================================================
 				if ("itemCode".equals(searchType)) {
 
-					sql += " AND I.ITEM_CODE LIKE ? ";
+					// =====================================================
+					// 품목코드 검색
+					// 대문자 / 소문자 구분 없이 검색하기 위해 UPPER 적용
+					// 예) RM, rm, Rm 모두 검색 가능
+					// =====================================================
+					sql += " AND UPPER(I.ITEM_CODE) LIKE UPPER(?) ";
 				}
 
 				// =========================================================
@@ -103,7 +111,11 @@ public class InventoryDAOImpl implements InventoryDAO {
 				// =========================================================
 				else if ("itemName".equals(searchType)) {
 
-					sql += " AND I.ITEM_NAME LIKE ? ";
+					// =====================================================
+					// 품목명 검색
+					// 영문 품목명도 대문자 / 소문자 구분 없이 검색
+					// =====================================================
+					sql += " AND UPPER(I.ITEM_NAME) LIKE UPPER(?) ";
 				}
 
 				// =========================================================
@@ -113,20 +125,26 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 					sql += " AND ( ";
 
-					sql += "     I.ITEM_CODE LIKE ? ";
-					sql += "     OR I.ITEM_NAME LIKE ? ";
-					sql += "     OR INV.STOCK_LOCATION LIKE ? ";
-					sql += "     OR INV.REMARK LIKE ? ";
-					sql += "     OR I.ITEM_UNIT LIKE ? ";
+					// =====================================================
+					// 전체 검색
+					// 문자 컬럼은 모두 UPPER 처리해서 대소문자 구분 없이 검색
+					// =====================================================
+					sql += "     UPPER(I.ITEM_CODE) LIKE UPPER(?) ";
+					sql += "     OR UPPER(I.ITEM_NAME) LIKE UPPER(?) ";
+					sql += "     OR UPPER(INV.STOCK_LOCATION) LIKE UPPER(?) ";
+					sql += "     OR UPPER(INV.REMARK) LIKE UPPER(?) ";
+					sql += "     OR UPPER(I.ITEM_UNIT) LIKE UPPER(?) ";
 
 					// =====================================================
 					// 품목유형 한글 검색
+					// 우리 프로젝트 기준: RM=원자재, FG=완제품, SM=완제품
 					// =====================================================
-					sql += "     OR CASE ";
+					sql += "     OR UPPER(CASE ";
 					sql += "         WHEN I.ITEM_TYPE = 'RM' THEN '원자재' ";
 					sql += "         WHEN I.ITEM_TYPE = 'FG' THEN '완제품' ";
+					sql += "         WHEN I.ITEM_TYPE = 'SM' THEN '완제품' ";
 					sql += "         ELSE I.ITEM_TYPE ";
-					sql += "     END LIKE ? ";
+					sql += "     END) LIKE UPPER(?) ";
 
 					// =====================================================
 					// 숫자 검색
@@ -155,8 +173,10 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 			// =============================================================
 			// 최신순 정렬
+			// 입출고 등록으로 INVENTORY가 갱신되면 UPDATED_DATE가 바뀌므로
+			// 재고조회 화면에서 방금 반영된 품목이 위쪽에 나오도록 한다.
 			// =============================================================
-			sql += " ORDER BY INV.INVENTORY_ID DESC ";
+			sql += " ORDER BY INV.UPDATED_DATE DESC, INV.INVENTORY_ID DESC ";
 
 			PreparedStatement pstmt =
 				conn.prepareStatement(sql);
@@ -307,7 +327,9 @@ public class InventoryDAOImpl implements InventoryDAO {
 			sql += "     I.ITEM_UNIT, ";
 
 			sql += "     NVL(MAX(INV.STOCK_LOCATION), '') ";
-			sql += "         AS STOCK_LOCATION ";
+			sql += "         AS STOCK_LOCATION, ";
+			sql += "     NVL(SUM(INV.INVENTORY_STOCK), 0) ";
+			sql += "         AS INVENTORY_STOCK ";
 
 			sql += " FROM ITEM I ";
 
@@ -351,6 +373,13 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 				dto.setStockLocation(
 					rs.getString("STOCK_LOCATION"));
+
+				// =====================================================
+				// 등록 모달에서 품목 선택 시
+				// 현재 DB 재고를 같이 보여주기 위한 값
+				// =====================================================
+				dto.setInventoryStock(
+					rs.getInt("INVENTORY_STOCK"));
 
 				list.add(dto);
 			}
@@ -439,17 +468,38 @@ public class InventoryDAOImpl implements InventoryDAO {
 			sql += " ) ";
 			sql += " VALUES ";
 			sql += " ( ";
-			sql += "     SEQ_INVENTORY_ID.NEXTVAL, ";
+			// =====================================================
+			// 시퀀스 값이 기존 INVENTORY_ID와 맞지 않으면
+			// PK 중복 오류가 날 수 있으므로 MAX(INVENTORY_ID) + 1 사용
+			// =====================================================
+			sql += "     ?, ";
 			sql += "     ?, ?, ?, ?, SYSDATE, SYSDATE ";
 			sql += " ) ";
 
 			PreparedStatement pstmt =
 				conn.prepareStatement(sql);
 
-			pstmt.setInt(1, dto.getItemId());
-			pstmt.setInt(2, dto.getInventoryStock());
-			pstmt.setString(3, dto.getStockLocation());
-			pstmt.setString(4, dto.getRemark());
+			int idx = 1;
+
+			pstmt.setInt(
+				idx++,
+				selectNextInventoryId(conn));
+
+			pstmt.setInt(
+				idx++,
+				dto.getItemId());
+
+			pstmt.setInt(
+				idx++,
+				dto.getInventoryStock());
+
+			pstmt.setString(
+				idx++,
+				dto.getStockLocation());
+
+			pstmt.setString(
+				idx++,
+				dto.getRemark());
 
 			result =
 				pstmt.executeUpdate();
@@ -463,6 +513,39 @@ public class InventoryDAOImpl implements InventoryDAO {
 		}
 
 		return result;
+	}
+
+	// =========================================================================
+	// 재고번호 자동 생성
+	// INVENTORY_ID는 PK이므로 기존 최대값보다 1 큰 값을 사용한다.
+	// =========================================================================
+	private int selectNextInventoryId(
+			Connection conn) throws Exception {
+
+		String sql = "";
+
+		sql += " SELECT ";
+		sql += "     NVL(MAX(INVENTORY_ID), 0) + 1 AS NEXT_INVENTORY_ID ";
+		sql += " FROM INVENTORY ";
+
+		PreparedStatement pstmt =
+			conn.prepareStatement(sql);
+
+		ResultSet rs =
+			pstmt.executeQuery();
+
+		int nextInventoryId = 1;
+
+		if (rs.next()) {
+
+			nextInventoryId =
+				rs.getInt("NEXT_INVENTORY_ID");
+		}
+
+		rs.close();
+		pstmt.close();
+
+		return nextInventoryId;
 	}
 
 	// =========================================================================
@@ -598,6 +681,104 @@ public class InventoryDAOImpl implements InventoryDAO {
 		}
 
 		return result;
+	}
+
+
+	// =========================================================================
+	// 재고 상세페이지 하단 입출고 내역 조회
+	// -------------------------------------------------------------------------
+	// 팀장님 피드백 반영 내용
+	// 재고번호를 클릭했을 때 단순히 현재재고만 보는 것이 아니라,
+	// 해당 재고의 품목이 언제 입고되었고, 작업지시에서 언제 사용되었고,
+	// 어떤 LOT / 입출고번호로 이력이 남았는지 확인할 수 있어야 한다.
+	//
+	// 기준:
+	// - inventoryId로 INVENTORY를 먼저 찾는다.
+	// - 찾은 ITEM_ID 기준으로 MATERIAL_INOUT 이력을 조회한다.
+	// - 같은 창고위치 기준 이력만 보려고 하면 MATERIAL_INOUT에 창고 컬럼이 없어서
+	//   현재 DB 구조에서는 ITEM_ID 기준으로 전체 입출고 이력을 보여준다.
+	// =========================================================================
+	@Override
+	public List<InventoryDTO> selectInventoryInoutHistoryList(
+			int inventoryId) {
+
+		List<InventoryDTO> list =
+			new ArrayList<InventoryDTO>();
+
+		try {
+
+			Connection conn =
+				getConnection();
+
+			String sql = "";
+
+			sql += " SELECT ";
+			sql += "     MI.INOUT_ID, ";
+			sql += "     MI.DOC_NO, ";
+			sql += "     MI.INOUT_TYPE, ";
+			sql += "     MI.MATERIAL_LOT, ";
+			sql += "     MI.INOUT_QTY, ";
+			sql += "     MI.INOUT_DATE, ";
+			sql += "     MI.STATUS, ";
+			sql += "     MI.REMARK, ";
+			sql += "     MI.CREATED_DATE, ";
+			sql += "     MI.UPDATED_DATE, ";
+			sql += "     I.ITEM_ID, ";
+			sql += "     I.ITEM_CODE, ";
+			sql += "     I.ITEM_NAME, ";
+			sql += "     I.ITEM_TYPE, ";
+			sql += "     I.ITEM_UNIT ";
+			sql += " FROM INVENTORY INV ";
+			sql += " JOIN MATERIAL_INOUT MI ";
+			sql += "     ON INV.ITEM_ID = MI.ITEM_ID ";
+			sql += " JOIN ITEM I ";
+			sql += "     ON MI.ITEM_ID = I.ITEM_ID ";
+			sql += " WHERE INV.INVENTORY_ID = ? ";
+			sql += " ORDER BY MI.INOUT_DATE DESC, MI.INOUT_ID DESC ";
+
+			PreparedStatement pstmt =
+				conn.prepareStatement(sql);
+
+			pstmt.setInt(1, inventoryId);
+
+			ResultSet rs =
+				pstmt.executeQuery();
+
+			while (rs.next()) {
+
+				InventoryDTO dto =
+					new InventoryDTO();
+
+				dto.setInoutId(rs.getInt("INOUT_ID"));
+				dto.setDocNo(rs.getString("DOC_NO"));
+				dto.setInoutType(rs.getString("INOUT_TYPE"));
+				dto.setMaterialLot(rs.getString("MATERIAL_LOT"));
+				dto.setInoutQty(rs.getInt("INOUT_QTY"));
+				dto.setInoutDate(rs.getDate("INOUT_DATE"));
+				dto.setStatus(rs.getString("STATUS"));
+				dto.setHistoryRemark(rs.getString("REMARK"));
+				dto.setHistoryCreatedDate(rs.getDate("CREATED_DATE"));
+				dto.setHistoryUpdatedDate(rs.getDate("UPDATED_DATE"));
+
+				dto.setItemId(rs.getInt("ITEM_ID"));
+				dto.setItemCode(rs.getString("ITEM_CODE"));
+				dto.setItemName(rs.getString("ITEM_NAME"));
+				dto.setItemType(rs.getString("ITEM_TYPE"));
+				dto.setItemUnit(rs.getString("ITEM_UNIT"));
+
+				list.add(dto);
+			}
+
+			rs.close();
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return list;
 	}
 
 	// =========================================================================
