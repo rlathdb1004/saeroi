@@ -1,15 +1,13 @@
 package kr.or.saeroi.service;
 
-import java.sql.Connection;
+import java.util.List;
 import java.util.UUID;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.stereotype.Service;
 
 import kr.or.saeroi.dao.LoginDAO;
 import kr.or.saeroi.dto.LoginDTO;
@@ -92,5 +90,9 @@ public class LoginService {
 	
 	public int update_my_page(LoginDTO dto) {
 	    return loginDAO.update_my_page(dto);
+	}
+	
+	public List<LoginDTO> emp_list() {
+	    return loginDAO.emp_list();
 	}
 }

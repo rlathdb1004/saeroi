@@ -391,8 +391,7 @@ public class EquipmentDAO {
 
 	    String sql =
 	        "UPDATE EQUIPMENT " +
-	        "SET EQUIP_STATUS = ?, " +	        
-	        "    USE_YN = ?, " +
+	        "SET EQUIP_STATUS = ?, " +	
 	        "    UPDATED_DATE = SYSTIMESTAMP, " +
 	        "    REMARK = ? " +
 	        "WHERE EQUIP_ID = ?";
@@ -402,10 +401,9 @@ public class EquipmentDAO {
 	        PreparedStatement ps = conn.prepareStatement(sql)
 	    ) {
 	    	
-	        ps.setString(1, dto.getEquip_status());
-	        ps.setString(2, dto.getUse_yn());	       
-	        ps.setString(3, dto.getRemark());
-	        ps.setInt(4, dto.getEquip_id());
+	        ps.setString(1, dto.getEquip_status());	             
+	        ps.setString(2, dto.getRemark());
+	        ps.setInt(3, dto.getEquip_id());
 
 	        result = ps.executeUpdate();
 
