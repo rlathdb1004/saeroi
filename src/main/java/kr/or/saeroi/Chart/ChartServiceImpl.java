@@ -22,4 +22,32 @@ public class ChartServiceImpl implements ChartService{
 		return list;
 	}
 	
+	// 대시보드 생산실적 추이 최근 7일 데이터를 조회한다.
+	@Override
+	public List<Map<String, Object>> dashboardProductionTrend() {
+		List<Map<String, Object>> list = chartDAO.dashboardProductionTrend();
+		return list;
+	}
+
+	// 대시보드 생산실적 추이 이번주 요약 데이터를 조회한다.
+	@Override
+	public Map<String, Object> dashboardProductionSummary() {
+		Map<String, Object> map = chartDAO.dashboardProductionSummary();
+		return map;
+	}
+	
+	// 대시보드 불량 추이 최근 7일 데이터를 조회한다.
+	@Override
+	public List<Map<String, Object>> dashboardDefectTrend() {
+		List<Map<String, Object>> list = chartDAO.dashboardDefectTrend();
+		return list;
+	}
+
+	// 대시보드 불량 추이 이번주 요약 데이터를 조회한다.
+	@Override
+	public Map<String, Object> dashboardDefectSummary() {
+		Map<String, Object> map = chartDAO.dashboardDefectSummary();
+		return map;
+	}
+	
 }

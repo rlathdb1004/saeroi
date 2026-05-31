@@ -26,9 +26,9 @@
 				<div class="search-item">
 					<label class="search-label">차트구분</label> <select name="searchType"
 						class="search-select" id="select_type">
+						<option value="month" selected>월별</option>
 						<option value="day">일별</option>
 						<option value="week">주별</option>
-						<option value="month" selected>월별</option>
 						<option value="year_sum">년별(합)</option>
 					</select>
 				</div>
@@ -52,6 +52,13 @@
 						</c:forEach>
 					</select>
 				</div>
+				  <div class="search-btn-wrap">
+				 <button type="button"
+                    class="search-btn search-btn-sub search-reset-btn">
+                   
+                    초기화
+                </button>
+                </div>
 			</div>
 		</div>
 	</form>
@@ -151,6 +158,22 @@ function getLocalDateFromWeek(weekStr, isEnd) {
 			let type = document.querySelector('#select_type').value || 'month';
 		    loadChartData(type,this.value);
 		});
+		
+		let resetBtn = document.querySelector('.search-reset-btn');
+
+		if (resetBtn) {
+		    resetBtn.addEventListener('click', function() {
+		    	
+		        document.querySelector('#select_type').value = 'month'; 
+		        document.querySelector('#select_item').value = 'all';   
+		        document.querySelector('#startDate').value = '';       
+		        document.querySelector('#endDate').value = '';         
+		        
+		        currentPage = 1;
+		        
+		        loadChartData('month', 'all');
+		    });
+		}
 		
 		let chart_btn = document.querySelector('#chart_detail');
 		if(chart_btn){

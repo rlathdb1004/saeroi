@@ -251,5 +251,204 @@
 		select * from item
 	</select>
 
+<!-- 대시보드 생산실적 추이 최근 7일 조회 -->
+<select id="select_dashboard_production_trend" resultType="map">
+	WITH base_date AS (
+		SELECT TRUNC(CURRENT_DATE) - 6 + LEVEL - 1 AS base_date
+		FROM dual
+		CONNECT BY LEVEL &lt;= 7
+	),
+	plan_data AS (
+		SELECT
+			TRUNC(prod_plan_date) AS base_date,
+			SUM(NVL(prod_plan_qty, 0)) AS plan_qty
+		FROM production_plan
+		WHERE prod_plan_date &gt;= TRUNC(CURRENT_DATE) - 6
+		AND prod_plan_date &lt; TRUNC(CURRENT_DATE) + 1
+		GROUP BY TRUNC(prod_plan_date)
+	),
+	prod_data AS (
+		SELECT
+			TRUNC(prod_date) AS base_date,
+			SUM(NVL(prod_qty, 0)) AS prod_qty
+		FROM production
+		WHERE prod_date &gt;= TRUNC(CURRENT_DATE) - 6
+		AND prod_date &lt; TRUNC(CURRENT_DATE) + 1
+		GROUP BY TRUNC(prod_date)
+	)
+	SELECT
+		TO_CHAR(b.base_date, 'MM/DD') AS LABEL,
+		NVL(p.plan_qty, 0) AS PLANQTY,
+		NVL(pr.prod_qty, 0) AS PRODQTY
+	FROM base_date b
+	LEFT JOIN plan_data p ON p.base_date = b.base_date
+	LEFT JOIN prod_data pr ON pr.base_date = b.base_date
+	ORDER BY b.base_date
+</select>
+
+<!-- 대시보드 생산실적 추이 이번주 요약 조회 -->
+<select id="select_dashboard_production_summary" resultType="map">
+	WITH week_data AS (
+		SELECT
+			NVL((
+				SELECT SUM(NVL(prod_plan_qty, 0))
+				FROM production_plan
+				WHERE prod_plan_date &gt;= TRUNC(CURRENT_DATE, 'IW')
+				AND prod_plan_date &lt; TRUNC(CURRENT_DATE, 'IW') + 7
+			), 0) AS curr_plan_qty,
+
+			NVL((
+				SELECT SUM(NVL(prod_qty, 0))
+				FROM production
+				WHERE prod_date &gt;= TRUNC(CURRENT_DATE, 'IW')
+				AND prod_date &lt; TRUNC(CURRENT_DATE, 'IW') + 7
+			), 0) AS curr_prod_qty,
+
+			NVL((
+				SELECT SUM(NVL(prod_qty, 0))
+				FROM production
+				WHERE prod_date &gt;= TRUNC(CURRENT_DATE, 'IW') - 7
+				AND prod_date &lt; TRUNC(CURRENT_DATE, 'IW')
+			), 0) AS prev_prod_qty
+		FROM dual
+	)
+	SELECT
+		curr_plan_qty AS CURRPLANQTY,
+		curr_prod_qty AS CURRPRODQTY,
+		prev_prod_qty AS PREVPRODQTY,
+
+		CASE
+			WHEN curr_plan_qty = 0 THEN 0
+			ELSE ROUND(curr_prod_qty / curr_plan_qty * 100, 1)
+		END AS PLANRATE,
+
+		CASE
+			WHEN prev_prod_qty = 0 THEN 0
+			ELSE ROUND((curr_prod_qty - prev_prod_qty) / prev_prod_qty * 100, 1)
+		END AS WEEKCOMPARERATE,
+
+		CASE
+			WHEN curr_prod_qty - prev_prod_qty &gt;= 0 THEN 'up'
+			ELSE 'down'
+		END AS WEEKCOMPARETYPE
+	FROM week_data
+</select>
+
+<!-- 대시보드 불량 추이 최근 7일 조회 -->
+<select id="select_dashboard_defect_trend" resultType="map">
+	WITH base_date AS (
+		SELECT TRUNC(CURRENT_DATE) - 6 + LEVEL - 1 AS base_date
+		FROM dual
+		CONNECT BY LEVEL &lt;= 7
+	),
+	prod_data AS (
+		SELECT
+			TRUNC(prod_date) AS base_date,
+			SUM(NVL(prod_qty, 0)) AS prod_qty
+		FROM production
+		WHERE prod_date &gt;= TRUNC(CURRENT_DATE) - 6
+		AND prod_date &lt; TRUNC(CURRENT_DATE) + 1
+		GROUP BY TRUNC(prod_date)
+	),
+	defect_data AS (
+		SELECT
+			TRUNC(p.prod_date) AS base_date,
+			SUM(NVL(dl.defect_qty, 0)) AS defect_qty
+		FROM production p
+		JOIN inspection i ON p.prod_id = i.prod_id
+		JOIN defect_list dl ON i.insp_id = dl.insp_id
+		WHERE p.prod_date &gt;= TRUNC(CURRENT_DATE) - 6
+		AND p.prod_date &lt; TRUNC(CURRENT_DATE) + 1
+		GROUP BY TRUNC(p.prod_date)
+	)
+	SELECT
+		TO_CHAR(b.base_date, 'MM/DD') AS LABEL,
+		NVL(p.prod_qty, 0) AS PRODQTY,
+		NVL(d.defect_qty, 0) AS DEFECTQTY,
+		CASE
+			WHEN NVL(p.prod_qty, 0) = 0 THEN 0
+			ELSE ROUND(NVL(d.defect_qty, 0) / p.prod_qty * 100, 1)
+		END AS DEFECTRATE
+	FROM base_date b
+	LEFT JOIN prod_data p ON p.base_date = b.base_date
+	LEFT JOIN defect_data d ON d.base_date = b.base_date
+	ORDER BY b.base_date
+</select>
+
+<!-- 대시보드 불량 추이 이번주 요약 조회 -->
+<select id="select_dashboard_defect_summary" resultType="map">
+	WITH week_data AS (
+		SELECT
+			NVL((
+				SELECT SUM(NVL(p.prod_qty, 0))
+				FROM production p
+				WHERE p.prod_date &gt;= TRUNC(CURRENT_DATE, 'IW')
+				AND p.prod_date &lt; TRUNC(CURRENT_DATE, 'IW') + 7
+			), 0) AS curr_prod_qty,
+
+			NVL((
+				SELECT SUM(NVL(dl.defect_qty, 0))
+				FROM production p
+				JOIN inspection i ON p.prod_id = i.prod_id
+				JOIN defect_list dl ON i.insp_id = dl.insp_id
+				WHERE p.prod_date &gt;= TRUNC(CURRENT_DATE, 'IW')
+				AND p.prod_date &lt; TRUNC(CURRENT_DATE, 'IW') + 7
+			), 0) AS curr_defect_qty,
+
+			NVL((
+				SELECT SUM(NVL(p.prod_qty, 0))
+				FROM production p
+				WHERE p.prod_date &gt;= TRUNC(CURRENT_DATE, 'IW') - 7
+				AND p.prod_date &lt; TRUNC(CURRENT_DATE, 'IW')
+			), 0) AS prev_prod_qty,
+
+			NVL((
+				SELECT SUM(NVL(dl.defect_qty, 0))
+				FROM production p
+				JOIN inspection i ON p.prod_id = i.prod_id
+				JOIN defect_list dl ON i.insp_id = dl.insp_id
+				WHERE p.prod_date &gt;= TRUNC(CURRENT_DATE, 'IW') - 7
+				AND p.prod_date &lt; TRUNC(CURRENT_DATE, 'IW')
+			), 0) AS prev_defect_qty
+		FROM dual
+	),
+	rate_data AS (
+		SELECT
+			curr_prod_qty,
+			curr_defect_qty,
+			prev_prod_qty,
+			prev_defect_qty,
+
+			CASE
+				WHEN curr_prod_qty = 0 THEN 0
+				ELSE ROUND(curr_defect_qty / curr_prod_qty * 100, 1)
+			END AS curr_defect_rate,
+
+			CASE
+				WHEN prev_prod_qty = 0 THEN 0
+				ELSE ROUND(prev_defect_qty / prev_prod_qty * 100, 1)
+			END AS prev_defect_rate
+		FROM week_data
+	)
+	SELECT
+		curr_prod_qty AS CURRPRODQTY,
+		curr_defect_qty AS CURRDEFECTQTY,
+		prev_prod_qty AS PREVPRODQTY,
+		prev_defect_qty AS PREVDEFECTQTY,
+		curr_defect_rate AS CURRDEFECTRATE,
+		prev_defect_rate AS PREVDEFECTRATE,
+
+		CASE
+			WHEN prev_defect_rate = 0 THEN 0
+			ELSE ROUND((curr_defect_rate - prev_defect_rate) / prev_defect_rate * 100, 1)
+		END AS WEEKCOMPARERATE,
+
+		CASE
+			WHEN curr_defect_rate - prev_defect_rate &gt; 0 THEN 'bad'
+			WHEN curr_defect_rate - prev_defect_rate &lt; 0 THEN 'good'
+			ELSE 'same'
+		END AS WEEKCOMPARETYPE
+	FROM rate_data
+</select>
 
 </mapper>

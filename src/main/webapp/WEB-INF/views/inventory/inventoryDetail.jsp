@@ -4,12 +4,124 @@
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
+<%@ taglib prefix="fmt"
+	uri="http://java.sun.com/jsp/jstl/fmt"%>
+
 <%-- =========================================================
 	상세페이지 공통 CSS
 	공통 파일은 건드리지 않고 기존 detail.css 그대로 사용
 ========================================================= --%>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
+
+<%-- =========================================================
+	재고 상세페이지 전용 보정 CSS
+	공통 CSS 파일은 절대 수정하지 않고, 이 JSP 안에서만 내역서 테이블 폭을 맞춘다.
+========================================================= --%>
+<style>
+
+	/* =====================================================
+		재고 입출고 내역서 표시 보정
+		공통 detail.css는 건드리지 않고 이 JSP 안에서만 적용한다.
+		하단 가로 스크롤바를 없애고, 입출고번호 / LOT번호가 한 줄로 보이도록
+		테이블 폭과 글자 크기만 조정한다.
+		말줄임표(...) 처리는 사용하지 않는다.
+	===================================================== */
+	.inventory-history-scroll {
+		width: 100%;
+		overflow-x: hidden;
+	}
+
+	.inventory-history-table {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	.inventory-history-table th,
+	.inventory-history-table td {
+		font-size: 11px;
+		white-space: nowrap;
+		word-break: keep-all;
+		text-align: center;
+		vertical-align: middle;
+		padding-left: 4px;
+		padding-right: 4px;
+		letter-spacing: -0.4px;
+	}
+
+	.inventory-history-table .memo-cell {
+		text-align: center;
+		white-space: nowrap;
+		font-size: 11px;
+	}
+
+	/* 구분 */
+	.inventory-history-table th:nth-child(1),
+	.inventory-history-table td:nth-child(1) {
+		width: 10%;
+	}
+
+	/* 입출고번호 */
+	.inventory-history-table th:nth-child(2),
+	.inventory-history-table td:nth-child(2) {
+		width: 19%;
+	}
+
+	/* 입출고일자 */
+	.inventory-history-table th:nth-child(3),
+	.inventory-history-table td:nth-child(3) {
+		width: 12%;
+	}
+
+	/* LOT번호 */
+	.inventory-history-table th:nth-child(4),
+	.inventory-history-table td:nth-child(4) {
+		width: 20%;
+	}
+
+	/* 수량/단위 */
+	.inventory-history-table th:nth-child(5),
+	.inventory-history-table td:nth-child(5) {
+		width: 11%;
+	}
+
+	/* 상태 */
+	.inventory-history-table th:nth-child(6),
+	.inventory-history-table td:nth-child(6) {
+		width: 8%;
+	}
+
+	/* 비고 */
+	.inventory-history-table th:nth-child(7),
+	.inventory-history-table td:nth-child(7) {
+		width: 20%;
+	}
+
+	.inventory-history-paging {
+		margin-top: 18px;
+	}
+
+	/* =====================================================
+		내역서 안에서 다른 상세화면으로 이동하는 링크 표시
+		LOT 이력추적 화면 스타일처럼 클릭 가능한 값에 ↗ 표시를 붙인다.
+	===================================================== */
+	.inventory-detail-link {
+		color: #0b7a5a;
+		font-weight: 700;
+		text-decoration: none;
+		border-bottom: 1px dotted #0b7a5a;
+		white-space: nowrap;
+	}
+
+	.inventory-detail-link::after {
+		content: " ↗";
+		font-size: 12px;
+	}
+
+	.inventory-detail-link:hover {
+		color: #075f46;
+	}
+</style>
 
 <div class="detail_page">
 
@@ -172,53 +284,41 @@
 						<tbody>
 
 							<%-- =====================================================
-								INVENTORY 테이블 기본 컬럼
-								INVENTORY_ID / ITEM_ID까지 상세에 표시한다.
+								화면 표시용 기본 정보
+								재고번호 / 품목ID / 단위는 중복 표시라서 제외한다.
+								단위는 현재재고/단위 칸에 같이 보여준다.
 							===================================================== --%>
 							<tr>
 
-								<th>재고번호</th>
-								<td>${inventory.inventoryId}</td>
-
-								<th>품목ID</th>
-								<td>${inventory.itemId}</td>
-
 								<th>품목코드</th>
 								<td>${inventory.itemCode}</td>
-
-							</tr>
-
-							<tr>
 
 								<th>품목명</th>
 								<td>${inventory.itemName}</td>
 
 								<th>품목유형</th>
 								<td>
-
 									<c:choose>
 										<c:when test="${inventory.itemType eq 'FG'}">완제품</c:when>
 										<c:when test="${inventory.itemType eq 'RM'}">원자재</c:when>
-										<c:when test="${inventory.itemType eq 'SM'}">부자재</c:when>
+										<c:when test="${inventory.itemType eq 'SM'}">완제품</c:when>
 										<c:otherwise>${inventory.itemType}</c:otherwise>
 									</c:choose>
-
 								</td>
-
-								<th>단위</th>
-								<td>${inventory.itemUnit}</td>
 
 							</tr>
 
 							<tr>
 
-								<th>현재재고</th>
+								<th>현재재고/단위</th>
 								<td>
 
 									<input type="number"
 										name="inventoryStock"
 										class="search-input"
 										value="${inventory.inventoryStock}">
+
+									${inventory.itemUnit}
 
 								</td>
 
@@ -277,48 +377,34 @@
 					<tbody>
 
 						<%-- =====================================================
-							INVENTORY 테이블에 있는 컬럼을 상세페이지에 모두 표시한다.
-							품목코드 / 품목명 / 품목유형 / 단위는 ITEM JOIN 표시용이다.
+							재고 상세 기본정보
+							재고번호 / 품목ID / 단위는 화면에서 제외한다.
+							단위는 현재재고/단위에 함께 표시한다.
 						===================================================== --%>
 						<tr>
 
-							<th>재고번호</th>
-							<td>${inventory.inventoryId}</td>
-
-							<th>품목ID</th>
-							<td>${inventory.itemId}</td>
-
 							<th>품목코드</th>
 							<td>${inventory.itemCode}</td>
-
-						</tr>
-
-						<tr>
 
 							<th>품목명</th>
 							<td>${inventory.itemName}</td>
 
 							<th>품목유형</th>
 							<td>
-
 								<c:choose>
 									<c:when test="${inventory.itemType eq 'FG'}">완제품</c:when>
 									<c:when test="${inventory.itemType eq 'RM'}">원자재</c:when>
-									<c:when test="${inventory.itemType eq 'SM'}">부자재</c:when>
+									<c:when test="${inventory.itemType eq 'SM'}">완제품</c:when>
 									<c:otherwise>${inventory.itemType}</c:otherwise>
 								</c:choose>
-
 							</td>
-
-							<th>단위</th>
-							<td>${inventory.itemUnit}</td>
 
 						</tr>
 
 						<tr>
 
-							<th>현재재고</th>
-							<td>${inventory.inventoryStock}</td>
+							<th>현재재고/단위</th>
+							<td><fmt:formatNumber value="${inventory.inventoryStock}" pattern="#,###" /> ${inventory.itemUnit}</td>
 
 							<th>창고위치</th>
 							<td>${inventory.stockLocation}</td>
@@ -347,5 +433,113 @@
 		</c:otherwise>
 
 	</c:choose>
+
+
+	<%-- =========================================================
+		재고 입출고 내역서
+		재고번호를 따라갔을 때 해당 품목의 입고 / 사용 / 출고 이력을 확인한다.
+		내역은 Controller에서 5개씩 잘라서 전달하고, 아래 공통 페이징으로 이동한다.
+		공통 paging.jsp는 수정하지 않는다.
+	========================================================= --%>
+	<div class="detail_card">
+
+		<div class="detail_card_title">
+			재고 입출고 내역서
+		</div>
+
+		<div class="inventory-history-scroll">
+
+		<table class="detail_info_table inventory-history-table">
+
+			<colgroup>
+				<col style="width: 10%;">
+				<col style="width: 19%;">
+				<col style="width: 12%;">
+				<col style="width: 20%;">
+				<col style="width: 11%;">
+				<col style="width: 8%;">
+				<col style="width: 20%;">
+			</colgroup>
+
+			<thead>
+
+				<tr>
+					<th>구분</th>
+					<th>입출고번호</th>
+					<th>입출고일자</th>
+					<th>LOT번호</th>
+					<th>수량/단위</th>
+					<th>상태</th>
+					<th>비고</th>
+				</tr>
+
+			</thead>
+
+			<tbody>
+
+				<c:choose>
+
+					<c:when test="${empty inoutHistory}">
+
+						<tr>
+							<td colspan="7">
+								입출고 내역이 없습니다.
+							</td>
+						</tr>
+
+					</c:when>
+
+					<c:otherwise>
+
+						<c:forEach var="history"
+							items="${inoutHistory}">
+
+							<tr>
+								<td>
+									<c:choose>
+										<c:when test="${history.inoutType eq 'MI'}">입고</c:when>
+										<c:when test="${history.inoutType eq 'MO-PROD'}">사용/출고</c:when>
+										<c:otherwise>${history.inoutType}</c:otherwise>
+									</c:choose>
+								</td>
+
+								<td>
+									<a class="inventory-detail-link"
+										href="${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${history.inoutId}">
+										${history.docNo}
+									</a>
+								</td>
+								<td>${history.inoutDate}</td>
+								<td>
+									<a class="inventory-detail-link"
+										href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${history.materialLot}">
+										${history.materialLot}
+									</a>
+								</td>
+								<td><fmt:formatNumber value="${history.inoutQty}" pattern="#,###" /> ${history.itemUnit}</td>
+								<td>${history.status}</td>
+								<td class="memo-cell">${history.historyRemark}</td>
+							</tr>
+
+						</c:forEach>
+
+					</c:otherwise>
+
+				</c:choose>
+
+			</tbody>
+
+		</table>
+
+		<%-- =====================================================
+			공통 페이징 영역
+			Controller에서 pageInfo / pageUrl을 전달하므로 기존 paging.jsp를 그대로 사용한다.
+			기본 5개씩 보이고, 공통 select 박스에서 몇 개씩 볼지 선택할 수 있다.
+		===================================================== --%>
+		<div class="inventory-history-paging">
+			<jsp:include page="/WEB-INF/views/common/paging.jsp" />
+		</div>
+
+	</div>
 
 </div>

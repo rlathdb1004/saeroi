@@ -5,6 +5,8 @@
 package kr.or.saeroi.service;
 
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 import kr.or.saeroi.dao.InventoryDAO;
 import kr.or.saeroi.dao.InventoryDAOImpl;
@@ -29,11 +31,47 @@ public class InventoryServiceImpl implements InventoryService {
 			String startDate,
 			String endDate) {
 
-		return dao.selectInventoryList(
+		// =============================================================
+		// 재고 목록 조회
+		// 등록 / 입출고 반영 후 UPDATED_DATE가 최신인 재고가
+		// 1페이지 첫 줄에 보이도록 Service에서도 한 번 더 정렬한다.
+		// 날짜가 같으면 INVENTORY_ID DESC 기준으로 정렬한다.
+		// =============================================================
+		List<InventoryDTO> list =
+			dao.selectInventoryList(
 				searchType,
 				keyword,
 				startDate,
 				endDate);
+
+		Collections.sort(
+			list,
+			new Comparator<InventoryDTO>() {
+
+				@Override
+				public int compare(
+						InventoryDTO a,
+						InventoryDTO b) {
+
+					if (a.getUpdatedDate() != null
+							&& b.getUpdatedDate() != null
+							&& !a.getUpdatedDate().equals(b.getUpdatedDate())) {
+
+						return b.getUpdatedDate().compareTo(a.getUpdatedDate());
+					}
+
+					if (a.getCreatedDate() != null
+							&& b.getCreatedDate() != null
+							&& !a.getCreatedDate().equals(b.getCreatedDate())) {
+
+						return b.getCreatedDate().compareTo(a.getCreatedDate());
+					}
+
+					return b.getInventoryId() - a.getInventoryId();
+				}
+			});
+
+		return list;
 	}
 
 	// =========================================================================
@@ -88,6 +126,18 @@ public class InventoryServiceImpl implements InventoryService {
 
 		return dao.deleteInventory(
 				inventoryIds);
+	}
+
+	// =========================================================================
+	// 재고 상세페이지 입출고 내역 조회
+	// Controller에서 재고번호를 넘기면 DAO에서 MATERIAL_INOUT 이력을 조회한다.
+	// =========================================================================
+	@Override
+	public List<InventoryDTO> getInventoryInoutHistoryList(
+			int inventoryId) {
+
+		return dao.selectInventoryInoutHistoryList(
+				inventoryId);
 	}
 
 	// =========================================================================
