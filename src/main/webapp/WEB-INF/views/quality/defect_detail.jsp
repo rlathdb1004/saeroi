@@ -15,6 +15,10 @@
 	border: 1px solid #F5CACA;
 }
 
+.defect_detail_section {
+	margin-top: 16px;
+}
+
 .defect_detail_bottom {
 	display: grid;
 	grid-template-columns: 1fr 1.2fr;
@@ -164,14 +168,14 @@
 		</div>
 	</div>
 
-	<div class="detail_card">
-		<div class="detail_card_title">기본 정보</div>
+	<form id="defectDetailForm" method="post" accept-charset="UTF-8"
+		action="${pageContext.request.contextPath}/quality/defect/update">
 
-		<form id="defectDetailForm" method="post" accept-charset="UTF-8"
-			action="${pageContext.request.contextPath}/quality/defect/update">
+		<input type="hidden" name="defect_list_id"
+			value="${defect.defect_list_id}">
 
-			<input type="hidden" name="defect_list_id"
-				value="${defect.defect_list_id}">
+		<div class="detail_card">
+			<div class="detail_card_title">불량 정보</div>
 
 			<table class="detail_info_table">
 				<colgroup>
@@ -196,16 +200,6 @@
 					</tr>
 
 					<tr>
-						<th>불량유형</th>
-						<td>${defect.defect_type}</td>
-
-						<th>발생일시</th>
-						<td>
-							<span class="detailText">${defect.defect_date}</span>
-							<input type="date" name="defect_date" class="detailInput"
-								value="${defect.defect_date}" style="display: none;" required>
-						</td>
-
 						<th>불량명</th>
 						<td>
 							<span
@@ -216,22 +210,16 @@
 								<option value="${defect.defect_id}" selected>${defect.defect_name}</option>
 							</select>
 						</td>
-					</tr>
 
-					<tr>
-						<th>불량수량</th>
+						<th>불량유형</th>
+						<td>${defect.defect_type}</td>
+
+						<th>불량발생일시</th>
 						<td>
-							<span class="detailText">${defect.defect_qty}</span>
-							<input type="number" name="defect_qty" class="detailInput"
-								value="${defect.defect_qty}" style="display: none;" min="0"
-								required>
+							<span class="detailText">${defect.defect_date}</span>
+							<input type="date" name="defect_date" class="detailInput"
+								value="${defect.defect_date}" style="display: none;" required>
 						</td>
-
-						<th>검사번호</th>
-						<td>${defect.insp_doc_no}</td>
-
-						<th>검사자</th>
-						<td>${defect.ename}</td>
 					</tr>
 
 					<tr>
@@ -246,6 +234,43 @@
 					</tr>
 
 					<tr>
+						<th>비고</th>
+						<td colspan="5">
+							<span class="detailText">${defect.remark}</span>
+							<input type="text" name="remark" class="detailInput"
+								value="${defect.remark}" style="display: none;">
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="detail_card defect_detail_section">
+			<div class="detail_card_title">검사/생산 및 수량 정보</div>
+
+			<table class="detail_info_table">
+				<colgroup>
+					<col style="width: 12%;">
+					<col style="width: 21%;">
+					<col style="width: 12%;">
+					<col style="width: 21%;">
+					<col style="width: 12%;">
+					<col style="width: 22%;">
+				</colgroup>
+
+				<tbody>
+					<tr>
+						<th>검사번호</th>
+						<td>${defect.insp_doc_no}</td>
+
+						<th>검사자</th>
+						<td>${defect.ename}</td>
+
+						<th>LOT번호</th>
+						<td>${defect.product_lot}</td>
+					</tr>
+
+					<tr>
 						<th>품목코드</th>
 						<td>${defect.item_code}</td>
 
@@ -257,50 +282,54 @@
 					</tr>
 
 					<tr>
-						<th>LOT번호</th>
-						<td>${defect.product_lot}</td>
-
 						<th>생산문서번호</th>
 						<td>${defect.prod_doc_no}</td>
 
 						<th>작업지시번호</th>
 						<td>${defect.work_order_doc_no}</td>
+
+						<th>생산상태</th>
+						<td>${defect.prod_status}</td>
 					</tr>
 
 					<tr>
 						<th>생산일자</th>
 						<td>${defect.prod_date}</td>
 
+						<th>지시일자</th>
+						<td colspan="3">${defect.order_date}</td>
+					</tr>
+
+					<tr>
+						<th>지시수량</th>
+						<td>${defect.order_qty}</td>
+
 						<th>생산수량</th>
 						<td>${defect.prod_qty}</td>
+
+						<th>검사수량</th>
+						<td>${defect.inspection_qty}</td>
+					</tr>
+
+					<tr>
+						<th>양품수량</th>
+						<td>${defect.good_qty}</td>
+
+						<th>불량수량</th>
+						<td>
+							<span class="detailText">${defect.defect_qty}</span>
+							<input type="number" name="defect_qty" class="detailInput"
+								value="${defect.defect_qty}" style="display: none;" min="0"
+								required>
+						</td>
 
 						<th>손실수량</th>
 						<td>${defect.loss_qty}</td>
 					</tr>
-
-					<tr>
-						<th>생산상태</th>
-						<td>${defect.prod_status}</td>
-
-						<th>지시수량</th>
-						<td>${defect.order_qty}</td>
-
-						<th>지시일자</th>
-						<td>${defect.order_date}</td>
-					</tr>
-
-					<tr>
-						<th>비고</th>
-						<td colspan="5">
-							<span class="detailText">${defect.remark}</span>
-							<input type="text" name="remark" class="detailInput"
-								value="${defect.remark}" style="display: none;">
-						</td>
-					</tr>
 				</tbody>
 			</table>
-		</form>
-	</div>
+		</div>
+	</form>
 
 	<div class="defect_detail_bottom">
 
@@ -326,8 +355,10 @@
 					(${defectActionList.size()}건)</div>
 
 				<c:if test="${canManageQuality}">
-					<button type="button" class="detail_btn_green modal_open_btn"
-						data_modal_target="#modal_action_insert">조치 추가</button>
+					<button type="button" id="actionAddBtn"
+						class="detail_btn_green modal_open_btn"
+						data_modal_target="#modal_action_insert" style="display: none;">조치
+						추가</button>
 				</c:if>
 			</div>
 

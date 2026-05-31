@@ -39,6 +39,14 @@
 	text-align: left;
 }
 
+.inspection_related_row {
+	cursor: pointer;
+}
+
+.inspection_related_row:hover td {
+	background: #F8FCF9;
+}
+
 @media ( max-width : 1100px) {
 	.inspection_related_grid {
 		grid-template-columns: 1fr;
@@ -218,7 +226,7 @@
 
 						<th>검사수량</th>
 						<td>
-							<span class="viewMode">${inspection.inspection_qty}</span>
+							<span class="viewMode">${inspection.inspection_qty}${inspection.item_unit}</span>
 							<input type="number" name="inspection_qty"
 								class="detailInput editMode"
 								value="${inspection.inspection_qty}" min="0"
@@ -227,7 +235,7 @@
 
 						<th>양품수량</th>
 						<td>
-							<span class="viewMode">${inspection.good_qty}</span>
+							<span class="viewMode">${inspection.good_qty}${inspection.item_unit}</span>
 							<input type="number" name="good_qty"
 								class="detailInput editMode"
 								value="${inspection.good_qty}" min="0"
@@ -269,10 +277,7 @@
 					<td>${inspection.item_code}</td>
 
 					<th>품목명</th>
-					<td>${inspection.item_name}</td>
-
-					<th>단위</th>
-					<td>${inspection.item_unit}</td>
+					<td colspan="3">${inspection.item_name}</td>
 				</tr>
 
 				<tr>
@@ -291,10 +296,10 @@
 					<td>${inspection.prod_date}</td>
 
 					<th>생산수량</th>
-					<td>${inspection.prod_qty}</td>
+					<td>${inspection.prod_qty}${inspection.item_unit}</td>
 
 					<th>손실수량</th>
-					<td>${inspection.loss_qty}</td>
+					<td>${inspection.loss_qty}${inspection.item_unit}</td>
 				</tr>
 
 				<tr>
@@ -302,7 +307,7 @@
 					<td>${inspection.prod_status}</td>
 
 					<th>지시수량</th>
-					<td>${inspection.order_qty}</td>
+					<td>${inspection.order_qty}${inspection.item_unit}</td>
 
 					<th>지시일자</th>
 					<td>${inspection.order_date}</td>
@@ -313,10 +318,7 @@
 					<td>${inspection.created_date}</td>
 
 					<th>수정일</th>
-					<td>${inspection.updated_date}</td>
-
-					<th>사용여부</th>
-					<td>${inspection.use_yn}</td>
+					<td colspan="3">${inspection.updated_date}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -340,7 +342,8 @@
 
 				<tbody>
 					<c:forEach var="defect" items="${inspectionDefectList}">
-						<tr>
+						<tr class="inspection_related_row"
+							onclick="location.href='${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${defect.defect_list_id}'">
 							<td>${defect.defect_code}</td>
 							<td>${defect.defect_date}</td>
 							<td class="coTextLeft">${defect.item_name}</td>
@@ -375,7 +378,8 @@
 
 				<tbody>
 					<c:forEach var="action" items="${inspectionActionList}">
-						<tr>
+						<tr class="inspection_related_row"
+							onclick="location.href='${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${action.defect_list_id}'">
 							<td>${action.defect_name}</td>
 							<td>${action.action_date}</td>
 							<td>${action.dept}</td>

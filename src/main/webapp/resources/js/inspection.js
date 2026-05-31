@@ -505,6 +505,7 @@ function changeEditMode(isEdit) {
     const editBtn = document.querySelector('#editBtn');
     const saveBtn = document.querySelector('#saveBtn');
     const cancelBtn = document.querySelector('#cancelBtn');
+    const actionAddBtn = document.querySelector('#actionAddBtn');
     const defectForm = document.querySelector('#defectDetailForm');
 
     detailTexts.forEach(function (text) {
@@ -529,6 +530,10 @@ function changeEditMode(isEdit) {
 
     if (cancelBtn) {
         cancelBtn.style.display = isEdit ? 'inline-flex' : 'none';
+    }
+
+    if (actionAddBtn) {
+        actionAddBtn.style.display = isEdit ? 'inline-flex' : 'none';
     }
 
     if (!isEdit && defectForm) {
