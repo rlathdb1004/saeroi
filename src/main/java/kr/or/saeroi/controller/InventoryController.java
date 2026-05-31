@@ -8,6 +8,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 import javax.servlet.http.HttpSession;
 
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.or.saeroi.common.PageDTO;
@@ -72,6 +75,24 @@ public class InventoryController {
 			HttpSession session,
 			Model model) {
 
+		// =============================================================
+		// 시작일 기본값 처리 변경
+		// 등록 후 redirect:/inventory/materialIn 으로 돌아오면 startDate가 비어 있다.
+		// 이때 오늘 날짜를 강제로 넣으면, 사용자가 과거 입출고일자로 등록한 데이터가
+		// 목록에서 바로 안 보일 수 있다.
+		// 그래서 최초 진입 / 등록 후 진입은 전체 조회가 되도록 startDate를 강제 세팅하지 않는다.
+		// =============================================================
+		// =============================================================
+		// 종료일 방어코딩
+		// 종료일이 시작일보다 이전이면 검색 조건이 꼬이므로 시작일로 맞춘다.
+		// =============================================================
+		if (endDate != null
+				&& !endDate.trim().equals("")
+				&& endDate.compareTo(startDate) < 0) {
+
+			endDate = startDate;
+		}
+
 		List<InoutDTO> list =
 			service.getInoutList(
 				searchType,
@@ -79,6 +100,25 @@ public class InventoryController {
 				keyword,
 				startDate,
 				endDate);
+
+		// =============================================================
+		// 자재입출고 목록 최신 등록순 정렬
+		// 등록 직후 화면 첫 번째 줄에 방금 등록한 데이터가 보여야 하므로
+		// 입출고일자가 아니라 INOUT_ID DESC 기준으로 정렬한다.
+		// 사용자가 입출고일자를 과거 날짜로 넣어도 신규 등록건이 위에 나온다.
+		// =============================================================
+		Collections.sort(
+			list,
+			new Comparator<InoutDTO>() {
+
+				@Override
+				public int compare(
+						InoutDTO a,
+						InoutDTO b) {
+
+					return b.getInoutId() - a.getInoutId();
+				}
+			});
 
 		int totalCount =
 			list.size();
@@ -441,12 +481,62 @@ public class InventoryController {
 			@RequestParam(value = "endDate", defaultValue = "") String endDate,
 			Model model) {
 
+		// =============================================================
+		// 시작일 기본값 처리 변경
+		// 재고 등록 / 입출고 등록 후 기존 INVENTORY 행이 UPDATED_DATE만 갱신되는 경우가 있다.
+		// 여기서 오늘 날짜를 CREATED_DATE 검색 조건으로 강제하면,
+		// 기존 재고 행이 목록에서 안 보이는 문제가 생긴다.
+		// 그래서 최초 진입 / 등록 후 진입은 전체 조회가 되도록 startDate를 강제 세팅하지 않는다.
+		// =============================================================
+		// =============================================================
+		// 종료일 방어코딩
+		// 종료일은 시작일보다 이전으로 검색되지 않게 한다.
+		// =============================================================
+		if (endDate != null
+				&& !endDate.trim().equals("")
+				&& endDate.compareTo(startDate) < 0) {
+
+			endDate = startDate;
+		}
+
 		List<InventoryDTO> list =
 			inventoryService.getInventoryList(
 				searchType,
 				keyword,
 				startDate,
 				endDate);
+
+		// =============================================================
+		// 재고조회 목록 최신 반영순 정렬
+		// DAO에서도 정렬하지만, 등록/수정 직후 화면 첫 줄 보장을 위해
+		// Controller에서 한 번 더 UPDATED_DATE DESC, INVENTORY_ID DESC 기준으로 정렬한다.
+		// =============================================================
+		Collections.sort(
+			list,
+			new Comparator<InventoryDTO>() {
+
+				@Override
+				public int compare(
+						InventoryDTO a,
+						InventoryDTO b) {
+
+					if (a.getUpdatedDate() != null
+							&& b.getUpdatedDate() != null
+							&& !a.getUpdatedDate().equals(b.getUpdatedDate())) {
+
+						return b.getUpdatedDate().compareTo(a.getUpdatedDate());
+					}
+
+					if (a.getCreatedDate() != null
+							&& b.getCreatedDate() != null
+							&& !a.getCreatedDate().equals(b.getCreatedDate())) {
+
+						return b.getCreatedDate().compareTo(a.getCreatedDate());
+					}
+
+					return b.getInventoryId() - a.getInventoryId();
+				}
+			});
 
 		int totalCount =
 			list.size();
@@ -527,7 +617,59 @@ public class InventoryController {
 	public String inventoryDetail(
 			@RequestParam("inventoryId") int inventoryId,
 			@RequestParam(value = "mode", defaultValue = "view") String mode,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "5") int size,
 			Model model) {
+
+		return inventoryDetailView(
+			inventoryId,
+			mode,
+			page,
+			size,
+			model);
+	}
+
+	// =========================================================================
+	// 재고 상세 하단 내역서 페이징 전용 URL
+	// 공통 paging.jsp는 pageUrl 뒤에 ?page=... 형식으로 붙는 구조이다.
+	// 그래서 쿼리스트링이 들어간 /detail?inventoryId=14를 pageUrl로 쓰지 않고
+	// /detail/14 형태의 별도 매핑을 만들어 공통 페이징을 그대로 사용한다.
+	// =========================================================================
+	@RequestMapping("/inventory/stockList/detail/{inventoryId}")
+	public String inventoryDetailPaging(
+			@PathVariable("inventoryId") int inventoryId,
+			@RequestParam(value = "mode", defaultValue = "view") String mode,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "5") int size,
+			Model model) {
+
+		return inventoryDetailView(
+			inventoryId,
+			mode,
+			page,
+			size,
+			model);
+	}
+
+	// =========================================================================
+	// 재고 상세 공통 처리
+	// 기본정보 + 재고 입출고 내역서 조회를 한 곳에서 처리한다.
+	// 내역서는 기본 5개씩 보이고, 공통 몇개씩 보기 select와 공통 paging.jsp를 그대로 사용한다.
+	// =========================================================================
+	private String inventoryDetailView(
+			int inventoryId,
+			String mode,
+			int page,
+			int size,
+			Model model) {
+
+		if (page < 1) {
+			page = 1;
+		}
+
+		if (size <= 0) {
+			size = 5;
+		}
 
 		InventoryDTO inventory =
 			inventoryService.getInventoryDetail(
@@ -537,15 +679,53 @@ public class InventoryController {
 			"inventory",
 			inventory);
 
-		// =============================================================
-		// 재고 상세페이지 하단 입출고 내역서
-		// 재고번호를 따라갔을 때 해당 품목의 입고 / 사용 / 출고 이력을
-		// 리스트로 확인할 수 있도록 MATERIAL_INOUT 이력을 같이 전달한다.
-		// =============================================================
+		List<InventoryDTO> historyList =
+			inventoryService.getInventoryInoutHistoryList(
+				inventoryId);
+
+		int totalCount =
+			historyList.size();
+
+		int startIndex =
+			(page - 1) * size;
+
+		int endIndex =
+			startIndex + size;
+
+		if (startIndex > totalCount) {
+			startIndex = totalCount;
+		}
+
+		if (endIndex > totalCount) {
+			endIndex = totalCount;
+		}
+
+		List<InventoryDTO> pageHistoryList =
+			historyList.subList(
+				startIndex,
+				endIndex);
+
+		PageDTO pageInfo =
+			new PageDTO(
+				page,
+				size,
+				totalCount);
+
 		model.addAttribute(
 			"inoutHistory",
-			inventoryService.getInventoryInoutHistoryList(
-				inventoryId));
+			pageHistoryList);
+
+		model.addAttribute(
+			"pageInfo",
+			pageInfo);
+
+		// =============================================================
+		// 공통 페이징 전용 URL
+		// 쿼리스트링이 없는 URL을 넘겨야 2페이지, 3페이지 이동이 정상 동작한다.
+		// =============================================================
+		model.addAttribute(
+			"pageUrl",
+			"/inventory/stockList/detail/" + inventoryId);
 
 		model.addAttribute(
 			"mode",

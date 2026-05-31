@@ -1,3 +1,4 @@
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
@@ -7,29 +8,105 @@
 <%@ taglib prefix="fmt"
 	uri="http://java.sun.com/jsp/jstl/fmt"%>
 
-<%-- =========================================================
-	에러 스타일 추가
-========================================================= --%>
 <style>
 
-	/* =====================================================
-		에러 메시지
-	===================================================== */
-	.input_error_text {
+	.coTable {
+		width: 100%;
+		table-layout: fixed;
+	}
 
-		margin-top: 6px;
-		font-size: 12px;
-		color: #e53935;
-		font-weight: 500;
-		display: none;
+	.coTable th,
+	.coTable td {
+		font-size: 13px;
+		text-align: center;
+		vertical-align: middle;
+		white-space: nowrap;
+		padding: 12px 5px;
+		word-break: keep-all;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	/* =====================================================
-		빨간 테두리
+		선택
 	===================================================== */
-	.input_error {
+	.coTable th:nth-child(1),
+	.coTable td:nth-child(1) {
+		width: 4%;
+	}
 
-		border: 1px solid #e53935 !important;
+	/* =====================================================
+		품목코드
+		품목명이 더 넓게 보이도록 기존보다 살짝 줄임
+	===================================================== */
+	.coTable th:nth-child(2),
+	.coTable td:nth-child(2) {
+		width: 14%;
+		font-size: 13px;
+		letter-spacing: -0.3px;
+	}
+
+	/* =====================================================
+		품목유형
+		원자재 / 완제품만 표시되므로 폭을 크게 줄임
+	===================================================== */
+	.coTable th:nth-child(3),
+	.coTable td:nth-child(3) {
+		width: 7%;
+		font-size: 13px;
+		letter-spacing: -0.3px;
+	}
+
+	/* =====================================================
+		품목명
+		가장 많이 보여야 하는 컬럼이므로 폭을 크게 늘림
+	===================================================== */
+	.coTable th:nth-child(4),
+	.coTable td:nth-child(4) {
+		width: 31%;
+		font-size: 13px;
+		letter-spacing: -0.3px;
+	}
+
+	/* =====================================================
+		현재재고/단위
+		숫자 + 단위만 표시되므로 폭을 줄임
+	===================================================== */
+	.coTable th:nth-child(5),
+	.coTable td:nth-child(5) {
+		width: 10%;
+		font-size: 13px;
+	}
+
+	/* =====================================================
+		창고위치
+		품목명 공간 확보를 위해 기존보다 줄임
+	===================================================== */
+	.coTable th:nth-child(6),
+	.coTable td:nth-child(6) {
+		width: 11%;
+		font-size: 13px;
+		letter-spacing: -0.3px;
+	}
+
+	/* =====================================================
+		생성일
+		날짜만 표시되므로 기존보다 줄임
+	===================================================== */
+	.coTable th:nth-child(7),
+	.coTable td:nth-child(7) {
+		width: 13%;
+		font-size: 13px;
+	}
+
+	/* =====================================================
+		상세
+		보기 버튼만 있으므로 최소 폭으로 줄임
+	===================================================== */
+	.coTable th:nth-child(8),
+	.coTable td:nth-child(8) {
+		width: 6%;
+		font-size: 13px;
 	}
 
 </style>
@@ -55,6 +132,7 @@
 
 					<input type="date"
 						name="startDate"
+						id="inventoryStartDate"
 						class="search-date"
 						value="${startDate}">
 
@@ -71,7 +149,9 @@
 
 					<input type="date"
 						name="endDate"
+						id="inventoryEndDate"
 						class="search-date"
+						min="${startDate}"
 						value="${endDate}">
 
 				</div>
@@ -446,7 +526,8 @@
 
 			</div>
 
-			<form class="modal_form"
+			<form id="inventoryInsertForm"
+				class="modal_form"
 				method="post"
 				action="${pageContext.request.contextPath}/inventory/stockList/insert"
 				onsubmit="return checkInventoryInsert();">
@@ -705,8 +786,16 @@
 
 					</button>
 
-					<button type="submit"
-						class="modal_btn modal_btn_submit">
+					<%-- =================================================
+						등록 버튼
+						type="submit"으로 직접 submit 되게 한다.
+						공통 모달 / 공통 JS는 건드리지 않고
+						현재 form의 onsubmit="return checkInventoryInsert();" 검증을 통과하면
+						Controller(/inventory/stockList/insert)로 정상 전송된다.
+					================================================= --%>
+					<button type="button"
+						class="modal_btn modal_btn_submit"
+						onclick="submitInventoryInsertDirect();">
 
 						등록
 
@@ -1026,4 +1115,96 @@
 				inventoryStock;
 		}
 	});
+
+	// =========================================================
+	// 재고 등록 버튼 직접 제출
+	// 공통 모달 스크립트는 건드리지 않고, 현재 JSP에서만 등록 버튼 submit을 보장한다.
+	// 기존 checkInventoryInsert() 검증을 통과한 경우에만 실제 form submit을 실행한다.
+	// =========================================================
+	function submitInventoryInsertForm() {
+
+		var form =
+			document.getElementById("inventoryInsertForm");
+
+		if (form == null) {
+			alert("재고 등록 폼을 찾을 수 없습니다.");
+			return;
+		}
+
+		if (checkInventoryInsert()) {
+			form.submit();
+		}
+	}
+
+</script>
+<script>
+// =============================================================
+// 재고조회 검색 날짜 제어
+// 공통 파일은 건드리지 않고 현재 JSP 안에서만 처리한다.
+// 시작일은 Controller에서 오늘 날짜로 기본 세팅되고,
+// 종료일은 시작일보다 이전 날짜를 선택하지 못하게 min 값을 맞춘다.
+// =============================================================
+(function() {
+
+	var startDate = document.getElementById("inventoryStartDate");
+	var endDate = document.getElementById("inventoryEndDate");
+
+	if (startDate == null || endDate == null) {
+		return;
+	}
+
+	function syncEndDateMin() {
+
+		if (startDate.value != "") {
+			endDate.min = startDate.value;
+
+			if (endDate.value != "" && endDate.value < startDate.value) {
+				endDate.value = startDate.value;
+			}
+		}
+	}
+
+	syncEndDateMin();
+	startDate.addEventListener("change", syncEndDateMin);
+
+})();
+</script>
+
+
+<script>
+/* =============================================================
+	재고 등록 submit 복구
+	공통 JS / 공통 JSP는 건드리지 않고 현재 JSP 안에서만 처리한다.
+
+	등록 모달은 정상으로 뜨는데 저장이 안 되는 경우는
+	공통 모달 스크립트가 .modal_btn_submit 클릭을 잡아먹거나,
+	type="submit" 이벤트가 꼬이는 경우가 있다.
+
+	그래서 등록 버튼 클릭 시
+	1) 기존 checkInventoryInsert() 검증을 먼저 실행하고
+	2) 통과하면 현재 form을 직접 submit 한다.
+============================================================= */
+function submitInventoryInsertDirect() {
+
+	var form =
+		document.getElementById("inventoryInsertForm");
+
+	if (form == null) {
+		alert("재고 등록 form을 찾을 수 없습니다.");
+		return;
+	}
+
+	if (typeof checkInventoryInsert == "function") {
+
+		if (!checkInventoryInsert()) {
+			return;
+		}
+	}
+
+	// =========================================================
+	// HTMLFormElement 기본 submit을 직접 호출한다.
+	// 공통 JS에서 버튼 click 이벤트를 막아도 Controller로 전송되게 한다.
+	// =========================================================
+	HTMLFormElement.prototype.submit.call(form);
+}
 </script>

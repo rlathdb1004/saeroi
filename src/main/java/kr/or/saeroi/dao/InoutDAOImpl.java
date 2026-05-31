@@ -221,6 +221,10 @@ public class InoutDAOImpl implements InoutDAO {
 				sql += " TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
+			// =============================================================
+			// 최신 등록순 정렬
+			// 등록 직후 입출고일자가 과거여도 방금 등록한 INOUT_ID가 맨 위에 오도록 한다.
+			// =============================================================
 			sql += " ORDER BY MI.INOUT_ID DESC ";
 
 			PreparedStatement pstmt =

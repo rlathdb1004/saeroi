@@ -13,6 +13,45 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
 
+<%-- =========================================================
+	입출고 상세페이지 전용 보정 CSS
+	공통 CSS 파일은 절대 수정하지 않고, 이 JSP 안에서만 내역서 테이블 폭을 맞춘다.
+========================================================= --%>
+<style>
+	.inout-report-table {
+		table-layout: fixed;
+		width: 100%;
+	}
+
+	.inout-report-table th,
+	.inout-report-table td {
+		white-space: normal;
+		word-break: keep-all;
+		overflow-wrap: anywhere;
+	}
+
+	/* =====================================================
+		LOT 이력추적으로 이동하는 링크 표시
+		공통 CSS는 수정하지 않고 현재 JSP 안에서만 적용한다.
+	===================================================== */
+	.inout-lot-link {
+		color: #0b7a5a;
+		font-weight: 700;
+		text-decoration: none;
+		border-bottom: 1px dotted #0b7a5a;
+		white-space: nowrap;
+	}
+
+	.inout-lot-link::after {
+		content: " ↗";
+		font-size: 12px;
+	}
+
+	.inout-lot-link:hover {
+		color: #075f46;
+	}
+</style>
+
 <div class="detail_page">
 
 	<%-- =========================================================
@@ -357,11 +396,11 @@
 								<th>창고위치</th>
 								<td>${inout.stockLocation}</td>
 
-								<th>현재재고</th>
-								<td>${inout.inventoryStock}</td>
+								<th>현재재고/단위</th>
+								<td><fmt:formatNumber value="${inout.inventoryStock}" pattern="#,###" /> ${inout.itemUnit}</td>
 
-								<th>재고단위</th>
-								<td>${inout.itemUnit}</td>
+								<th>상태</th>
+								<td>${inout.status}</td>
 
 							</tr>
 
@@ -397,7 +436,7 @@
 					입출고 내역서
 				</div>
 
-				<table class="detail_info_table">
+				<table class="detail_info_table inout-report-table">
 
 					<tbody>
 
@@ -435,7 +474,12 @@
 							<td>${inout.stockLocation}</td>
 
 							<th>LOT번호</th>
-							<td>${inout.materialLot}</td>
+							<td>
+								<a class="inout-lot-link"
+									href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${inout.materialLot}">
+									${inout.materialLot}
+								</a>
+							</td>
 
 						</tr>
 
@@ -519,7 +563,12 @@
 						<tr>
 
 							<th>자재 LOT번호</th>
-							<td>${inout.materialLot}</td>
+							<td>
+								<a class="inout-lot-link"
+									href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${inout.materialLot}">
+									${inout.materialLot}
+								</a>
+							</td>
 
 							<th>입출고구분</th>
 
@@ -613,8 +662,8 @@
 							<th>현재재고/단위</th>
 							<td><fmt:formatNumber value="${inout.inventoryStock}" pattern="#,###" /> ${inout.itemUnit}</td>
 
-							<th>창고정보</th>
-							<td>${inout.stockLocation}</td>
+								<th>상태</th>
+								<td>${inout.status}</td>
 
 						</tr>
 
@@ -643,7 +692,7 @@
 					입출고 내역서
 				</div>
 
-				<table class="detail_info_table">
+				<table class="detail_info_table inout-report-table">
 
 					<tbody>
 
@@ -681,7 +730,12 @@
 							<td>${inout.stockLocation}</td>
 
 							<th>LOT번호</th>
-							<td>${inout.materialLot}</td>
+							<td>
+								<a class="inout-lot-link"
+									href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${inout.materialLot}">
+									${inout.materialLot}
+								</a>
+							</td>
 
 						</tr>
 

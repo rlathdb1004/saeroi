@@ -72,18 +72,21 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 			// =============================================================
 			// 날짜 검색
+			// 등록/입출고 반영 후 첫 화면에서 안 보이는 문제 방지
+			// CREATED_DATE만 보면 기존 재고가 수정된 경우 조회에서 빠질 수 있으므로
+			// UPDATED_DATE가 있으면 UPDATED_DATE를 기준으로 검색한다.
 			// =============================================================
 			if (startDate != null
 				&& !"".equals(startDate)) {
 
-				sql += " AND INV.CREATED_DATE >= ";
+				sql += " AND NVL(INV.UPDATED_DATE, INV.CREATED_DATE) >= ";
 				sql += " TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
 			if (endDate != null
 				&& !"".equals(endDate)) {
 
-				sql += " AND INV.CREATED_DATE <= ";
+				sql += " AND NVL(INV.UPDATED_DATE, INV.CREATED_DATE) <= ";
 				sql += " TO_DATE(?, 'YYYY-MM-DD') + 0.99999 ";
 			}
 
@@ -172,11 +175,12 @@ public class InventoryDAOImpl implements InventoryDAO {
 			}
 
 			// =============================================================
-			// 최신순 정렬
-			// 입출고 등록으로 INVENTORY가 갱신되면 UPDATED_DATE가 바뀌므로
-			// 재고조회 화면에서 방금 반영된 품목이 위쪽에 나오도록 한다.
+			// 최신 반영순 정렬
+			// 재고조회관리에서는 새로 등록한 재고뿐 아니라,
+			// 자재입출고 등록으로 기존 재고 수량이 갱신된 품목도 맨 위에 보여야 한다.
+			// 그래서 CREATED_DATE가 아니라 UPDATED_DATE DESC를 우선 정렬 기준으로 사용한다.
 			// =============================================================
-			sql += " ORDER BY INV.UPDATED_DATE DESC, INV.INVENTORY_ID DESC ";
+			sql += " ORDER BY NVL(INV.UPDATED_DATE, INV.CREATED_DATE) DESC, INV.INVENTORY_ID DESC ";
 
 			PreparedStatement pstmt =
 				conn.prepareStatement(sql);
@@ -443,6 +447,18 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 	// =========================================================================
 	// 재고 등록
+	// -------------------------------------------------------------------------
+	// 화면에서 등록 버튼을 누르면 항상 신규 재고 행을 INSERT한다.
+	//
+	// 수정 이유:
+	// 기존 코드는 같은 품목 + 같은 창고위치가 이미 있으면 INSERT가 아니라
+	// UPDATE로 처리했다. 그래서 등록은 되었지만 새 INVENTORY_ID가 생기지 않아
+	// 목록 첫 번째 줄에 새 등록건처럼 보이지 않는 문제가 있었다.
+	//
+	// 현재 요구사항:
+	// 재고조회 등록 모달에서 등록한 데이터는 신규 재고번호를 생성하고,
+	// CREATED_DATE / UPDATED_DATE를 SYSDATE로 저장하여 목록 첫 번째 줄에 보이게 한다.
+	// 공통 파일은 수정하지 않고 DAO 등록 로직만 수정한다.
 	// =========================================================================
 	@Override
 	public int insertInventory(InventoryDTO dto) {
@@ -453,6 +469,20 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 			Connection conn =
 				getConnection();
+
+			// =====================================================
+			// NULL 방어코딩
+			// 화면에서 비어있는 값이 넘어와도 DB에는 빈 문자열로 저장한다.
+			// =====================================================
+			if (dto.getStockLocation() == null) {
+
+				dto.setStockLocation("");
+			}
+
+			if (dto.getRemark() == null) {
+
+				dto.setRemark("");
+			}
 
 			String sql = "";
 
@@ -469,11 +499,17 @@ public class InventoryDAOImpl implements InventoryDAO {
 			sql += " VALUES ";
 			sql += " ( ";
 			// =====================================================
-			// 시퀀스 값이 기존 INVENTORY_ID와 맞지 않으면
-			// PK 중복 오류가 날 수 있으므로 MAX(INVENTORY_ID) + 1 사용
+			// 신규 재고번호 생성
+			// 기존 시퀀스 값이 꼬여도 PK 중복이 나지 않도록
+			// 현재 INVENTORY_ID 최대값 + 1을 사용한다.
 			// =====================================================
 			sql += "     ?, ";
-			sql += "     ?, ?, ?, ?, SYSDATE, SYSDATE ";
+			sql += "     ?, ";
+			sql += "     ?, ";
+			sql += "     ?, ";
+			sql += "     ?, ";
+			sql += "     SYSDATE, ";
+			sql += "     SYSDATE ";
 			sql += " ) ";
 
 			PreparedStatement pstmt =
@@ -513,6 +549,49 @@ public class InventoryDAOImpl implements InventoryDAO {
 		}
 
 		return result;
+	}
+
+	// =========================================================================
+	// 같은 품목 + 같은 창고위치 재고번호 조회
+	// 재고 등록 시 중복 행을 만들지 않고 기존 재고를 갱신하기 위한 보조 메서드
+	// =========================================================================
+	private Integer selectInventoryIdByItemAndLocation(
+			Connection conn,
+			int itemId,
+			String stockLocation) throws Exception {
+
+		Integer inventoryId =
+			null;
+
+		String sql = "";
+
+		sql += " SELECT ";
+		sql += "     INVENTORY_ID ";
+		sql += " FROM INVENTORY ";
+		sql += " WHERE ITEM_ID = ? ";
+		sql += " AND NVL(STOCK_LOCATION, ' ') = NVL(?, ' ') ";
+		sql += " ORDER BY INVENTORY_ID DESC ";
+
+		PreparedStatement pstmt =
+			conn.prepareStatement(sql);
+
+		pstmt.setInt(1, itemId);
+		pstmt.setString(2, stockLocation);
+
+		ResultSet rs =
+			pstmt.executeQuery();
+
+		if (rs.next()) {
+
+			inventoryId =
+				Integer.valueOf(
+					rs.getInt("INVENTORY_ID"));
+		}
+
+		rs.close();
+		pstmt.close();
+
+		return inventoryId;
 	}
 
 	// =========================================================================
