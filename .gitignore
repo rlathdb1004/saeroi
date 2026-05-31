@@ -3,3 +3,20 @@
 .settings/
 target/
 
+src/main/java/kr/or/saeroi/common/pwhash.java
+src/main/java/kr/or/saeroi/controller/ReportController.java
+src/main/webapp/resources/css/inspection.css
+src/main/webapp/resources/css/common/defect.css
+src/main/webapp/resources/css/common/inspection.css
+src/main/webapp/resources/js/common/inspection.js
+src/main/webapp/WEB-INF/views/defect.jsp
+src/main/webapp/WEB-INF/views/detail.jsp
+src/main/webapp/WEB-INF/views/findPw.jsp
+src/main/webapp/WEB-INF/views/inout.jsp
+src/main/webapp/WEB-INF/views/inoutDetail.jsp
+src/main/webapp/WEB-INF/views/productionPlan.jsp
+src/main/webapp/WEB-INF/views/inventoryManage.jsp
+src/main/webapp/WEB-INF/views/inventoryList.jsp
+src/main/webapp/WEB-INF/views/inventoryDetail.jsp
+src/main/webapp/WEB-INF/views/inoutManage.jsp
+src/main/webapp/WEB-INF/views/inspection.jsp
