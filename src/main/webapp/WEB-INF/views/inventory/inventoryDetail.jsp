@@ -4,6 +4,9 @@
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
+<%@ taglib prefix="fmt"
+	uri="http://java.sun.com/jsp/jstl/fmt"%>
+
 <%-- =========================================================
 	상세페이지 공통 CSS
 	공통 파일은 건드리지 않고 기존 detail.css 그대로 사용
@@ -199,26 +202,29 @@
 									<c:choose>
 										<c:when test="${inventory.itemType eq 'FG'}">완제품</c:when>
 										<c:when test="${inventory.itemType eq 'RM'}">원자재</c:when>
-										<c:when test="${inventory.itemType eq 'SM'}">부자재</c:when>
+										<%-- SM은 우리 프로젝트 기준으로 완제품으로 표시 --%>
+										<c:when test="${inventory.itemType eq 'SM'}">완제품</c:when>
 										<c:otherwise>${inventory.itemType}</c:otherwise>
 									</c:choose>
 
 								</td>
 
-								<th>단위</th>
+								<th>재고단위</th>
 								<td>${inventory.itemUnit}</td>
 
 							</tr>
 
 							<tr>
 
-								<th>현재재고</th>
+								<th>현재재고/단위</th>
 								<td>
 
 									<input type="number"
 										name="inventoryStock"
 										class="search-input"
 										value="${inventory.inventoryStock}">
+
+									${inventory.itemUnit}
 
 								</td>
 
@@ -304,7 +310,8 @@
 								<c:choose>
 									<c:when test="${inventory.itemType eq 'FG'}">완제품</c:when>
 									<c:when test="${inventory.itemType eq 'RM'}">원자재</c:when>
-									<c:when test="${inventory.itemType eq 'SM'}">부자재</c:when>
+									<%-- SM은 우리 프로젝트 기준으로 완제품으로 표시 --%>
+										<c:when test="${inventory.itemType eq 'SM'}">완제품</c:when>
 									<c:otherwise>${inventory.itemType}</c:otherwise>
 								</c:choose>
 
@@ -317,8 +324,8 @@
 
 						<tr>
 
-							<th>현재재고</th>
-							<td>${inventory.inventoryStock}</td>
+							<th>현재재고/단위</th>
+							<td><fmt:formatNumber value="${inventory.inventoryStock}" pattern="#,###" /> ${inventory.itemUnit}</td>
 
 							<th>창고위치</th>
 							<td>${inventory.stockLocation}</td>
@@ -347,5 +354,81 @@
 		</c:otherwise>
 
 	</c:choose>
+
+
+	<%-- =========================================================
+		재고 입출고 내역서
+		재고번호를 따라갔을 때 해당 품목의 입고 / 사용 / 출고 이력을 리스트로 확인한다.
+		목록 테이블에는 추가하지 않고 상세페이지 하단에서만 보여준다.
+	========================================================= --%>
+	<div class="detail_card">
+
+		<div class="detail_card_title">
+			재고 입출고 내역서
+		</div>
+
+		<table class="detail_info_table">
+
+			<thead>
+
+				<tr>
+					<th>구분</th>
+					<th>입출고번호</th>
+					<th>입출고일자</th>
+					<th>LOT번호</th>
+					<th>수량/단위</th>
+					<th>상태</th>
+					<th>비고</th>
+					<th>등록일</th>
+				</tr>
+
+			</thead>
+
+			<tbody>
+
+				<c:choose>
+
+					<c:when test="${empty inoutHistory}">
+
+						<tr>
+							<td colspan="8">
+								입출고 내역이 없습니다.
+							</td>
+						</tr>
+
+					</c:when>
+
+					<c:otherwise>
+
+						<c:forEach var="history" items="${inoutHistory}">
+
+							<tr>
+								<td>
+									<c:choose>
+										<c:when test="${history.inoutType eq 'MI'}">입고</c:when>
+										<c:when test="${history.inoutType eq 'MO-PROD'}">사용/출고</c:when>
+										<c:otherwise>${history.inoutType}</c:otherwise>
+									</c:choose>
+								</td>
+								<td>${history.docNo}</td>
+								<td>${history.inoutDate}</td>
+								<td>${history.materialLot}</td>
+								<td><fmt:formatNumber value="${history.inoutQty}" pattern="#,###" /> ${history.itemUnit}</td>
+								<td>${history.status}</td>
+								<td>${history.historyRemark}</td>
+								<td>${history.historyCreatedDate}</td>
+							</tr>
+
+						</c:forEach>
+
+					</c:otherwise>
+
+				</c:choose>
+
+			</tbody>
+
+		</table>
+
+	</div>
 
 </div>

@@ -91,6 +91,18 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	// =========================================================================
+	// 재고 상세페이지 입출고 내역 조회
+	// Controller에서 재고번호를 넘기면 DAO에서 MATERIAL_INOUT 이력을 조회한다.
+	// =========================================================================
+	@Override
+	public List<InventoryDTO> getInventoryInoutHistoryList(
+			int inventoryId) {
+
+		return dao.selectInventoryInoutHistoryList(
+				inventoryId);
+	}
+
+	// =========================================================================
 	// 재고 수정
 	// =========================================================================
 	@Override

@@ -1,7 +1,11 @@
 package kr.or.saeroi.controller;
 
 import java.lang.reflect.Method;
+import java.sql.Connection;
 import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -147,12 +151,20 @@ public class InventoryController {
 			endDate);
 
 		// =============================================================
-		// 로그인한 사용자 사원번호
-		// 등록모달에서 자동 표시하고 insert에서도 이 값을 사용한다.
+		// DB 저장용 EMP_ID
+		// MATERIAL_INOUT.EMP_ID에는 숫자 PK가 들어가야 하므로 4 같은 값 사용
 		// =============================================================
 		model.addAttribute(
 			"loginEmpId",
 			getLoginEmpId(session));
+
+		// =============================================================
+		// 화면 표시용 EMPNO
+		// 등록모달 사원번호 칸에는 E2026004 같은 사번을 보여준다.
+		// =============================================================
+		model.addAttribute(
+			"loginEmpNo",
+			getLoginEmpNo(session));
 
 		return "inventory/inoutManage.tiles";
 	}
@@ -160,8 +172,7 @@ public class InventoryController {
 	// =========================================================================
 	// 입출고 등록
 	// 사원번호는 로그인 사용자 기준으로 자동 저장한다.
-	// 작업지시번호 / 문서번호 / 문서순번은 등록모달에서 제거한다.
-	// 문서번호 / 문서순번은 DAO에서 자동 생성한다.
+	// 화면에는 EMPNO가 보여도 DB에는 EMP_ID가 저장된다.
 	// =========================================================================
 	@RequestMapping("/inventory/materialIn/insert")
 	public String insertInout(
@@ -180,7 +191,9 @@ public class InventoryController {
 			new InoutDTO();
 
 		// =============================================================
-		// 로그인한 사용자 사원번호 자동 저장
+		// DB 저장용 사원 ID
+		// 로그인 세션의 EMPNO로 EMP 테이블의 실제 EMP_ID를 조회해서 저장
+		// FK_MIO_EMP 오류 방지
 		// =============================================================
 		dto.setEmpId(
 			getLoginEmpId(session));
@@ -190,8 +203,8 @@ public class InventoryController {
 
 		// =============================================================
 		// LOT번호 처리
-		// 입고: 화면에서 자동 생성된 값이 넘어오고, 비어 있으면 서버에서 한 번 더 생성
-		// 출고: 화면 select 박스에서 선택한 기존 LOT가 넘어온다.
+		// 입고: 비어 있으면 서버에서 자동 생성
+		// 출고: 화면 select에서 선택한 LOT 사용
 		// =============================================================
 		if ((materialLot == null
 				|| materialLot.trim().equals(""))
@@ -208,17 +221,11 @@ public class InventoryController {
 		dto.setRemark(remark);
 		dto.setStatus(status);
 		dto.setUseYn(useYn);
-
-		// =============================================================
-		// 창고위치
-		// MATERIAL_INOUT에는 창고위치 컬럼이 없으므로
-		// DAO에서 INVENTORY 현재재고 갱신 기준으로 사용한다.
-		// =============================================================
 		dto.setStockLocation(stockLocation);
 
 		// =============================================================
-		// 작업지시번호는 등록모달에서 제거
-		// 신규 수기 입출고 등록은 ORDER_ID를 NULL로 저장한다.
+		// 수기 자재 입출고는 작업지시번호 없이 저장
+		// DAO에서 ORDER_ID는 NULL 처리
 		// =============================================================
 		dto.setOrderId(0);
 
@@ -229,19 +236,14 @@ public class InventoryController {
 
 	// =========================================================================
 	// 선택 삭제
-	// 체크박스로 선택한 입출고 데이터 삭제
 	// =========================================================================
 	@RequestMapping("/inventory/materialIn/delete")
 	public String deleteInout(
-			@RequestParam(
-				value = "inoutIds",
-				required = false)
-			String[] inoutIds) {
+			@RequestParam(value = "inoutIds", required = false) String[] inoutIds) {
 
 		if (inoutIds != null) {
 
-			service.removeInout(
-				inoutIds);
+			service.removeInout(inoutIds);
 		}
 
 		return "redirect:/inventory/materialIn";
@@ -249,15 +251,11 @@ public class InventoryController {
 
 	// =========================================================================
 	// 상세보기 페이지
-	// 상세페이지는 DAO에서 전체 DB 컬럼을 조회해서 inoutDetail.jsp로 전달
 	// =========================================================================
 	@RequestMapping("/inventory/materialIn/detail")
 	public String inoutDetail(
 			@RequestParam("inoutId") int inoutId,
-			@RequestParam(
-				value = "mode",
-				defaultValue = "view")
-			String mode,
+			@RequestParam(value = "mode", defaultValue = "view") String mode,
 			Model model) {
 
 		InoutDTO inout =
@@ -277,7 +275,6 @@ public class InventoryController {
 
 	// =========================================================================
 	// 입출고 수정
-	// 상세페이지 수정모드용 기존 흐름 유지
 	// =========================================================================
 	@RequestMapping("/inventory/materialIn/update")
 	public String updateInout(
@@ -320,7 +317,6 @@ public class InventoryController {
 
 	// =========================================================================
 	// 품목 선택 시 거래처명 / 담당자 / 현재재고 자동조회
-	// AJAX에서 문자열 JSON으로 받아 등록모달에 출력한다.
 	// =========================================================================
 	@ResponseBody
 	@RequestMapping(
@@ -335,10 +331,6 @@ public class InventoryController {
 				itemId,
 				inoutType);
 
-		// =============================================================
-		// null 방어코딩
-		// 품목 연결 정보가 비어 있어도 AJAX가 깨지지 않게 빈 DTO로 처리한다.
-		// =============================================================
 		if (dto == null) {
 
 			dto =
@@ -358,7 +350,6 @@ public class InventoryController {
 
 	// =========================================================================
 	// 품목 선택 시 창고위치 select 박스 자동조회
-	// 창고위치별 현재재고도 같이 내려준다.
 	// =========================================================================
 	@ResponseBody
 	@RequestMapping(
@@ -371,9 +362,7 @@ public class InventoryController {
 			inoutDAO.selectStockLocationList(
 				itemId);
 
-		String result = "";
-
-		result += "[";
+		String result = "[";
 
 		for (int i = 0; i < list.size(); i++) {
 
@@ -398,7 +387,6 @@ public class InventoryController {
 
 	// =========================================================================
 	// 출고 선택 시 LOT번호 목록 자동조회
-	// 품목별 잔량이 남은 LOT만 내려준다.
 	// =========================================================================
 	@ResponseBody
 	@RequestMapping(
@@ -411,9 +399,7 @@ public class InventoryController {
 			inoutDAO.selectMaterialLotList(
 				itemId);
 
-		String result = "";
-
-		result += "[";
+		String result = "[";
 
 		for (int i = 0; i < list.size(); i++) {
 
@@ -438,11 +424,6 @@ public class InventoryController {
 
 	// =========================================================================
 	// 여기부터 재고조회 코드
-	// 기존 재고조회 기능은 건드리지 않음
-	// =========================================================================
-
-	// =========================================================================
-	// 재고조회 목록
 	// =========================================================================
 	@RequestMapping({
 		"/inventory/inventoryStatus",
@@ -493,53 +474,24 @@ public class InventoryController {
 		List<InventoryDTO> itemList =
 			inventoryService.getItemList();
 
-		model.addAttribute(
-			"list",
-			page_list);
-
-		model.addAttribute(
-			"itemList",
-			itemList);
-
-		model.addAttribute(
-			"pageInfo",
-			pageInfo);
-
-		model.addAttribute(
-			"pageUrl",
-			"/inventory/stockList");
-
-		model.addAttribute(
-			"searchType",
-			searchType);
-
-		model.addAttribute(
-			"keyword",
-			keyword);
-
-		model.addAttribute(
-			"startDate",
-			startDate);
-
-		model.addAttribute(
-			"endDate",
-			endDate);
+		model.addAttribute("list", page_list);
+		model.addAttribute("itemList", itemList);
+		model.addAttribute("pageInfo", pageInfo);
+		model.addAttribute("pageUrl", "/inventory/stockList");
+		model.addAttribute("searchType", searchType);
+		model.addAttribute("keyword", keyword);
+		model.addAttribute("startDate", startDate);
+		model.addAttribute("endDate", endDate);
 
 		return "inventory/inventoryManage.tiles";
 	}
 
-	// =========================================================================
-	// 재고 등록
-	// =========================================================================
 	@RequestMapping("/inventory/stockList/insert")
 	public String insertInventory(
 			@RequestParam("itemId") int itemId,
 			@RequestParam("inventoryStock") int inventoryStock,
 			@RequestParam("stockLocation") String stockLocation,
-			@RequestParam(
-				value = "remark",
-				defaultValue = "")
-			String remark) {
+			@RequestParam(value = "remark", defaultValue = "") String remark) {
 
 		InventoryDTO dto =
 			new InventoryDTO();
@@ -559,35 +511,22 @@ public class InventoryController {
 		return "redirect:/inventory/stockList";
 	}
 
-	// =========================================================================
-	// 재고 선택 삭제
-	// =========================================================================
 	@RequestMapping("/inventory/stockList/delete")
 	public String deleteInventory(
-			@RequestParam(
-				value = "inventoryIds",
-				required = false)
-			String[] inventoryIds) {
+			@RequestParam(value = "inventoryIds", required = false) String[] inventoryIds) {
 
 		if (inventoryIds != null) {
 
-			inventoryService.removeInventory(
-				inventoryIds);
+			inventoryService.removeInventory(inventoryIds);
 		}
 
 		return "redirect:/inventory/stockList";
 	}
 
-	// =========================================================================
-	// 재고 상세
-	// =========================================================================
 	@RequestMapping("/inventory/stockList/detail")
 	public String inventoryDetail(
 			@RequestParam("inventoryId") int inventoryId,
-			@RequestParam(
-				value = "mode",
-				defaultValue = "view")
-			String mode,
+			@RequestParam(value = "mode", defaultValue = "view") String mode,
 			Model model) {
 
 		InventoryDTO inventory =
@@ -598,6 +537,16 @@ public class InventoryController {
 			"inventory",
 			inventory);
 
+		// =============================================================
+		// 재고 상세페이지 하단 입출고 내역서
+		// 재고번호를 따라갔을 때 해당 품목의 입고 / 사용 / 출고 이력을
+		// 리스트로 확인할 수 있도록 MATERIAL_INOUT 이력을 같이 전달한다.
+		// =============================================================
+		model.addAttribute(
+			"inoutHistory",
+			inventoryService.getInventoryInoutHistoryList(
+				inventoryId));
+
 		model.addAttribute(
 			"mode",
 			mode);
@@ -605,18 +554,12 @@ public class InventoryController {
 		return "inventory/inventoryDetail.tiles";
 	}
 
-	// =========================================================================
-	// 재고 수정
-	// =========================================================================
 	@RequestMapping("/inventory/stockList/update")
 	public String updateInventory(
 			@RequestParam("inventoryId") int inventoryId,
 			@RequestParam("inventoryStock") int inventoryStock,
 			@RequestParam("stockLocation") String stockLocation,
-			@RequestParam(
-				value = "remark",
-				defaultValue = "")
-			String remark) {
+			@RequestParam(value = "remark", defaultValue = "") String remark) {
 
 		InventoryDTO dto =
 			new InventoryDTO();
@@ -632,11 +575,6 @@ public class InventoryController {
 				+ inventoryId;
 	}
 
-	// =========================================================================
-	// 품목 선택 시 창고위치 자동 조회
-	// 재고조회 등록 모달에서 사용
-	// 기존 재고조회 기능이므로 유지한다.
-	// =========================================================================
 	@ResponseBody
 	@RequestMapping("/inventory/getStockLocation")
 	public String getStockLocation(
@@ -647,6 +585,7 @@ public class InventoryController {
 				itemId);
 
 		if (stockLocation == null) {
+
 			stockLocation = "";
 		}
 
@@ -654,16 +593,16 @@ public class InventoryController {
 	}
 
 	// =========================================================================
-	// 로그인 사용자 사원번호 추출
-	// 프로젝트 LoginDTO 필드명이 달라도 컴파일 에러가 나지 않도록 reflection 사용
-	// getEmpId가 있으면 우선 사용하고, 없으면 getEmpno에서 숫자만 추출한다.
+	// 로그인 사용자 EMP_ID 조회
+	// DB 저장용
+	// EMPNO를 그대로 저장하면 FK 오류가 나므로 EMP 테이블에서 EMP_ID를 조회한다.
 	// =========================================================================
 	private int getLoginEmpId(
 			HttpSession session) {
 
 		if (session == null) {
 
-			return 0;
+			return 1;
 		}
 
 		Object loginUser =
@@ -677,7 +616,7 @@ public class InventoryController {
 
 		if (loginUser == null) {
 
-			return 0;
+			return 1;
 		}
 
 		Integer empId =
@@ -691,15 +630,55 @@ public class InventoryController {
 			return empId.intValue();
 		}
 
-		empId =
-			callIntGetter(
+		String empno =
+			callStringGetter(
 				loginUser,
-				"getEmp_id");
+				"getEmpno");
 
-		if (empId != null
-				&& empId.intValue() > 0) {
+		if (empno == null
+				|| empno.trim().equals("")) {
 
-			return empId.intValue();
+			return 1;
+		}
+
+		Integer foundEmpId =
+			selectEmpIdByEmpno(
+				empno.trim());
+
+		if (foundEmpId != null
+				&& foundEmpId.intValue() > 0) {
+
+			return foundEmpId.intValue();
+		}
+
+		return 1;
+	}
+
+	// =========================================================================
+	// 로그인 사용자 EMPNO 조회
+	// 화면 표시용
+	// 등록모달에는 E2026004 같은 사번을 보여준다.
+	// =========================================================================
+	private String getLoginEmpNo(
+			HttpSession session) {
+
+		if (session == null) {
+
+			return "";
+		}
+
+		Object loginUser =
+			session.getAttribute("loginUser");
+
+		if (loginUser == null) {
+
+			loginUser =
+				session.getAttribute("member");
+		}
+
+		if (loginUser == null) {
+
+			return "";
 		}
 
 		String empno =
@@ -707,26 +686,73 @@ public class InventoryController {
 				loginUser,
 				"getEmpno");
 
-		if (empno != null) {
+		if (empno == null) {
 
-			String onlyNumber =
-				empno.replaceAll("[^0-9]", "");
-
-			if (!onlyNumber.equals("")) {
-
-				try {
-
-					return Integer.parseInt(
-							onlyNumber);
-
-				} catch (Exception e) {
-
-					return 0;
-				}
-			}
+			return "";
 		}
 
-		return 0;
+		return empno;
+	}
+
+	// =========================================================================
+	// EMPNO로 EMP_ID 조회
+	// =========================================================================
+	private Integer selectEmpIdByEmpno(
+			String empno) {
+
+		Integer empId =
+			null;
+
+		try {
+
+			Class.forName("oracle.jdbc.driver.OracleDriver");
+
+			String url =
+				"jdbc:oracle:thin:@//125.181.132.133:51521/xe";
+
+			String id =
+				"tofhdl";
+
+			String pw =
+				"rlatofhdl";
+
+			Connection conn =
+				DriverManager.getConnection(url, id, pw);
+
+			String sql = "";
+
+			sql += " SELECT ";
+			sql += "     EMP_ID ";
+			sql += " FROM EMP ";
+			sql += " WHERE EMPNO = ? ";
+
+			PreparedStatement pstmt =
+				conn.prepareStatement(sql);
+
+			pstmt.setString(
+				1,
+				empno);
+
+			ResultSet rs =
+				pstmt.executeQuery();
+
+			if (rs.next()) {
+
+				empId =
+					Integer.valueOf(
+						rs.getInt("EMP_ID"));
+			}
+
+			rs.close();
+			pstmt.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return empId;
 	}
 
 	private Integer callIntGetter(
@@ -793,13 +819,18 @@ public class InventoryController {
 
 	// =========================================================================
 	// 입고 LOT번호 자동 생성
-	// 화면에서 생성된 값이 비어있을 때 서버에서 한 번 더 생성한다.
 	// =========================================================================
 	private String createMaterialLot(
 			String inoutDate) {
 
-		String dateText =
-			inoutDate.replaceAll("-", "");
+		String dateText = "";
+
+		if (inoutDate != null
+				&& !inoutDate.trim().equals("")) {
+
+			dateText =
+				inoutDate.replaceAll("-", "");
+		}
 
 		if (dateText == null
 				|| dateText.equals("")) {
@@ -819,7 +850,7 @@ public class InventoryController {
 	}
 
 	// =========================================================================
-	// 간단한 JSON 문자열 이스케이프
+	// JSON 문자열 이스케이프
 	// =========================================================================
 	private String json(
 			String value) {

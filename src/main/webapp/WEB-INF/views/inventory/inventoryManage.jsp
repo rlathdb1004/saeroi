@@ -4,6 +4,9 @@
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
+<%@ taglib prefix="fmt"
+	uri="http://java.sun.com/jsp/jstl/fmt"%>
+
 <%-- =========================================================
 	에러 스타일 추가
 ========================================================= --%>
@@ -312,9 +315,9 @@
 						<th class="mobile_hidden">품목코드</th>
 						<th class="mobile_hidden">품목유형</th>
 						<th class="mobile_show">품목명</th>
-						<th class="mobile_show">현재재고</th>
-						<th class="mobile_hidden">단위</th>
+						<th class="mobile_show">현재재고/단위</th>
 						<th class="mobile_show">창고위치</th>
+						<th class="mobile_show">생성일</th>
 						<th class="mobile_show">상세</th>
 
 					</tr>
@@ -355,8 +358,12 @@
 										원자재
 									</c:when>
 
+									<%-- =====================================================
+										우리 프로젝트 기준
+										SM은 화면에서 부자재가 아니라 완제품으로 표시한다.
+									===================================================== --%>
 									<c:when test="${inventory.itemType eq 'SM'}">
-										부자재
+										완제품
 									</c:when>
 
 									<c:otherwise>
@@ -376,19 +383,23 @@
 
 							<td class="mobile_show">
 
-								${inventory.inventoryStock}
-
-							</td>
-
-							<td class="mobile_hidden">
-
-								${inventory.itemUnit}
+								<%-- =====================================================
+									팀장님 피드백 반영
+									현재재고와 단위를 따로 보여주지 않고 한 칸에 합쳐서 표시한다.
+								===================================================== --%>
+								<fmt:formatNumber value="${inventory.inventoryStock}" pattern="#,###" /> ${inventory.itemUnit}
 
 							</td>
 
 							<td class="mobile_show">
 
 								${inventory.stockLocation}
+
+							</td>
+
+							<td class="mobile_show">
+
+								${inventory.createdDate}
 
 							</td>
 
@@ -484,7 +495,11 @@
 								items="${itemList}">
 
 								<option value="${item.itemId}"
-									data-location="${item.stockLocation}">
+									data-code="${item.itemCode}"
+									data-type="${item.itemType}"
+									data-unit="${item.itemUnit}"
+									data-location="${item.stockLocation}"
+									data-stock="${item.inventoryStock}">
 
 									${item.itemName}
 
@@ -518,6 +533,58 @@
 
 						<input type="text"
 							id="insertInventoryItemIdView"
+							class="modal_input"
+							readonly>
+
+					</div>
+
+					<%-- =================================================
+						품목코드
+						ITEM 테이블 조회값을 품목 선택 시 자동 표시한다.
+					================================================= --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							품목코드
+						</label>
+
+						<input type="text"
+							id="insertInventoryItemCodeView"
+							class="modal_input"
+							readonly>
+
+					</div>
+
+					<%-- =================================================
+						품목유형
+						FG / RM / SM 코드를 한글명으로 자동 표시한다.
+						SM은 우리 프로젝트 기준으로 완제품으로 표시한다.
+					================================================= --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							품목유형
+						</label>
+
+						<input type="text"
+							id="insertInventoryItemTypeView"
+							class="modal_input"
+							readonly>
+
+					</div>
+
+					<%-- =================================================
+						단위
+						ITEM.ITEM_UNIT 값을 자동 표시한다.
+					================================================= --%>
+					<div class="modal_item">
+
+						<label class="modal_label">
+							단위
+						</label>
+
+						<input type="text"
+							id="insertInventoryItemUnitView"
 							class="modal_input"
 							readonly>
 
@@ -839,12 +906,75 @@
 			selectedOption.getAttribute(
 				"data-location");
 
+		var itemCode =
+			selectedOption.getAttribute(
+				"data-code");
+
+		var itemType =
+			selectedOption.getAttribute(
+				"data-type");
+
+		var itemUnit =
+			selectedOption.getAttribute(
+				"data-unit");
+
+		var inventoryStock =
+			selectedOption.getAttribute(
+				"data-stock");
+
 		if (stockLocation == null
 			|| stockLocation == "null"
 			|| stockLocation == undefined
 			|| stockLocation == "창고 미지정") {
 
 			stockLocation = "";
+		}
+
+		if (itemCode == null
+			|| itemCode == "null"
+			|| itemCode == undefined) {
+
+			itemCode = "";
+		}
+
+		if (itemUnit == null
+			|| itemUnit == "null"
+			|| itemUnit == undefined) {
+
+			itemUnit = "";
+		}
+
+		if (inventoryStock == null
+			|| inventoryStock == "null"
+			|| inventoryStock == undefined
+			|| inventoryStock == "") {
+
+			inventoryStock = "";
+		}
+
+		var itemTypeText = "";
+
+		if (itemType == "FG") {
+
+			itemTypeText = "완제품";
+
+		} else if (itemType == "RM") {
+
+			itemTypeText = "원자재";
+
+		} else if (itemType == "SM") {
+
+			// =====================================================
+			// 우리 프로젝트 기준
+			// SM은 화면에서 부자재가 아니라 완제품으로 표시한다.
+			// =====================================================
+			itemTypeText = "완제품";
+
+		} else if (itemType != null
+			&& itemType != "null"
+			&& itemType != undefined) {
+
+			itemTypeText = itemType;
 		}
 
 		document.getElementById(
@@ -858,6 +988,42 @@
 
 			itemIdView.value =
 				this.value;
+		}
+
+		var itemCodeView =
+			document.getElementById("insertInventoryItemCodeView");
+
+		if (itemCodeView != null) {
+
+			itemCodeView.value =
+				itemCode;
+		}
+
+		var itemTypeView =
+			document.getElementById("insertInventoryItemTypeView");
+
+		if (itemTypeView != null) {
+
+			itemTypeView.value =
+				itemTypeText;
+		}
+
+		var itemUnitView =
+			document.getElementById("insertInventoryItemUnitView");
+
+		if (itemUnitView != null) {
+
+			itemUnitView.value =
+				itemUnit;
+		}
+
+		var inventoryStockInput =
+			document.getElementById("insertInventoryStock");
+
+		if (inventoryStockInput != null) {
+
+			inventoryStockInput.value =
+				inventoryStock;
 		}
 	});
 </script>
