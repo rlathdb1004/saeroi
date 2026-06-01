@@ -10,8 +10,8 @@ public class EquipmentTroubleDTO {
 	private int equip_id;
 	private int emp_id;	
 	private String ename;	
-	private String trouble_content;
-	private Timestamp trouble_date;
+	private String trouble_content;	
+	private Timestamp trouble_date;	
 	private Timestamp resolve_date;
 	private String trouble_resolve;	
 	private String remark;
