@@ -317,11 +317,18 @@
 
 							<%-- =====================================================
 								입출고번호 출력
-								팀장님 요청 기준으로 숫자 INOUT_ID 대체 출력은 하지 않는다.
-								DOC_NO는 등록 시 DB에 반드시 저장되어야 한다.
+								공통 JSP / 공통 CSS는 건드리지 않고 현재 JSP에서만 출력값을 변경한다.
+
+								기존에는 ${inout.docNo}만 출력해서,
+								DB의 기존 데이터 중 DOC_NO가 비어 있는 행은 입출고번호 칸이 빈칸으로 보였다.
+
+								InoutDTO.getDisplayDocNo()에서
+								1) DOC_NO가 있으면 DOC_NO 출력
+								2) DOC_NO가 비어 있으면 입출고구분 + 일자 + INOUT_ID로 표시용 번호 생성
+								하도록 처리했기 때문에 여기서는 displayDocNo만 출력한다.
 							===================================================== --%>
-							<td>
-								${inout.docNo}
+							<td title="${inout.displayDocNo}">
+								${inout.displayDocNo}
 							</td>
 
 							<td>

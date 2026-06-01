@@ -242,7 +242,11 @@
 
 				<input type="hidden"
 					name="docNo"
-					value="${inout.docNo}">
+					value="<%-- =====================================================
+						DOC_NO가 비어있는 기존 데이터도 상세페이지에서 입출고번호가 보이도록
+						DTO의 화면 표시용 getter(displayDocNo)를 사용한다.
+					===================================================== --%>
+					${inout.displayDocNo}">
 
 				<input type="hidden"
 					name="docSeq"
@@ -269,7 +273,7 @@
 							<tr>
 
 								<th>입출고번호</th>
-								<td>${inout.docNo}</td>
+								<td>${inout.displayDocNo}</td>
 
 								<th>입출고일자</th>
 
@@ -449,7 +453,7 @@
 						<tr>
 
 							<th>입출고번호</th>
-							<td>${inout.docNo}</td>
+							<td>${inout.displayDocNo}</td>
 
 							<th>입출고일자</th>
 							<td>${inout.inoutDate}</td>
@@ -550,7 +554,7 @@
 						<tr>
 
 							<th>입출고번호</th>
-							<td>${inout.docNo}</td>
+							<td>${inout.displayDocNo}</td>
 
 							<th>입출고일자</th>
 							<td>${inout.inoutDate}</td>
@@ -705,7 +709,7 @@
 						<tr>
 
 							<th>입출고번호</th>
-							<td>${inout.docNo}</td>
+							<td>${inout.displayDocNo}</td>
 
 							<th>입출고일자</th>
 							<td>${inout.inoutDate}</td>

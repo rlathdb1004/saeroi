@@ -40,6 +40,12 @@ public class InoutDAOImpl implements InoutDAO {
 				pw);
 	}
 
+	// =============================================================
+	// 입출고 목록 조회
+	// 검색어는 띄어쓰기를 무시해서 검색한다.
+	// 예) 'EV6배터리'로 검색해도 'EV6 배터리'가 검색된다.
+	// 공통 JSP / Controller / Service는 건드리지 않고 DAO SQL에서만 처리한다.
+	// =============================================================
 	@Override
 	public List<InoutDTO> selectInoutList(
 			String searchType,
@@ -150,18 +156,20 @@ public class InoutDAOImpl implements InoutDAO {
 
 					// =====================================================
 					// 품목코드 검색
-					// UPPER를 사용해서 대문자 / 소문자를 구분하지 않는다.
-					// 예: RM, rm, Rm 모두 검색 가능
+					// UPPER로 대소문자를 무시하고,
+					// REPLACE로 띄어쓰기를 제거해서 검색한다.
+					// 예: RM 001 = RM001
 					// =====================================================
-					sql += " AND UPPER(I.ITEM_CODE) LIKE UPPER(?) ";
+					sql += " AND REPLACE(UPPER(I.ITEM_CODE), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
 
 				} else if ("itemName".equals(searchType)) {
 
 					// =====================================================
 					// 품목명 검색
-					// 영어가 들어간 품목명도 대소문자 구분 없이 검색한다.
+					// 영어가 들어간 품목명도 대소문자 구분 없이 검색하고,
+					// 띄어쓰기 차이도 무시한다.
 					// =====================================================
-					sql += " AND UPPER(I.ITEM_NAME) LIKE UPPER(?) ";
+					sql += " AND REPLACE(UPPER(I.ITEM_NAME), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
 
 				} else if (isNumber) {
 
@@ -172,18 +180,18 @@ public class InoutDAOImpl implements InoutDAO {
 					// =====================================================
 					// 통합검색
 					// 품목코드 / 품목명 / 단위 / 문서번호 / LOT번호 등
-					// 영어 검색어가 들어가는 컬럼은 UPPER를 적용해서
-					// 대소문자를 구분하지 않게 한다.
+					// 영어 검색어가 들어가는 컬럼은 UPPER + REPLACE를 적용해서
+					// 대소문자와 띄어쓰기 차이를 무시한다.
 					// =====================================================
 					sql += " AND ( ";
-					sql += "     UPPER(I.ITEM_CODE) LIKE UPPER(?) ";
-					sql += "     OR UPPER(I.ITEM_NAME) LIKE UPPER(?) ";
-					sql += "     OR UPPER(I.ITEM_UNIT) LIKE UPPER(?) ";
-					sql += "     OR UPPER(MI.DOC_NO) LIKE UPPER(?) ";
-					sql += "     OR UPPER(MI.MATERIAL_LOT) LIKE UPPER(?) ";
-					sql += "     OR UPPER(MI.REMARK) LIKE UPPER(?) ";
-					sql += "     OR UPPER(MI.STATUS) LIKE UPPER(?) ";
-					sql += "     OR UPPER(MI.USE_YN) LIKE UPPER(?) ";
+					sql += "     REPLACE(UPPER(I.ITEM_CODE), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(I.ITEM_NAME), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(I.ITEM_UNIT), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(MI.DOC_NO), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(MI.MATERIAL_LOT), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(MI.REMARK), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(MI.STATUS), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(MI.USE_YN), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
 					sql += "     OR TO_CHAR(MI.INOUT_DATE, 'YYYY-MM-DD') LIKE ? ";
 					// =====================================================
 					// 입고/출고 한글 검색도 대소문자 구분 없이 처리한다.
