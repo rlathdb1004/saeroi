@@ -15,4 +15,5 @@ public class EquipmentTroubleDTO {
 	private Timestamp resolve_date;
 	private String trouble_resolve;	
 	private String remark;
+	private int history_id;
 }
