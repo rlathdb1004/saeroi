@@ -4,6 +4,11 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -202,27 +207,39 @@ public class EquipmentStatusDAO {
 	        "HISTORY_ID, EQUIP_ID, "+
 	        "OPERATION_DATE, TIME_START, TIME_END, " +
 	        "PLAN_TIME_MIN, RUNTIME_MIN, DOWNTIME_MIN, " +
-	        "DOWN_REASON, REMARK) " +
+	        "DOWN_REASON, REMARK, DOC_NO) " +
 	        "VALUES (" +
 	        "EQUIPMENT_HISTORY_SEQ.NEXTVAL, ?, "+
 	        "?, ?, ?, " +
 	        "?, ?, ?, " +
-	        "?, ?)";
+	        "?, ?, ?)";
 
 	    try (
 	        Connection conn = dataSource.getConnection();
 	        PreparedStatement ps = conn.prepareStatement(sql)
 	    ) {
+	    	SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+	    	String dateStr = sdf.format(dto.getOperation_date());
+	    	String docNo = "EH-" + dateStr + "-" + String.format("%04d", dto.getEquip_id());
 
-	        ps.setInt(1, dto.getEquip_id());
-	        ps.setDate(2, dto.getOperation_date());
-	        ps.setDate(3, dto.getOperation_date());
-	        ps.setDate(4, dto.getOperation_date());
-	        ps.setInt(5, dto.getPlan_time_min());
-	        ps.setInt(6, dto.getRuntime_min());
-	        ps.setInt(7, dto.getDowntime_min());
-	        ps.setString(8, dto.getDown_reason());
-	        ps.setString(9, dto.getRemark());
+	    	LocalDate operation_date = dto.getOperation_date().toLocalDate();
+	    	LocalDateTime start_date_time = 
+	    			LocalDateTime.of(operation_date, LocalTime.of(8, 0));
+	    	LocalDateTime end_date_time = 
+	    	        start_date_time.plusMinutes(dto.getPlan_time_min());
+	    	Timestamp time_start = Timestamp.valueOf(start_date_time);
+	    	Timestamp time_end = Timestamp.valueOf(end_date_time);
+	    	
+	    	ps.setInt(1, dto.getEquip_id());
+	    	ps.setDate(2, dto.getOperation_date());
+	    	ps.setTimestamp(3, time_start);
+	        ps.setTimestamp(4, time_end);
+	    	ps.setInt(5, dto.getPlan_time_min());
+	    	ps.setInt(6, dto.getRuntime_min());
+	    	ps.setInt(7, dto.getDowntime_min());
+	    	ps.setString(8, dto.getDown_reason());
+	    	ps.setString(9, dto.getRemark());
+	    	ps.setString(10, docNo);
 
 	        result = ps.executeUpdate();
 
