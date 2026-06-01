@@ -340,13 +340,18 @@ launcher.addEventListener('pointerup', function (e) {
 		
 		 async function message(){
 				let prompt = document.querySelector('#prompt');
+				let btn = document.querySelector('#btn');
 				let url = contextPath + "/gemini";
 				
 				let promptValue = prompt.value.trim();
+				
 				if (!promptValue) return
-				console.log(promptValue)
+				
+				btn.disabled = true;
+				prompt.disabled = true;
 				
 				chat.innerHTML +="<div class='message-bubble user'>" + promptValue + "</div>";
+				chat.innerHTML += "<div class='message-bubble ai' id='ai-loading'><i class='fa-solid fa-spinner fa-spin'></i> 답변을 분석 중입니다...</div>";
 				chat.scrollTop = chat.scrollHeight;
 				
 				
@@ -364,11 +369,13 @@ launcher.addEventListener('pointerup', function (e) {
 				let data = await response.text()
 // 				let data = JSON.parse(text)
 // 				let aiResponse = data.candidates[0].content.parts[0].text;
-				
+				document.querySelector('#ai-loading').remove();
 				chat.innerHTML += "<div class='message-bubble ai'>" + data + "</div>";;
 				chat.scrollTop = chat.scrollHeight;
 				
-				
+				btn.disabled = false;
+			    prompt.disabled = false;
+			    prompt.focus();
 		}
 		
 		document.querySelector('#btn').addEventListener('click', message);
