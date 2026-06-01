@@ -1,6 +1,8 @@
 package kr.or.saeroi.controller;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import kr.or.saeroi.Chart.ChartService;
 import kr.or.saeroi.dto.BoradDTO;
@@ -69,6 +73,52 @@ public class DashboardController {
 		return "dashboard.tiles";
 	}
 	
+	// KPI 상세 모달 주차별 데이터를 조회한다.
+	@GetMapping("/dashboard/kpi/week-detail")
+	@ResponseBody
+	public Map<String, Object> dashboardKpiWeekDetail(
+			@RequestParam(value = "kpiType", required = false) String kpiType,
+			@RequestParam(value = "baseDate", required = false) String baseDate) {
+
+		Map<String, Object> result = new HashMap<>();
+
+		if (!isAllowedKpiType(kpiType)) {
+			result.put("success", false);
+			result.put("message", "허용되지 않은 KPI 유형입니다.");
+			return result;
+		}
+
+		String searchBaseDate = baseDate;
+
+		if (searchBaseDate == null || searchBaseDate.trim().isEmpty()) {
+			searchBaseDate = LocalDate.now().toString();
+		}
+
+		Map<String, Object> param = new HashMap<>();
+		param.put("kpiType", kpiType);
+		param.put("baseDate", searchBaseDate);
+
+		List<Map<String, Object>> kpiWeekList =
+				chartService.dashboardKpiWeekDetail(param);
+
+		result.put("success", true);
+		result.put("kpiType", kpiType);
+		result.put("baseDate", searchBaseDate);
+		result.put("kpiWeekList", kpiWeekList);
+
+		return result;
+	}
+
+	// KPI 상세 모달에서 허용된 KPI 유형인지 확인한다.
+	private boolean isAllowedKpiType(String kpiType) {
+		return "achievement".equals(kpiType)
+				|| "production".equals(kpiType)
+				|| "defect".equals(kpiType)
+				|| "cost".equals(kpiType)
+				|| "oee".equals(kpiType)
+				|| "delay".equals(kpiType);
+	}
+	
 	// 대시보드 KPI 핵심 6대 지표 데이터를 조회한다.
 	private void setDashboardKpi(Model model) {
 		Map<String, Object> dashKpiSummary = chartService.dashboardKpiSummary();
@@ -108,19 +158,21 @@ public class DashboardController {
 		BigDecimal defectRate = getNumberValue(dashKpiSummary, "DEFECTRATE");
 		BigDecimal defectQty = getNumberValue(dashKpiSummary, "DEFECTQTY");
 		BigDecimal inspectionQty = getNumberValue(dashKpiSummary, "INSPECTIONQTY");
+		BigDecimal prevInspectionQty = getNumberValue(dashKpiSummary, "PREVINSPECTIONQTY");
 		BigDecimal defectComparePoint = getNumberValue(dashKpiSummary, "DEFECTCOMPAREPOINT");
 
 		model.addAttribute("dashKpiDefectRate", defectRate);
 		model.addAttribute("dashKpiDefectQty", defectQty);
 		model.addAttribute("dashKpiInspectionQty", inspectionQty);
+		model.addAttribute("dashKpiPrevInspectionQty", prevInspectionQty);
 		model.addAttribute("dashKpiDefectComparePoint", defectComparePoint.abs());
 
 		setCompareDisplay(model,
 				defectComparePoint,
 				"dashKpiDefectCompare",
 				false,
-				prevProdQty.compareTo(BigDecimal.ZERO) > 0);
-
+				prevInspectionQty.compareTo(BigDecimal.ZERO) > 0);
+		
 		BigDecimal costActual = getNumberValue(dashKpiSummary, "COSTACTUAL");
 		BigDecimal costPrev = getNumberValue(dashKpiSummary, "COSTPREV");
 		BigDecimal costTarget = getNumberValue(dashKpiSummary, "COSTTARGET");
@@ -517,5 +569,31 @@ public class DashboardController {
 		}
 
 		return String.valueOf(map.get(key));
+	}
+	
+	// 생산달성률 상세 모달 주차별 데이터를 조회한다.
+	@GetMapping("/dashboard/kpi/achievement-week")
+	@ResponseBody
+	public Map<String, Object> dashboardAchievementWeek(
+			@RequestParam(value = "baseDate", required = false) String baseDate) {
+
+		String searchBaseDate = baseDate;
+
+		if (searchBaseDate == null || searchBaseDate.trim().isEmpty()) {
+			searchBaseDate = LocalDate.now().toString();
+		}
+
+		Map<String, Object> param = new HashMap<>();
+		param.put("baseDate", searchBaseDate);
+
+		List<Map<String, Object>> achievementWeekList =
+				chartService.dashboardAchievementWeek(param);
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("success", true);
+		result.put("baseDate", searchBaseDate);
+		result.put("achievementWeekList", achievementWeekList);
+
+		return result;
 	}
 }

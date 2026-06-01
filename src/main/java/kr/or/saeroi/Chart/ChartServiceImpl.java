@@ -92,4 +92,18 @@ public class ChartServiceImpl implements ChartService{
 		return map;
 	}
 	
+	// 생산달성률 상세 모달 주차별 데이터를 조회한다.
+	@Override
+	public List<Map<String, Object>> dashboardAchievementWeek(Map<String, Object> param) {
+		List<Map<String, Object>> list = chartDAO.dashboardAchievementWeek(param);
+		return list;
+	}
+	
+	// KPI 상세 모달 주차별 데이터를 조회한다.
+	@Override
+	public List<Map<String, Object>> dashboardKpiWeekDetail(Map<String, Object> param) {
+		List<Map<String, Object>> list = chartDAO.dashboardKpiWeekDetail(param);
+		return list;
+	}
+	
 }

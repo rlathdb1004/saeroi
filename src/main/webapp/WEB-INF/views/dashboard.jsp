@@ -37,270 +37,261 @@
 		</div>
 	</section>
 
-<%-- KPI 핵심 6대 지표 영역이다. --%>
-<section class="dash-kpi-panel">
+	<%-- KPI 핵심 6대 지표 영역이다. --%>
+	<section class="dash-kpi-panel">
 
-	<div class="dash-kpi-panel-head">
-		<h3>KPI 핵심 6대 지표</h3>
-	</div>
+		<div class="dash-kpi-panel-head">
+			<h3>KPI 핵심 6대 지표</h3>
+		</div>
 
-	<section class="dash-kpi-grid">
+		<section class="dash-kpi-grid">
 
-		<article class="dash-kpi-card">
-			<div class="dash-kpi-head">
-				<strong>생산달성률</strong>
-				<span class="dash-info-mini">i</span>
-			</div>
+			<article class="dash-kpi-card dash-kpi-click"
+				id="dashAchievementKpiCard" data-kpi-type="achievement"
+				data-kpi-title="생산달성률">
 
-			<div class="dash-kpi-body">
-				<span class="dash-kpi-icon dash-green-icon">
-					<svg viewBox="0 0 24 24" aria-hidden="true">
+				<div class="dash-kpi-head">
+					<strong>생산달성률</strong> <span class="dash-info-mini">i</span>
+				</div>
+
+				<div class="dash-kpi-body">
+					<span class="dash-kpi-icon dash-green-icon"> <svg
+							viewBox="0 0 24 24" aria-hidden="true">
 						<circle cx="12" cy="12" r="8"></circle>
 						<circle cx="12" cy="12" r="4"></circle>
 						<path d="M12 12L18 6"></path>
 						<path d="M17 6H20V9"></path>
 					</svg>
-				</span>
+					</span>
 
-				<div class="dash-kpi-value dash-green-text">
-					<strong>
-						<fmt:formatNumber value="${dashKpiAchievementRate}" pattern="#,##0.0" />
-					</strong>
-					<span>%</span>
+					<div class="dash-kpi-value dash-green-text">
+						<strong> <fmt:formatNumber
+								value="${dashKpiAchievementRate}" pattern="#,##0.0" />
+						</strong> <span>%</span>
+					</div>
 				</div>
-			</div>
 
-			<div class="dash-kpi-detail">
-				<span>
-					목표
-					<strong>
-						<fmt:formatNumber value="${dashKpiProdTargetQty}" pattern="#,##0" /> EA
+				<div class="dash-kpi-detail">
+					<span> 목표 <strong> <fmt:formatNumber
+								value="${dashKpiProdTargetQty}" pattern="#,##0" /> EA
 					</strong>
-				</span>
-				<span>
-					실적
-					<strong>
-						<fmt:formatNumber value="${dashKpiProdActualQty}" pattern="#,##0" /> EA
+					</span> <span> 실적 <strong> <fmt:formatNumber
+								value="${dashKpiProdActualQty}" pattern="#,##0" /> EA
 					</strong>
-				</span>
-			</div>
+					</span>
+				</div>
 
-			<div class="dash-kpi-bottom">
-				<c:choose>
-					<c:when test="${dashKpiAchievementCompareNoPrevData}">
-						<strong class="dash-neutral-text">전일 데이터 없음</strong>
-					</c:when>
+				<div class="dash-kpi-bottom">
+					<c:choose>
+						<c:when test="${dashKpiAchievementCompareNoPrevData}">
+							<strong class="dash-neutral-text">전일 데이터 없음</strong>
+						</c:when>
 
-					<c:otherwise>
-						<span>전일 대비</span>
-						<strong class="${dashKpiAchievementCompareClass}">
-							<c:choose>
-								<c:when test="${empty dashKpiAchievementComparePoint or dashKpiAchievementComparePoint eq 0}">
+						<c:otherwise>
+							<span>전일 대비</span>
+							<strong class="${dashKpiAchievementCompareClass}"> <c:choose>
+									<c:when
+										test="${empty dashKpiAchievementComparePoint or dashKpiAchievementComparePoint eq 0}">
 									변동 없음
 								</c:when>
-								<c:otherwise>
+									<c:otherwise>
 									${dashKpiAchievementCompareArrow}
-									<fmt:formatNumber value="${dashKpiAchievementComparePoint}" pattern="#,##0.0" />%p
+									<fmt:formatNumber value="${dashKpiAchievementComparePoint}"
+											pattern="#,##0.0" />%p
 								</c:otherwise>
-							</c:choose>
-						</strong>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</article>
+								</c:choose>
+							</strong>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</article>
 
-		<article class="dash-kpi-card">
-			<div class="dash-kpi-head">
-				<strong>금일 생산량</strong>
-				<span class="dash-info-mini">i</span>
-			</div>
+			<article class="dash-kpi-card dash-kpi-click"
+				id="dashProductionKpiCard" data-kpi-type="production"
+				data-kpi-title="금일 생산량">
 
-			<div class="dash-kpi-body">
-				<span class="dash-kpi-icon dash-green-icon">
-					<svg viewBox="0 0 24 24" aria-hidden="true">
+				<div class="dash-kpi-head">
+					<strong>금일 생산량</strong> <span class="dash-info-mini">i</span>
+				</div>
+
+				<div class="dash-kpi-body">
+					<span class="dash-kpi-icon dash-green-icon"> <svg
+							viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M5 19V13"></path>
 						<path d="M10 19V9"></path>
 						<path d="M15 19V5"></path>
 						<path d="M20 19V11"></path>
 					</svg>
-				</span>
+					</span>
 
-				<div class="dash-kpi-value dash-green-text">
-					<strong>
-						<fmt:formatNumber value="${dashKpiTodayProdQty}" pattern="#,##0" />
-					</strong>
-					<span>EA</span>
+					<div class="dash-kpi-value dash-green-text">
+						<strong> <fmt:formatNumber value="${dashKpiTodayProdQty}"
+								pattern="#,##0" />
+						</strong> <span>EA</span>
+					</div>
 				</div>
-			</div>
 
-			<div class="dash-kpi-detail">
-				<span>
-					전일
-					<strong>
-						<fmt:formatNumber value="${dashKpiPrevProdQty}" pattern="#,##0" /> EA
+				<div class="dash-kpi-detail">
+					<span> 전일 <strong> <fmt:formatNumber
+								value="${dashKpiPrevProdQty}" pattern="#,##0" /> EA
 					</strong>
-				</span>
-			</div>
+					</span>
+				</div>
 
-			<div class="dash-kpi-bottom">
-				<c:choose>
-					<c:when test="${dashKpiTodayProdCompareNoPrevData}">
-						<strong class="dash-neutral-text">전일 데이터 없음</strong>
-					</c:when>
+				<div class="dash-kpi-bottom">
+					<c:choose>
+						<c:when test="${dashKpiTodayProdCompareNoPrevData}">
+							<strong class="dash-neutral-text">전일 데이터 없음</strong>
+						</c:when>
 
-					<c:otherwise>
-						<span>전일 대비</span>
-						<strong class="${dashKpiTodayProdCompareClass}">
-							<c:choose>
-								<c:when test="${empty dashKpiTodayProdCompareQty or dashKpiTodayProdCompareQty eq 0}">
+						<c:otherwise>
+							<span>전일 대비</span>
+							<strong class="${dashKpiTodayProdCompareClass}"> <c:choose>
+									<c:when
+										test="${empty dashKpiTodayProdCompareQty or dashKpiTodayProdCompareQty eq 0}">
 									변동 없음
 								</c:when>
-								<c:otherwise>
+									<c:otherwise>
 									${dashKpiTodayProdCompareArrow}
-									<fmt:formatNumber value="${dashKpiTodayProdCompareQty}" pattern="#,##0" /> EA
+									<fmt:formatNumber value="${dashKpiTodayProdCompareQty}"
+											pattern="#,##0" /> EA
 								</c:otherwise>
-							</c:choose>
-						</strong>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</article>
+								</c:choose>
+							</strong>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</article>
 
-		<article class="dash-kpi-card">
-			<div class="dash-kpi-head">
-				<strong>불량률</strong>
-				<span class="dash-info-mini">i</span>
-			</div>
+			<article class="dash-kpi-card dash-kpi-click" id="dashDefectKpiCard"
+				data-kpi-type="defect" data-kpi-title="불량률">
 
-			<div class="dash-kpi-body">
-				<span class="dash-kpi-icon dash-red-icon">
-					<svg viewBox="0 0 24 24" aria-hidden="true">
+				<div class="dash-kpi-head">
+					<strong>불량률</strong> <span class="dash-info-mini">i</span>
+				</div>
+
+				<div class="dash-kpi-body">
+					<span class="dash-kpi-icon dash-red-icon"> <svg
+							viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M12 22S20 18 20 10V5L12 2L4 5V10C4 18 12 22 12 22Z"></path>
 						<path d="M9 9L15 15"></path>
 						<path d="M15 9L9 15"></path>
 					</svg>
-				</span>
+					</span>
 
-				<div class="dash-kpi-value dash-red-text">
-					<strong>
-						<fmt:formatNumber value="${dashKpiDefectRate}" pattern="#,##0.0" />
-					</strong>
-					<span>%</span>
+					<div class="dash-kpi-value dash-red-text">
+						<strong> <fmt:formatNumber value="${dashKpiDefectRate}"
+								pattern="#,##0.0" />
+						</strong> <span>%</span>
+					</div>
 				</div>
-			</div>
 
-			<div class="dash-kpi-detail">
-				<span>
-					불량
-					<strong>
-						<fmt:formatNumber value="${dashKpiDefectQty}" pattern="#,##0" /> EA
+				<div class="dash-kpi-detail">
+					<span> 불량 <strong> <fmt:formatNumber
+								value="${dashKpiDefectQty}" pattern="#,##0" /> EA
 					</strong>
-				</span>
-				<span>
-					검사
-					<strong>
-						<fmt:formatNumber value="${dashKpiInspectionQty}" pattern="#,##0" /> EA
+					</span> <span> 검사 <strong> <fmt:formatNumber
+								value="${dashKpiInspectionQty}" pattern="#,##0" /> EA
 					</strong>
-				</span>
-			</div>
+					</span>
+				</div>
 
-			<div class="dash-kpi-bottom">
-				<c:choose>
-					<c:when test="${dashKpiDefectCompareNoPrevData}">
-						<strong class="dash-neutral-text">전일 데이터 없음</strong>
-					</c:when>
+				<div class="dash-kpi-bottom">
+					<c:choose>
+						<c:when test="${dashKpiDefectCompareNoPrevData}">
+							<strong class="dash-neutral-text">전일 데이터 없음</strong>
+						</c:when>
 
-					<c:otherwise>
-						<span>전일 대비</span>
-						<strong class="${dashKpiDefectCompareClass}">
-							<c:choose>
-								<c:when test="${empty dashKpiDefectComparePoint or dashKpiDefectComparePoint eq 0}">
+						<c:otherwise>
+							<span>전일 대비</span>
+							<strong class="${dashKpiDefectCompareClass}"> <c:choose>
+									<c:when
+										test="${empty dashKpiDefectComparePoint or dashKpiDefectComparePoint eq 0}">
 									변동 없음
 								</c:when>
-								<c:otherwise>
+									<c:otherwise>
 									${dashKpiDefectCompareArrow}
-									<fmt:formatNumber value="${dashKpiDefectComparePoint}" pattern="#,##0.0" />%p
+									<fmt:formatNumber value="${dashKpiDefectComparePoint}"
+											pattern="#,##0.0" />%p
 								</c:otherwise>
-							</c:choose>
-						</strong>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</article>
+								</c:choose>
+							</strong>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</article>
 
-		<article class="dash-kpi-card">
-			<div class="dash-kpi-head">
-				<strong>생산원가</strong>
-				<span class="dash-info-mini">i</span>
-			</div>
+			<article class="dash-kpi-card dash-kpi-click" id="dashCostKpiCard"
+				data-kpi-type="cost" data-kpi-title="생산원가">
 
-			<div class="dash-kpi-body">
-				<span class="dash-kpi-icon dash-black-icon">
-					<svg viewBox="0 0 24 24" aria-hidden="true">
+				<div class="dash-kpi-head">
+					<strong>생산원가</strong> <span class="dash-info-mini">i</span>
+				</div>
+
+
+				<div class="dash-kpi-body">
+					<span class="dash-kpi-icon dash-black-icon"> <svg
+							viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M5 5L8.5 19L12 9L15.5 19L19 5"></path>
 						<path d="M4 10H20"></path>
 						<path d="M4 14H20"></path>
 					</svg>
-				</span>
+					</span>
 
-				<div class="dash-kpi-value dash-black-text">
-					<strong>
-						<fmt:formatNumber value="${dashKpiCostActual}" pattern="#,##0" />
-					</strong>
-					<span>원/EA</span>
+					<div class="dash-kpi-value dash-black-text">
+						<strong> <fmt:formatNumber value="${dashKpiCostActual}"
+								pattern="#,##0" />
+						</strong> <span>원/EA</span>
+					</div>
 				</div>
-			</div>
 
-			<div class="dash-kpi-detail">
-				<span>
-					목표
-					<strong>
-						<fmt:formatNumber value="${dashKpiCostTarget}" pattern="#,##0" /> 원/EA
+				<div class="dash-kpi-detail">
+					<span> 목표 <strong> <fmt:formatNumber
+								value="${dashKpiCostTarget}" pattern="#,##0" /> 원/EA
 					</strong>
-				</span>
-				<span>
-					실적
-					<strong>
-						<fmt:formatNumber value="${dashKpiCostActual}" pattern="#,##0" /> 원/EA
+					</span> <span> 실적 <strong> <fmt:formatNumber
+								value="${dashKpiCostActual}" pattern="#,##0" /> 원/EA
 					</strong>
-				</span>
-			</div>
+					</span>
+				</div>
 
-			<div class="dash-kpi-bottom">
-				<c:choose>
-					<c:when test="${dashKpiCostCompareNoPrevData}">
-						<strong class="dash-neutral-text">전일 데이터 없음</strong>
-					</c:when>
+				<div class="dash-kpi-bottom">
+					<c:choose>
+						<c:when test="${dashKpiCostCompareNoPrevData}">
+							<strong class="dash-neutral-text">전일 데이터 없음</strong>
+						</c:when>
 
-					<c:otherwise>
-						<span>전일 대비</span>
-						<strong class="${dashKpiCostCompareClass}">
-							<c:choose>
-								<c:when test="${empty dashKpiCostCompareValue or dashKpiCostCompareValue eq 0}">
+						<c:otherwise>
+							<span>전일 대비</span>
+							<strong class="${dashKpiCostCompareClass}"> <c:choose>
+									<c:when
+										test="${empty dashKpiCostCompareValue or dashKpiCostCompareValue eq 0}">
 									변동 없음
 								</c:when>
-								<c:otherwise>
+									<c:otherwise>
 									${dashKpiCostCompareArrow}
-									<fmt:formatNumber value="${dashKpiCostCompareValue}" pattern="#,##0" /> 원
+									<fmt:formatNumber value="${dashKpiCostCompareValue}"
+											pattern="#,##0" /> 원
 								</c:otherwise>
-							</c:choose>
-						</strong>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</article>
+								</c:choose>
+							</strong>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</article>
 
-		<article class="dash-kpi-card">
-			<div class="dash-kpi-head">
-				<strong>OEE</strong>
-				<span class="dash-info-mini">i</span>
-			</div>
+			<article class="dash-kpi-card dash-kpi-click" id="dashOeeKpiCard"
+				data-kpi-type="oee" data-kpi-title="OEE">
 
-			<div class="dash-kpi-body">
-				<span class="dash-kpi-icon dash-green-icon dash-oee-icon">
-					<svg class="dash-oee-svg" viewBox="0 0 64 64" aria-hidden="true">
+				<div class="dash-kpi-head">
+					<strong>OEE</strong> <span class="dash-info-mini">i</span>
+				</div>
+
+				<div class="dash-kpi-body">
+					<span class="dash-kpi-icon dash-green-icon dash-oee-icon"> <svg
+							class="dash-oee-svg" viewBox="0 0 64 64" aria-hidden="true">
 						<path class="dash-oee-arc"
-							  d="M12 42C12 30.95 20.95 22 32 22C43.05 22 52 30.95 52 42"></path>
+								d="M12 42C12 30.95 20.95 22 32 22C43.05 22 52 30.95 52 42"></path>
 						<path class="dash-oee-tick" d="M16 42H10"></path>
 						<path class="dash-oee-tick" d="M20.5 30.5L16.2 26.2"></path>
 						<path class="dash-oee-tick" d="M32 26V19"></path>
@@ -309,113 +300,203 @@
 						<path class="dash-oee-needle" d="M32 42L44 30"></path>
 						<circle class="dash-oee-center" cx="32" cy="42" r="4"></circle>
 					</svg>
-				</span>
+					</span>
 
-				<div class="dash-kpi-value dash-green-text">
-					<strong>
-						<fmt:formatNumber value="${dashKpiOeeRate}" pattern="#,##0.0" />
-					</strong>
-					<span>%</span>
+					<div class="dash-kpi-value dash-green-text">
+						<strong> <fmt:formatNumber value="${dashKpiOeeRate}"
+								pattern="#,##0.0" />
+						</strong> <span>%</span>
+					</div>
 				</div>
-			</div>
 
-			<div class="dash-kpi-detail">
-				<span>
-					가동
-					<strong>
-						<fmt:formatNumber value="${dashKpiOeeRunTime}" pattern="#,##0" />분
+				<div class="dash-kpi-detail">
+					<span> 가동 <strong> <fmt:formatNumber
+								value="${dashKpiOeeRunTime}" pattern="#,##0" />분
 					</strong>
-				</span>
-				<span>
-					계획
-					<strong>
-						<fmt:formatNumber value="${dashKpiOeePlanTime}" pattern="#,##0" />분
+					</span> <span> 계획 <strong> <fmt:formatNumber
+								value="${dashKpiOeePlanTime}" pattern="#,##0" />분
 					</strong>
-				</span>
-			</div>
+					</span>
+				</div>
 
-			<div class="dash-kpi-bottom">
-				<c:choose>
-					<c:when test="${dashKpiOeeCompareNoPrevData}">
-						<strong class="dash-neutral-text">전일 데이터 없음</strong>
-					</c:when>
+				<div class="dash-kpi-bottom">
+					<c:choose>
+						<c:when test="${dashKpiOeeCompareNoPrevData}">
+							<strong class="dash-neutral-text">전일 데이터 없음</strong>
+						</c:when>
 
-					<c:otherwise>
-						<span>전일 대비</span>
-						<strong class="${dashKpiOeeCompareClass}">
-							<c:choose>
-								<c:when test="${empty dashKpiOeeComparePoint or dashKpiOeeComparePoint eq 0}">
+						<c:otherwise>
+							<span>전일 대비</span>
+							<strong class="${dashKpiOeeCompareClass}"> <c:choose>
+									<c:when
+										test="${empty dashKpiOeeComparePoint or dashKpiOeeComparePoint eq 0}">
 									변동 없음
 								</c:when>
-								<c:otherwise>
+									<c:otherwise>
 									${dashKpiOeeCompareArrow}
-									<fmt:formatNumber value="${dashKpiOeeComparePoint}" pattern="#,##0.0" />%p
+									<fmt:formatNumber value="${dashKpiOeeComparePoint}"
+											pattern="#,##0.0" />%p
 								</c:otherwise>
-							</c:choose>
-						</strong>
-					</c:otherwise>
-				</c:choose>
-			</div>
-		</article>
+								</c:choose>
+							</strong>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</article>
 
-		<article class="dash-kpi-card">
-			<div class="dash-kpi-head">
-				<strong>지연 작업지시</strong>
-				<span class="dash-info-mini">i</span>
-			</div>
+			<article class="dash-kpi-card dash-kpi-click" id="dashDelayKpiCard"
+				data-kpi-type="delay" data-kpi-title="지연 작업지시">
 
-			<div class="dash-kpi-body">
-				<span class="dash-kpi-icon dash-orange-icon">
-					<svg viewBox="0 0 24 24" aria-hidden="true">
+				<div class="dash-kpi-head">
+					<strong>지연 작업지시</strong> <span class="dash-info-mini">i</span>
+				</div>
+
+				<div class="dash-kpi-body">
+					<span class="dash-kpi-icon dash-orange-icon"> <svg
+							viewBox="0 0 24 24" aria-hidden="true">
 						<circle cx="12" cy="12" r="9"></circle>
 						<path d="M12 7V12L16 15"></path>
 					</svg>
-				</span>
+					</span>
 
-				<div class="dash-kpi-value dash-orange-text">
-					<strong>
-						<fmt:formatNumber value="${dashKpiDelayOrderCount}" pattern="#,##0" />
-					</strong>
-					<span>건</span>
+					<div class="dash-kpi-value dash-orange-text">
+						<strong> <fmt:formatNumber
+								value="${dashKpiDelayOrderCount}" pattern="#,##0" />
+						</strong> <span>건</span>
+					</div>
 				</div>
-			</div>
 
-			<div class="dash-kpi-detail">
-				<span>
-					지연 수량
-					<strong>
-						<fmt:formatNumber value="${dashKpiDelayQty}" pattern="#,##0" /> EA
+				<div class="dash-kpi-detail">
+					<span> 지연 수량 <strong> <fmt:formatNumber
+								value="${dashKpiDelayQty}" pattern="#,##0" /> EA
 					</strong>
-				</span>
-			</div>
+					</span>
+				</div>
 
-			<div class="dash-kpi-bottom">
-				<c:choose>
-					<c:when test="${dashKpiDelayCompareNoPrevData}">
-						<strong class="dash-neutral-text">전일 데이터 없음</strong>
-					</c:when>
+				<div class="dash-kpi-bottom">
+					<c:choose>
+						<c:when test="${dashKpiDelayCompareNoPrevData}">
+							<strong class="dash-neutral-text">전일 데이터 없음</strong>
+						</c:when>
 
-					<c:otherwise>
-						<span>전일 대비</span>
-						<strong class="${dashKpiDelayCompareClass}">
-							<c:choose>
-								<c:when test="${empty dashKpiDelayCompareCount or dashKpiDelayCompareCount eq 0}">
+						<c:otherwise>
+							<span>전일 대비</span>
+							<strong class="${dashKpiDelayCompareClass}"> <c:choose>
+									<c:when
+										test="${empty dashKpiDelayCompareCount or dashKpiDelayCompareCount eq 0}">
 									변동 없음
 								</c:when>
-								<c:otherwise>
+									<c:otherwise>
 									${dashKpiDelayCompareArrow}
-									<fmt:formatNumber value="${dashKpiDelayCompareCount}" pattern="#,##0" />건
+									<fmt:formatNumber value="${dashKpiDelayCompareCount}"
+											pattern="#,##0" />건
 								</c:otherwise>
-							</c:choose>
-						</strong>
-					</c:otherwise>
-				</c:choose>
+								</c:choose>
+							</strong>
+						</c:otherwise>
+					</c:choose>
+				</div>
+			</article>
+
+		</section>
+
+		<%-- KPI 상세 모달 영역이다. --%>
+		<div class="dash-kpi-modal-backdrop" id="dashKpiModalBackdrop">
+			<div class="dash-kpi-modal">
+
+				<div class="dash-kpi-modal-head">
+					<div>
+						<h3 id="dashKpiModalTitle">생산달성률 상세</h3>
+						<p>선택한 주차와 전주 데이터를 비교한다.</p>
+					</div>
+
+					<button type="button" class="dash-kpi-modal-close"
+						id="dashKpiModalClose">×</button>
+				</div>
+
+				<div class="dash-kpi-modal-week">
+					<button type="button" class="dash-kpi-week-btn"
+						id="dashKpiPrevWeekBtn">‹ 이전 주</button>
+
+					<div class="dash-kpi-week-center">
+						<strong id="dashKpiWeekRange">-</strong> <span
+							id="dashKpiPrevWeekRange">비교 기간 -</span>
+					</div>
+
+					<div class="dash-kpi-week-picker">
+						<label for="dashKpiWeekDate">주차 선택</label> <input type="date"
+							id="dashKpiWeekDate">
+					</div>
+
+					<button type="button" class="dash-kpi-week-btn"
+						id="dashKpiNextWeekBtn">다음 주 ›</button>
+				</div>
+
+				<div class="dash-kpi-modal-summary">
+					<div>
+						<span>이번 주 평균 달성률</span> <strong id="dashKpiCurrentAvg">0.0%</strong>
+					</div>
+
+					<div>
+						<span>전주 평균 달성률</span> <strong id="dashKpiPrevAvg">0.0%</strong>
+					</div>
+
+					<div>
+						<span>증감</span> <strong id="dashKpiCompareAvg"
+							class="dash-neutral-text">변동 없음</strong>
+					</div>
+				</div>
+
+				<div class="dash-kpi-modal-table-grid">
+					<div class="dash-kpi-modal-table-box">
+						<h4 id="dashKpiCurrentTableTitle">이번 주</h4>
+
+						<table class="dash-kpi-modal-table">
+							<thead>
+								<tr>
+									<th>날짜</th>
+									<th>계획량</th>
+									<th>실적량</th>
+									<th>달성률</th>
+								</tr>
+							</thead>
+							<tbody id="dashKpiCurrentTbody">
+								<tr>
+									<td colspan="4">조회 중입니다.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="dash-kpi-modal-table-box">
+						<h4 id="dashKpiPrevTableTitle">전주</h4>
+
+						<table class="dash-kpi-modal-table">
+							<thead>
+								<tr>
+									<th>날짜</th>
+									<th>계획량</th>
+									<th>실적량</th>
+									<th>달성률</th>
+								</tr>
+							</thead>
+							<tbody id="dashKpiPrevTbody">
+								<tr>
+									<td colspan="4">조회 중입니다.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="dash-kpi-modal-foot">
+					<span>계획량, 실적량, 달성률은 생산 일자 기준으로 집계된다.</span>
+				</div>
+
 			</div>
-		</article>
+		</div>
 
 	</section>
-
-</section>
 
 	<%-- 현장 이슈와 LOT 현황 영역이다. --%>
 	<section class="dash-alert-panel">
@@ -458,7 +539,7 @@
 			</c:if>
 
 			<c:if test="${dashDefectIssueYn eq 'Y'}">
-				<div class="dash-alert-card">
+	<div class="dash-alert-card dash-dashboard-detail-click" data-detail-type="defectIssue">
 					<div class="dash-alert-text">
 						<div class="dash-alert-title-row">
 							<strong>불량 경고</strong>
@@ -2048,4 +2129,777 @@
 			});
 		}
 	});
+	
+	(function() {
+		const contextPath = '${pageContext.request.contextPath}';
+
+		const kpiCards = document.querySelectorAll('.dash-kpi-click');
+		const modalBackdrop = document.getElementById('dashKpiModalBackdrop');
+		const modalClose = document.getElementById('dashKpiModalClose');
+		const modalCloseBottom = document.getElementById('dashKpiModalCloseBottom');
+		const prevWeekBtn = document.getElementById('dashKpiPrevWeekBtn');
+		const nextWeekBtn = document.getElementById('dashKpiNextWeekBtn');
+		const weekDateInput = document.getElementById('dashKpiWeekDate');
+
+		const modalTitle = document.getElementById('dashKpiModalTitle');
+		const weekRange = document.getElementById('dashKpiWeekRange');
+		const prevWeekRange = document.getElementById('dashKpiPrevWeekRange');
+		const currentAvg = document.getElementById('dashKpiCurrentAvg');
+		const prevAvg = document.getElementById('dashKpiPrevAvg');
+		const compareAvg = document.getElementById('dashKpiCompareAvg');
+		const compareAvgLabel = compareAvg ? compareAvg.previousElementSibling : null;
+		const currentTableTitle = document.getElementById('dashKpiCurrentTableTitle');
+		const prevTableTitle = document.getElementById('dashKpiPrevTableTitle');
+		const currentTbody = document.getElementById('dashKpiCurrentTbody');
+		const prevTbody = document.getElementById('dashKpiPrevTbody');
+		const modalFootText = document.querySelector('.dash-kpi-modal-foot span');
+		
+
+		const currentTableHead = currentTbody.closest('table').querySelector('thead');
+		const prevTableHead = prevTbody.closest('table').querySelector('thead');
+
+		let currentBaseDate = getTodayText();
+		let currentKpiType = 'achievement';
+
+		const kpiConfig = {
+				achievement: {
+					title: '생산달성률 상세',
+					currentLabel: '이번 주 평균 달성률',
+					prevLabel: '전주 평균 달성률',
+					goodIncrease: true,
+					unitType: 'rate',
+					head: ['날짜', '계획량', '실적량', '달성률'],
+					footText: '계획량, 실적량, 달성률은 생산 일자 기준으로 집계된다.'
+				},
+				production: {
+					title: '금일 생산량 상세',
+					currentLabel: '이번 주 총 생산량',
+					prevLabel: '전주 총 생산량',
+					goodIncrease: true,
+					unitType: 'qty',
+					head: ['날짜', '생산량', '누적 생산량', '비고'],
+					footText: '생산량은 생산실적 등록일 기준으로 집계된다.'
+				},
+				defect: {
+					title: '불량률 상세',
+					currentLabel: '이번 주 평균 불량률',
+					prevLabel: '전주 평균 불량률',
+					goodIncrease: false,
+					unitType: 'rate',
+					head: ['날짜', '검사수량', '불량수량', '불량률'],
+					footText: '불량률은 불량수량을 검사수량으로 나눈 기준으로 계산된다.'
+				},
+				cost: {
+					title: '생산원가 상세',
+					currentLabel: '이번 주 평균 원가',
+					prevLabel: '전주 평균 원가',
+					goodIncrease: false,
+					unitType: 'cost',
+					head: ['날짜', '목표원가', '실적원가', '차이'],
+					footText: '목표원가는 표준원가 기준, 실적원가는 일별 실제원가 기준으로 집계된다.'
+				},
+				oee: {
+					title: 'OEE 상세',
+					currentLabel: '이번 주 평균 OEE',
+					prevLabel: '전주 평균 OEE',
+					goodIncrease: true,
+					unitType: 'rate',
+					head: ['날짜', '가동시간', '계획시간', 'OEE'],
+					footText: 'OEE는 가동시간을 계획시간으로 나눈 기준으로 계산된다.'
+				},
+				delay: {
+					title: '지연 작업지시 상세',
+					currentLabel: '이번 주 지연건수',
+					prevLabel: '전주 지연건수',
+					goodIncrease: false,
+					unitType: 'count',
+					head: ['날짜', '지연건수', '지연수량', '비고'],
+					footText: '지연 작업지시는 납기일이 지났고 생산이 완료되지 않은 작업지시 기준으로 집계된다.'
+				}
+			};
+
+		kpiCards.forEach(function(card) {
+			card.addEventListener('click', function() {
+				currentKpiType = card.dataset.kpiType;
+				currentBaseDate = getTodayText();
+
+				if (weekDateInput) {
+					weekDateInput.value = currentBaseDate;
+				}
+
+				openModal();
+				loadKpiWeek(currentKpiType, currentBaseDate);
+			});
+		});
+
+		if (modalClose) {
+			modalClose.addEventListener('click', closeModal);
+		}
+
+		if (modalCloseBottom) {
+			modalCloseBottom.addEventListener('click', closeModal);
+		}
+
+		if (modalBackdrop) {
+			modalBackdrop.addEventListener('click', function(event) {
+				if (event.target === modalBackdrop) {
+					closeModal();
+				}
+			});
+		}
+
+		if (prevWeekBtn) {
+			prevWeekBtn.addEventListener('click', function() {
+				currentBaseDate = moveDate(currentBaseDate, -7);
+
+				if (weekDateInput) {
+					weekDateInput.value = currentBaseDate;
+				}
+
+				loadKpiWeek(currentKpiType, currentBaseDate);
+			});
+		}
+
+		if (nextWeekBtn) {
+			nextWeekBtn.addEventListener('click', function() {
+				currentBaseDate = moveDate(currentBaseDate, 7);
+
+				if (weekDateInput) {
+					weekDateInput.value = currentBaseDate;
+				}
+
+				loadKpiWeek(currentKpiType, currentBaseDate);
+			});
+		}
+
+		if (weekDateInput) {
+			weekDateInput.addEventListener('change', function() {
+				if (!weekDateInput.value) {
+					return;
+				}
+
+				currentBaseDate = weekDateInput.value;
+				loadKpiWeek(currentKpiType, currentBaseDate);
+			});
+		}
+
+		function openModal() {
+			modalBackdrop.classList.add('is-open');
+		}
+
+		function closeModal() {
+			modalBackdrop.classList.remove('is-open');
+		}
+
+		function loadKpiWeek(kpiType, baseDate) {
+			setLoading(kpiType);
+
+			fetch(contextPath + '/dashboard/kpi/week-detail?kpiType='
+					+ encodeURIComponent(kpiType)
+					+ '&baseDate='
+					+ encodeURIComponent(baseDate))
+				.then(function(response) {
+					return response.json();
+				})
+				.then(function(data) {
+					if (!data || !data.success) {
+						setError();
+						return;
+					}
+
+					renderKpiWeek(kpiType, data.kpiWeekList || []);
+				})
+				.catch(function() {
+					setError();
+				});
+		}
+
+		function renderKpiWeek(kpiType, list) {
+			const config = kpiConfig[kpiType];
+
+			const currentList = list.filter(function(row) {
+				return getValue(row, 'PERIOD_TYPE') === 'CURRENT';
+			});
+
+			const prevList = list.filter(function(row) {
+				return getValue(row, 'PERIOD_TYPE') === 'PREV';
+			});
+
+			const currentSummary = getSummary(kpiType, currentList);
+			const prevSummary = getSummary(kpiType, prevList);
+
+			setHead(config.head);
+			setWeekText(currentList, prevList);
+
+			modalTitle.textContent = config.title;
+			currentAvg.previousElementSibling.textContent = config.currentLabel;
+			prevAvg.previousElementSibling.textContent = config.prevLabel;
+
+			currentAvg.textContent = formatSummaryValue(kpiType, currentSummary.value);
+			prevAvg.textContent = formatSummaryValue(kpiType, prevSummary.value);
+
+			renderCompare(config, currentSummary.value, prevSummary.value);
+			renderTable(kpiType, currentTbody, currentList, currentSummary);
+			renderTable(kpiType, prevTbody, prevList, prevSummary);
+		}
+
+		function setHead(headList) {
+			let html = '<tr>';
+
+			headList.forEach(function(head) {
+				html += '<th>' + head + '</th>';
+			});
+
+			html += '</tr>';
+
+			currentTableHead.innerHTML = html;
+			prevTableHead.innerHTML = html;
+		}
+
+		function setWeekText(currentList, prevList) {
+			const currentStart = currentList.length > 0 ? getValue(currentList[0], 'WEEK_START') : '-';
+			const currentEnd = currentList.length > 0 ? getValue(currentList[0], 'WEEK_END') : '-';
+			const prevStart = prevList.length > 0 ? getValue(prevList[0], 'WEEK_START') : '-';
+			const prevEnd = prevList.length > 0 ? getValue(prevList[0], 'WEEK_END') : '-';
+
+			weekRange.textContent = currentStart + ' ~ ' + currentEnd;
+			prevWeekRange.textContent = '비교 기간: ' + prevStart + ' ~ ' + prevEnd;
+
+			currentTableTitle.textContent = '이번 주 (' + currentStart + ' ~ ' + currentEnd + ')';
+			prevTableTitle.textContent = '전주 (' + prevStart + ' ~ ' + prevEnd + ')';
+		}
+
+		function getSummary(kpiType, rows) {
+			if (kpiType === 'achievement') {
+				return getAchievementSummary(rows);
+			}
+
+			if (kpiType === 'production') {
+				return getProductionSummary(rows);
+			}
+
+			if (kpiType === 'defect') {
+				return getDefectSummary(rows);
+			}
+
+			if (kpiType === 'cost') {
+				return getCostSummary(rows);
+			}
+
+			if (kpiType === 'oee') {
+				return getOeeSummary(rows);
+			}
+
+			if (kpiType === 'delay') {
+				return getDelaySummary(rows);
+			}
+
+			return { value: 0 };
+		}
+
+		function getAchievementSummary(rows) {
+			let planQty = 0;
+			let actualQty = 0;
+
+			rows.forEach(function(row) {
+				planQty += Number(getValue(row, 'PLAN_QTY')) || 0;
+				actualQty += Number(getValue(row, 'ACTUAL_QTY')) || 0;
+			});
+
+			const rate = planQty === 0 ? 0 : roundOne(actualQty / planQty * 100);
+
+			return {
+				planQty: planQty,
+				actualQty: actualQty,
+				value: rate
+			};
+		}
+
+		function getProductionSummary(rows) {
+			let prodQty = 0;
+
+			rows.forEach(function(row) {
+				prodQty += Number(getValue(row, 'PROD_QTY')) || 0;
+			});
+
+			return {
+				prodQty: prodQty,
+				value: prodQty
+			};
+		}
+
+		function getDefectSummary(rows) {
+			let inspectionQty = 0;
+			let defectQty = 0;
+
+			rows.forEach(function(row) {
+				inspectionQty += Number(getValue(row, 'INSPECTION_QTY')) || 0;
+				defectQty += Number(getValue(row, 'DEFECT_QTY')) || 0;
+			});
+
+			const rate = inspectionQty === 0 ? 0 : roundOne(defectQty / inspectionQty * 100);
+
+			return {
+				inspectionQty: inspectionQty,
+				defectQty: defectQty,
+				value: rate
+			};
+		}
+
+		function getCostSummary(rows) {
+			let actualTotal = 0;
+			let actualCount = 0;
+			let targetTotal = 0;
+			let targetCount = 0;
+
+			rows.forEach(function(row) {
+				const actualCost = Number(getValue(row, 'ACTUAL_COST')) || 0;
+				const targetCost = Number(getValue(row, 'TARGET_COST')) || 0;
+
+				if (actualCost > 0) {
+					actualTotal += actualCost;
+					actualCount++;
+				}
+
+				if (targetCost > 0) {
+					targetTotal += targetCost;
+					targetCount++;
+				}
+			});
+
+			const actualAvg = actualCount === 0 ? 0 : Math.round(actualTotal / actualCount);
+			const targetAvg = targetCount === 0 ? 0 : Math.round(targetTotal / targetCount);
+
+			return {
+				actualCost: actualAvg,
+				targetCost: targetAvg,
+				value: actualAvg
+			};
+		}
+
+		function getOeeSummary(rows) {
+			let runtimeMin = 0;
+			let planTimeMin = 0;
+
+			rows.forEach(function(row) {
+				runtimeMin += Number(getValue(row, 'RUNTIME_MIN')) || 0;
+				planTimeMin += Number(getValue(row, 'PLAN_TIME_MIN')) || 0;
+			});
+
+			const rate = planTimeMin === 0 ? 0 : roundOne(runtimeMin / planTimeMin * 100);
+
+			return {
+				runtimeMin: runtimeMin,
+				planTimeMin: planTimeMin,
+				value: rate
+			};
+		}
+
+		function getDelaySummary(rows) {
+			let delayCount = 0;
+			let delayQty = 0;
+
+			rows.forEach(function(row) {
+				delayCount += Number(getValue(row, 'DELAY_COUNT')) || 0;
+				delayQty += Number(getValue(row, 'DELAY_QTY')) || 0;
+			});
+
+			return {
+				delayCount: delayCount,
+				delayQty: delayQty,
+				value: delayCount
+			};
+		}
+
+		function renderTable(kpiType, tbody, rows, summary) {
+			if (!rows || rows.length === 0) {
+				tbody.innerHTML = '<tr><td colspan="4">조회된 데이터가 없습니다.</td></tr>';
+				return;
+			}
+
+			if (kpiType === 'achievement') {
+				renderAchievementTable(tbody, rows, summary);
+				return;
+			}
+
+			if (kpiType === 'production') {
+				renderProductionTable(tbody, rows, summary);
+				return;
+			}
+
+			if (kpiType === 'defect') {
+				renderDefectTable(tbody, rows, summary);
+				return;
+			}
+
+			if (kpiType === 'cost') {
+				renderCostTable(tbody, rows, summary);
+				return;
+			}
+
+			if (kpiType === 'oee') {
+				renderOeeTable(tbody, rows, summary);
+				return;
+			}
+
+			if (kpiType === 'delay') {
+				renderDelayTable(tbody, rows, summary);
+			}
+		}
+
+		function renderAchievementTable(tbody, rows, summary) {
+			let html = '';
+
+			rows.forEach(function(row) {
+				html += '<tr>';
+				html += '<td>' + getDateText(row) + '</td>';
+				html += '<td>' + formatNumber(getValue(row, 'PLAN_QTY')) + ' EA</td>';
+				html += '<td>' + formatNumber(getValue(row, 'ACTUAL_QTY')) + ' EA</td>';
+				html += '<td class="dash-green-text">' + formatRate(getValue(row, 'ACHIEVEMENT_RATE')) + '</td>';
+				html += '</tr>';
+			});
+
+			html += '<tr class="dash-kpi-total-row">';
+			html += '<td>합계 / 평균</td>';
+			html += '<td>' + formatNumber(summary.planQty) + ' EA</td>';
+			html += '<td>' + formatNumber(summary.actualQty) + ' EA</td>';
+			html += '<td>' + formatRate(summary.value) + '</td>';
+			html += '</tr>';
+
+			tbody.innerHTML = html;
+		}
+
+		function renderProductionTable(tbody, rows, summary) {
+			let html = '';
+			let accQty = 0;
+			const accMap = {};
+
+			rows.slice().reverse().forEach(function(row) {
+				accQty += Number(getValue(row, 'PROD_QTY')) || 0;
+				accMap[getValue(row, 'DISPLAY_DATE')] = accQty;
+			});
+
+			rows.forEach(function(row) {
+				html += '<tr>';
+				html += '<td>' + getDateText(row) + '</td>';
+				html += '<td class="dash-green-text">' + formatNumber(getValue(row, 'PROD_QTY')) + ' EA</td>';
+				html += '<td>' + formatNumber(accMap[getValue(row, 'DISPLAY_DATE')]) + ' EA</td>';
+				html += '<td>-</td>';
+				html += '</tr>';
+			});
+
+			html += '<tr class="dash-kpi-total-row">';
+			html += '<td>합계</td>';
+			html += '<td>' + formatNumber(summary.prodQty) + ' EA</td>';
+			html += '<td>' + formatNumber(summary.prodQty) + ' EA</td>';
+			html += '<td>-</td>';
+			html += '</tr>';
+
+			tbody.innerHTML = html;
+		}
+
+		function renderDefectTable(tbody, rows, summary) {
+			let html = '';
+
+			rows.forEach(function(row) {
+				const inspectionQty = Number(getValue(row, 'INSPECTION_QTY')) || 0;
+				const defectQty = Number(getValue(row, 'DEFECT_QTY')) || 0;
+				const defectRate = Number(getValue(row, 'DEFECT_RATE')) || 0;
+
+				let inspectionText = '-';
+				let defectText = '-';
+				let rateText = '-';
+
+				if (inspectionQty > 0) {
+					inspectionText = formatNumber(inspectionQty) + ' EA';
+					defectText = formatNumber(defectQty) + ' EA';
+					rateText = formatRate(defectRate);
+				}
+
+				html += '<tr>';
+				html += '<td>' + getDateText(row) + '</td>';
+				html += '<td>' + inspectionText + '</td>';
+				html += '<td class="dash-red-text">' + defectText + '</td>';
+				html += '<td class="dash-red-text">' + rateText + '</td>';
+				html += '</tr>';
+			});
+
+			html += '<tr class="dash-kpi-total-row">';
+			html += '<td>합계 / 평균</td>';
+			html += '<td>' + formatNumber(summary.inspectionQty) + ' EA</td>';
+			html += '<td>' + formatNumber(summary.defectQty) + ' EA</td>';
+
+			if (summary.inspectionQty > 0) {
+				html += '<td>' + formatRate(summary.value) + '</td>';
+			} else {
+				html += '<td>-</td>';
+			}
+
+			html += '</tr>';
+
+			tbody.innerHTML = html;
+		}
+		
+		function renderCostTable(tbody, rows, summary) {
+			let html = '';
+
+			rows.forEach(function(row) {
+				const targetCost = Number(getValue(row, 'TARGET_COST')) || 0;
+				const actualCost = Number(getValue(row, 'ACTUAL_COST')) || 0;
+				const gap = actualCost - targetCost;
+
+				let actualCostText = '-';
+				let gapClass = 'dash-neutral-text';
+				let gapText = '-';
+
+				if (actualCost > 0) {
+					actualCostText = formatNumber(actualCost) + ' 원/EA';
+
+					if (gap > 0) {
+						gapClass = 'dash-red-text';
+						gapText = '▲ ' + formatNumber(Math.abs(gap)) + ' 원';
+					} else if (gap < 0) {
+						gapClass = 'dash-green-text';
+						gapText = '▼ ' + formatNumber(Math.abs(gap)) + ' 원';
+					}
+				}
+
+				html += '<tr>';
+				html += '<td>' + getDateText(row) + '</td>';
+				html += '<td>' + formatNumber(targetCost) + ' 원/EA</td>';
+				html += '<td>' + actualCostText + '</td>';
+				html += '<td class="' + gapClass + '">' + gapText + '</td>';
+				html += '</tr>';
+			});
+
+			html += '<tr class="dash-kpi-total-row">';
+			html += '<td>평균</td>';
+			html += '<td>' + formatNumber(summary.targetCost) + ' 원/EA</td>';
+
+			if (summary.actualCost > 0) {
+				html += '<td>' + formatNumber(summary.actualCost) + ' 원/EA</td>';
+			} else {
+				html += '<td>-</td>';
+			}
+
+			html += '<td>-</td>';
+			html += '</tr>';
+
+			tbody.innerHTML = html;
+		}
+
+		function renderOeeTable(tbody, rows, summary) {
+			let html = '';
+
+			rows.forEach(function(row) {
+				const runtimeMin = Number(getValue(row, 'RUNTIME_MIN')) || 0;
+				const planTimeMin = Number(getValue(row, 'PLAN_TIME_MIN')) || 0;
+				const oeeRate = Number(getValue(row, 'OEE_RATE')) || 0;
+
+				let runtimeText = '-';
+				let planTimeText = '-';
+				let oeeText = '-';
+
+				if (planTimeMin > 0) {
+					runtimeText = formatNumber(runtimeMin) + '분';
+					planTimeText = formatNumber(planTimeMin) + '분';
+					oeeText = formatRate(oeeRate);
+				}
+
+				html += '<tr>';
+				html += '<td>' + getDateText(row) + '</td>';
+				html += '<td>' + runtimeText + '</td>';
+				html += '<td>' + planTimeText + '</td>';
+				html += '<td class="dash-green-text">' + oeeText + '</td>';
+				html += '</tr>';
+			});
+
+			html += '<tr class="dash-kpi-total-row">';
+			html += '<td>합계 / 평균</td>';
+			html += '<td>' + formatNumber(summary.runtimeMin) + '분</td>';
+			html += '<td>' + formatNumber(summary.planTimeMin) + '분</td>';
+
+			if (summary.planTimeMin > 0) {
+				html += '<td>' + formatRate(summary.value) + '</td>';
+			} else {
+				html += '<td>-</td>';
+			}
+
+			html += '</tr>';
+
+			tbody.innerHTML = html;
+		}
+
+		function renderDelayTable(tbody, rows, summary) {
+			let html = '';
+
+			rows.forEach(function(row) {
+				html += '<tr>';
+				html += '<td>' + getDateText(row) + '</td>';
+				html += '<td class="dash-orange-text">' + formatNumber(getValue(row, 'DELAY_COUNT')) + '건</td>';
+				html += '<td>' + formatNumber(getValue(row, 'DELAY_QTY')) + ' EA</td>';
+				html += '<td>-</td>';
+				html += '</tr>';
+			});
+
+			html += '<tr class="dash-kpi-total-row">';
+			html += '<td>합계</td>';
+			html += '<td>' + formatNumber(summary.delayCount) + '건</td>';
+			html += '<td>' + formatNumber(summary.delayQty) + ' EA</td>';
+			html += '<td>-</td>';
+			html += '</tr>';
+
+			tbody.innerHTML = html;
+		}
+
+		function renderCompare(config, currentValue, prevValue) {
+			const diff = currentValue - prevValue;
+
+			compareAvg.className = '';
+
+			if (prevValue === 0 && currentValue > 0) {
+				if (compareAvgLabel) {
+					compareAvgLabel.textContent = '비교 불가';
+				}
+
+				compareAvg.textContent = '전주 데이터 없음';
+				compareAvg.classList.add('dash-neutral-text');
+				return;
+			}
+
+			if (Math.abs(diff) < 0.05) {
+				if (compareAvgLabel) {
+					compareAvgLabel.textContent = '변동 없음';
+				}
+
+				compareAvg.textContent = '-';
+				compareAvg.classList.add('dash-neutral-text');
+				return;
+			}
+
+			const isIncrease = diff > 0;
+			const isGood = isIncrease === config.goodIncrease;
+			const arrow = isIncrease ? '▲ ' : '▼ ';
+
+			if (compareAvgLabel) {
+				compareAvgLabel.textContent = isIncrease ? '증가' : '감소';
+			}
+
+			compareAvg.classList.add(isGood ? 'dash-green-text' : 'dash-red-text');
+			compareAvg.textContent = arrow + formatCompareValue(config.unitType, Math.abs(diff));
+		}
+
+		function formatSummaryValue(kpiType, value) {
+			if (kpiType === 'production') {
+				return formatNumber(value) + ' EA';
+			}
+
+			if (kpiType === 'cost') {
+				return formatNumber(value) + ' 원/EA';
+			}
+
+			if (kpiType === 'delay') {
+				return formatNumber(value) + '건';
+			}
+
+			return formatRate(value);
+		}
+
+		function formatCompareValue(unitType, value) {
+			if (unitType === 'qty') {
+				return formatNumber(value) + ' EA';
+			}
+
+			if (unitType === 'cost') {
+				return formatNumber(value) + ' 원';
+			}
+
+			if (unitType === 'count') {
+				return formatNumber(value) + '건';
+			}
+
+			return Number(value || 0).toFixed(1) + '%p';
+		}
+
+		function setLoading(kpiType) {
+			const config = kpiConfig[kpiType];
+
+			modalTitle.textContent = config.title;
+			currentAvg.previousElementSibling.textContent = config.currentLabel;
+			prevAvg.previousElementSibling.textContent = config.prevLabel;
+			
+			if (modalFootText) {
+				modalFootText.textContent = config.footText;
+			}
+			
+
+			weekRange.textContent = '조회 중입니다.';
+			prevWeekRange.textContent = '비교 기간 조회 중입니다.';
+			currentAvg.textContent = '-';
+			prevAvg.textContent = '-';
+			
+			if (compareAvgLabel) {
+				compareAvgLabel.textContent = '증감';
+			}
+			
+			compareAvg.textContent = '-';
+			compareAvg.className = 'dash-neutral-text';
+			currentTbody.innerHTML = '<tr><td colspan="4">조회 중입니다.</td></tr>';
+			prevTbody.innerHTML = '<tr><td colspan="4">조회 중입니다.</td></tr>';
+		}
+
+		function setError() {
+			weekRange.textContent = '조회 실패';
+			prevWeekRange.textContent = '데이터를 불러오지 못했습니다.';
+			currentTbody.innerHTML = '<tr><td colspan="4">데이터 조회 중 오류가 발생했습니다.</td></tr>';
+			prevTbody.innerHTML = '<tr><td colspan="4">데이터 조회 중 오류가 발생했습니다.</td></tr>';
+		}
+
+		function getDateText(row) {
+			return getValue(row, 'DISPLAY_DATE') + ' (' + getValue(row, 'DAY_NAME') + ')';
+		}
+
+		function getValue(row, key) {
+			return row[key] || row[key.toLowerCase()] || row[toCamelCase(key)] || '';
+		}
+
+		function toCamelCase(key) {
+			return key.toLowerCase().replace(/_([a-z])/g, function(match, letter) {
+				return letter.toUpperCase();
+			});
+		}
+
+		function formatNumber(value) {
+			return Number(value || 0).toLocaleString('ko-KR');
+		}
+
+		function formatRate(value) {
+			return Number(value || 0).toFixed(1) + '%';
+		}
+
+		
+		function roundOne(value) {
+			return Math.round(value * 10) / 10;
+		}
+
+		function getTodayText() {
+			const today = new Date();
+			const year = today.getFullYear();
+			const month = String(today.getMonth() + 1).padStart(2, '0');
+			const date = String(today.getDate()).padStart(2, '0');
+
+			return year + '-' + month + '-' + date;
+		}script
+
+		function moveDate(dateText, day) {
+			const date = new Date(dateText);
+			date.setDate(date.getDate() + day);
+
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, '0');
+			const targetDate = String(date.getDate()).padStart(2, '0');
+
+			return year + '-' + month + '-' + targetDate;
+		}
+	})();
 </script>

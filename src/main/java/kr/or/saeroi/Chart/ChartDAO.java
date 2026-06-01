@@ -30,5 +30,11 @@ public interface ChartDAO {
 	
 	//대시보드 긴급이슈
 	public Map<String, Object> dashboardIssueStatus();
+	
+	// 생산달성률 상세 모달 주차별 데이터를 조회한다.
+	public List<Map<String, Object>> dashboardAchievementWeek(Map<String, Object> param);
+	
+	// KPI 상세 모달 주차별 데이터를 조회한다.
+	public List<Map<String, Object>> dashboardKpiWeekDetail(Map<String, Object> param);
 }
 
