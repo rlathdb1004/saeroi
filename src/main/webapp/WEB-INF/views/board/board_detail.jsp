@@ -209,8 +209,7 @@
 		<div class="detail_btn_area">
 
 			<c:if test="${canModifyBoard}">
-				<button type="button" id="editBtn" class="detail_btn_green"
-					onclick="changeEditMode(true);">
+				<button type="button" id="editBtn" class="detail_btn_green">
 
 					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
 						stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -224,7 +223,23 @@
 					수정
 				</button>
 
-				<button type="button" class="search-btn search-btn-sub"
+				<button type="button" id="cancelBtn" class="detail_btn_line"
+					onclick="changeBoardEditMode(false);" style="display: none;">
+
+					<svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+						stroke="currentColor" stroke-width="2" stroke-linecap="round"
+						stroke-linejoin="round"
+						style="vertical-align: -3px; margin-right: 6px;"
+						aria-hidden="true">
+						<path d="M18 6L6 18"></path>
+						<path d="M6 6l12 12"></path>
+					</svg>
+
+					취소
+				</button>
+
+				<button type="button" id="boardDeleteBtn"
+					class="search-btn search-btn-sub"
 					onclick="if(confirm('삭제하시겠습니까?')) document.getElementById('boardDeleteForm').submit()">
 					<svg viewBox="0 0 24 24" fill="none">
         <path d="M4 7H20" stroke="currentColor" stroke-width="2"
@@ -554,17 +569,59 @@
 		commentView.style.display = isActive ? 'none' : '';
 	}
 
+	const boardEditIconHtml = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"'
+			+ ' stroke="currentColor" stroke-width="2" stroke-linecap="round"'
+			+ ' stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px;"'
+			+ ' aria-hidden="true">'
+			+ '<path d="M12 20h9"></path>'
+			+ '<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>'
+			+ '</svg>';
+
+	const boardSaveIconHtml = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"'
+			+ ' stroke="currentColor" stroke-width="2" stroke-linecap="round"'
+			+ ' stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px;"'
+			+ ' aria-hidden="true">'
+			+ '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>'
+			+ '<path d="M17 21v-8H7v8"></path>'
+			+ '<path d="M7 3v5h8"></path>'
+			+ '</svg>';
+
+	function changeBoardEditMode(isEdit) {
+		const editBtn = document.getElementById('editBtn');
+		const cancelBtn = document.getElementById('cancelBtn');
+		const deleteBtn = document.getElementById('boardDeleteBtn');
+		const form = document.getElementById('boardDetailForm');
+
+		document.querySelectorAll('.viewMode').forEach(function(el) {
+			el.style.display = isEdit ? 'none' : '';
+		});
+
+		document.querySelectorAll('.editMode').forEach(function(el) {
+			el.style.display = isEdit ? '' : 'none';
+		});
+
+		if (editBtn) {
+			editBtn.dataset.mode = isEdit ? 'edit' : '';
+			editBtn.innerHTML = isEdit ? boardSaveIconHtml + '저장'
+					: boardEditIconHtml + '수정';
+		}
+
+		if (cancelBtn) {
+			cancelBtn.style.display = isEdit ? 'inline-flex' : 'none';
+		}
+
+		if (deleteBtn) {
+			deleteBtn.style.display = isEdit ? 'none' : 'inline-flex';
+		}
+
+		if (!isEdit && form) {
+			form.reset();
+		}
+	}
+
 	document.addEventListener('DOMContentLoaded', function() {
 		const editBtn = document.getElementById('editBtn');
 		const form = document.getElementById('boardDetailForm');
-		const saveIconHtml = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"'
-				+ ' stroke="currentColor" stroke-width="2" stroke-linecap="round"'
-				+ ' stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px;"'
-				+ ' aria-hidden="true">'
-				+ '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>'
-				+ '<path d="M17 21v-8H7v8"></path>'
-				+ '<path d="M7 3v5h8"></path>'
-				+ '</svg>';
 
 		if (!editBtn) {
 			return;
@@ -574,16 +631,7 @@
 			const isEditMode = editBtn.dataset.mode === 'edit';
 
 			if (!isEditMode) {
-				document.querySelectorAll('.viewMode').forEach(function(el) {
-					el.style.display = 'none';
-				});
-
-				document.querySelectorAll('.editMode').forEach(function(el) {
-					el.style.display = '';
-				});
-
-				editBtn.dataset.mode = 'edit';
-				editBtn.innerHTML = saveIconHtml + '저장';
+				changeBoardEditMode(true);
 				return;
 			}
 
