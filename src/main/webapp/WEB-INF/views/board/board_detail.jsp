@@ -557,6 +557,14 @@
 	document.addEventListener('DOMContentLoaded', function() {
 		const editBtn = document.getElementById('editBtn');
 		const form = document.getElementById('boardDetailForm');
+		const saveIconHtml = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"'
+				+ ' stroke="currentColor" stroke-width="2" stroke-linecap="round"'
+				+ ' stroke-linejoin="round" style="vertical-align: -3px; margin-right: 6px;"'
+				+ ' aria-hidden="true">'
+				+ '<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>'
+				+ '<path d="M17 21v-8H7v8"></path>'
+				+ '<path d="M7 3v5h8"></path>'
+				+ '</svg>';
 
 		if (!editBtn) {
 			return;
@@ -575,7 +583,7 @@
 				});
 
 				editBtn.dataset.mode = 'edit';
-				editBtn.textContent = '저장';
+				editBtn.innerHTML = saveIconHtml + '저장';
 				return;
 			}
 
