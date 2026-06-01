@@ -6,6 +6,312 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/common/worker.css">
 
+
+<%-- =========================================================
+	QR 카메라 스캔 화면
+	공통 worker.css는 건드리지 않고, 작업자 메인 JSP 안에서만 적용한다.
+	네이버 QR 스캔처럼 전체화면 카메라 + 중앙 스캔 프레임 + 스캔 라인으로 구성한다.
+========================================================= --%>
+<style>
+
+	/* =====================================================
+		QR 카메라 모달 전체 영역
+	===================================================== */
+	.workerQrCameraModal {
+
+		display: none;
+		position: fixed;
+		inset: 0;
+		z-index: 99999;
+		background: #020806;
+		overflow: hidden;
+	}
+
+	/* =====================================================
+		카메라 영상
+	===================================================== */
+	.workerQrCameraVideo {
+
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		background: #020806;
+	}
+
+	/* =====================================================
+		카메라 위 어두운 오버레이
+	===================================================== */
+	.workerQrCameraDim {
+
+		position: absolute;
+		inset: 0;
+		background: rgba(0, 0, 0, 0.28);
+		pointer-events: none;
+	}
+
+	/* =====================================================
+		상단 안내 영역
+	===================================================== */
+	.workerQrCameraTop {
+
+		position: absolute;
+		top: 26px;
+		left: 24px;
+		right: 24px;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 14px;
+		z-index: 2;
+	}
+
+	.workerQrCameraTitleBox {
+
+		color: #ffffff;
+		text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+	}
+
+	.workerQrCameraTitle {
+
+		font-size: 26px;
+		font-weight: 800;
+		letter-spacing: -0.5px;
+	}
+
+	.workerQrCameraSubTitle {
+
+		margin-top: 6px;
+		font-size: 14px;
+		font-weight: 600;
+		opacity: 0.9;
+	}
+
+	/* =====================================================
+		닫기 버튼
+	===================================================== */
+	.workerQrCameraCloseBtn {
+
+		width: 48px;
+		height: 48px;
+		border: 1px solid rgba(255, 255, 255, 0.45);
+		border-radius: 50%;
+		background: rgba(255, 255, 255, 0.18);
+		color: #ffffff;
+		font-size: 30px;
+		line-height: 1;
+		cursor: pointer;
+		backdrop-filter: blur(8px);
+	}
+
+	/* =====================================================
+		중앙 스캔 프레임
+	===================================================== */
+	.workerQrCameraFrame {
+
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 310px;
+		height: 310px;
+		transform: translate(-50%, -50%);
+		border-radius: 28px;
+		z-index: 2;
+	}
+
+	/* =====================================================
+		스캔 프레임 모서리
+	===================================================== */
+	.workerQrCameraCorner {
+
+		position: absolute;
+		width: 58px;
+		height: 58px;
+		border-color: #65f0a5;
+		border-style: solid;
+		filter: drop-shadow(0 0 10px rgba(101, 240, 165, 0.85));
+	}
+
+	.workerQrCameraCorner.leftTop {
+
+		top: 0;
+		left: 0;
+		border-width: 6px 0 0 6px;
+		border-top-left-radius: 24px;
+	}
+
+	.workerQrCameraCorner.rightTop {
+
+		top: 0;
+		right: 0;
+		border-width: 6px 6px 0 0;
+		border-top-right-radius: 24px;
+	}
+
+	.workerQrCameraCorner.leftBottom {
+
+		left: 0;
+		bottom: 0;
+		border-width: 0 0 6px 6px;
+		border-bottom-left-radius: 24px;
+	}
+
+	.workerQrCameraCorner.rightBottom {
+
+		right: 0;
+		bottom: 0;
+		border-width: 0 6px 6px 0;
+		border-bottom-right-radius: 24px;
+	}
+
+	/* =====================================================
+		움직이는 스캔 라인
+	===================================================== */
+	.workerQrCameraScanLine {
+
+		position: absolute;
+		left: 18px;
+		right: 18px;
+		top: 22px;
+		height: 4px;
+		border-radius: 999px;
+		background: linear-gradient(
+			90deg,
+			rgba(101, 240, 165, 0),
+			rgba(101, 240, 165, 1),
+			rgba(101, 240, 165, 0)
+		);
+		box-shadow: 0 0 18px rgba(101, 240, 165, 0.95);
+		animation: workerQrCameraScanMove 2s linear infinite;
+	}
+
+	@keyframes workerQrCameraScanMove {
+
+		0% {
+			top: 22px;
+		}
+
+		100% {
+			top: 284px;
+		}
+	}
+
+	/* =====================================================
+		하단 상태 메시지
+	===================================================== */
+	.workerQrCameraGuide {
+
+		position: absolute;
+		left: 24px;
+		right: 24px;
+		bottom: 34px;
+		z-index: 2;
+		text-align: center;
+		color: #ffffff;
+	}
+
+	.workerQrCameraGuideMain {
+
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 48px;
+		padding: 0 22px;
+		border-radius: 999px;
+		background: rgba(0, 0, 0, 0.42);
+		font-size: 16px;
+		font-weight: 800;
+		backdrop-filter: blur(8px);
+	}
+
+	.workerQrCameraGuideSub {
+
+		margin-top: 12px;
+		font-size: 13px;
+		font-weight: 600;
+		opacity: 0.9;
+		text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+	}
+
+	/* =====================================================
+		카메라 권한 / 오류 안내 박스
+	===================================================== */
+	.workerQrCameraMessageBox {
+
+		display: none;
+		position: absolute;
+		left: 50%;
+		top: 50%;
+		width: min(420px, calc(100% - 48px));
+		transform: translate(-50%, -50%);
+		padding: 28px 24px;
+		border-radius: 24px;
+		background: #ffffff;
+		color: #0b1f1a;
+		text-align: center;
+		z-index: 3;
+		box-shadow: 0 18px 50px rgba(0, 0, 0, 0.34);
+	}
+
+	.workerQrCameraMessageTitle {
+
+		font-size: 22px;
+		font-weight: 900;
+	}
+
+	.workerQrCameraMessageText {
+
+		margin-top: 12px;
+		font-size: 14px;
+		font-weight: 600;
+		line-height: 1.6;
+		color: #53635f;
+	}
+
+	.workerQrCameraMessageBtn {
+
+		margin-top: 20px;
+		width: 100%;
+		height: 46px;
+		border: none;
+		border-radius: 12px;
+		background: #2f876b;
+		color: #ffffff;
+		font-size: 15px;
+		font-weight: 800;
+		cursor: pointer;
+	}
+
+
+	/* =====================================================
+		같은 PC 화면에서 QR을 테스트하기 위한 버튼
+		PC 웹캠은 현재 모니터 화면을 직접 볼 수 없기 때문에,
+		시연/개발 중에는 이 버튼으로 현재 화면 QR 동작을 바로 확인한다.
+		공통 CSS는 건드리지 않고 workerMain.jsp 안에서만 적용한다.
+	===================================================== */
+	.workerQrCameraTestBtn {
+
+		margin-top: 14px;
+		min-width: 260px;
+		height: 48px;
+		border: 1px solid rgba(255, 255, 255, 0.5);
+		border-radius: 999px;
+		background: rgba(255, 255, 255, 0.16);
+		color: #ffffff;
+		font-size: 14px;
+		font-weight: 900;
+		cursor: pointer;
+		backdrop-filter: blur(8px);
+		box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
+	}
+
+	.workerQrCameraTestBtn:hover {
+
+		background: rgba(255, 255, 255, 0.26);
+	}
+
+</style>
+
+
 <div class="workerPage workerKioskPage">
 
 
@@ -273,36 +579,51 @@
 				<div class="qrCorner bottomLeft"></div>
 				<div class="qrCorner bottomRight"></div>
 
-				<div class="workerQrWhiteBox">
+				<div class="workerQrWhiteBox"
+					onclick="event.stopPropagation(); moveWorkerCurrentQrTest();">
 
-					<svg class="realQrImg"
-						viewBox="0 0 23 23"
-						xmlns="http://www.w3.org/2000/svg"
-						role="img"
-						aria-label="QR 코드"
-						shape-rendering="crispEdges"
-						focusable="false">
+					<%-- =====================================================
+						실제 작업지시 QR 표시
+						-----------------------------------------------------
+						기존에는 고정 SVG QR 이미지를 보여줬지만,
+						이제는 로그인한 작업자의 오늘 작업지시 ORDER_ID를 기준으로
+						팀원이 만든 QR 생성 URL을 그대로 사용한다.
 
-						<rect x="0" y="0" width="23" height="23" fill="#ffffff" />
+						팀원 코드 수정 없음:
+						/production/workorder/qr?orderId=...
+					===================================================== --%>
+					<c:choose>
 
-						<path fill="#000000"
-							d="M1 1h7v1H1z M9 1h2v1H9z M12 1h1v1H12z M15 1h7v1H15z M1 2h1v1H1z M7 2h1v1H7z M9 2h3v1H9z M15 2h1v1H15z M21 2h1v1H21z M1 3h1v1H1z M3 3h3v1H3z M7 3h1v1H7z M10 3h2v1H10z M13 3h1v1H13z M15 3h1v1H15z M17 3h3v1H17z M21 3h1v1H21z M1 4h1v1H1z M3 4h3v1H3z M7 4h1v1H7z M9 4h1v1H9z M12 4h1v1H12z M15 4h1v1H15z M17 4h3v1H17z M21 4h1v1H21z M1 5h1v1H1z M3 5h3v1H3z M7 5h1v1H7z M10 5h2v1H10z M15 5h1v1H15z M17 5h3v1H17z M21 5h1v1H21z M1 6h1v1H1z M7 6h1v1H7z M10 6h2v1H10z M15 6h1v1H15z M21 6h1v1H21z M1 7h7v1H1z M9 7h1v1H9z M11 7h1v1H11z M13 7h1v1H13z M15 7h7v1H15z M9 8h1v1H9z M1 9h1v1H1z M3 9h2v1H3z M6 9h3v1H6z M11 9h1v1H11z M15 9h1v1H15z M18 9h1v1H18z M20 9h2v1H20z M3 10h3v1H3z M10 10h2v1H10z M13 10h1v1H13z M17 10h3v1H17z M21 10h1v1H21z M1 11h4v1H1z M7 11h2v1H7z M11 11h1v1H11z M13 11h1v1H13z M16 11h1v1H16z M20 11h2v1H20z M3 12h3v1H3z M8 12h2v1H8z M13 12h1v1H13z M16 12h1v1H16z M21 12h1v1H21z M1 13h1v1H1z M4 13h2v1H4z M7 13h1v1H7z M9 13h1v1H9z M12 13h1v1H12z M16 13h1v1H16z M20 13h2v1H20z M9 14h1v1H9z M11 14h1v1H11z M14 14h1v1H14z M16 14h1v1H16z M18 14h1v1H18z M21 14h1v1H21z M1 15h7v1H1z M9 15h3v1H9z M16 15h4v1H16z M21 15h1v1H21z M1 16h1v1H1z M7 16h1v1H7z M9 16h2v1H9z M12 16h2v1H12z M15 16h2v1H15z M19 16h1v1H19z M21 16h1v1H21z M1 17h1v1H1z M3 17h3v1H3z M7 17h1v1H7z M10 17h1v1H10z M12 17h1v1H12z M15 17h3v1H15z M20 17h2v1H20z M1 18h1v1H1z M3 18h3v1H3z M7 18h1v1H7z M9 18h2v1H9z M14 18h1v1H14z M20 18h1v1H20z M1 19h1v1H1z M3 19h3v1H3z M7 19h1v1H7z M9 19h4v1H9z M16 19h2v1H16z M1 20h1v1H1z M7 20h1v1H7z M12 20h2v1H12z M15 20h1v1H15z M17 20h3v1H17z M1 21h7v1H1z M9 21h1v1H9z M11 21h4v1H11z M18 21h3v1H18z" />
+						<c:when test="${workerQrOrderId gt 0}">
 
-						<rect x="8.3"
-							y="8.5"
-							width="6.4"
-							height="5.7"
-							rx="0.7"
-							fill="#ffffff" />
+							<img class="realQrImg"
+								src="${pageContext.request.contextPath}/production/workorder/qr?orderId=${workerQrOrderId}"
+								alt="오늘 작업지시 QR 코드">
 
-						<image href="${pageContext.request.contextPath}/resources/saeroi_logo.png"
-							x="8.8"
-							y="9.0"
-							width="5.4"
-							height="4.7"
-							preserveAspectRatio="xMidYMid meet" />
+						</c:when>
 
-					</svg>
+						<c:otherwise>
+
+							<div class="realQrImg"
+								style="display:flex; align-items:center; justify-content:center; background:#ffffff; color:#2f6f5e; font-size:13px; font-weight:900; text-align:center; line-height:1.5; padding:12px; box-sizing:border-box;">
+
+								오늘 작업지시가<br>
+								없습니다
+
+							</div>
+
+						</c:otherwise>
+
+					</c:choose>
+
+					<%-- =====================================================
+						현재 화면 QR 테스트 / QR 이미지 클릭 이동용 URL
+						- 실제 QR URL이 있으면 해당 URL로 이동
+						- QR URL이 없으면 오늘 작업지시 조회 화면으로 이동
+					===================================================== --%>
+					<input type="hidden"
+						id="workerCurrentQrMoveUrl"
+						value="<c:choose><c:when test="${workerQrMoveUrl.indexOf('http://') == 0 || workerQrMoveUrl.indexOf('https://') == 0}">${workerQrMoveUrl}</c:when><c:otherwise>${pageContext.request.contextPath}${workerQrMoveUrl}</c:otherwise></c:choose>">
 
 				</div>
 
@@ -527,8 +848,14 @@
 
 				<div class="workerTodayGrid">
 
-					<div class="workerTodayItem">
+					<div class="workerTodayItem"
+						onclick="location.href='${pageContext.request.contextPath}/worker/workorder?todayOnly=Y'">
 
+						<%-- =====================================================
+							오늘 작업지시 카드
+							로그인 작업자 + 오늘 날짜 기준 작업지시 목록으로 이동한다.
+							공통 파일은 건드리지 않고 현재 JSP 클릭 경로만 연결한다.
+						===================================================== --%>
 						<div class="workerTodayIcon">
 
 							<svg viewBox="0 0 24 24"
@@ -547,17 +874,22 @@
 						</p>
 
 						<strong>
-							5 건
+							${workerTodayWorkOrderCount} 건
 						</strong>
 
 					</div>
 
-					<div class="workerTodayItem">
+					<div class="workerTodayItem"
+						onclick="location.href='${pageContext.request.contextPath}/worker/workorder?todayOnly=Y&status=progress'">
 
+						<%-- =====================================================
+							진행 상태 카드
+							오늘 작업 중 완료되지 않은 건만 작업지시조회에서 확인한다.
+						===================================================== --%>
 						<div class="workerProgressCircle">
 
 							<span>
-								72%
+								${workerTodayProgressRate}%
 							</span>
 
 						</div>
@@ -567,13 +899,18 @@
 						</p>
 
 						<strong>
-							진행 중
+							${workerTodayProgressText}
 						</strong>
 
 					</div>
 
-					<div class="workerTodayItem">
+					<div class="workerTodayItem"
+						onclick="location.href='${pageContext.request.contextPath}/notice/list'">
 
+						<%-- =====================================================
+							최근 알림 카드
+							별도 알림 테이블은 건드리지 않고 공지사항/게시판으로 이동한다.
+						===================================================== --%>
 						<div class="workerTodayIcon workerTodayAlertIcon">
 
 							<svg viewBox="0 0 24 24"
@@ -594,7 +931,7 @@
 						</p>
 
 						<strong>
-							2 건
+							${workerRecentAlertCount} 건
 						</strong>
 
 					</div>
@@ -609,6 +946,127 @@
 
 </div>
 
+
+
+<%-- =========================================================
+	QR 카메라 스캔 모달
+	작업자 메인에서만 사용하는 화면이므로 공통 JSP / 공통 CSS는 수정하지 않는다.
+========================================================= --%>
+<div id="workerQrCameraModal"
+	class="workerQrCameraModal"
+	aria-hidden="true">
+
+	<video id="workerQrCameraVideo"
+		class="workerQrCameraVideo"
+		autoplay
+		playsinline
+		muted>
+	</video>
+
+	<div class="workerQrCameraDim"></div>
+
+	<div class="workerQrCameraTop">
+
+		<div class="workerQrCameraTitleBox">
+
+			<div class="workerQrCameraTitle">
+				QR 스캔
+			</div>
+
+			<div class="workerQrCameraSubTitle">
+				작업지시 QR을 카메라 중앙에 맞춰주세요.
+			</div>
+
+		</div>
+
+		<button type="button"
+			class="workerQrCameraCloseBtn"
+			onclick="closeWorkerQrScan()"
+			aria-label="QR 스캔 닫기">
+
+			×
+
+		</button>
+
+	</div>
+
+	<div class="workerQrCameraFrame">
+
+		<div class="workerQrCameraCorner leftTop"></div>
+		<div class="workerQrCameraCorner rightTop"></div>
+		<div class="workerQrCameraCorner leftBottom"></div>
+		<div class="workerQrCameraCorner rightBottom"></div>
+
+		<div class="workerQrCameraScanLine"></div>
+
+	</div>
+
+	<div class="workerQrCameraGuide">
+
+		<div id="workerQrCameraStatus"
+			class="workerQrCameraGuideMain">
+
+			카메라를 준비하고 있습니다.
+
+		</div>
+
+		<div class="workerQrCameraGuideSub">
+			QR 인식 후 작업지시 또는 생산실적 화면으로 자동 이동합니다.
+		</div>
+
+		<%-- =====================================================
+			같은 PC에서 현재 화면 QR 동작을 확인하는 테스트 버튼
+			PC 웹캠은 모니터 속 QR을 직접 볼 수 없어서,
+			시연/개발 중에는 이 버튼으로 작업지시 조회 흐름을 바로 확인한다.
+			실제 현장에서는 카메라로 QR을 스캔하면 된다.
+		===================================================== --%>
+		<button type="button"
+			class="workerQrCameraTestBtn"
+			onclick="moveWorkerCurrentQrTest();">
+
+			현재 화면 QR 테스트 실행
+
+		</button>
+
+	</div>
+
+	<div id="workerQrCameraMessageBox"
+		class="workerQrCameraMessageBox">
+
+		<div id="workerQrCameraMessageTitle"
+			class="workerQrCameraMessageTitle">
+
+			카메라를 사용할 수 없습니다.
+
+		</div>
+
+		<div id="workerQrCameraMessageText"
+			class="workerQrCameraMessageText">
+
+			카메라 권한을 허용한 뒤 다시 시도해주세요.
+
+		</div>
+
+		<button type="button"
+			class="workerQrCameraMessageBtn"
+			onclick="closeWorkerQrScan()">
+
+			확인
+
+		</button>
+
+	</div>
+
+</div>
+
+
+<%-- =========================================================
+	QR 인식 라이브러리
+	BarcodeDetector는 브라우저마다 지원 차이가 있어서 사용하지 않는다.
+	jsQR은 canvas 이미지 분석 방식이라 Chrome / Edge / Safari 등에서 더 안정적으로 동작한다.
+	공통 파일은 건드리지 않고 작업자 메인 JSP에서만 로드한다.
+========================================================= --%>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
 <script>
 	document.title = "SAEROI MES";
@@ -749,10 +1207,390 @@
 	        });
 	}
 
-	function startWorkerQrScan() {
+	// =====================================================
+	// QR 카메라 스캔 관련 전역 변수
+	// 공통 JS는 건드리지 않고 workerMain.jsp 안에서만 사용한다.
+	// =====================================================
+	// =====================================================
+	// 카메라 스트림 / 반복 스캔 타이머
+	// BarcodeDetector는 브라우저별 지원 차이가 있어서 제거하고,
+	// jsQR + canvas 방식으로 QR을 인식한다.
+	// =====================================================
+	var workerQrStream = null;
+	var workerQrScanTimer = null;
+	var workerQrScanning = false;
+	var workerQrCanvas = document.createElement("canvas");
+	var workerQrCanvasContext = workerQrCanvas.getContext("2d");
 
-		alert("QR 스캔 기능 연결 예정입니다.");
+	// =====================================================
+	// QR 스캔 시작
+	// -----------------------------------------------------
+	// 1. 전체화면 카메라 모달을 연다.
+	// 2. 브라우저 기본 BarcodeDetector로 QR 인식을 준비한다.
+	// 3. 카메라 권한을 요청한다.
+	// 4. QR 인식 성공 시 QR 안의 URL 또는 값으로 이동한다.
+	//
+	// 주의:
+	// getUserMedia는 일반적으로 HTTPS 또는 localhost에서 동작한다.
+	// 학교/시연 환경에서 http IP 접속이면 브라우저 보안 정책 때문에
+	// 카메라가 막힐 수 있으므로 안내 메시지를 보여준다.
+	// =====================================================
+	async function startWorkerQrScan() {
 
+		var modal =
+			document.getElementById("workerQrCameraModal");
+
+		var video =
+			document.getElementById("workerQrCameraVideo");
+
+		var status =
+			document.getElementById("workerQrCameraStatus");
+
+		var messageBox =
+			document.getElementById("workerQrCameraMessageBox");
+
+		if (modal == null
+				|| video == null) {
+
+			alert("QR 스캔 화면을 찾을 수 없습니다.");
+			return;
+		}
+
+		modal.style.display = "block";
+		modal.setAttribute("aria-hidden", "false");
+
+		if (messageBox != null) {
+
+			messageBox.style.display = "none";
+		}
+
+		if (status != null) {
+
+			status.innerText = "카메라 권한을 확인하고 있습니다.";
+		}
+
+		// =================================================
+		// 카메라 API 지원 여부 확인
+		// =================================================
+		if (navigator.mediaDevices == null
+				|| navigator.mediaDevices.getUserMedia == null) {
+
+			showWorkerQrMessage(
+				"카메라를 사용할 수 없습니다.",
+				"브라우저에서 카메라 기능을 지원하지 않거나 보안 연결이 아닙니다. HTTPS 또는 localhost 환경에서 실행해주세요."
+			);
+
+			return;
+		}
+
+		try {
+
+			// =================================================
+			// QR 인식 라이브러리 확인
+			// 브라우저 기본 BarcodeDetector 대신 jsQR을 사용한다.
+			// CDN이 차단되면 카메라는 켜져도 QR 분석을 할 수 없으므로
+			// 안내 메시지를 보여준다.
+			// =================================================
+			if (typeof jsQR === "undefined") {
+
+				showWorkerQrMessage(
+					"QR 인식 스크립트를 불러오지 못했습니다.",
+					"인터넷 연결 또는 jsQR 스크립트 로드 상태를 확인해주세요."
+				);
+
+				return;
+			}
+
+			workerQrStream =
+				await navigator.mediaDevices.getUserMedia({
+					video: {
+						facingMode: {
+							ideal: "environment"
+						}
+					},
+					audio: false
+				});
+
+			video.srcObject =
+				workerQrStream;
+
+			await video.play();
+
+			workerQrScanning =
+				true;
+
+			if (status != null) {
+
+				status.innerText = "QR 코드를 스캔 영역 안에 맞춰주세요.";
+			}
+
+			scanWorkerQrCode();
+
+		} catch (error) {
+
+			console.error(error);
+
+			showWorkerQrMessage(
+				"카메라 실행에 실패했습니다.",
+				"카메라 권한을 허용했는지 확인해주세요. 모바일에서는 HTTPS 또는 localhost 환경에서 카메라가 동작합니다."
+			);
+		}
+	}
+
+	// =====================================================
+	// QR 반복 인식
+	// -----------------------------------------------------
+	// BarcodeDetector는 브라우저 지원 차이가 있어서 사용하지 않는다.
+	// video 화면을 canvas에 그린 뒤 jsQR로 QR 코드를 분석한다.
+	// 이렇게 하면 Chrome / Edge / Safari 계열에서 더 안정적으로 동작한다.
+	// =====================================================
+	function scanWorkerQrCode() {
+
+		if (!workerQrScanning) {
+
+			return;
+		}
+
+		var video =
+			document.getElementById("workerQrCameraVideo");
+
+		var status =
+			document.getElementById("workerQrCameraStatus");
+
+		if (video == null
+				|| typeof jsQR === "undefined"
+				|| workerQrCanvasContext == null) {
+
+			workerQrScanTimer =
+				setTimeout(scanWorkerQrCode, 350);
+
+			return;
+		}
+
+		try {
+
+			// =================================================
+			// video.readyState 2 이상이면 현재 프레임을 canvas로 복사할 수 있다.
+			// =================================================
+			if (video.readyState >= 2
+					&& video.videoWidth > 0
+					&& video.videoHeight > 0) {
+
+				workerQrCanvas.width =
+					video.videoWidth;
+
+				workerQrCanvas.height =
+					video.videoHeight;
+
+				workerQrCanvasContext.drawImage(
+					video,
+					0,
+					0,
+					workerQrCanvas.width,
+					workerQrCanvas.height);
+
+				var imageData =
+					workerQrCanvasContext.getImageData(
+						0,
+						0,
+						workerQrCanvas.width,
+						workerQrCanvas.height);
+
+				var qrCode =
+					jsQR(
+						imageData.data,
+						imageData.width,
+						imageData.height,
+						{
+							inversionAttempts: "attemptBoth"
+						});
+
+				if (qrCode != null
+						&& qrCode.data != null
+						&& qrCode.data.trim() != "") {
+
+					workerQrScanning =
+						false;
+
+					if (status != null) {
+
+						status.innerText = "QR 인식 완료. 화면을 이동합니다.";
+					}
+
+					moveWorkerQrResult(
+						qrCode.data.trim());
+
+					return;
+				}
+			}
+
+		} catch (error) {
+
+			console.error(error);
+		}
+
+		workerQrScanTimer =
+			setTimeout(scanWorkerQrCode, 250);
+	}
+
+
+	// =====================================================
+	// 현재 화면 QR 테스트 실행
+	// -----------------------------------------------------
+	// 같은 PC에서 웹캠으로 현재 모니터 안의 QR을 직접 찍는 것은
+	// 물리적으로 어렵다. 그래서 개발/시연용으로 현재 화면 QR을
+	// 눌렀을 때와 같은 흐름을 바로 실행한다.
+	// 팀원 작업지시 코드는 건드리지 않고 작업자 전용 경로만 사용한다.
+	// =====================================================
+	function moveWorkerCurrentQrTest() {
+
+		// =================================================
+		// 현재 화면 QR 테스트 실행
+		// -------------------------------------------------
+		// 같은 PC에서는 카메라가 모니터 속 QR을 직접 볼 수 없기 때문에
+		// 현재 화면 QR을 클릭하거나 테스트 버튼을 누르면
+		// 실제 QR 이동 URL로 바로 이동하게 한다.
+		// =================================================
+		var qrMoveUrl =
+			document.getElementById("workerCurrentQrMoveUrl");
+
+		if (qrMoveUrl != null
+				&& qrMoveUrl.value != null
+				&& qrMoveUrl.value.trim() != "") {
+
+			location.href =
+				qrMoveUrl.value.trim();
+
+			return;
+		}
+
+		moveWorkerQrResult(
+			"${pageContext.request.contextPath}/worker/workorder?todayOnly=Y");
+	}
+
+	// =====================================================
+	// QR 인식 결과 이동 처리
+	// -----------------------------------------------------
+	// 팀원이 만든 작업지시 QR은 생산실적 URL을 담고 있으므로
+	// QR 값이 URL이면 그대로 이동한다.
+	//
+	// 혹시 QR 값이 숫자 작업지시번호만 들어오는 경우도 대비해서
+	// 생산실적 등록 화면으로 이동하도록 보완한다.
+	// =====================================================
+	function moveWorkerQrResult(qrValue) {
+
+		closeWorkerQrScan();
+
+		if (qrValue.indexOf("http://") == 0
+				|| qrValue.indexOf("https://") == 0
+				|| qrValue.indexOf("/") == 0) {
+
+			location.href =
+				qrValue;
+
+			return;
+		}
+
+		if (/^[0-9]+$/.test(qrValue)) {
+
+			location.href =
+				"${pageContext.request.contextPath}/production/productionresult?orderId="
+				+ encodeURIComponent(qrValue)
+				+ "&openModal=Y";
+
+			return;
+		}
+
+		// =================================================
+		// QR 값이 예상 형식이 아닐 때는 작업지시조회로 이동한다.
+		// 이후 작업지시조회에서 검색어로 활용할 수 있도록 keyword에 담는다.
+		// =================================================
+		location.href =
+			"${pageContext.request.contextPath}/worker/workorder?keyword="
+			+ encodeURIComponent(qrValue);
+	}
+
+	// =====================================================
+	// QR 스캔 닫기
+	// 카메라 스트림을 반드시 종료해서 브라우저 카메라 점유를 해제한다.
+	// =====================================================
+	function closeWorkerQrScan() {
+
+		workerQrScanning =
+			false;
+
+		if (workerQrScanTimer != null) {
+
+			clearTimeout(workerQrScanTimer);
+			workerQrScanTimer = null;
+		}
+
+		if (workerQrStream != null) {
+
+			workerQrStream.getTracks().forEach(function(track) {
+
+				track.stop();
+			});
+
+			workerQrStream = null;
+		}
+
+		var video =
+			document.getElementById("workerQrCameraVideo");
+
+		if (video != null) {
+
+			video.pause();
+			video.srcObject = null;
+		}
+
+		var modal =
+			document.getElementById("workerQrCameraModal");
+
+		if (modal != null) {
+
+			modal.style.display = "none";
+			modal.setAttribute("aria-hidden", "true");
+		}
+	}
+
+	// =====================================================
+	// QR 카메라 안내 메시지 출력
+	// 카메라 권한 실패 / 브라우저 미지원 / 보안 연결 문제를 화면에 보여준다.
+	// =====================================================
+	function showWorkerQrMessage(title, text) {
+
+		var status =
+			document.getElementById("workerQrCameraStatus");
+
+		var messageBox =
+			document.getElementById("workerQrCameraMessageBox");
+
+		var messageTitle =
+			document.getElementById("workerQrCameraMessageTitle");
+
+		var messageText =
+			document.getElementById("workerQrCameraMessageText");
+
+		if (status != null) {
+
+			status.innerText = "QR 스캔을 시작할 수 없습니다.";
+		}
+
+		if (messageTitle != null) {
+
+			messageTitle.innerText = title;
+		}
+
+		if (messageText != null) {
+
+			messageText.innerText = text;
+		}
+
+		if (messageBox != null) {
+
+			messageBox.style.display = "block";
+		}
 	}
 
 	updateClock();

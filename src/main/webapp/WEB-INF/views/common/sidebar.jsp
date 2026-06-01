@@ -2,8 +2,10 @@
 	<%-- 이 JSP 파일에서 한글이 깨지지 않도록 UTF-8로 설정한다. --%>
 	<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+		<c:set var="admin" value="${sessionScope.loginUser.role eq 'ADMIN'}" />
+		<c:set var="manager" value="${sessionScope.loginUser.role eq 'MANAGER'}" />
 		<c:set var="Worker" value="${sessionScope.loginUser.role eq 'WORKER'}" />
-		<c:choose>
+		<c:choose>			
 			<c:when test="${Worker}">
 				<aside id="siSidebar" class="siSidebar">
 
@@ -90,9 +92,6 @@
 
 										</div>
 
-
-
-
 											<div class="siMenuGroup">
 
 													<button type="button" class="siMenuTitle" data-main-menu="생산관리">
@@ -137,7 +136,7 @@
 
 				</aside>
 			</c:when>
-			<c:otherwise>
+			<c:when test="${admin or manager}">
 				<aside id="siSidebar" class="siSidebar">
 					<%-- 사이드바 전체를 감싸는 영역이다. layout.jsp에서 Tiles로 불러와 모든 화면에 공통으로 표시된다. --%>
 
@@ -434,7 +433,7 @@
 																	LOT 이력추적
 															</a>
 
-
+															<c:if test="${admin}">															
 															<div class="siMenuGroup">
 																<%-- 기준정보관리 큰 메뉴와 하위 메뉴를 묶는 영역이다. --%>
 
@@ -508,7 +507,7 @@
 
 															</div>
 															<%-- 기준정보관리 메뉴 그룹을 끝낸다. --%>
-
+															</c:if>
 								</nav>
 								<%-- 메뉴 전체 영역을 끝낸다. --%>
 
@@ -524,5 +523,5 @@
 									<%-- 로그아웃 영역을 끝낸다. --%>
 
 				</aside>
-			</c:otherwise>
+			</c:when>
 		</c:choose>

@@ -2,6 +2,7 @@ package kr.or.saeroi.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpSession;
 
@@ -46,6 +47,161 @@ public class WorkerController {
 		model.addAttribute("workerName", loginUser.getEname());
 		model.addAttribute("workerDept", loginUser.getDept());
 
+		// =============================================================
+		// 오늘 작업 현황 조회
+		// 팀원이 만든 작업지시 Controller / Mapper는 건드리지 않고,
+		// 작업자 전용 DAO로 로그인한 작업자의 작업지시만 가져온 뒤
+		// 오늘 날짜 기준으로 화면에 보여줄 건수와 진행률을 계산한다.
+		// =============================================================
+		String empno = "";
+
+		if (loginUser.getEmpno() != null) {
+
+			empno =
+				loginUser.getEmpno().trim();
+		}
+
+		String ename = "";
+
+		if (loginUser.getEname() != null) {
+
+			ename =
+				loginUser.getEname().trim();
+		}
+
+		List<ProductionDTO> myWorkOrderList =
+			workerDAO.selectMyWorkOrderList(
+				empno,
+				ename);
+
+		if (myWorkOrderList == null) {
+
+			myWorkOrderList =
+				new ArrayList<ProductionDTO>();
+		}
+
+		int todayWorkOrderCount = 0;
+		int todayCompleteCount = 0;
+		int todayProgressCount = 0;
+
+		for (ProductionDTO workOrder : myWorkOrderList) {
+
+			if (workOrder == null
+					|| !isToday(workOrder.getOrderDate())) {
+
+				continue;
+			}
+
+			todayWorkOrderCount++;
+
+			if (isCompleteStatus(workOrder.getProdStatus())) {
+
+				todayCompleteCount++;
+
+			} else {
+
+				todayProgressCount++;
+			}
+		}
+
+		int todayProgressRate = 0;
+
+		if (todayWorkOrderCount > 0) {
+
+			todayProgressRate =
+				(todayCompleteCount * 100) / todayWorkOrderCount;
+		}
+
+		String todayProgressText = "대기";
+
+		if (todayWorkOrderCount > 0
+				&& todayCompleteCount == todayWorkOrderCount) {
+
+			todayProgressText = "완료";
+
+		} else if (todayProgressCount > 0) {
+
+			todayProgressText = "진행 중";
+		}
+
+		model.addAttribute(
+			"workerTodayWorkOrderCount",
+			todayWorkOrderCount);
+
+		model.addAttribute(
+			"workerTodayProgressRate",
+			todayProgressRate);
+
+		model.addAttribute(
+			"workerTodayProgressText",
+			todayProgressText);
+
+		// =============================================================
+		// 최근 알림은 현재 별도 알림 테이블을 건드리지 않는다.
+		// 기존 화면의 알림 건수 표시는 유지하고, 클릭 시 공지사항으로 이동하게 한다.
+		// =============================================================
+		model.addAttribute(
+			"workerRecentAlertCount",
+			2);
+
+
+		// =============================================================
+		// 작업자 메인 실제 작업지시 QR 조회
+		// -------------------------------------------------------------
+		// 팀원 작업지시 파일은 수정하지 않는다.
+		// 작업자 전용 DAO에서 로그인한 작업자의 오늘 작업지시 1건만 조회하고,
+		// workerMain.jsp에서는 기존 팀원 QR 생성 URL을 그대로 사용한다.
+		//
+		// QR 이미지:
+		// /production/workorder/qr?orderId=작업지시번호
+		//
+		// QR 클릭 / 테스트 버튼 이동:
+		// WORK_ORDER.QR_URL이 있으면 그 값을 사용하고,
+		// 없으면 생산실적 등록 화면으로 이동한다.
+		// =============================================================
+		ProductionDTO workerQrWorkOrder =
+			workerDAO.selectTodayQrWorkOrder(
+				empno,
+				ename);
+
+		int workerQrOrderId = 0;
+		String workerQrMoveUrl =
+			"/worker/workorder?todayOnly=Y";
+
+		if (workerQrWorkOrder != null
+				&& workerQrWorkOrder.getOrderId() != null) {
+
+			workerQrOrderId =
+				workerQrWorkOrder.getOrderId().intValue();
+
+			if (workerQrWorkOrder.getQrUrl() != null
+					&& !workerQrWorkOrder.getQrUrl().trim().equals("")) {
+
+				workerQrMoveUrl =
+					workerQrWorkOrder.getQrUrl().trim();
+
+			} else {
+
+				workerQrMoveUrl =
+					"/production/productionresult?orderId="
+					+ workerQrOrderId
+					+ "&openModal=Y";
+			}
+		}
+
+		model.addAttribute(
+			"workerQrWorkOrder",
+			workerQrWorkOrder);
+
+		model.addAttribute(
+			"workerQrOrderId",
+			workerQrOrderId);
+
+		model.addAttribute(
+			"workerQrMoveUrl",
+			workerQrMoveUrl);
+
+
 		return "worker/workerMain";
 	}
 
@@ -53,6 +209,8 @@ public class WorkerController {
 	public String workerWorkOrder(
 			@RequestParam(value = "page", defaultValue = "1") int page,
 			@RequestParam(value = "size", defaultValue = "5") int size,
+			@RequestParam(value = "todayOnly", defaultValue = "") String todayOnly,
+			@RequestParam(value = "status", defaultValue = "") String status,
 			HttpSession session,
 			Model model) {
 
@@ -91,6 +249,38 @@ public class WorkerController {
 				new ArrayList<ProductionDTO>();
 		}
 
+		// =============================================================
+		// 작업자 메인에서 오늘 작업지시 / 진행상태를 눌렀을 때
+		// 팀원 작업지시 코드는 건드리지 않고 이 Controller에서만
+		// 로그인 작업자 + 오늘 날짜 + 진행중 조건으로 목록을 좁힌다.
+		// =============================================================
+		if ("Y".equals(todayOnly)
+				|| "progress".equals(status)) {
+
+			List<ProductionDTO> filteredList =
+				new ArrayList<ProductionDTO>();
+
+			for (ProductionDTO workOrder : myAllList) {
+
+				if (workOrder == null
+						|| !isToday(workOrder.getOrderDate())) {
+
+					continue;
+				}
+
+				if ("progress".equals(status)
+						&& isCompleteStatus(workOrder.getProdStatus())) {
+
+					continue;
+				}
+
+				filteredList.add(workOrder);
+			}
+
+			myAllList =
+				filteredList;
+		}
+
 		int totalCount =
 			myAllList.size();
 
@@ -125,9 +315,28 @@ public class WorkerController {
 
 		model.addAttribute("list", list);
 		model.addAttribute("pageInfo", pageInfo);
-		model.addAttribute("pageUrl", "/worker/workorder");
+		// =============================================================
+		// 공통 paging.jsp는 pageUrl을 기준으로 페이지를 만든다.
+		// 오늘 작업지시 / 진행상태에서 들어온 경우도 필터가 유지되도록
+		// pageUrl에 현재 조건을 같이 넘긴다.
+		// =============================================================
+		String pageUrl = "/worker/workorder";
 
-		model.addAttribute("prodStatus", "");
+		if ("Y".equals(todayOnly)
+				&& "progress".equals(status)) {
+
+			pageUrl =
+				"/worker/workorder?todayOnly=Y&status=progress";
+
+		} else if ("Y".equals(todayOnly)) {
+
+			pageUrl =
+				"/worker/workorder?todayOnly=Y";
+		}
+
+		model.addAttribute("pageUrl", pageUrl);
+
+		model.addAttribute("prodStatus", status);
 		model.addAttribute("keyword", "");
 		model.addAttribute("startDate", "");
 		model.addAttribute("endDate", "");
@@ -259,6 +468,43 @@ public class WorkerController {
 		// 기존 팀원 tiles 화면으로 이동해야 CSS가 깨지지 않음
 		// =================================================
 		return "production/productionresult.tiles";
+	}
+
+	// =====================================================
+	// 오늘 날짜 여부 확인
+	// WORK_ORDER.ORDER_DATE는 yyyy-MM-dd 문자열로 DTO에 들어오므로
+	// 오늘 날짜 문자열과 비교한다.
+	// =====================================================
+	private boolean isToday(
+			String dateText) {
+
+		if (dateText == null
+				|| dateText.trim().equals("")) {
+
+			return false;
+		}
+
+		String today =
+			new SimpleDateFormat("yyyy-MM-dd")
+				.format(new java.util.Date());
+
+		return today.equals(dateText.trim());
+	}
+
+	// =====================================================
+	// 완료 상태 여부 확인
+	// 상태명은 팀원 작업지시/생산실적 코드에서 넘어오는 값을 그대로 사용하되,
+	// '완료'가 들어가면 완료 처리하고 나머지는 진행 대상으로 본다.
+	// =====================================================
+	private boolean isCompleteStatus(
+			String status) {
+
+		if (status == null) {
+
+			return false;
+		}
+
+		return status.indexOf("완료") >= 0;
 	}
 
 	// =====================================================

@@ -35,6 +35,7 @@ public class QualityController {
 
 	private static final String RESULT_PASS = "합격";
 	private static final String RESULT_CONDITIONAL = "조건부";
+	private static final String RESULT_WAIT = "대기";
 
 	private boolean canManageQuality(LoginDTO loginUser) {
 		return loginUser != null && ("ADMIN".equals(loginUser.getRole()) || "MANAGER".equals(loginUser.getRole()));
@@ -110,37 +111,42 @@ public class QualityController {
 		double defectQtyValue = toNumber(defect_qty);
 		boolean isPassResult = RESULT_PASS.equals(result);
 		boolean isConditionalResult = RESULT_CONDITIONAL.equals(result);
+		boolean isWaitResult = RESULT_WAIT.equals(result);
 
-		if (!isPassResult && !isConditionalResult) {
-			return "redirect:/quality/inspection";
+		if (!isPassResult && !isConditionalResult && !isWaitResult) {
+		    return "redirect:/quality/inspection";
 		}
 
-		if (inspectionQtyValue <= 0 || goodQtyValue < 0 || defectQtyValue < 0) {
-			return "redirect:/quality/inspection";
-		}
+		if (isWaitResult) {
+		    // 대기는 양품수량 강제 0, 불량 없음
+		    good_qty = "0";
+		    has_defect = null;
+		} else {
+		    if (inspectionQtyValue <= 0 || goodQtyValue < 0 || defectQtyValue < 0) {
+		        return "redirect:/quality/inspection";
+		    }
 
-		if (isPassResult && !isSameQuantity(goodQtyValue, inspectionQtyValue)) {
-			return "redirect:/quality/inspection";
-		}
+		    if (isPassResult && !isSameQuantity(goodQtyValue, inspectionQtyValue)) {
+		        return "redirect:/quality/inspection";
+		    }
 
-		if (isPassResult) {
-			has_defect = null;
-			defectQtyValue = 0;
-		}
+		    if (isPassResult) {
+		        has_defect = null;
+		        defectQtyValue = 0;
+		    }
 
-		if (isConditionalResult) {
-			if (!"Y".equals(has_defect) || defectQtyValue <= 0) {
-				return "redirect:/quality/inspection";
-			}
-
-			if (!isSameQuantity(goodQtyValue + defectQtyValue, inspectionQtyValue)) {
-				return "redirect:/quality/inspection";
-			}
-
-			if (!hasText(defect_date) || !hasText(defect_id) || !hasText(action_date) || !hasText(action_emp_id)
-					|| !hasText(action_content)) {
-				return "redirect:/quality/inspection";
-			}
+		    if (isConditionalResult) {
+		        if (!"Y".equals(has_defect) || defectQtyValue <= 0) {
+		            return "redirect:/quality/inspection";
+		        }
+		        if (!isSameQuantity(goodQtyValue + defectQtyValue, inspectionQtyValue)) {
+		            return "redirect:/quality/inspection";
+		        }
+		        if (!hasText(defect_date) || !hasText(defect_id) || !hasText(action_date) || !hasText(action_emp_id)
+		                || !hasText(action_content)) {
+		            return "redirect:/quality/inspection";
+		        }
+		    }
 		}
 
 		int inspId = qualityService._ser_insert_Inspection(insp_date, prod_id, emp_id, insp_type, result, inspection_qty,

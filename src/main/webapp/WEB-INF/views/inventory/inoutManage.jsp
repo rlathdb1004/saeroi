@@ -29,6 +29,92 @@
 		border: 1px solid #e53935 !important;
 	}
 
+	/* =====================================================
+		자재입출고 목록 테이블 초기 폭 조정
+		공통 CSS / 공통 JSP는 절대 수정하지 않고 이 JSP 안에서만 보정한다.
+		목표:
+		- 드래그 리사이즈 기능은 유지
+		- 처음 페이지 진입 시 입출고번호가 넓게 보이도록 설정
+		- 입출고구분 / 수량 / 단위 / 상세 컬럼은 줄여서 공간 확보
+		- 가로 스크롤바 추가 없음
+		- 긴 품목명이 셀 선을 넘어가지 않도록 현재 JSP에서만 표시를 보정한다.
+		- 공통 CSS / 공통 JSP는 수정하지 않는다.
+	===================================================== */
+	.coTableWrap {
+		width: 100%;
+		overflow-x: hidden;
+	}
+
+	.coTable {
+		width: 100%;
+		table-layout: fixed;
+	}
+
+	.coTable th,
+	.coTable td {
+		font-size: 12px;
+		white-space: nowrap;
+		word-break: keep-all;
+		vertical-align: middle;
+		text-align: center;
+		padding-left: 4px;
+		padding-right: 4px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	/* 선택: 체크박스만 들어가므로 가장 작게 둔다. */
+	.coTable th:nth-child(1),
+	.coTable td:nth-child(1) {
+		width: 48px;
+	}
+
+	/* 입출고번호: 가장 길게 보이는 컬럼이라 넓힌다. */
+	.coTable th:nth-child(2),
+	.coTable td:nth-child(2) {
+		width: 190px;
+		font-size: 12px;
+		letter-spacing: -0.4px;
+	}
+
+	/* 입출고구분: 입고 / 출고만 표시되므로 줄인다. */
+	.coTable th:nth-child(3),
+	.coTable td:nth-child(3) {
+		width: 70px;
+	}
+
+	/* 품목명: 한 줄로 보이도록 기존보다 여유 있게 둔다. */
+	.coTable th:nth-child(4),
+	.coTable td:nth-child(4) {
+		width: 220px;
+		font-size: 12px;
+		letter-spacing: -0.4px;
+	}
+
+	/* 입출고량 */
+	.coTable th:nth-child(5),
+	.coTable td:nth-child(5) {
+		width: 80px;
+	}
+
+	/* 단위: EA / M / KG 정도만 표시되므로 줄인다. */
+	.coTable th:nth-child(6),
+	.coTable td:nth-child(6) {
+		width: 55px;
+	}
+
+	/* 일자 */
+	.coTable th:nth-child(7),
+	.coTable td:nth-child(7) {
+		width: 110px;
+	}
+
+	/* 상세 */
+	.coTable th:nth-child(8),
+	.coTable td:nth-child(8) {
+		width: 55px;
+	}
+
 </style>
 
 <div class="coPageWrap">
@@ -43,12 +129,12 @@
 
 				<div class="search-item">
 					<label class="search-label">시작일</label>
-					<input type="date" name="startDate" class="search-date" value="${startDate}">
+					<input type="date" name="startDate" id="inoutStartDate" class="search-date" value="${startDate}">
 				</div>
 
 				<div class="search-item">
 					<label class="search-label">종료일</label>
-					<input type="date" name="endDate" class="search-date" value="${endDate}">
+					<input type="date" name="endDate" id="inoutEndDate" class="search-date" min="${startDate}" value="${endDate}">
 				</div>
 
 				<div class="search-item">
@@ -183,6 +269,21 @@
 
 			<table class="coTable">
 
+				<%-- =====================================================
+					초기 컬럼 폭 지정
+					공통 테이블 리사이즈 기능은 유지하고, 처음 진입 시 기본 폭만 맞춘다.
+				===================================================== --%>
+				<colgroup>
+					<col style="width:48px;">
+					<col style="width:190px;">
+					<col style="width:80px;">
+					<col style="width:200px;">
+					<col style="width:80px;">
+					<col style="width:55px;">
+					<col style="width:110px;">
+					<col style="width:55px;">
+				</colgroup>
+
 				<thead>
 					<tr>
 						<th>
@@ -216,11 +317,18 @@
 
 							<%-- =====================================================
 								입출고번호 출력
-								팀장님 요청 기준으로 숫자 INOUT_ID 대체 출력은 하지 않는다.
-								DOC_NO는 등록 시 DB에 반드시 저장되어야 한다.
+								공통 JSP / 공통 CSS는 건드리지 않고 현재 JSP에서만 출력값을 변경한다.
+
+								기존에는 ${inout.docNo}만 출력해서,
+								DB의 기존 데이터 중 DOC_NO가 비어 있는 행은 입출고번호 칸이 빈칸으로 보였다.
+
+								InoutDTO.getDisplayDocNo()에서
+								1) DOC_NO가 있으면 DOC_NO 출력
+								2) DOC_NO가 비어 있으면 입출고구분 + 일자 + INOUT_ID로 표시용 번호 생성
+								하도록 처리했기 때문에 여기서는 displayDocNo만 출력한다.
 							===================================================== --%>
-							<td>
-								${inout.docNo}
+							<td title="${inout.displayDocNo}">
+								${inout.displayDocNo}
 							</td>
 
 							<td>
@@ -294,7 +402,8 @@
 
 			</div>
 
-			<form class="modal_form"
+			<form id="inoutInsertForm"
+				class="modal_form"
 				method="post"
 				action="${pageContext.request.contextPath}/inventory/materialIn/insert"
 				autocomplete="off"
@@ -302,21 +411,30 @@
 				onsubmit="return checkInoutInsert();">
 
 				<%-- =====================================================
-					화면에서 제거한 DB 저장용 값
-					사용여부 / 작업지시번호 / 문서번호 / 문서순번은 화면에는 보이지 않게 유지한다.
-					Controller가 해당 값을 받더라도 등록이 깨지지 않도록 hidden 기본값만 전송한다.
+					사용여부
+					화면에는 표시하지 않지만 DB 저장 시 기본값 Y가 필요해서 hidden으로 보낸다.
 				===================================================== --%>
-				<input type="hidden" name="useYn" value="Y">
-				<input type="hidden" name="orderId" value="0">
-				<input type="hidden" name="docNo" value="">
-				<input type="hidden" name="docSeq" value="0">
+				<input type="hidden"
+					name="useYn"
+					value="Y">
 
 				<div class="modal_body modal_body_2col">
 
 					<%-- =====================================================
 						사원번호
-						화면에서는 로그인 사용자 사원번호를 자동 표시한다.
-						실제 저장은 Controller에서 session 로그인 정보 기준으로 한 번 더 처리한다.
+						화면에는 DB 저장용 EMP_ID 숫자값이 아니라
+						EMP 테이블의 사번 EMPNO를 보여준다.
+
+						예)
+						화면 표시 : E2026004
+						DB 저장   : EMP_ID = 4
+
+						주의:
+						이 input에는 name을 넣지 않는다.
+						실제 저장은 Controller에서 session 로그인 정보로
+						getLoginEmpId(session)을 호출해서 처리한다.
+						그래서 화면에는 E2026004가 보여도
+						MATERIAL_INOUT.EMP_ID에는 4가 저장된다.
 					===================================================== --%>
 					<div class="modal_item">
 
@@ -325,11 +443,10 @@
 							<span class="modal_required">*</span>
 						</label>
 
-						<input type="number"
-							name="empId"
-							id="insertEmpId"
+						<input type="text"
+							id="insertEmpNo"
 							class="modal_input"
-							value="${loginEmpId}"
+							value="${loginEmpNo}"
 							readonly>
 
 					</div>
@@ -595,8 +712,16 @@
 
 					</button>
 
-					<button type="submit"
-						class="modal_btn modal_btn_submit">
+					<%-- =================================================
+						등록 버튼
+						type="submit"으로 직접 submit 되게 한다.
+						공통 모달 / 공통 JS는 건드리지 않고
+						현재 form의 onsubmit="return checkInoutInsert();" 검증을 통과하면
+						Controller(/inventory/materialIn/insert)로 정상 전송된다.
+					================================================= --%>
+					<button type="button"
+						class="modal_btn modal_btn_submit"
+						onclick="submitInoutInsertDirect();">
 
 						등록
 
@@ -619,6 +744,8 @@
 	// =========================================================
 	// 등록 모달 필수값 방어코딩
 	// 공통 JS는 건드리지 않고 현재 JSP 안에서만 검증한다.
+	// 입고(MI)일 때 LOT번호가 비어 있으면 등록 직전에 한 번 더 자동 생성한다.
+	// 출고(MO-PROD)일 때는 select 박스에서 고른 LOT번호를 hidden 값에 복사한다.
 	// =========================================================
 	function checkInoutInsert() {
 
@@ -636,6 +763,12 @@
 
 		var materialLot =
 			document.getElementById("insertMaterialLot");
+
+		var materialLotInput =
+			document.getElementById("insertMaterialLotInput");
+
+		var materialLotSelect =
+			document.getElementById("insertMaterialLotSelect");
 
 		var inoutTypeError =
 			document.getElementById("inoutTypeError");
@@ -688,6 +821,49 @@
 			inoutDate.classList.add("input_error");
 			dateError.style.display = "block";
 			isValid = false;
+		}
+
+		// =====================================================
+		// LOT번호 최종 방어코딩
+		// 이벤트가 꼬여도 입고는 등록 직전에 자동 생성되게 한다.
+		// =====================================================
+		if (materialLot != null
+			&& inoutType.value == "MI"
+			&& materialLot.value == "") {
+
+			var lotNo =
+				createInsertMaterialLot();
+
+			materialLot.value =
+				lotNo;
+
+			if (materialLotInput != null) {
+
+				materialLotInput.value =
+					lotNo;
+
+				materialLotInput.style.display =
+					"";
+			}
+
+			if (materialLotSelect != null) {
+
+				materialLotSelect.style.display =
+					"none";
+			}
+		}
+
+		// =====================================================
+		// 출고는 select 박스 선택값을 hidden materialLot에 복사한다.
+		// =====================================================
+		if (materialLot != null
+			&& inoutType.value == "MO-PROD") {
+
+			if (materialLotSelect != null) {
+
+				materialLot.value =
+					materialLotSelect.value;
+			}
 		}
 
 		if (materialLot != null
@@ -754,12 +930,12 @@
 			&& dateInput.value != "") {
 
 			dateText =
-				dateInput.value.replaceAll("-", "");
+				dateInput.value.split("-").join("");
 
 		} else {
 
 			dateText =
-				formatDateForInput(new Date()).replaceAll("-", "");
+				formatDateForInput(new Date()).split("-").join("");
 		}
 
 		var randomNo =
@@ -1097,26 +1273,26 @@
 					option.value =
 						list[i].materialLot || "";
 
-					var remainQty =
-						0;
-
-					if (list[i].remainQty != null) {
-
-						remainQty =
-							list[i].remainQty;
-
-					} else if (list[i].inoutQty != null) {
-
-						remainQty =
-							list[i].inoutQty;
-					}
-
 					option.text =
 						(list[i].materialLot || "")
 						+ " / 잔량 "
-						+ remainQty;
+						+ (list[i].remainQty == null ? 0 : list[i].remainQty);
 
 					insertMaterialLotSelect.appendChild(option);
+				}
+
+				// =================================================
+				// 출고 가능한 LOT가 1개뿐이면 자동 선택해서 hidden 값까지 넣어준다.
+				// =================================================
+				if (list.length == 1) {
+
+					insertMaterialLotSelect.selectedIndex = 1;
+
+					if (insertMaterialLot != null) {
+
+						insertMaterialLot.value =
+							insertMaterialLotSelect.value;
+					}
 				}
 			});
 		}
@@ -1168,6 +1344,120 @@
 				}
 			});
 		}
+
+
+		// =====================================================
+		// 모달을 다시 열 때도 현재 선택값 기준으로 LOT 영역을 다시 맞춘다.
+		// 공통 모달 스크립트는 건드리지 않고 이 JSP 안에서만 보완한다.
+		// =====================================================
+		var modalOpenBtns =
+			document.querySelectorAll(".modal_open_btn[data_modal_target='#modal_insert']");
+
+		for (var i = 0; i < modalOpenBtns.length; i++) {
+
+			modalOpenBtns[i].addEventListener("click", function() {
+
+				setTimeout(function() {
+
+					loadItemInfo();
+					loadStockLocations();
+					refreshMaterialLotArea();
+
+				}, 0);
+			});
+		}
 	});
 
+
+	// =========================================================
+	// 입출고 등록 버튼 직접 제출
+	// 공통 모달 스크립트는 건드리지 않고, 현재 JSP에서만 등록 버튼 submit을 보장한다.
+	// 기존 checkInoutInsert() 검증을 통과한 경우에만 실제 form submit을 실행한다.
+	// =========================================================
+	function submitInoutInsertForm() {
+
+		var form =
+			document.getElementById("inoutInsertForm");
+
+		if (form == null) {
+			alert("입출고 등록 폼을 찾을 수 없습니다.");
+			return;
+		}
+
+		if (checkInoutInsert()) {
+			form.submit();
+		}
+	}
+
+</script>
+
+<script>
+// =============================================================
+// 자재입출고 검색 날짜 제어
+// 공통 파일은 수정하지 않고 현재 JSP 안에서만 종료일 min 값을 맞춘다.
+// 종료일은 시작일보다 이전 날짜를 선택하지 못하게 한다.
+// =============================================================
+(function() {
+
+	var startDate = document.getElementById("inoutStartDate");
+	var endDate = document.getElementById("inoutEndDate");
+
+	if (startDate == null || endDate == null) {
+		return;
+	}
+
+	function syncEndDateMin() {
+
+		if (startDate.value != "") {
+			endDate.min = startDate.value;
+
+			if (endDate.value != "" && endDate.value < startDate.value) {
+				endDate.value = startDate.value;
+			}
+		}
+	}
+
+	syncEndDateMin();
+	startDate.addEventListener("change", syncEndDateMin);
+
+})();
+</script>
+
+
+<script>
+/* =============================================================
+	자재입출고 등록 submit 복구
+	공통 JS / 공통 JSP는 건드리지 않고 현재 JSP 안에서만 처리한다.
+
+	등록 모달은 정상으로 뜨는데 저장이 안 되는 경우는
+	공통 모달 스크립트가 .modal_btn_submit 클릭을 잡아먹거나,
+	type="submit" 이벤트가 꼬이는 경우가 있다.
+
+	그래서 등록 버튼 클릭 시
+	1) 기존 checkInoutInsert() 검증을 먼저 실행하고
+	2) 통과하면 현재 form을 직접 submit 한다.
+============================================================= */
+function submitInoutInsertDirect() {
+
+	var form =
+		document.getElementById("inoutInsertForm");
+
+	if (form == null) {
+		alert("입출고 등록 form을 찾을 수 없습니다.");
+		return;
+	}
+
+	if (typeof checkInoutInsert == "function") {
+
+		if (!checkInoutInsert()) {
+			return;
+		}
+	}
+
+	// =========================================================
+	// HTMLFormElement 기본 submit을 직접 호출한다.
+	// 공통 JS에서 버튼 click 이벤트를 막아도 Controller로 전송되게 한다.
+	// =========================================================
+	HTMLFormElement.prototype.submit.call(form);
+}
 </script>

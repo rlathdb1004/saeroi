@@ -40,6 +40,12 @@ public class InoutDAOImpl implements InoutDAO {
 				pw);
 	}
 
+	// =============================================================
+	// 입출고 목록 조회
+	// 검색어는 띄어쓰기를 무시해서 검색한다.
+	// 예) 'EV6배터리'로 검색해도 'EV6 배터리'가 검색된다.
+	// 공통 JSP / Controller / Service는 건드리지 않고 DAO SQL에서만 처리한다.
+	// =============================================================
 	@Override
 	public List<InoutDTO> selectInoutList(
 			String searchType,
@@ -148,11 +154,22 @@ public class InoutDAOImpl implements InoutDAO {
 
 				if ("itemCode".equals(searchType)) {
 
-					sql += " AND I.ITEM_CODE LIKE ? ";
+					// =====================================================
+					// 품목코드 검색
+					// UPPER로 대소문자를 무시하고,
+					// REPLACE로 띄어쓰기를 제거해서 검색한다.
+					// 예: RM 001 = RM001
+					// =====================================================
+					sql += " AND REPLACE(UPPER(I.ITEM_CODE), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
 
 				} else if ("itemName".equals(searchType)) {
 
-					sql += " AND I.ITEM_NAME LIKE ? ";
+					// =====================================================
+					// 품목명 검색
+					// 영어가 들어간 품목명도 대소문자 구분 없이 검색하고,
+					// 띄어쓰기 차이도 무시한다.
+					// =====================================================
+					sql += " AND REPLACE(UPPER(I.ITEM_NAME), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
 
 				} else if (isNumber) {
 
@@ -160,27 +177,40 @@ public class InoutDAOImpl implements InoutDAO {
 
 				} else {
 
+					// =====================================================
+					// 통합검색
+					// 품목코드 / 품목명 / 단위 / 문서번호 / LOT번호 등
+					// 영어 검색어가 들어가는 컬럼은 UPPER + REPLACE를 적용해서
+					// 대소문자와 띄어쓰기 차이를 무시한다.
+					// =====================================================
 					sql += " AND ( ";
-					sql += "     I.ITEM_CODE LIKE ? ";
-					sql += "     OR I.ITEM_NAME LIKE ? ";
-					sql += "     OR I.ITEM_UNIT LIKE ? ";
-					sql += "     OR MI.DOC_NO LIKE ? ";
-					sql += "     OR MI.MATERIAL_LOT LIKE ? ";
-					sql += "     OR MI.REMARK LIKE ? ";
-					sql += "     OR MI.STATUS LIKE ? ";
-					sql += "     OR MI.USE_YN LIKE ? ";
+					sql += "     REPLACE(UPPER(I.ITEM_CODE), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(I.ITEM_NAME), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(I.ITEM_UNIT), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(MI.DOC_NO), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(MI.MATERIAL_LOT), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(MI.REMARK), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(MI.STATUS), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(MI.USE_YN), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
 					sql += "     OR TO_CHAR(MI.INOUT_DATE, 'YYYY-MM-DD') LIKE ? ";
-					sql += "     OR CASE ";
+					// =====================================================
+					// 입고/출고 한글 검색도 대소문자 구분 없이 처리한다.
+					// =====================================================
+					sql += "     OR UPPER(CASE ";
 					sql += "            WHEN MI.INOUT_TYPE = 'MI' THEN '입고' ";
 					sql += "            WHEN MI.INOUT_TYPE = 'MO-PROD' THEN '출고' ";
 					sql += "            ELSE MI.INOUT_TYPE ";
-					sql += "        END LIKE ? ";
-					sql += "     OR CASE ";
+					sql += "        END) LIKE UPPER(?) ";
+					// =====================================================
+					// 품목유형 검색도 대소문자 구분 없이 처리한다.
+					// FG / fg / Rm 같은 검색어도 동일하게 처리된다.
+					// =====================================================
+					sql += "     OR UPPER(CASE ";
 					sql += "            WHEN I.ITEM_TYPE = 'FG' THEN '완제품' ";
 					sql += "            WHEN I.ITEM_TYPE = 'RM' THEN '원자재' ";
 					sql += "            WHEN I.ITEM_TYPE = 'SM' THEN '부자재' ";
 					sql += "            ELSE I.ITEM_TYPE ";
-					sql += "        END LIKE ? ";
+					sql += "        END) LIKE UPPER(?) ";
 					sql += " ) ";
 				}
 			}
@@ -199,6 +229,10 @@ public class InoutDAOImpl implements InoutDAO {
 				sql += " TO_DATE(?, 'YYYY-MM-DD') ";
 			}
 
+			// =============================================================
+			// 최신 등록순 정렬
+			// 등록 직후 입출고일자가 과거여도 방금 등록한 INOUT_ID가 맨 위에 오도록 한다.
+			// =============================================================
 			sql += " ORDER BY MI.INOUT_ID DESC ";
 
 			PreparedStatement pstmt =
@@ -831,7 +865,13 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += "     DOC_NO, ";
 			sql += "     DOC_SEQ ";
 			sql += " ) VALUES ( ";
-			sql += "     SEQ_MATERIAL_INOUT.NEXTVAL, ";
+			// =====================================================
+			// 기존 SEQ_MATERIAL_INOUT.NEXTVAL 값이
+			// 이미 DB에 있는 INOUT_ID와 겹치면 ORA-00001이 발생한다.
+			// 그래서 현재 MATERIAL_INOUT의 최대 INOUT_ID보다 큰 값을
+			// 직접 구해서 PK 중복을 방지한다.
+			// =====================================================
+			sql += "     ?, ";
 			sql += "     ?, ?, ?, ?, ?, ?, ?, ";
 			sql += "     SYSDATE, ";
 			sql += "     SYSDATE, ";
@@ -842,6 +882,27 @@ public class InoutDAOImpl implements InoutDAO {
 					conn.prepareStatement(sql);
 
 			int idx = 1;
+
+			pstmt.setInt(
+					idx++,
+					selectNextInoutId(conn));
+
+			// =====================================================
+			// 사용여부 / 상태 기본값 방어코딩
+			// 화면에서 사용여부는 제거했기 때문에 값이 없으면 Y로 저장한다.
+			// 상태가 비어 있으면 완료로 저장한다.
+			// =====================================================
+			if (dto.getUseYn() == null
+					|| dto.getUseYn().trim().equals("")) {
+
+				dto.setUseYn("Y");
+			}
+
+			if (dto.getStatus() == null
+					|| dto.getStatus().trim().equals("")) {
+
+				dto.setStatus("완료");
+			}
 
 			pstmt.setInt(idx++, dto.getEmpId());
 			pstmt.setInt(idx++, dto.getItemId());
@@ -900,6 +961,42 @@ public class InoutDAOImpl implements InoutDAO {
 		return result;
 	}
 
+
+
+	// =============================================================
+	// 입출고 ID 자동 생성
+	// 기존 시퀀스 값이 DB 최대 INOUT_ID보다 작으면
+	// PK_MAT_IO 중복 오류(ORA-00001)가 발생할 수 있다.
+	// 그래서 등록 시점의 MAX(INOUT_ID) + 1 값을 사용한다.
+	// =============================================================
+	private int selectNextInoutId(
+			Connection conn) throws Exception {
+
+		String sql = "";
+
+		sql += " SELECT ";
+		sql += "     NVL(MAX(INOUT_ID), 0) + 1 AS NEXT_INOUT_ID ";
+		sql += " FROM MATERIAL_INOUT ";
+
+		PreparedStatement pstmt =
+			conn.prepareStatement(sql);
+
+		ResultSet rs =
+			pstmt.executeQuery();
+
+		int nextInoutId = 1;
+
+		if (rs.next()) {
+
+			nextInoutId =
+				rs.getInt("NEXT_INOUT_ID");
+		}
+
+		rs.close();
+		pstmt.close();
+
+		return nextInoutId;
+	}
 
 	// =============================================================
 	// 문서순번 자동 생성
@@ -988,15 +1085,60 @@ public class InoutDAOImpl implements InoutDAO {
 			Connection conn,
 			InoutDTO dto) throws Exception {
 
-		if (dto.getStockLocation() == null
-				|| dto.getStockLocation().trim().equals("")) {
+		// =====================================================
+		// 입출고 등록 후 재고조회 페이지에 바로 반영되도록
+		// MATERIAL_INOUT 저장이 성공하면 INVENTORY 현재재고를 같이 갱신한다.
+		//
+		// 핵심 흐름:
+		// 1. 입고(MI)     : 현재재고 + 입고수량
+		// 2. 출고(MO-PROD): 현재재고 - 출고수량
+		// 3. 기존 재고 행이 없고 입고라면 INVENTORY 행을 새로 생성
+		//
+		// 주의:
+		// MATERIAL_INOUT 테이블에는 창고위치 컬럼이 없기 때문에
+		// 화면에서 넘어온 dto.stockLocation을 INVENTORY 갱신 기준으로 사용한다.
+		// 만약 화면에서 창고위치가 비어 오면 기존 INVENTORY의 대표 창고위치를 찾아서 사용한다.
+		// =====================================================
+		String stockLocation =
+			dto.getStockLocation();
+
+		if (stockLocation == null
+				|| stockLocation.trim().equals("")) {
+
+			stockLocation =
+				selectDefaultStockLocation(
+					conn,
+					dto.getItemId());
+
+			dto.setStockLocation(stockLocation);
+		}
+
+		// =====================================================
+		// 창고위치가 끝까지 없으면 재고 갱신 기준이 없으므로
+		// INVENTORY를 잘못 갱신하지 않고 종료한다.
+		// 이 경우 MATERIAL_INOUT 이력은 저장되지만 재고조회 현재재고는 변하지 않는다.
+		// =====================================================
+		if (stockLocation == null
+				|| stockLocation.trim().equals("")) {
+
+			System.out.println(
+				"재고 반영 실패 : 창고위치가 비어 있습니다. ITEM_ID="
+				+ dto.getItemId());
 
 			return;
 		}
 
+		stockLocation =
+			stockLocation.trim();
+
 		int changeQty =
 			dto.getInoutQty();
 
+		// =====================================================
+		// 출고는 재고 차감
+		// 작업지시 자동 투입도 MO-PROD 유형으로 들어오기 때문에
+		// 같은 규칙으로 재고가 차감된다.
+		// =====================================================
 		if ("MO-PROD".equals(dto.getInoutType())) {
 
 			changeQty =
@@ -1025,7 +1167,7 @@ public class InoutDAOImpl implements InoutDAO {
 
 		pstmt.setString(
 			3,
-			dto.getStockLocation());
+			stockLocation);
 
 		int updateCount =
 			pstmt.executeUpdate();
@@ -1033,8 +1175,12 @@ public class InoutDAOImpl implements InoutDAO {
 		pstmt.close();
 
 		// =====================================================
-		// 입고인데 해당 품목 + 창고위치 재고 행이 아직 없으면 새 재고 행을 만든다.
-		// 출고는 기존 재고가 없는 창고에 새 행을 만들지 않는다.
+		// 입고인데 해당 품목 + 창고위치 재고 행이 아직 없으면
+		// INVENTORY에 새 행을 만든다.
+		//
+		// 기존에는 SEQ_INVENTORY_ID.NEXTVAL을 사용했는데
+		// 시퀀스 값과 실제 DB 최대 INVENTORY_ID가 어긋나면 PK 중복 오류가 날 수 있다.
+		// 그래서 여기서는 MAX(INVENTORY_ID) + 1을 사용해서 안정적으로 생성한다.
 		// =====================================================
 		if (updateCount == 0
 				&& "MI".equals(dto.getInoutType())) {
@@ -1050,7 +1196,7 @@ public class InoutDAOImpl implements InoutDAO {
 			insertSql += "     UPDATED_DATE, ";
 			insertSql += "     ITEM_ID ";
 			insertSql += " ) VALUES ( ";
-			insertSql += "     SEQ_INVENTORY_ID.NEXTVAL, ";
+			insertSql += "     ?, ";
 			insertSql += "     ?, ";
 			insertSql += "     ?, ";
 			insertSql += "     ?, ";
@@ -1064,18 +1210,22 @@ public class InoutDAOImpl implements InoutDAO {
 
 			insertPstmt.setInt(
 				1,
+				selectNextInventoryId(conn));
+
+			insertPstmt.setInt(
+				2,
 				dto.getInoutQty());
 
 			insertPstmt.setString(
-				2,
+				3,
 				"자재 입고 자동반영");
 
 			insertPstmt.setString(
-				3,
-				dto.getStockLocation());
+				4,
+				stockLocation);
 
 			insertPstmt.setInt(
-				4,
+				5,
 				dto.getItemId());
 
 			insertPstmt.executeUpdate();
@@ -1084,7 +1234,87 @@ public class InoutDAOImpl implements InoutDAO {
 		}
 	}
 
-	@Override
+	// =============================================================
+	// 품목 기준 대표 창고위치 조회
+	// 입출고 등록 시 창고위치가 비어 넘어온 경우 재고 반영이 누락되지 않도록
+	// 기존 INVENTORY에 있는 가장 최근 창고위치를 가져온다.
+	// =============================================================
+	private String selectDefaultStockLocation(
+			Connection conn,
+			int itemId) throws Exception {
+
+		String stockLocation = "";
+
+		String sql = "";
+
+		sql += " SELECT STOCK_LOCATION ";
+		sql += " FROM ( ";
+		sql += "     SELECT STOCK_LOCATION ";
+		sql += "     FROM INVENTORY ";
+		sql += "     WHERE ITEM_ID = ? ";
+		sql += "     AND STOCK_LOCATION IS NOT NULL ";
+		sql += "     ORDER BY UPDATED_DATE DESC, INVENTORY_ID DESC ";
+		sql += " ) ";
+		sql += " WHERE ROWNUM = 1 ";
+
+		PreparedStatement pstmt =
+			conn.prepareStatement(sql);
+
+		pstmt.setInt(
+			1,
+			itemId);
+
+		ResultSet rs =
+			pstmt.executeQuery();
+
+		if (rs.next()) {
+
+			stockLocation =
+				rs.getString("STOCK_LOCATION");
+		}
+
+		rs.close();
+		pstmt.close();
+
+		return stockLocation;
+	}
+
+	// =============================================================
+	// INVENTORY_ID 자동 생성
+	// INVENTORY 시퀀스가 실제 데이터보다 작을 때 PK 중복이 날 수 있으므로
+	// MAX(INVENTORY_ID) + 1로 새 재고번호를 만든다.
+	// =============================================================
+	private int selectNextInventoryId(
+			Connection conn) throws Exception {
+
+		String sql = "";
+
+		sql += " SELECT ";
+		sql += "     NVL(MAX(INVENTORY_ID), 0) + 1 AS NEXT_INVENTORY_ID ";
+		sql += " FROM INVENTORY ";
+
+		PreparedStatement pstmt =
+			conn.prepareStatement(sql);
+
+		ResultSet rs =
+			pstmt.executeQuery();
+
+		int nextInventoryId = 1;
+
+		if (rs.next()) {
+
+			nextInventoryId =
+				rs.getInt("NEXT_INVENTORY_ID");
+		}
+
+		rs.close();
+		pstmt.close();
+
+		return nextInventoryId;
+	}
+
+
+@Override
 	public List<InoutDTO> selectMaterialLotList(int itemId) {
 
 		List<InoutDTO> list =

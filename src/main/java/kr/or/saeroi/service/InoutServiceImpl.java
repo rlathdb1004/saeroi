@@ -1,6 +1,8 @@
 package kr.or.saeroi.service;
 
 import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 import kr.or.saeroi.dao.InoutDAO;
 import kr.or.saeroi.dao.InoutDAOImpl;
@@ -19,12 +21,34 @@ public class InoutServiceImpl implements InoutService {
 			String startDate,
 			String endDate) {
 
-		return dao.selectInoutList(
+		// =============================================================
+		// 자재입출고 목록 조회
+		// DAO에서 ORDER BY를 걸어도 다른 코드에서 정렬이 바뀔 수 있으므로
+		// Service에서도 INOUT_ID DESC 기준으로 한 번 더 정렬한다.
+		// 등록된 최신 입출고번호가 1페이지 첫 줄에 보이게 하기 위한 처리다.
+		// =============================================================
+		List<InoutDTO> list =
+			dao.selectInoutList(
 				searchType,
 				inoutType,
 				keyword,
 				startDate,
 				endDate);
+
+		Collections.sort(
+			list,
+			new Comparator<InoutDTO>() {
+
+				@Override
+				public int compare(
+						InoutDTO a,
+						InoutDTO b) {
+
+					return b.getInoutId() - a.getInoutId();
+				}
+			});
+
+		return list;
 	}
 
 	// 전체 개수 조회

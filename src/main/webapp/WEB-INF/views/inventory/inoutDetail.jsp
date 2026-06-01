@@ -3,12 +3,54 @@
 <%@ taglib prefix="c"
 	uri="http://java.sun.com/jsp/jstl/core"%>
 
+<%@ taglib prefix="fmt"
+	uri="http://java.sun.com/jsp/jstl/fmt"%>
+
 <%-- =========================================================
 	상세페이지 공통 CSS
 	공통 파일은 건드리지 않고 기존 detail.css 그대로 사용
 ========================================================= --%>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
+
+<%-- =========================================================
+	입출고 상세페이지 전용 보정 CSS
+	공통 CSS 파일은 절대 수정하지 않고, 이 JSP 안에서만 내역서 테이블 폭을 맞춘다.
+========================================================= --%>
+<style>
+	.inout-report-table {
+		table-layout: fixed;
+		width: 100%;
+	}
+
+	.inout-report-table th,
+	.inout-report-table td {
+		white-space: normal;
+		word-break: keep-all;
+		overflow-wrap: anywhere;
+	}
+
+	/* =====================================================
+		LOT 이력추적으로 이동하는 링크 표시
+		공통 CSS는 수정하지 않고 현재 JSP 안에서만 적용한다.
+	===================================================== */
+	.inout-lot-link {
+		color: #0b7a5a;
+		font-weight: 700;
+		text-decoration: none;
+		border-bottom: 1px dotted #0b7a5a;
+		white-space: nowrap;
+	}
+
+	.inout-lot-link::after {
+		content: " ↗";
+		font-size: 12px;
+	}
+
+	.inout-lot-link:hover {
+		color: #075f46;
+	}
+</style>
 
 <div class="detail_page">
 
@@ -200,7 +242,11 @@
 
 				<input type="hidden"
 					name="docNo"
-					value="${inout.docNo}">
+					value="<%-- =====================================================
+						DOC_NO가 비어있는 기존 데이터도 상세페이지에서 입출고번호가 보이도록
+						DTO의 화면 표시용 getter(displayDocNo)를 사용한다.
+					===================================================== --%>
+					${inout.displayDocNo}">
 
 				<input type="hidden"
 					name="docSeq"
@@ -227,7 +273,7 @@
 							<tr>
 
 								<th>입출고번호</th>
-								<td>${inout.docNo}</td>
+								<td>${inout.displayDocNo}</td>
 
 								<th>입출고일자</th>
 
@@ -354,11 +400,11 @@
 								<th>창고위치</th>
 								<td>${inout.stockLocation}</td>
 
-								<th>현재재고</th>
-								<td>${inout.inventoryStock}</td>
+								<th>현재재고/단위</th>
+								<td><fmt:formatNumber value="${inout.inventoryStock}" pattern="#,###" /> ${inout.itemUnit}</td>
 
-								<th>재고단위</th>
-								<td>${inout.itemUnit}</td>
+								<th>상태</th>
+								<td>${inout.status}</td>
 
 							</tr>
 
@@ -394,33 +440,89 @@
 					입출고 내역서
 				</div>
 
-				<table class="detail_info_table">
+				<table class="detail_info_table inout-report-table">
 
 					<tbody>
 
+						<%-- =====================================================
+							팀장님 피드백 반영
+							입출고번호, 특정 날짜, 창고정보가 한눈에 보이도록
+							내역서 형태로 다시 정리한다.
+							문서순번과 사용여부는 화면에서 제외한다.
+						===================================================== --%>
 						<tr>
 
 							<th>입출고번호</th>
-							<td>${inout.docNo}</td>
-
-							<th>상태</th>
-							<td>${inout.status}</td>
+							<td>${inout.displayDocNo}</td>
 
 							<th>입출고일자</th>
 							<td>${inout.inoutDate}</td>
+
+							<th>상태</th>
+							<td>${inout.status}</td>
 
 						</tr>
 
 						<tr>
 
-							<th>사용여부</th>
-							<td>${inout.useYn}</td>
+							<th>입출고구분</th>
+							<td>
+								<c:choose>
+									<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
+									<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
+									<c:otherwise>${inout.inoutType}</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>창고위치</th>
+							<td>${inout.stockLocation}</td>
+
+							<th>LOT번호</th>
+							<td>
+								<a class="inout-lot-link"
+									href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${inout.materialLot}">
+									${inout.materialLot}
+								</a>
+							</td>
+
+						</tr>
+
+						<tr>
+
+							<th>품목명</th>
+							<td>${inout.itemName}</td>
+
+							<th>입출고수량/단위</th>
+							<td><fmt:formatNumber value="${inout.inoutQty}" pattern="#,###" /> ${inout.itemUnit}</td>
+
+							<th>현재재고/단위</th>
+							<td><fmt:formatNumber value="${inout.inventoryStock}" pattern="#,###" /> ${inout.itemUnit}</td>
+
+						</tr>
+
+						<tr>
+
+							<th>거래처명</th>
+							<td>${inout.clientName}</td>
+
+							<th>담당자</th>
+							<td>${inout.clientManager}</td>
+
+							<th>사원번호</th>
+							<td>${inout.empId}</td>
+
+						</tr>
+
+						<tr>
 
 							<th>등록일</th>
 							<td>${inout.createdDate}</td>
 
 							<th>수정일</th>
 							<td>${inout.updatedDate}</td>
+
+							<th>비고</th>
+							<td>${inout.remark}</td>
 
 						</tr>
 
@@ -452,7 +554,7 @@
 						<tr>
 
 							<th>입출고번호</th>
-							<td>${inout.docNo}</td>
+							<td>${inout.displayDocNo}</td>
 
 							<th>입출고일자</th>
 							<td>${inout.inoutDate}</td>
@@ -465,7 +567,12 @@
 						<tr>
 
 							<th>자재 LOT번호</th>
-							<td>${inout.materialLot}</td>
+							<td>
+								<a class="inout-lot-link"
+									href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${inout.materialLot}">
+									${inout.materialLot}
+								</a>
+							</td>
 
 							<th>입출고구분</th>
 
@@ -523,7 +630,7 @@
 							</td>
 
 							<th>입출고수량</th>
-							<td>${inout.inoutQty}</td>
+							<td><fmt:formatNumber value="${inout.inoutQty}" pattern="#,###" /> ${inout.itemUnit}</td>
 
 							<th>단위</th>
 							<td>${inout.itemUnit}</td>
@@ -556,11 +663,11 @@
 							<th>창고위치</th>
 							<td>${inout.stockLocation}</td>
 
-							<th>현재재고</th>
-							<td>${inout.inventoryStock}</td>
+							<th>현재재고/단위</th>
+							<td><fmt:formatNumber value="${inout.inventoryStock}" pattern="#,###" /> ${inout.itemUnit}</td>
 
-							<th>재고단위</th>
-							<td>${inout.itemUnit}</td>
+								<th>상태</th>
+								<td>${inout.status}</td>
 
 						</tr>
 
@@ -589,33 +696,89 @@
 					입출고 내역서
 				</div>
 
-				<table class="detail_info_table">
+				<table class="detail_info_table inout-report-table">
 
 					<tbody>
 
+						<%-- =====================================================
+							팀장님 피드백 반영
+							입출고번호, 특정 날짜, 창고정보가 한눈에 보이도록
+							내역서 형태로 다시 정리한다.
+							문서순번과 사용여부는 화면에서 제외한다.
+						===================================================== --%>
 						<tr>
 
 							<th>입출고번호</th>
-							<td>${inout.docNo}</td>
-
-							<th>상태</th>
-							<td>${inout.status}</td>
+							<td>${inout.displayDocNo}</td>
 
 							<th>입출고일자</th>
 							<td>${inout.inoutDate}</td>
+
+							<th>상태</th>
+							<td>${inout.status}</td>
 
 						</tr>
 
 						<tr>
 
-							<th>사용여부</th>
-							<td>${inout.useYn}</td>
+							<th>입출고구분</th>
+							<td>
+								<c:choose>
+									<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
+									<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
+									<c:otherwise>${inout.inoutType}</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>창고위치</th>
+							<td>${inout.stockLocation}</td>
+
+							<th>LOT번호</th>
+							<td>
+								<a class="inout-lot-link"
+									href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${inout.materialLot}">
+									${inout.materialLot}
+								</a>
+							</td>
+
+						</tr>
+
+						<tr>
+
+							<th>품목명</th>
+							<td>${inout.itemName}</td>
+
+							<th>입출고수량/단위</th>
+							<td><fmt:formatNumber value="${inout.inoutQty}" pattern="#,###" /> ${inout.itemUnit}</td>
+
+							<th>현재재고/단위</th>
+							<td><fmt:formatNumber value="${inout.inventoryStock}" pattern="#,###" /> ${inout.itemUnit}</td>
+
+						</tr>
+
+						<tr>
+
+							<th>거래처명</th>
+							<td>${inout.clientName}</td>
+
+							<th>담당자</th>
+							<td>${inout.clientManager}</td>
+
+							<th>사원번호</th>
+							<td>${inout.empId}</td>
+
+						</tr>
+
+						<tr>
 
 							<th>등록일</th>
 							<td>${inout.createdDate}</td>
 
 							<th>수정일</th>
 							<td>${inout.updatedDate}</td>
+
+							<th>비고</th>
+							<td>${inout.remark}</td>
 
 						</tr>
 

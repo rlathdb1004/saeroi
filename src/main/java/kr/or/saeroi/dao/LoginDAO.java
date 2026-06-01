@@ -3,6 +3,8 @@ package kr.or.saeroi.dao;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.DataSource;
 
@@ -238,7 +240,7 @@ public class LoginDAO {
         String sql =
             "SELECT EMPNO, EMP_PW, ENAME, DEPT, JOB, HIRE_DATE, " +
             "EMP_TEL, EMAIL, STATUS, ROLE, CREATED_DATE, UPDATED_DATE " +
-            "FROM EMP WHERE EMPNAME = ?";
+            "FROM EMP WHERE ENAME = ?";
 
         try (Connection conn = dataSource.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -270,4 +272,36 @@ public class LoginDAO {
 
         return login;
     }    
+	
+	public List<LoginDTO> emp_list() {
+
+	    List<LoginDTO> list = new ArrayList<>();
+
+	    String sql =
+	        "SELECT EMP_ID, EMPNO, ENAME " +
+	        "FROM EMP " +
+//	        "WHERE STATUS = '재직' " +
+	        "ORDER BY ENAME";
+
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql);
+	         ResultSet rs = ps.executeQuery()) {
+
+	        while (rs.next()) {
+
+	            LoginDTO dto = new LoginDTO();
+	            
+	            dto.setEmp_id(rs.getInt("EMP_ID"));
+	            dto.setEmpno(rs.getString("EMPNO"));
+	            dto.setEname(rs.getString("ENAME"));
+
+	            list.add(dto);
+	        }
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("사원 목록 조회 실패", e);
+	    }
+
+	    return list;
+	}
 }
