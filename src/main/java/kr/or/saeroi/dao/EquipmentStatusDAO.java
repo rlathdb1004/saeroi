@@ -547,12 +547,52 @@ public class EquipmentStatusDAO {
 	    return result;
 	}
 	
+	public EquipmentMaintenanceDTO maintenance_detail(int equip_main_id) {
+		EquipmentMaintenanceDTO dto = null;
+
+	    String sql =
+	        "SELECT m.*, e.ENAME, eq.EQUIP_NAME " +
+	        "FROM EQUIPMENT_MAINTENANCE m " +
+	        "LEFT JOIN emp e ON m.emp_id = e.emp_id " +
+	        "LEFT JOIN equipment eq ON m.equip_id = eq.equip_id " +
+	        "WHERE m.EQUIP_MAIN_ID = ?";
+
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setInt(1, equip_main_id);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+
+	            if (rs.next()) {
+
+	                dto = new EquipmentMaintenanceDTO();
+
+	                dto.setEquip_main_id(rs.getInt("EQUIP_MAIN_ID"));
+	                dto.setEquip_id(rs.getInt("EQUIP_ID"));
+	                dto.setEmp_id(rs.getInt("EMP_ID"));
+	                dto.setEquip_main_type(rs.getString("EQUIP_MAIN_TYPE"));
+	                dto.setEquip_main_content(rs.getString("EQUIP_MAIN_CONTENT"));
+	                dto.setEquip_main_time(rs.getInt("EQUIP_MAIN_TIME"));
+	                dto.setEquip_main_date(rs.getDate("EQUIP_MAIN_DATE"));
+	                dto.setRemark(rs.getString("REMARK"));
+	                dto.setEname(rs.getString("ENAME"));
+	                dto.setEquip_name(rs.getString("EQUIP_NAME"));
+	            }
+	        }
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("설비 정비 이력 상세 조회 실패", e);
+	    }
+
+	    return dto;
+	}
 	
 	public EquipmentTroubleDTO trouble_detail(int trouble_id) {
 		EquipmentTroubleDTO dto = null;
 
 	    String sql =
-	        "SELECT t.*, e.ENAME, eh. eq.EQUIP_NAME " +	        	        
+	        "SELECT t.*, e.ENAME, eq.EQUIP_NAME " +	        	        
 	        "FROM EQUIPMENT_TROUBLE t " +	                
 	        "LEFT JOIN emp e ON t.emp_id = e.emp_id "+	        
 	        "LEFT JOIN equipment eq ON t.equip_id = eq.equip_id " +
@@ -587,6 +627,39 @@ public class EquipmentStatusDAO {
 
 	    return dto;
 	}
+	public int maintenance_update(EquipmentMaintenanceDTO dto) {
+		int result = 0;
+
+	    String sql =
+	        "UPDATE EQUIPMENT_MAINTENANCE " +
+	        "SET EMP_ID = ?, " +
+	        "    EQUIP_MAIN_DATE = ?, " +
+	        "    EQUIP_MAIN_TYPE = ?, " +
+	        "    EQUIP_MAIN_CONTENT = ?, " +
+	        "    EQUIP_MAIN_TIME = ?, " +
+	        "    UPDATED_DATE = SYSDATE, " +
+	        "    REMARK = ? " +	          
+	        "WHERE EQUIP_MAIN_ID = ?";
+
+	    try (
+	        Connection conn = dataSource.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql)
+	    ) {
+
+	    	ps.setInt(1, dto.getEmp_id());
+	    	ps.setDate(2, dto.getEquip_main_date());
+	    	ps.setString(3, dto.getEquip_main_type());
+	    	ps.setString(4, dto.getEquip_main_content());
+	    	ps.setInt(5, dto.getEquip_main_time());
+	    	ps.setString(6, dto.getRemark());
+	    	ps.setInt(7, dto.getEquip_main_id());
+
+	        result = ps.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return result;
+	}
 	
 	public int truoble_update(EquipmentTroubleDTO dto) {
 		int result = 0;
@@ -613,7 +686,7 @@ public class EquipmentStatusDAO {
 	        ps.setString(4, dto.getTrouble_resolve());
 	        ps.setTimestamp(5, dto.getResolve_date());
 	        ps.setString(6, dto.getRemark());
-	        ps.setInt(7, dto.getHistory_id());
+	        ps.setInt(7, dto.getTrouble_id());
 
 	        result = ps.executeUpdate();
 	    } catch (Exception e) {
@@ -621,6 +694,78 @@ public class EquipmentStatusDAO {
 	    }
 	    return result;
 	}
+
+	public int trouble_delete(List<Integer> ids) {
+		int result = 0;
+
+	    StringBuilder sql = new StringBuilder(
+	            "DELETE FROM equipment_trouble WHERE trouble_ID IN ("
+	        );
+
+	    for(int i=0;i<ids.size();i++) {
+
+	        sql.append("?");
+
+	        if(i < ids.size()-1) {
+	            sql.append(",");
+	        }
+	    }
+
+	    sql.append(")");
+
+	    try (
+	        Connection conn = dataSource.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql.toString())
+	    ) {
+
+	        for(int i=0;i<ids.size();i++) {
+	            ps.setInt(i + 1, ids.get(i));
+	        }
+	        result = ps.executeUpdate();
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return result;
+	}
+
+	public int maintenance_delete(List<Integer> ids) {
+		int result = 0;
+
+	    StringBuilder sql = new StringBuilder(
+	            "DELETE FROM equipment_maintenance WHERE EQUIP_MAIN_ID IN ("
+	        );
+
+	    for(int i=0;i<ids.size();i++) {
+
+	        sql.append("?");
+
+	        if(i < ids.size()-1) {
+	            sql.append(",");
+	        }
+	    }
+
+	    sql.append(")");
+
+	    try (
+	        Connection conn = dataSource.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql.toString())
+	    ) {
+
+	        for(int i=0;i<ids.size();i++) {
+	            ps.setInt(i + 1, ids.get(i));
+	        }
+	        result = ps.executeUpdate();
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return result;
+	}
+
+	
+
+	
 
 
 	
