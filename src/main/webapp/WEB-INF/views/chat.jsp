@@ -31,7 +31,6 @@
 /* 	background-color: #357ABD; */
 /* } */
 
-
 /* 령 - 챗봇위치 자유자재로 이동하고자 코드 추가함  */
 /* 챗봇 플로팅 버튼이다. 마우스로 드래그해서 위치를 이동할 수 있다. */
 #chatbot-launcher {
@@ -66,19 +65,16 @@
 	background-color: #357ABD;
 }
 
-
 /* ----------------------------위에 코드까지 추가함 */
-
-
 
 /* 2. 챗봇 채팅창 전체 컨테이너 */
 #chatbot-container {
-/* PC화면에서 정중앙으로 오게 수정  */
-/* 	position: fixed; */
-/* 	bottom: 100px; */
-/* 	right: 30px; */
-/* 	width: 96%; */
-/* 	height: 88%; */
+	/* PC화면에서 정중앙으로 오게 수정  */
+	/* 	position: fixed; */
+	/* 	bottom: 100px; */
+	/* 	right: 30px; */
+	/* 	width: 96%; */
+	/* 	height: 88%; */
 	position: fixed;
 	top: 50%;
 	left: 50%;
@@ -86,7 +82,7 @@
 	bottom: auto;
 	width: min(1100px, calc(100% - 48px));
 	height: min(760px, calc(100vh - 80px));
-/* 	여기위까지 추가함  */
+	/* 	여기위까지 추가함  */
 	background-color: #2f7d62;
 	border-radius: 16px;
 	box-shadow: 0 5px 25px rgba(0, 0, 0, 0.15);
@@ -96,8 +92,8 @@
 	z-index: 1000;
 	/* 시작할 때 숨김 및 올라오는 애니메이션 설정 */
 	opacity: 0;
-/* 	transform: translateY(20px) scale(0.95); */
-/* 위에꺼 주석하고 아래 코드로 변경함 */
+	/* 	transform: translateY(20px) scale(0.95); */
+	/* 위에꺼 주석하고 아래 코드로 변경함 */
 	transform: translate(-50%, -48%) scale(0.95);
 	pointer-events: none;
 	transition: all 0.3s ease;
@@ -335,8 +331,9 @@ launcher.addEventListener('pointerup', function (e) {
         container.classList.remove('active');
         launcher.style.display = 'flex'; // 창이 닫히면 아이콘 다시 표시
     });
-	let param = [];
+    let param = JSON.parse(sessionStorage.getItem('aiChatHistory')) || [];
 	
+//     document.addEventListener
 		
 		 async function message(){
 				let prompt = document.querySelector('#prompt');
@@ -373,12 +370,14 @@ launcher.addEventListener('pointerup', function (e) {
 				chat.innerHTML += "<div class='message-bubble ai'>" + data + "</div>";;
 				chat.scrollTop = chat.scrollHeight;
 				
+				param.push({ role: "model", text: data });
+			    sessionStorage.setItem('aiChatHistory', JSON.stringify(param));
+			    
 				btn.disabled = false;
 			    prompt.disabled = false;
 			    prompt.focus();
 		}
 		
-		document.querySelector('#btn').addEventListener('click', message);
 		
 		document.querySelector('#prompt').addEventListener('keyup',function(e){
 			if (e.isComposing) return;
