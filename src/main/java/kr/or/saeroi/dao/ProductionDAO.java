@@ -440,11 +440,10 @@ public class ProductionDAO {
 	}
 
 	// 공정진행 현황 검색 select box에 사용할 진행상태 목록을 조회한다.
-	// 현재 Mapper에는 별도 상태 목록 쿼리가 없으므로 작업지시 상태 목록을 재사용한다.
 	public List<String> selectProcessProgressStatusList() {
 
 		return sqlSession.selectList(
-				NAMESPACE + "selectWorkOrderStatusList");
+				NAMESPACE + "selectProcessProgressStatusList");
 	}
 
 	// 공정진행 상세 정보를 조회한다.
