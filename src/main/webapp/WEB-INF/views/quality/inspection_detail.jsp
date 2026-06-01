@@ -11,7 +11,7 @@
 <style>
 .inspection_related_grid {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
+	grid-template-columns: 1fr;
 	gap: 16px;
 	margin-top: 16px;
 }
@@ -46,12 +46,11 @@
 .inspection_related_row:hover td {
 	background: #F8FCF9;
 }
-
-@media ( max-width : 1100px) {
-	.inspection_related_grid {
-		grid-template-columns: 1fr;
-	}
-}
+/* .coStatusReady { */
+/*     background-color: #F5F5F5; */
+/*     color: #757575; */
+/*     border: 1px solid #E0E0E0; */
+/* } */
 </style>
 
 <div class="detail_page">
@@ -106,8 +105,7 @@
 						style="vertical-align: -3px; margin-right: 6px;"
 						aria-hidden="true">
 						<path d="M12 20h9"></path>
-						<path
-							d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
 					</svg>
 
 					수정
@@ -159,12 +157,9 @@
 						<td>${inspection.doc_no}</td>
 
 						<th>검사일자</th>
-						<td>
-							<span class="viewMode">${inspection.insp_date}</span>
-							<input type="date" name="insp_date"
-								class="detailInput editMode"
-								value="${inspection.insp_date}" style="display: none;"
-								required>
+						<td><span class="viewMode">${inspection.insp_date}</span> <input
+							type="date" name="insp_date" class="detailInput editMode"
+							value="${inspection.insp_date}" style="display: none;" required>
 						</td>
 
 						<th>검사상태</th>
@@ -179,79 +174,68 @@
 						<td>${inspection.dept}</td>
 
 						<th>검사결과</th>
-						<td>
-							<span class="viewMode">
-								<c:choose>
+						<td><span class="viewMode"> <c:choose>
 									<c:when test="${inspection.result == '조건부'}">
 										<span class="coStatus coStatusStop">${inspection.result}</span>
+									</c:when>
+									<c:when test="${inspection.result == '대기'}">
+										<span class="coStatus coStatusUse">${inspection.result}</span>
 									</c:when>
 									<c:otherwise>
 										<span class="coStatus coStatusUse">${inspection.result}</span>
 									</c:otherwise>
 								</c:choose>
-							</span>
-
-							<select name="result" class="detailInput editMode"
-								style="display: none;" required>
+						</span> <select name="result" class="detailInput editMode"
+							style="display: none;" required>
 								<option value="합격"
 									<c:if test="${inspection.result == '합격'}">selected</c:if>>합격</option>
 								<option value="조건부"
 									<c:if test="${inspection.result == '조건부'}">selected</c:if>>조건부</option>
-							</select>
-						</td>
+						</select></td>
 					</tr>
 
-					<tr>
-						<th>검사구분</th>
-						<td>
-							<span class="viewMode">${inspection.insp_type}</span>
-							<select name="insp_type" class="detailInput editMode"
-								style="display: none;" required>
-								<option value="외관검사"
-									<c:if test="${inspection.insp_type == '외관검사'}">selected</c:if>>외관검사</option>
-								<option value="치수검사"
-									<c:if test="${inspection.insp_type == '치수검사'}">selected</c:if>>치수검사</option>
-								<option value="품질판정"
-									<c:if test="${inspection.insp_type == '품질판정'}">selected</c:if>>품질판정</option>
-								<option value="재검사"
-									<c:if test="${inspection.insp_type == '재검사'}">selected</c:if>>재검사</option>
-								<option value="수입검사"
-									<c:if test="${inspection.insp_type == '수입검사'}">selected</c:if>>수입검사</option>
-								<option value="공정검사"
-									<c:if test="${inspection.insp_type == '공정검사'}">selected</c:if>>공정검사</option>
-								<option value="최종검사"
-									<c:if test="${inspection.insp_type == '최종검사'}">selected</c:if>>최종검사</option>
-							</select>
-						</td>
 
+					<!-- 						<th>검사구분</th> -->
+					<!-- 						<td> -->
+					<%-- 							<span class="viewMode">${inspection.insp_type}</span> --%>
+					<!-- 							<select name="insp_type" class="detailInput editMode" -->
+					<!-- 								style="display: none;" required> -->
+					<!-- 								<option value="외관검사" -->
+					<%-- 									<c:if test="${inspection.insp_type == '외관검사'}">selected</c:if>>외관검사</option> --%>
+					<!-- 								<option value="치수검사" -->
+					<%-- 									<c:if test="${inspection.insp_type == '치수검사'}">selected</c:if>>치수검사</option> --%>
+					<!-- 								<option value="품질판정" -->
+					<%-- 									<c:if test="${inspection.insp_type == '품질판정'}">selected</c:if>>품질판정</option> --%>
+					<!-- 								<option value="재검사" -->
+					<%-- 									<c:if test="${inspection.insp_type == '재검사'}">selected</c:if>>재검사</option> --%>
+					<!-- 								<option value="수입검사" -->
+					<%-- 									<c:if test="${inspection.insp_type == '수입검사'}">selected</c:if>>수입검사</option> --%>
+					<!-- 								<option value="공정검사" -->
+					<%-- 									<c:if test="${inspection.insp_type == '공정검사'}">selected</c:if>>공정검사</option> --%>
+					<!-- 								<option value="최종검사" -->
+					<%-- 									<c:if test="${inspection.insp_type == '최종검사'}">selected</c:if>>최종검사</option> --%>
+					<!-- 							</select> -->
+					<!-- 						</td> -->
+
+					<tr>
 						<th>검사수량</th>
-						<td>
-							<span class="viewMode">${inspection.inspection_qty}${inspection.item_unit}</span>
+						<td><span class="viewMode">${inspection.inspection_qty}${inspection.item_unit}</span>
 							<input type="number" name="inspection_qty"
-								class="detailInput editMode"
-								value="${inspection.inspection_qty}" min="0"
-								style="display: none;" required>
-						</td>
+							class="detailInput editMode" value="${inspection.inspection_qty}"
+							min="0" style="display: none;" required></td>
 
 						<th>양품수량</th>
-						<td>
-							<span class="viewMode">${inspection.good_qty}${inspection.item_unit}</span>
-							<input type="number" name="good_qty"
-								class="detailInput editMode"
-								value="${inspection.good_qty}" min="0"
-								style="display: none;" required>
-						</td>
-					</tr>
+						<td><span class="viewMode">${inspection.good_qty}${inspection.item_unit}</span>
+							<input type="number" name="good_qty" class="detailInput editMode"
+							value="${inspection.good_qty}" min="0" style="display: none;"
+							required></td>
 
-					<tr>
 						<th>비고</th>
-						<td colspan="5">
-							<span class="viewMode">${inspection.remark}</span>
-							<input type="text" name="remark"
-								class="detailInput editMode"
-								value="${inspection.remark}" style="display: none;">
-						</td>
+						<td><span class="viewMode">${inspection.remark}</span> <input
+							type="text" name="remark" class="detailInput editMode"
+							value="${inspection.remark}" style="display: none;"></td>
 					</tr>
+					<tr>
 				</tbody>
 			</table>
 

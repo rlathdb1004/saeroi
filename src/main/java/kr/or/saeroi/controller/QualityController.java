@@ -221,6 +221,8 @@ public class QualityController {
 		int updateResult = qualityService._ser_update_Inspection(insp_id, insp_date, insp_type, result, inspection_qty,
 				good_qty, remark);
 		System.out.println("inspection update_result: " + updateResult);
+		// 결과 변경 시 defect_list / defect_action use_yn 동기화
+		qualityService._ser_update_Defect_UseYn_ByInspection(insp_id, result);
 
 		return "redirect:/quality/inspection_detail?insp_id=" + insp_id;
 	}
@@ -390,35 +392,31 @@ public class QualityController {
 	}
 
 	private String saveDefectPhoto(MultipartFile defectPhotoFile, HttpServletRequest request) throws IOException {
-		if (defectPhotoFile == null || defectPhotoFile.isEmpty()) {
-			return null;
-		}
+	    if (defectPhotoFile == null || defectPhotoFile.isEmpty()) {
+	        return null;
+	    }
 
-		String originalFilename = defectPhotoFile.getOriginalFilename();
-		String extension = "";
+	    String originalFilename = defectPhotoFile.getOriginalFilename();
+	    String extension = "";
 
-		if (originalFilename != null && originalFilename.lastIndexOf(".") >= 0) {
-			extension = originalFilename.substring(originalFilename.lastIndexOf("."));
-		}
+	    if (originalFilename != null && originalFilename.lastIndexOf(".") >= 0) {
+	        extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+	    }
 
-		String uploadRelativePath = "/resources/upload/defect/";
-		String uploadRealPath = request.getServletContext().getRealPath(uploadRelativePath);
+	    String uploadRealPath = "C:/team3/upload/defect/";
+	    String uploadRelativePath = "/upload/defect/";
 
-		if (uploadRealPath == null) {
-			throw new IOException("업로드 경로를 찾을 수 없습니다.");
-		}
+	    File uploadDir = new File(uploadRealPath);
 
-		File uploadDir = new File(uploadRealPath);
+	    if (!uploadDir.exists()) {
+	        uploadDir.mkdirs();
+	    }
 
-		if (!uploadDir.exists()) {
-			uploadDir.mkdirs();
-		}
+	    String savedFilename = "defect_" + UUID.randomUUID().toString().replace("-", "") + extension;
+	    File savedFile = new File(uploadDir, savedFilename);
+	    defectPhotoFile.transferTo(savedFile);
 
-		String savedFilename = "defect_" + UUID.randomUUID().toString().replace("-", "") + extension;
-		File savedFile = new File(uploadDir, savedFilename);
-		defectPhotoFile.transferTo(savedFile);
-
-		return uploadRelativePath + savedFilename;
+	    return uploadRelativePath + savedFilename;
 	}
 
 	private boolean hasText(String value) {
