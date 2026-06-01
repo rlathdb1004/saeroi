@@ -139,4 +139,13 @@ public class ChartDAOImpl implements ChartDAO{
 		return list;
 	}
 	
+	// 대시보드 현장 이슈와 LOT 간략 목록을 조회한다.
+	@Override
+	public List<Map<String, Object>> dashboardDetailList(Map<String, Object> param) {
+		List<Map<String, Object>> list =
+				sqlSession.selectList("mapper.chart.select_dashboard_detail_list", param);
+
+		return list;
+	}
+	
 }

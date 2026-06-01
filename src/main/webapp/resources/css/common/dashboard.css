@@ -2912,3 +2912,145 @@
 		width: 100%;
 	}
 }
+
+/* 현장 이슈와 LOT 카드 클릭 가능 표시이다. */
+.dashboard-page .dash-dashboard-detail-click {
+	cursor: pointer;
+	transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* 현장 이슈와 LOT 카드 hover 상태이다. */
+.dashboard-page .dash-dashboard-detail-click:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+/* 현장 이슈와 LOT 모달 배경이다. */
+.dashboard-page .dash-dashboard-detail-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	background-color: rgba(15, 23, 42, 0.45);
+}
+
+/* 현장 이슈와 LOT 모달 열림 상태이다. */
+.dashboard-page .dash-dashboard-detail-modal-backdrop.is-open {
+	display: flex;
+}
+
+/* 현장 이슈와 LOT 모달 박스이다. */
+.dashboard-page .dash-dashboard-detail-modal {
+	width: min(940px, 100%);
+	max-height: 86vh;
+	overflow: hidden;
+	border-radius: 18px;
+	background-color: #FFFFFF;
+	box-shadow: 0 24px 70px rgba(15, 23, 42, 0.22);
+}
+
+/* 현장 이슈와 LOT 모달 헤더이다. */
+.dashboard-page .dash-dashboard-detail-modal-head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 18px;
+	padding: 24px 28px 18px;
+	border-bottom: 1px solid #E5E7EB;
+}
+
+/* 현장 이슈와 LOT 모달 제목이다. */
+.dashboard-page .dash-dashboard-detail-modal-head h3 {
+	margin: 0;
+	font-size: 22px;
+	font-weight: 900;
+	color: #111827;
+}
+
+/* 현장 이슈와 LOT 모달 설명이다. */
+.dashboard-page .dash-dashboard-detail-modal-head p {
+	margin: 7px 0 0;
+	font-size: 13px;
+	font-weight: 700;
+	color: #6B7280;
+}
+
+/* 현장 이슈와 LOT 모달 닫기 버튼이다. */
+.dashboard-page .dash-dashboard-detail-modal-close {
+	width: 34px;
+	height: 34px;
+	border: 0;
+	border-radius: 50%;
+	background-color: #F3F4F6;
+	color: #111827;
+	font-size: 24px;
+	font-weight: 700;
+	line-height: 1;
+	cursor: pointer;
+}
+
+/* 현장 이슈와 LOT 모달 본문이다. */
+.dashboard-page .dash-dashboard-detail-modal-body {
+	padding: 22px 28px 28px;
+	overflow-x: auto;
+}
+
+/* 현장 이슈와 LOT 모달 테이블이다. */
+.dashboard-page .dash-dashboard-detail-table {
+	width: 100%;
+	min-width: 760px;
+	border-collapse: collapse;
+	table-layout: fixed;
+}
+
+/* 현장 이슈와 LOT 모달 셀이다. */
+.dashboard-page .dash-dashboard-detail-table th,
+.dashboard-page .dash-dashboard-detail-table td {
+	height: 48px;
+	padding: 0 12px;
+	border-bottom: 1px solid #E5E7EB;
+	font-size: 13px;
+	font-weight: 800;
+	text-align: center;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+/* 현장 이슈와 LOT 모달 헤더 셀이다. */
+.dashboard-page .dash-dashboard-detail-table th {
+	background-color: #F9FAFB;
+	color: #374151;
+	font-weight: 900;
+}
+
+/* 현장 이슈와 LOT 상세 버튼이다. */
+.dashboard-page .dash-dashboard-detail-link {
+	height: 32px;
+	padding: 0 14px;
+	border: 1px solid #1F7A57;
+	border-radius: 999px;
+	background-color: #FFFFFF;
+	color: #1F7A57;
+	font-size: 12px;
+	font-weight: 900;
+	cursor: pointer;
+}
+
+/* 현장 이슈와 LOT 상세 버튼 hover 상태이다. */
+.dashboard-page .dash-dashboard-detail-link:hover {
+	background-color: #F0F9F5;
+}
+
+/* 현장 이슈와 LOT 모달 행 클릭 가능 표시이다. */
+.dashboard-page .dash-dashboard-detail-row {
+	cursor: pointer;
+}
+
+/* 현장 이슈와 LOT 모달 행 hover 상태이다. */
+.dashboard-page .dash-dashboard-detail-row:hover td {
+	background-color: #F9FAFB;
+}

@@ -557,7 +557,7 @@
 			</c:if>
 
 			<c:if test="${dashTroubleIssueYn eq 'Y'}">
-				<div class="dash-alert-card">
+	<div class="dash-alert-card dash-dashboard-detail-click" data-detail-type="equipmentIssue">
 					<div class="dash-alert-text">
 						<div class="dash-alert-title-row">
 							<strong>설비 고장</strong>
@@ -572,7 +572,7 @@
 			</c:if>
 
 			<c:if test="${dashDelayIssueYn eq 'Y'}">
-				<div class="dash-alert-card dash-alert-orange">
+	<div class="dash-alert-card dash-alert-orange dash-dashboard-detail-click" data-detail-type="delayLot">
 					<div class="dash-alert-text">
 						<div class="dash-alert-title-row">
 							<strong>지연 작업지시</strong>
@@ -588,8 +588,8 @@
 		</div>
 
 		<div class="dash-lot-row">
-			<div class="dash-lot-box"
-				onclick="location.href='${pageContext.request.contextPath}/lot/lothistory'">
+			<div class="dash-lot-box dash-dashboard-detail-click"
+				data-detail-type="delayLot">
 				<span class="dash-lot-icon dash-lot-red-icon"> <svg
 						viewBox="0 0 24 24" aria-hidden="true">
 				<circle cx="12" cy="12" r="9"></circle>
@@ -598,7 +598,7 @@
 				</span>
 
 				<div class="dash-lot-info">
-					<span>지연 LOT</span> <strong class="dash-red-text"> <c:choose>
+					<span>생산지연 LOT</span> <strong class="dash-red-text"> <c:choose>
 							<c:when test="${empty dashDelayLotCount}">
 						0
 					</c:when>
@@ -612,8 +612,8 @@
 				<em class="dash-lot-arrow">›</em>
 			</div>
 
-			<div class="dash-lot-box"
-				onclick="location.href='${pageContext.request.contextPath}/lot/lothistory'">
+			<div class="dash-lot-box dash-dashboard-detail-click"
+				data-detail-type="inspectionWaitLot">
 				<span class="dash-lot-icon dash-lot-orange-icon"> <svg
 						viewBox="0 0 24 24" aria-hidden="true">
 				<path d="M8 3H16"></path>
@@ -641,8 +641,8 @@
 				<em class="dash-lot-arrow">›</em>
 			</div>
 
-			<div class="dash-lot-box"
-				onclick="location.href='${pageContext.request.contextPath}/lot/lothistory'">
+			<div class="dash-lot-box dash-dashboard-detail-click"
+				data-detail-type="shipmentWaitLot">
 				<span class="dash-lot-icon dash-lot-blue-icon"> <svg
 						viewBox="0 0 24 24" aria-hidden="true">
 				<path d="M21 8L12 3L3 8L12 13L21 8Z"></path>
@@ -671,6 +671,42 @@
 
 	</section>
 
+	<%-- 현장 이슈와 LOT 간략 목록 모달 영역이다. --%>
+	<div class="dash-dashboard-detail-modal-backdrop"
+		id="dashDashboardDetailModalBackdrop">
+		<div class="dash-dashboard-detail-modal">
+
+			<div class="dash-dashboard-detail-modal-head">
+				<div>
+					<h3 id="dashDashboardDetailModalTitle">상세 목록</h3>
+					<p id="dashDashboardDetailModalDesc">선택한 항목의 간략 목록을 조회한다.</p>
+				</div>
+
+				<button type="button" class="dash-dashboard-detail-modal-close"
+					id="dashDashboardDetailModalClose">×</button>
+			</div>
+
+			<div class="dash-dashboard-detail-modal-body">
+				<table class="dash-dashboard-detail-table">
+					<thead id="dashDashboardDetailThead">
+						<tr>
+							<th>항목</th>
+							<th>내용</th>
+							<th>상태</th>
+							<th>상세</th>
+						</tr>
+					</thead>
+
+					<tbody id="dashDashboardDetailTbody">
+						<tr>
+							<td colspan="4">조회 중입니다.</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+
+		</div>
+	</div>
 
 	<%-- 주요 운영 지표 추이 영역이다. --%>
 	<section class="dash-chart-panel">
@@ -2889,7 +2925,7 @@
 			const date = String(today.getDate()).padStart(2, '0');
 
 			return year + '-' + month + '-' + date;
-		}script
+		}
 
 		function moveDate(dateText, day) {
 			const date = new Date(dateText);
@@ -2900,6 +2936,290 @@
 			const targetDate = String(date.getDate()).padStart(2, '0');
 
 			return year + '-' + month + '-' + targetDate;
+		}
+	})();
+	
+	(function() {
+		const contextPath = '${pageContext.request.contextPath}';
+
+		const detailItems = document.querySelectorAll('.dash-dashboard-detail-click');
+		const detailBackdrop = document.getElementById('dashDashboardDetailModalBackdrop');
+		const detailClose = document.getElementById('dashDashboardDetailModalClose');
+		const detailTitle = document.getElementById('dashDashboardDetailModalTitle');
+		const detailDesc = document.getElementById('dashDashboardDetailModalDesc');
+		const detailThead = document.getElementById('dashDashboardDetailThead');
+		const detailTbody = document.getElementById('dashDashboardDetailTbody');
+
+		const detailConfig = {
+			defectIssue: {
+				title: '불량 경고 상세',
+				desc: '금일 발생한 불량 LOT를 간략하게 조회한다.',
+				head: ['LOT번호', '품목명', '불량유형', '불량수량', '발생일', '상세'],
+				fields: [
+					{ key: 'PRODUCT_LOT' },
+					{ key: 'ITEM_NAME' },
+					{ key: 'DEFECT_NAME' },
+					{ key: 'DEFECT_QTY', suffix: ' EA', danger: true, number: true },
+					{ key: 'DEFECT_DATE' }
+				]
+			},
+			equipmentIssue: {
+				title: '설비 고장 상세',
+				desc: '현재 미조치 상태인 설비 고장 내역을 조회한다.',
+				head: ['설비명', '고장내용', '발생일시', '상태', '상세'],
+				fields: [
+					{ key: 'EQUIP_NAME' },
+					{ key: 'TROUBLE_CONTENT' },
+					{ key: 'TROUBLE_DATE' },
+					{ key: 'TROUBLE_STATUS', danger: true }
+				]
+			},
+			delayLot: {
+				title: '생산지연 LOT 상세',
+				desc: '납기일이 당일 또는 경과되었지만 생산이 완료되지 않은 LOT를 조회한다.',
+				head: ['LOT번호', '품목명', '납기일', '잔여수량', '현재상태', '상세'],
+				fields: [
+					{ key: 'PRODUCT_LOT' },
+					{ key: 'ITEM_NAME' },
+					{ key: 'DUE_DATE' },
+					{ key: 'REMAIN_QTY', suffix: ' EA', danger: true, number: true },
+					{ key: 'DELAY_STATUS', danger: true }
+				]
+			},
+			inspectionWaitLot: {
+				title: '검사대기 LOT 상세',
+				desc: '검사 대기 상태인 LOT를 조회한다.',
+				head: ['LOT번호', '품목명', '검사번호', '검사일', '상태', '상세'],
+				fields: [
+					{ key: 'PRODUCT_LOT' },
+					{ key: 'ITEM_NAME' },
+					{ key: 'INSP_DOC_NO' },
+					{ key: 'INSP_DATE' },
+					{ key: 'INSP_STATUS', warning: true }
+				]
+			},
+			shipmentWaitLot: {
+				title: '완제품 출하대기 LOT 상세',
+				desc: '검사는 완료되었지만 아직 출하되지 않은 LOT를 조회한다.',
+				head: ['LOT번호', '품목명', '입고일', '상태', '상세'],
+				fields: [
+					{ key: 'PRODUCT_LOT' },
+					{ key: 'ITEM_NAME' },
+					{ key: 'INOUT_DATE' },
+					{ key: 'SHIP_STATUS', info: true }
+				]
+			}
+		};
+
+		detailItems.forEach(function(item) {
+			item.addEventListener('click', function(event) {
+				event.preventDefault();
+				event.stopPropagation();
+
+				const detailType = item.dataset.detailType;
+
+				if (!detailConfig[detailType]) {
+					return;
+				}
+
+				openDetailModal();
+				setDetailLoading(detailType);
+				loadDashboardDetailList(detailType);
+			});
+		});
+
+		if (detailClose) {
+			detailClose.addEventListener('click', closeDetailModal);
+		}
+
+		if (detailBackdrop) {
+			detailBackdrop.addEventListener('click', function(event) {
+				if (event.target === detailBackdrop) {
+					closeDetailModal();
+				}
+			});
+		}
+
+		function openDetailModal() {
+			detailBackdrop.classList.add('is-open');
+		}
+
+		function closeDetailModal() {
+			detailBackdrop.classList.remove('is-open');
+		}
+
+		function setDetailLoading(detailType) {
+			const config = detailConfig[detailType];
+
+			detailTitle.textContent = config.title;
+			detailDesc.textContent = config.desc;
+			renderDetailHead(config.head);
+
+			detailTbody.innerHTML = '<tr><td colspan="' + config.head.length + '">조회 중입니다.</td></tr>';
+		}
+
+		function loadDashboardDetailList(detailType) {
+			fetch(contextPath + '/dashboard/detail/list?detailType=' + encodeURIComponent(detailType))
+				.then(function(response) {
+					return response.json();
+				})
+				.then(function(data) {
+					if (!data || !data.success) {
+						setDetailError(detailType);
+						return;
+					}
+
+					renderDashboardDetailList(detailType, data.detailList || []);
+				})
+				.catch(function() {
+					setDetailError(detailType);
+				});
+		}
+
+		function renderDetailHead(headList) {
+			let html = '<tr>';
+
+			headList.forEach(function(head) {
+				html += '<th>' + head + '</th>';
+			});
+
+			html += '</tr>';
+			detailThead.innerHTML = html;
+		}
+
+		function renderDashboardDetailList(detailType, list) {
+			const config = detailConfig[detailType];
+
+			if (!list || list.length === 0) {
+				detailTbody.innerHTML =
+					'<tr><td colspan="' + config.head.length + '">조회된 데이터가 없습니다.</td></tr>';
+				return;
+			}
+
+			let html = '';
+
+			list.forEach(function(row) {
+				const detailUrl = buildDetailUrl(detailType, row);
+
+				html += '<tr class="dash-dashboard-detail-row" data-url="' + escapeHtml(detailUrl) + '">';
+
+				config.fields.forEach(function(field) {
+					const value = getDetailValue(row, field.key);
+					const text = formatDetailCell(value, field);
+					const className = getDetailCellClass(field);
+
+					html += '<td class="' + className + '" title="' + escapeHtml(text) + '">' + escapeHtml(text) + '</td>';
+				});
+
+				html += '<td><button type="button" class="dash-dashboard-detail-link" data-url="' + escapeHtml(detailUrl) + '">상세</button></td>';
+				html += '</tr>';
+			});
+
+			detailTbody.innerHTML = html;
+			bindDetailButtons();
+		}
+
+		function buildDetailUrl(detailType, row) {
+			if (detailType === 'defectIssue') {
+				return contextPath + '/quality/defect_detail?defect_list_id='
+					+ encodeURIComponent(getDetailValue(row, 'DEFECT_LIST_ID'));
+			}
+
+			if (detailType === 'equipmentIssue') {
+				const historyId = getDetailValue(row, 'HISTORY_ID');
+
+				if (historyId) {
+					return contextPath + '/equipment/equipmentstatus/detail?history_id='
+						+ encodeURIComponent(historyId);
+				}
+
+				return contextPath + '/equipment/equipmentstatus';
+			}
+
+			return contextPath + '/lot/lothistory/detail?orderId='
+				+ encodeURIComponent(getDetailValue(row, 'ORDER_ID'));
+		}
+
+		function bindDetailButtons() {
+			const rows = detailTbody.querySelectorAll('.dash-dashboard-detail-row');
+
+			rows.forEach(function(row) {
+				row.addEventListener('click', function() {
+					const url = row.dataset.url;
+
+					if (url) {
+						location.href = url;
+					}
+				});
+			});
+
+			const buttons = detailTbody.querySelectorAll('.dash-dashboard-detail-link');
+
+			buttons.forEach(function(button) {
+				button.addEventListener('click', function(event) {
+					event.stopPropagation();
+
+					const url = button.dataset.url;
+
+					if (url) {
+						location.href = url;
+					}
+				});
+			});
+		}
+
+		function setDetailError(detailType) {
+			const config = detailConfig[detailType];
+
+			detailTbody.innerHTML =
+				'<tr><td colspan="' + config.head.length + '">데이터 조회 중 오류가 발생했습니다.</td></tr>';
+		}
+
+		function getDetailCellClass(field) {
+			if (field.danger) {
+				return 'dash-red-text';
+			}
+
+			if (field.warning) {
+				return 'dash-orange-text';
+			}
+
+			if (field.info) {
+				return 'dash-blue-text';
+			}
+
+			return '';
+		}
+
+		function formatDetailCell(value, field) {
+			if (value === null || value === undefined || value === '') {
+				return '-';
+			}
+
+			if (field.number) {
+				return Number(value || 0).toLocaleString('ko-KR') + (field.suffix || '');
+			}
+
+			return String(value) + (field.suffix || '');
+		}
+
+		function getDetailValue(row, key) {
+			return row[key] || row[key.toLowerCase()] || row[toDetailCamelCase(key)] || '';
+		}
+
+		function toDetailCamelCase(key) {
+			return key.toLowerCase().replace(/_([a-z])/g, function(match, letter) {
+				return letter.toUpperCase();
+			});
+		}
+
+		function escapeHtml(value) {
+			return String(value || '')
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#039;');
 		}
 	})();
 </script>
