@@ -86,6 +86,7 @@ const inspectionType = document.querySelector('#modal_insert [name="insp_type"]'
 const inspectionResult = document.querySelector('#modal_insert [name="result"]');
 const RESULT_PASS = '합격';
 const RESULT_CONDITIONAL = '조건부';
+const RESULT_WAIT = '대기';
 
 if (inspectionType) {
     inspectionType.innerHTML = '';
@@ -101,6 +102,10 @@ if (inspectionResult) {
     inspectionResult.innerHTML += '<option value="">선택</option>';
     inspectionResult.innerHTML += '<option value="' + RESULT_PASS + '">' + RESULT_PASS + '</option>';
     inspectionResult.innerHTML += '<option value="' + RESULT_CONDITIONAL + '">' + RESULT_CONDITIONAL + '</option>';
+    inspectionResult.innerHTML += '<option value="' + RESULT_WAIT + '">' + RESULT_WAIT + '</option>';
+}
+function isWaitResult() {
+    return inspectionResult && inspectionResult.value === RESULT_WAIT;
 }
 
 let productionOptions = null;
@@ -333,6 +338,9 @@ function isPassResult() {
 function isConditionalResult() {
     return inspectionResult && inspectionResult.value === RESULT_CONDITIONAL;
 }
+function isWaitResult() {
+    return inspectionResult && inspectionResult.value === RESULT_WAIT;
+}
 
 function setInspectionQtyError(message) {
     if (!inspectionQtyError) {
@@ -358,7 +366,9 @@ function validateInspectionQuantity() {
     const defectQty = hasDefect && hasDefect.checked && !hasDefect.disabled ? toNumber(inspectionDefectQty) : 0;
     let errorMessage = '';
 
-    if (prodQty > 0 && goodQty + defectQty > prodQty) {
+        if (isWaitResult()) {
+        // 대기는 수량 검증 없음
+    } else if (prodQty > 0 && goodQty + defectQty > prodQty) {
         errorMessage = '생산 수량을 초과 할 수 없습니다.';
     } else if (isPassResult() && prodQty > 0 && goodQty !== prodQty) {
         errorMessage = '합격은 생산수량 전체가 양품수량이어야 합니다.';
@@ -386,14 +396,24 @@ function updateDefectCheckboxByResult() {
         return;
     }
 
-    if (isPassResult()) {
+      if (isPassResult()) {
         hasDefect.checked = false;
         hasDefect.disabled = true;
     } else if (isConditionalResult()) {
         hasDefect.checked = true;
         hasDefect.disabled = false;
+    } else if (isWaitResult()) {
+        hasDefect.checked = false;
+        hasDefect.disabled = true;
+        if (inspectionGoodQty) {
+            inspectionGoodQty.value = 0;
+            inspectionGoodQty.readOnly = true;
+        }
     } else {
         hasDefect.disabled = false;
+        if (inspectionGoodQty) {
+            inspectionGoodQty.readOnly = false;
+        }
     }
 
     toggleInspectionDefectArea();

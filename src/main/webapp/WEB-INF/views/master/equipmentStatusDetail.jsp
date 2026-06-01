@@ -138,10 +138,12 @@
 
 									<tr>
 										<th>계획 가동 시간</th>
-										<td>${eqp.plan_time_min}</td>
+										<td>
+											<input type="number" name="plan_time_min" value="${eqp.plan_time_min}">
+										</td>
 										<th>가동 시간</th>
 										<td>
-											<input type="number" name="runtime_min" value="${eqp.runtime_min}">
+											<input type="number" name="runtime_min" value="${eqp.runtime_min}" readonly>
 										</td>
 										<th>비가동 시간</th>
 										<td>
@@ -237,7 +239,7 @@
 											<th>정비자</th>
 											<th>정비 시간</th>
 											<th>비고</th>
-											
+
 										</tr>
 
 										<c:forEach var="m" items="${maintenanceList}">
@@ -308,7 +310,7 @@
 														pattern="yyyy-MM-dd HH:mm" />
 												</td>
 												<td>${t.ename}</td>
-												<td>${t.trouble_resolve}</td>												
+												<td>${t.trouble_resolve}</td>
 												<td>
 													<c:if test="${not empty t.resolve_date}">
 														<fmt:formatDate value="${t.resolve_date}"
@@ -507,16 +509,19 @@
 			</div>
 
 			<script>
-				const planTime = ${ eqp.plan_time_min };
+				const plantime = document.querySelector("input[name='plan_time_min']")
+				const downtime = document.querySelector("input[name='downtime_min']")
+				const runtime = document.querySelector("input[name='runtime_min']")
 
-				const downtime = document.querySelector("input[name='downtime_min']");
-				const runtime = document.querySelector("input[name='runtime_min']");
-
-				if (downtime && runtime) {
+				if (plantime && downtime) {
 					function calcRuntime() {
+						const p = Number(plantime.value) || 0;
 						const d = Number(downtime.value) || 0;
-						runtime.value = Math.max(0, planTime - d);
+
+						runtime.value = Math.max(0, p - d);
 					}
+					plantime.addEventListener("input", calcRuntime);
 					downtime.addEventListener("input", calcRuntime);
+					calcRuntime();
 				}
 			</script>

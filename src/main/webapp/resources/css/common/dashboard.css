@@ -2535,3 +2535,380 @@
 	transform: translateY(0);
 	box-shadow: 0 4px 10px rgba(31, 122, 87, 0.08);
 }
+
+/* 긴급 이슈가 없을 때 긴급 알림 카드이다. */
+.dashboard-page .dash-alert-main.dash-issue-normal {
+	border-color: #DCE6E1;
+	background-color: #FBFDFB;
+	color: var(--dash-text);
+}
+
+/* 긴급 이슈가 없을 때 벨 아이콘이다. */
+.dashboard-page .dash-alert-main.dash-issue-normal .dash-alert-bell {
+	background-color: #F3F7F5;
+	color: var(--dash-green);
+}
+
+/* 긴급 이슈가 없을 때 건수 배지이다. */
+.dashboard-page .dash-alert-main.dash-issue-normal em {
+	border-color: #DCE6E1;
+	background-color: #FFFFFF;
+	color: var(--dash-green);
+}
+
+/* 긴급 이슈가 있을 때 긴급 알림 카드이다. */
+.dashboard-page .dash-alert-main.dash-issue-danger {
+	border-color: #F1D5D5;
+	background-color: #FFFBFB;
+	color: var(--dash-red);
+}
+
+/* 긴급 이슈가 없을 때 이슈 없음 카드가 한 줄을 차지하게 한다. */
+.dashboard-page .dash-alert-items.dash-alert-items-empty {
+	grid-template-columns: 1fr;
+}
+
+/* 긴급 이슈 없음 카드이다. */
+.dashboard-page .dash-alert-empty-card {
+	border-color: #DCE6E1;
+	background-color: #FBFDFB;
+}
+
+/* 긴급 이슈 없음 카드의 점 색상이다. */
+.dashboard-page .dash-alert-empty-card .dash-alert-text::before {
+	background-color: var(--dash-green);
+}
+
+/* KPI 카드 클릭 가능 상태 */
+.dashboard-page .dash-kpi-click {
+	cursor: pointer;
+}
+
+/* KPI 상세 모달 배경 */
+.dashboard-page .dash-kpi-modal-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 9999;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	background: rgba(15, 23, 42, 0.45);
+}
+
+/* KPI 상세 모달 열림 상태 */
+.dashboard-page .dash-kpi-modal-backdrop.is-open {
+	display: flex;
+}
+
+/* KPI 상세 모달 박스 */
+.dashboard-page .dash-kpi-modal {
+	width: min(1080px, 100%);
+	max-height: 90vh;
+	overflow-y: auto;
+	background: #fff;
+	border-radius: 14px;
+	box-shadow: 0 20px 45px rgba(15, 23, 42, 0.22);
+}
+
+/* KPI 상세 모달 헤더 */
+.dashboard-page .dash-kpi-modal-head {
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	gap: 20px;
+	padding: 24px 28px 18px;
+	border-bottom: 1px solid #e5e7eb;
+}
+
+/* KPI 상세 모달 제목 */
+.dashboard-page .dash-kpi-modal-head h3 {
+	margin: 0;
+	font-size: 24px;
+	font-weight: 800;
+	color: #111827;
+}
+
+/* KPI 상세 모달 설명 */
+.dashboard-page .dash-kpi-modal-head p {
+	margin: 6px 0 0;
+	font-size: 13px;
+	color: #6b7280;
+}
+
+/* KPI 상세 모달 닫기 버튼 */
+.dashboard-page .dash-kpi-modal-close {
+	border: 0;
+	background: transparent;
+	font-size: 34px;
+	line-height: 1;
+	color: #111827;
+	cursor: pointer;
+}
+
+/* KPI 주차 선택 영역 */
+.dashboard-page .dash-kpi-modal-week {
+	display: grid;
+	grid-template-columns: 120px 1fr 170px 120px;
+	align-items: center;
+	gap: 16px;
+	padding: 18px 28px;
+}
+
+/* KPI 주차 버튼 */
+.dashboard-page .dash-kpi-week-btn {
+	height: 40px;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	background: #fff;
+	font-size: 14px;
+	font-weight: 700;
+	color: #111827;
+	cursor: pointer;
+}
+
+/* KPI 주차 중앙 텍스트 */
+.dashboard-page .dash-kpi-week-center {
+	text-align: center;
+}
+
+/* KPI 선택 주차 */
+.dashboard-page .dash-kpi-week-center strong {
+	display: block;
+	font-size: 18px;
+	font-weight: 800;
+	color: #111827;
+}
+
+/* KPI 비교 주차 */
+.dashboard-page .dash-kpi-week-center span {
+	display: block;
+	margin-top: 5px;
+	font-size: 13px;
+	color: #6b7280;
+}
+
+/* KPI 상세 요약 */
+.dashboard-page .dash-kpi-modal-summary {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	margin: 0 28px 20px;
+	border: 1px solid #dbe7df;
+	border-radius: 10px;
+	background: #f7fbf8;
+	overflow: hidden;
+}
+
+/* KPI 상세 요약 칸 */
+.dashboard-page .dash-kpi-modal-summary div {
+	padding: 18px;
+	text-align: center;
+	border-right: 1px solid #dbe7df;
+}
+
+/* KPI 상세 요약 마지막 칸 */
+.dashboard-page .dash-kpi-modal-summary div:last-child {
+	border-right: 0;
+}
+
+/* KPI 상세 요약 라벨 */
+.dashboard-page .dash-kpi-modal-summary span {
+	display: block;
+	margin-bottom: 8px;
+	font-size: 13px;
+	font-weight: 700;
+	color: #374151;
+}
+
+/* KPI 상세 요약 값 */
+.dashboard-page .dash-kpi-modal-summary strong {
+	font-size: 28px;
+	font-weight: 800;
+}
+
+/* KPI 상세 테이블 2단 */
+.dashboard-page .dash-kpi-modal-table-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 20px;
+	padding: 0 28px 20px;
+}
+
+/* KPI 상세 테이블 박스 */
+.dashboard-page .dash-kpi-modal-table-box {
+	border: 1px solid #e5e7eb;
+	border-radius: 10px;
+	overflow: hidden;
+}
+
+/* KPI 상세 테이블 제목 */
+.dashboard-page .dash-kpi-modal-table-box h4 {
+	margin: 0;
+	padding: 13px 16px;
+	font-size: 15px;
+	font-weight: 800;
+	color: #166534;
+	background: #f0f9f4;
+}
+
+/* KPI 상세 테이블 */
+.dashboard-page .dash-kpi-modal-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 13px;
+}
+
+/* KPI 상세 테이블 셀 */
+.dashboard-page .dash-kpi-modal-table th,
+.dashboard-page .dash-kpi-modal-table td {
+	height: 38px;
+	padding: 8px 10px;
+	border-bottom: 1px solid #e5e7eb;
+	text-align: center;
+	white-space: nowrap;
+}
+
+/* KPI 상세 테이블 헤더 */
+.dashboard-page .dash-kpi-modal-table th {
+	background: #f9fafb;
+	font-weight: 800;
+	color: #111827;
+}
+
+/* KPI 상세 테이블 마지막 행 */
+.dashboard-page .dash-kpi-modal-table tr:last-child td {
+	border-bottom: 0;
+}
+
+/* KPI 상세 합계 행 */
+.dashboard-page .dash-kpi-modal-table .dash-kpi-total-row td {
+	font-weight: 800;
+	background: #f9fafb;
+}
+
+/* KPI 상세 모달 하단 */
+.dashboard-page .dash-kpi-modal-foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	padding: 18px 28px 24px;
+	border-top: 1px solid #e5e7eb;
+}
+
+/* KPI 상세 모달 하단 안내 */
+.dashboard-page .dash-kpi-modal-foot span {
+	font-size: 13px;
+	color: #6b7280;
+}
+
+/* KPI 상세 모달 닫기 */
+.dashboard-page .dash-kpi-modal-btn {
+	min-width: 96px;
+	height: 40px;
+	border: 1px solid #13795b;
+	border-radius: 8px;
+	background: #fff;
+	font-size: 14px;
+	font-weight: 800;
+	color: #13795b;
+	cursor: pointer;
+}
+
+/* KPI 주차 선택 영역 */
+.dashboard-page .dash-kpi-modal-week {
+	display: grid;
+	grid-template-columns: 120px 1fr 170px 120px;
+	align-items: end;
+	gap: 16px;
+	padding: 22px 28px 18px;
+}
+
+/* KPI 주차 버튼 */
+.dashboard-page .dash-kpi-week-btn {
+	width: 100%;
+	height: 40px;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	background: #fff;
+	font-size: 14px;
+	font-weight: 800;
+	color: #111827;
+	cursor: pointer;
+}
+
+/* KPI 주차 중앙 텍스트 */
+.dashboard-page .dash-kpi-week-center {
+	align-self: center;
+	text-align: center;
+}
+
+/* KPI 선택 주차 */
+.dashboard-page .dash-kpi-week-center strong {
+	display: block;
+	font-size: 22px;
+	font-weight: 900;
+	line-height: 1.2;
+	color: #111827;
+}
+
+/* KPI 비교 주차 */
+.dashboard-page .dash-kpi-week-center span {
+	display: block;
+	margin-top: 6px;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1.2;
+	color: #6b7280;
+}
+
+/* KPI 주차 선택 영역 */
+.dashboard-page .dash-kpi-week-picker {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+
+/* KPI 주차 선택 라벨 */
+.dashboard-page .dash-kpi-week-picker label {
+	height: 15px;
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 15px;
+	color: #6b7280;
+}
+
+/* KPI 주차 선택 날짜 */
+.dashboard-page .dash-kpi-week-picker input {
+	width: 100%;
+	height: 40px;
+	padding: 0 12px;
+	border: 1px solid #d1d5db;
+	border-radius: 8px;
+	background: #fff;
+	font-size: 14px;
+	font-weight: 800;
+	color: #111827;
+	box-sizing: border-box;
+}
+
+/* KPI 상세 모달 모바일 */
+@media (max-width: 900px) {
+	.dashboard-page .dash-kpi-modal-week {
+		grid-template-columns: 1fr;
+	}
+
+	.dashboard-page .dash-kpi-modal-summary,
+	.dashboard-page .dash-kpi-modal-table-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.dashboard-page .dash-kpi-modal-foot {
+		align-items: stretch;
+		flex-direction: column;
+	}
+
+	.dashboard-page .dash-kpi-modal-btn {
+		width: 100%;
+	}
+}
