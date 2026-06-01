@@ -253,6 +253,64 @@ public class InventoryDTO {
 		this.historyUpdatedDate = historyUpdatedDate;
 	}
 
+	// =========================================================================
+	// 재고 상세페이지 입출고 내역 표시용 입출고번호
+	// -------------------------------------------------------------------------
+	// 기존 MATERIAL_INOUT 데이터 중 DOC_NO가 NULL 또는 빈 문자열인 행이 있으면
+	// JSP에서 ${history.docNo} 출력 시 입출고번호 칸이 빈칸으로 보인다.
+	//
+	// 공통 JSP / 공통 CSS는 건드리지 않고 DTO에서 화면 표시용 번호를 보정한다.
+	//
+	// 우선순위:
+	// 1. DOC_NO가 있으면 DB 값을 그대로 표시
+	// 2. DOC_NO가 없으면 입출고구분 + 입출고일자 + INOUT_ID로 표시용 번호 생성
+	//
+	// 예:
+	// MI      → RM-MI-20260604-0001
+	// MO      → RM-MO-20260604-0001
+	// MO-PROD → RM-MO-20260604-0001
+	// =========================================================================
+	public String getDisplayDocNo() {
+
+		if (docNo != null
+				&& !docNo.trim().equals("")) {
+
+			return docNo;
+		}
+
+		String typeText =
+			"INOUT";
+
+		if ("MI".equals(inoutType)) {
+
+			typeText =
+				"MI";
+
+		} else if ("MO".equals(inoutType)
+				|| "MO-PROD".equals(inoutType)) {
+
+			typeText =
+				"MO";
+		}
+
+		String dateText =
+			"00000000";
+
+		if (inoutDate != null) {
+
+			dateText =
+				inoutDate.toString().replace("-", "");
+		}
+
+		return "RM-"
+				+ typeText
+				+ "-"
+				+ dateText
+				+ "-"
+				+ String.format("%04d", inoutId);
+	}
+
+
 	@Override
 	public String toString() {
 		return "InventoryDTO [inventoryId=" + inventoryId + ", inventoryStock=" + inventoryStock + ", remark=" + remark

@@ -292,6 +292,21 @@ public class QualityDAOImpl implements QualityDAO {
 
 		return empList;
 	}
+	@Override
+	public int _dao_update_Defect_UseYn_ByInspection(String insp_id, String result) {
+	    Map<String, Object> param = new HashMap<String, Object>();
+	    param.put("insp_id", insp_id);
+	    param.put("result", result);
+	    return sqlSession.update("mapper.quality._update_Defect_UseYn_ByInspection", param);
+	}
+
+	@Override
+	public int _dao_update_DefectAction_UseYn_ByInspection(String insp_id, String result) {
+	    Map<String, Object> param = new HashMap<String, Object>();
+	    param.put("insp_id", insp_id);
+	    param.put("result", result);
+	    return sqlSession.update("mapper.quality._update_DefectAction_UseYn_ByInspection", param);
+	}
 	
 	// 대시보드 최근 7일 불량유형별 수량 TOP5를 조회한다.
 	@Override

@@ -51,6 +51,8 @@ public interface QualityDAO {
 
 	List<DefectDTO> _dao_select_Defect_action_emp_option(String dept);
 	
+	int _dao_update_Defect_UseYn_ByInspection(String insp_id, String result);
+	int _dao_update_DefectAction_UseYn_ByInspection(String insp_id, String result);
 	// 대시보드 최근 7일 불량유형별 수량 TOP5를 조회한다.
 	List<DefectDTO> _dao_select_Dashboard_DefectTop5();
 }

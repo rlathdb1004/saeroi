@@ -8,46 +8,48 @@
 	<select id="_select_Inspection"
 		resultType="kr.or.saeroi.dto.InspectionDTO">
 		SELECT
-			i.insp_id,
-			i.doc_no,
-			NVL(i.doc_seq, 0) AS doc_seq,
-			TO_CHAR(i.insp_date, 'YYYY-MM-DD') AS insp_date,
-			it.item_code,
-			it.item_name,
-			it.item_unit,
-			w.product_lot,
-			e.ename,
-			e.dept,
-			i.result,
-			i.prod_id,
-			i.emp_id,
-			i.insp_type,
-			i.insp_status,
-			NVL(i.inspection_qty, 0) AS inspection_qty,
-			NVL(i.good_qty, 0) AS good_qty,
-			i.remark,
-			TO_CHAR(i.created_date, 'YYYY-MM-DD HH24:MI') AS created_date,
-			TO_CHAR(i.updated_date, 'YYYY-MM-DD HH24:MI') AS updated_date,
-			NVL(i.use_yn, 'Y') AS use_yn,
-			p.doc_no AS prod_doc_no,
-			TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
-			NVL(p.prod_qty, 0) AS prod_qty,
-			NVL(p.loss_qty, 0) AS loss_qty,
-			p.prod_status,
-			w.doc_no AS work_order_doc_no,
-			NVL(w.order_qty, 0) AS order_qty,
-			TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date
+		i.insp_id,
+		i.doc_no,
+		NVL(i.doc_seq, 0) AS doc_seq,
+		TO_CHAR(i.insp_date, 'YYYY-MM-DD') AS insp_date,
+		it.item_code,
+		it.item_name,
+		it.item_unit,
+		w.product_lot,
+		e.ename,
+		e.dept,
+		i.result,
+		i.prod_id,
+		i.emp_id,
+		i.insp_type,
+		i.insp_status,
+		NVL(i.inspection_qty, 0) AS inspection_qty,
+		NVL(i.good_qty, 0) AS good_qty,
+		i.remark,
+		TO_CHAR(i.created_date, 'YYYY-MM-DD HH24:MI') AS created_date,
+		TO_CHAR(i.updated_date, 'YYYY-MM-DD HH24:MI') AS updated_date,
+		NVL(i.use_yn, 'Y') AS use_yn,
+		p.doc_no AS prod_doc_no,
+		TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
+		NVL(p.prod_qty, 0) AS prod_qty,
+		NVL(p.loss_qty, 0) AS loss_qty,
+		p.prod_status,
+		w.doc_no AS work_order_doc_no,
+		NVL(w.order_qty, 0) AS order_qty,
+		TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date
 		FROM inspection i,
-			production p,
-			work_order w,
-			production_plan pr,
-			item it,
-			emp e
+		production p,
+		work_order w,
+		production_plan pr,
+		item it,
+		emp e
 		WHERE i.prod_id = p.prod_id
 		AND p.order_id = w.order_id
-		AND w.prod_plan_id = pr.prod_plan_id
+		AND
+		w.prod_plan_id = pr.prod_plan_id
 		AND pr.item_id = it.item_id
-		AND i.emp_id = e.emp_id
+		AND
+		i.emp_id = e.emp_id
 		AND NVL(i.use_yn, 'Y') = 'Y'
 
 		<if test="startDate != null and startDate != ''">
@@ -61,55 +63,65 @@
 			<choose>
 				<when test="searchType == null or searchType == ''">
 					AND (
-						UPPER(REPLACE(i.doc_no, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						OR UPPER(REPLACE(it.item_name, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						OR UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						OR EXISTS (
-							SELECT 1
-							FROM defect_list dl
-							WHERE dl.insp_id = i.insp_id
-							  AND NVL(dl.use_yn, 'Y') = 'Y'
-							  AND UPPER(REPLACE(
-								CASE
-									WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
-									THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date, 'YYYYMMDD'), 1, 1)
-									ELSE w.product_lot
-								END, ' ', ''
-							  )) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						)
-						OR UPPER(REPLACE(e.ename, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						OR UPPER(REPLACE(i.result, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					UPPER(REPLACE(i.doc_no, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					OR UPPER(REPLACE(it.item_name, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					OR UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					OR EXISTS (
+					SELECT 1
+					FROM defect_list dl
+					WHERE dl.insp_id = i.insp_id
+					AND NVL(dl.use_yn, 'Y') = 'Y'
+					AND UPPER(REPLACE(
+					CASE
+					WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
+					THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date,
+					'YYYYMMDD'), 1, 1)
+					ELSE w.product_lot
+					END, ' ', ''
+					)) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					)
+					OR UPPER(REPLACE(e.ename, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					OR UPPER(REPLACE(i.result, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 					)
 				</when>
 				<when test="searchType == 'insp_id'">
-					AND UPPER(REPLACE(i.doc_no, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					AND UPPER(REPLACE(i.doc_no, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 				</when>
 				<when test="searchType == 'itemName'">
-					AND UPPER(REPLACE(it.item_name, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					AND UPPER(REPLACE(it.item_name, ' ', '')) LIKE '%'
+					|| UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 				</when>
 				<when test="searchType == 'productLot'">
 					AND (
-						UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						OR EXISTS (
-							SELECT 1
-							FROM defect_list dl
-							WHERE dl.insp_id = i.insp_id
-							  AND NVL(dl.use_yn, 'Y') = 'Y'
-							  AND UPPER(REPLACE(
-								CASE
-									WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
-									THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date, 'YYYYMMDD'), 1, 1)
-									ELSE w.product_lot
-								END, ' ', ''
-							  )) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						)
+					UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					OR EXISTS (
+					SELECT 1
+					FROM defect_list dl
+					WHERE dl.insp_id = i.insp_id
+					AND NVL(dl.use_yn, 'Y') = 'Y'
+					AND UPPER(REPLACE(
+					CASE
+					WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
+					THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date,
+					'YYYYMMDD'), 1, 1)
+					ELSE w.product_lot
+					END, ' ', ''
+					)) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					)
 					)
 				</when>
 				<when test="searchType == 'ename'">
-					AND UPPER(REPLACE(e.ename, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					AND UPPER(REPLACE(e.ename, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 				</when>
 				<when test="searchType == 'result'">
-					AND UPPER(REPLACE(i.result, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					AND UPPER(REPLACE(i.result, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 				</when>
 			</choose>
 		</if>
@@ -120,272 +132,275 @@
 	<select id="_select_Inspection_option"
 		resultType="kr.or.saeroi.dto.InspectionDTO">
 		SELECT
-			insp_id,
-			prod_id,
-			doc_no,
-			item_code,
-			item_name,
-			item_unit,
-			product_lot,
-			emp_id,
-			ename,
-			result,
-			prod_doc_no,
-			prod_date,
-			prod_qty,
-			loss_qty,
-			prod_status,
-			work_order_doc_no,
-			order_qty,
-			order_date
+		insp_id,
+		prod_id,
+		doc_no,
+		item_code,
+		item_name,
+		item_unit,
+		product_lot,
+		emp_id,
+		ename,
+		result,
+		prod_doc_no,
+		prod_date,
+		prod_qty,
+		loss_qty,
+		prod_status,
+		work_order_doc_no,
+		order_qty,
+		order_date
 		FROM (
-			SELECT
-				option_data.*,
-				ROW_NUMBER() OVER (ORDER BY option_data.option_sort DESC NULLS LAST, option_data.option_name) AS rn
-			FROM (
-				<choose>
-					<when test="searchType == 'productionTarget'">
-						SELECT
-							0 AS insp_id,
-							p.prod_id AS prod_id,
-							NULL AS doc_no,
-							it.item_code AS item_code,
-							it.item_name AS item_name,
-							it.item_unit AS item_unit,
-							w.product_lot AS product_lot,
-							NULL AS emp_id,
-							e.ename AS ename,
-							NULL AS result,
-							p.doc_no AS prod_doc_no,
-							TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
-							NVL(p.prod_qty, 0) AS prod_qty,
-							NVL(p.loss_qty, 0) AS loss_qty,
-							p.prod_status AS prod_status,
-							w.doc_no AS work_order_doc_no,
-							NVL(w.order_qty, 0) AS order_qty,
-							TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date,
-							p.doc_no || ' ' || it.item_name || ' ' || w.product_lot AS option_name,
-							p.prod_id AS option_sort
-						FROM production p,
-							work_order w,
-							production_plan pr,
-							item it,
-							emp e
-						WHERE p.order_id = w.order_id
-						AND w.prod_plan_id = pr.prod_plan_id
-						AND pr.item_id = it.item_id
-						AND p.emp_id = e.emp_id
-						AND p.prod_id IS NOT NULL
-					</when>
+		SELECT
+		option_data.*,
+		ROW_NUMBER() OVER (ORDER BY option_data.option_sort DESC NULLS LAST,
+		option_data.option_name) AS rn
+		FROM (
+		<choose>
+			<when test="searchType == 'productionTarget'">
+				SELECT
+				0 AS insp_id,
+				p.prod_id AS prod_id,
+				NULL AS doc_no,
+				it.item_code AS item_code,
+				it.item_name AS item_name,
+				it.item_unit AS item_unit,
+				w.product_lot AS product_lot,
+				NULL AS emp_id,
+				e.ename AS ename,
+				NULL AS result,
+				p.doc_no AS prod_doc_no,
+				TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
+				NVL(p.prod_qty, 0) AS prod_qty,
+				NVL(p.loss_qty, 0) AS loss_qty,
+				p.prod_status AS prod_status,
+				w.doc_no AS work_order_doc_no,
+				NVL(w.order_qty, 0) AS order_qty,
+				TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date,
+				p.doc_no || ' ' || it.item_name || ' ' || w.product_lot AS option_name,
+				p.prod_id AS option_sort
+				FROM production p,
+				work_order w,
+				production_plan pr,
+				item it,
+				emp e
+				WHERE p.order_id = w.order_id
+				AND w.prod_plan_id = pr.prod_plan_id
+				AND pr.item_id = it.item_id
+				AND p.emp_id = e.emp_id
+				AND p.prod_id IS NOT NULL
+			</when>
 
-					<when test="searchType == 'itemName'">
-						SELECT
-							0 AS insp_id,
-							MIN(p.prod_id) AS prod_id,
-							NULL AS doc_no,
-							it.item_code AS item_code,
-							it.item_name AS item_name,
-							it.item_unit AS item_unit,
-							NULL AS product_lot,
-							0 AS emp_id,
-							NULL AS ename,
-							NULL AS result,
-							NULL AS prod_doc_no,
-							NULL AS prod_date,
-							0 AS prod_qty,
-							0 AS loss_qty,
-							NULL AS prod_status,
-							NULL AS work_order_doc_no,
-							0 AS order_qty,
-							NULL AS order_date,
-							it.item_name AS option_name,
-							MIN(p.prod_id) AS option_sort
-						FROM production p,
-							work_order w,
-							production_plan pr,
-							item it
-						WHERE p.order_id = w.order_id
-						AND w.prod_plan_id = pr.prod_plan_id
-						AND pr.item_id = it.item_id
-						GROUP BY it.item_code, it.item_name, it.item_unit
-					</when>
+			<when test="searchType == 'itemName'">
+				SELECT
+				0 AS insp_id,
+				MIN(p.prod_id) AS prod_id,
+				NULL AS doc_no,
+				it.item_code AS item_code,
+				it.item_name AS item_name,
+				it.item_unit AS item_unit,
+				NULL AS product_lot,
+				0 AS emp_id,
+				NULL AS ename,
+				NULL AS result,
+				NULL AS prod_doc_no,
+				NULL AS prod_date,
+				0 AS prod_qty,
+				0 AS loss_qty,
+				NULL AS prod_status,
+				NULL AS work_order_doc_no,
+				0 AS order_qty,
+				NULL AS order_date,
+				it.item_name AS option_name,
+				MIN(p.prod_id) AS option_sort
+				FROM production p,
+				work_order w,
+				production_plan pr,
+				item it
+				WHERE p.order_id = w.order_id
+				AND w.prod_plan_id = pr.prod_plan_id
+				AND pr.item_id = it.item_id
+				GROUP BY it.item_code, it.item_name, it.item_unit
+			</when>
 
-					<when test="searchType == 'ename'">
-						SELECT
-							0 AS insp_id,
-							0 AS prod_id,
-							NULL AS doc_no,
-							NULL AS item_code,
-							NULL AS item_name,
-							NULL AS item_unit,
-							NULL AS product_lot,
-							NVL(e.emp_id, 0) AS emp_id,
-							e.ename AS ename,
-							NULL AS result,
-							NULL AS prod_doc_no,
-							NULL AS prod_date,
-							0 AS prod_qty,
-							0 AS loss_qty,
-							NULL AS prod_status,
-							NULL AS work_order_doc_no,
-							0 AS order_qty,
-							NULL AS order_date,
-							e.ename AS option_name,
-							e.emp_id AS option_sort
-						FROM emp e
-						WHERE e.dept = '품질'
-						AND e.ename IS NOT NULL
-					</when>
+			<when test="searchType == 'ename'">
+				SELECT
+				0 AS insp_id,
+				0 AS prod_id,
+				NULL AS doc_no,
+				NULL AS item_code,
+				NULL AS item_name,
+				NULL AS item_unit,
+				NULL AS product_lot,
+				NVL(e.emp_id, 0) AS emp_id,
+				e.ename AS ename,
+				NULL AS result,
+				NULL AS prod_doc_no,
+				NULL AS prod_date,
+				0 AS prod_qty,
+				0 AS loss_qty,
+				NULL AS prod_status,
+				NULL AS work_order_doc_no,
+				0 AS order_qty,
+				NULL AS order_date,
+				e.ename AS option_name,
+				e.emp_id AS option_sort
+				FROM emp e
+				WHERE e.dept = '품질'
+				AND e.ename IS NOT NULL
+			</when>
 
-					<when test="searchType == 'result'">
-						SELECT
-							0 AS insp_id,
-							0 AS prod_id,
-							NULL AS doc_no,
-							NULL AS item_code,
-							NULL AS item_name,
-							NULL AS item_unit,
-							NULL AS product_lot,
-							0 AS emp_id,
-							NULL AS ename,
-							i.result AS result,
-							NULL AS prod_doc_no,
-							NULL AS prod_date,
-							0 AS prod_qty,
-							0 AS loss_qty,
-							NULL AS prod_status,
-							NULL AS work_order_doc_no,
-							0 AS order_qty,
-							NULL AS order_date,
-							i.result AS option_name,
-							MIN(i.insp_id) AS option_sort
-						FROM inspection i
-						WHERE i.result IS NOT NULL
-						AND NVL(i.use_yn, 'Y') = 'Y'
-						GROUP BY i.result
-					</when>
+			<when test="searchType == 'result'">
+				SELECT
+				0 AS insp_id,
+				0 AS prod_id,
+				NULL AS doc_no,
+				NULL AS item_code,
+				NULL AS item_name,
+				NULL AS item_unit,
+				NULL AS product_lot,
+				0 AS emp_id,
+				NULL AS ename,
+				i.result AS result,
+				NULL AS prod_doc_no,
+				NULL AS prod_date,
+				0 AS prod_qty,
+				0 AS loss_qty,
+				NULL AS prod_status,
+				NULL AS work_order_doc_no,
+				0 AS order_qty,
+				NULL AS order_date,
+				i.result AS option_name,
+				MIN(i.insp_id) AS option_sort
+				FROM inspection i
+				WHERE i.result IS NOT NULL
+				AND NVL(i.use_yn, 'Y') = 'Y'
+				GROUP BY i.result
+			</when>
 
-					<when test="searchType == 'docNo'">
-						SELECT
-							NVL(i.insp_id, 0) AS insp_id,
-							0 AS prod_id,
-							i.doc_no AS doc_no,
-							it.item_code AS item_code,
-							it.item_name AS item_name,
-							it.item_unit AS item_unit,
-							w.product_lot AS product_lot,
-							0 AS emp_id,
-							NULL AS ename,
-							NULL AS result,
-							p.doc_no AS prod_doc_no,
-							TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
-							NVL(p.prod_qty, 0) AS prod_qty,
-							NVL(p.loss_qty, 0) AS loss_qty,
-							p.prod_status AS prod_status,
-							w.doc_no AS work_order_doc_no,
-							NVL(w.order_qty, 0) AS order_qty,
-							TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date,
-							i.doc_no AS option_name,
-							i.insp_id AS option_sort
-						FROM inspection i,
-							production p,
-							work_order w,
-							production_plan pr,
-							item it
-						WHERE i.prod_id = p.prod_id
-						AND p.order_id = w.order_id
-						AND w.prod_plan_id = pr.prod_plan_id
-						AND pr.item_id = it.item_id
-						AND i.doc_no IS NOT NULL
-						AND NVL(i.use_yn, 'Y') = 'Y'
-					</when>
+			<when test="searchType == 'docNo'">
+				SELECT
+				NVL(i.insp_id, 0) AS insp_id,
+				0 AS prod_id,
+				i.doc_no AS doc_no,
+				it.item_code AS item_code,
+				it.item_name AS item_name,
+				it.item_unit AS item_unit,
+				w.product_lot AS product_lot,
+				0 AS emp_id,
+				NULL AS ename,
+				NULL AS result,
+				p.doc_no AS prod_doc_no,
+				TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
+				NVL(p.prod_qty, 0) AS prod_qty,
+				NVL(p.loss_qty, 0) AS loss_qty,
+				p.prod_status AS prod_status,
+				w.doc_no AS work_order_doc_no,
+				NVL(w.order_qty, 0) AS order_qty,
+				TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date,
+				i.doc_no AS option_name,
+				i.insp_id AS option_sort
+				FROM inspection i,
+				production p,
+				work_order w,
+				production_plan pr,
+				item it
+				WHERE i.prod_id = p.prod_id
+				AND p.order_id = w.order_id
+				AND w.prod_plan_id = pr.prod_plan_id
+				AND pr.item_id = it.item_id
+				AND i.doc_no IS NOT NULL
+				AND NVL(i.use_yn, 'Y') = 'Y'
+			</when>
 
-					<otherwise>
-						SELECT
-							0 AS insp_id,
-							0 AS prod_id,
-							NULL AS doc_no,
-							NULL AS item_code,
-							NULL AS item_name,
-							NULL AS item_unit,
-							NULL AS product_lot,
-							0 AS emp_id,
-							NULL AS ename,
-							NULL AS result,
-							NULL AS prod_doc_no,
-							NULL AS prod_date,
-							0 AS prod_qty,
-							0 AS loss_qty,
-							NULL AS prod_status,
-							NULL AS work_order_doc_no,
-							0 AS order_qty,
-							NULL AS order_date,
-							NULL AS option_name,
-							NULL AS option_sort
-						FROM dual
-					</otherwise>
-				</choose>
-			) option_data
-			WHERE option_data.option_name IS NOT NULL
+			<otherwise>
+				SELECT
+				0 AS insp_id,
+				0 AS prod_id,
+				NULL AS doc_no,
+				NULL AS item_code,
+				NULL AS item_name,
+				NULL AS item_unit,
+				NULL AS product_lot,
+				0 AS emp_id,
+				NULL AS ename,
+				NULL AS result,
+				NULL AS prod_doc_no,
+				NULL AS prod_date,
+				0 AS prod_qty,
+				0 AS loss_qty,
+				NULL AS prod_status,
+				NULL AS work_order_doc_no,
+				0 AS order_qty,
+				NULL AS order_date,
+				NULL AS option_name,
+				NULL AS option_sort
+				FROM dual
+			</otherwise>
+		</choose>
+		) option_data
+		WHERE option_data.option_name IS NOT NULL
 		)
-		WHERE rn BETWEEN ((#{optionPage} - 1) * #{optionSize} + 1)
+		WHERE rn BETWEEN ((#{optionPage}
+		- 1) * #{optionSize} + 1)
 		AND (#{optionPage} * #{optionSize})
 	</select>
 
 	<insert id="_insert_Inspection" parameterType="map">
-		<selectKey keyProperty="insp_id" resultType="int" order="BEFORE">
+		<selectKey keyProperty="insp_id" resultType="int"
+			order="BEFORE">
 			SELECT NVL(MAX(insp_id), 0) + 1 FROM inspection
 		</selectKey>
 
 		INSERT INTO inspection (
-			insp_id,
-			doc_no,
-			doc_seq,
-			emp_id,
-			prod_id,
-			insp_type,
-			insp_date,
-			insp_status,
-			result,
-			inspection_qty,
-			good_qty,
-			remark,
-			created_date,
-			updated_date,
-			use_yn
+		insp_id,
+		doc_no,
+		doc_seq,
+		emp_id,
+		prod_id,
+		insp_type,
+		insp_date,
+		insp_status,
+		result,
+		inspection_qty,
+		good_qty,
+		remark,
+		created_date,
+		updated_date,
+		use_yn
 		)
 		SELECT
-			#{insp_id},
-			'INSP-' || TO_CHAR(TO_DATE(#{insp_date}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
-			LPAD(
-				(SELECT NVL(MAX(doc_seq), 0) + 1
-				FROM inspection
-				WHERE TRUNC(insp_date) = TRUNC(TO_DATE(#{insp_date}, 'YYYY-MM-DD'))),
-				4,
-				'0'
-			),
-			(SELECT NVL(MAX(doc_seq), 0) + 1
-			FROM inspection
-			WHERE TRUNC(insp_date) = TRUNC(TO_DATE(#{insp_date}, 'YYYY-MM-DD'))),
-			(SELECT e.emp_id FROM emp e WHERE e.empno = #{emp_id}),
-			TO_NUMBER(#{prod_id}),
-			#{insp_type},
-			TO_DATE(#{insp_date}, 'YYYY-MM-DD'),
-			CASE WHEN #{result} = '대기' THEN '검사 예정' ELSE '검사 완료' END,
-			#{result},
-			TO_NUMBER(#{inspection_qty}),
-			TO_NUMBER(#{good_qty}),
-			#{remark},
-			SYSDATE,
-			SYSDATE,
-			'Y'
+		#{insp_id},
+		'INSP-' || TO_CHAR(TO_DATE(#{insp_date}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
+		LPAD(
+		(SELECT NVL(MAX(doc_seq), 0) + 1
+		FROM inspection
+		WHERE TRUNC(insp_date) = TRUNC(TO_DATE(#{insp_date}, 'YYYY-MM-DD'))),
+		4,
+		'0'
+		),
+		(SELECT NVL(MAX(doc_seq), 0) + 1
+		FROM inspection
+		WHERE TRUNC(insp_date) = TRUNC(TO_DATE(#{insp_date}, 'YYYY-MM-DD'))),
+		(SELECT e.emp_id FROM emp e WHERE e.empno = #{emp_id}),
+		TO_NUMBER(#{prod_id}),
+		#{insp_type},
+		TO_DATE(#{insp_date}, 'YYYY-MM-DD'),
+		CASE WHEN #{result} = '대기' THEN '검사 예정' ELSE '검사 완료' END,
+		#{result},
+		TO_NUMBER(#{inspection_qty}),
+		TO_NUMBER(#{good_qty}),
+		#{remark},
+		SYSDATE,
+		SYSDATE,
+		'Y'
 		FROM dual
 	</insert>
 
 	<update id="_delete_Inspection" parameterType="map">
 		UPDATE inspection
 		SET use_yn = 'N',
-			updated_date = SYSDATE
+		updated_date = SYSDATE
 		WHERE insp_id IN
 		<foreach collection="insp_id" item="id" open="(" separator=","
 			close=")">
@@ -393,19 +408,20 @@
 		</foreach>
 	</update>
 
-	<update id="_delete_Defect_Action_By_Inspection" parameterType="map">
+	<update id="_delete_Defect_Action_By_Inspection"
+		parameterType="map">
 		UPDATE defect_action
 		SET use_yn = 'N',
-			updated_date = SYSDATE
+		updated_date = SYSDATE
 		WHERE defect_list_id IN (
-			SELECT dl.defect_list_id
-			FROM defect_list dl
-			WHERE dl.insp_id IN
-			<foreach collection="insp_id" item="id" open="(" separator=","
-				close=")">
-				TO_NUMBER(#{id})
-			</foreach>
-			AND NVL(dl.use_yn, 'Y') = 'Y'
+		SELECT dl.defect_list_id
+		FROM defect_list dl
+		WHERE dl.insp_id IN
+		<foreach collection="insp_id" item="id" open="(" separator=","
+			close=")">
+			TO_NUMBER(#{id})
+		</foreach>
+		AND NVL(dl.use_yn, 'Y') = 'Y'
 		)
 		AND NVL(use_yn, 'Y') = 'Y'
 	</update>
@@ -413,7 +429,7 @@
 	<update id="_delete_Defect_By_Inspection" parameterType="map">
 		UPDATE defect_list
 		SET use_yn = 'N',
-			updated_date = SYSDATE
+		updated_date = SYSDATE
 		WHERE insp_id IN
 		<foreach collection="insp_id" item="id" open="(" separator=","
 			close=")">
@@ -425,149 +441,188 @@
 	<select id="_select_Inspection_detail"
 		resultType="kr.or.saeroi.dto.InspectionDTO">
 		SELECT
-			i.insp_id,
-			i.doc_no,
-			NVL(i.doc_seq, 0) AS doc_seq,
-			TO_CHAR(i.insp_date, 'YYYY-MM-DD') AS insp_date,
-			it.item_code,
-			it.item_name,
-			it.item_unit,
-			w.product_lot,
-			e.ename,
-			e.dept,
-			i.result,
-			i.prod_id,
-			i.emp_id,
-			i.insp_type,
-			i.insp_status,
-			NVL(i.inspection_qty, 0) AS inspection_qty,
-			NVL(i.good_qty, 0) AS good_qty,
-			i.remark,
-			TO_CHAR(i.created_date, 'YYYY-MM-DD HH24:MI') AS created_date,
-			TO_CHAR(i.updated_date, 'YYYY-MM-DD HH24:MI') AS updated_date,
-			NVL(i.use_yn, 'Y') AS use_yn,
-			p.doc_no AS prod_doc_no,
-			TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
-			NVL(p.prod_qty, 0) AS prod_qty,
-			NVL(p.loss_qty, 0) AS loss_qty,
-			p.prod_status,
-			w.doc_no AS work_order_doc_no,
-			NVL(w.order_qty, 0) AS order_qty,
-			TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date
+		i.insp_id,
+		i.doc_no,
+		NVL(i.doc_seq, 0) AS doc_seq,
+		TO_CHAR(i.insp_date, 'YYYY-MM-DD') AS insp_date,
+		it.item_code,
+		it.item_name,
+		it.item_unit,
+		w.product_lot,
+		e.ename,
+		e.dept,
+		i.result,
+		i.prod_id,
+		i.emp_id,
+		i.insp_type,
+		i.insp_status,
+		NVL(i.inspection_qty, 0) AS inspection_qty,
+		NVL(i.good_qty, 0) AS good_qty,
+		i.remark,
+		TO_CHAR(i.created_date, 'YYYY-MM-DD HH24:MI') AS created_date,
+		TO_CHAR(i.updated_date, 'YYYY-MM-DD HH24:MI') AS updated_date,
+		NVL(i.use_yn, 'Y') AS use_yn,
+		p.doc_no AS prod_doc_no,
+		TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
+		NVL(p.prod_qty, 0) AS prod_qty,
+		NVL(p.loss_qty, 0) AS loss_qty,
+		p.prod_status,
+		w.doc_no AS work_order_doc_no,
+		NVL(w.order_qty, 0) AS order_qty,
+		TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date
 		FROM inspection i,
-			production p,
-			work_order w,
-			production_plan pr,
-			item it,
-			emp e
+		production p,
+		work_order w,
+		production_plan pr,
+		item it,
+		emp e
 		WHERE i.prod_id = p.prod_id
 		AND p.order_id = w.order_id
-		AND w.prod_plan_id = pr.prod_plan_id
+		AND
+		w.prod_plan_id = pr.prod_plan_id
 		AND pr.item_id = it.item_id
-		AND i.emp_id = e.emp_id
+		AND
+		i.emp_id = e.emp_id
 		AND i.insp_id = TO_NUMBER(#{insp_id})
-		AND NVL(i.use_yn, 'Y') = 'Y'
+		AND
+		NVL(i.use_yn, 'Y') = 'Y'
 	</select>
 
 	<update id="_update_Inspection" parameterType="map">
 		UPDATE inspection
 		SET insp_date = TO_DATE(#{insp_date}, 'YYYY-MM-DD'),
-			insp_type = #{insp_type},
-			result = #{result},
-			inspection_qty = TO_NUMBER(#{inspection_qty}),
-			good_qty = TO_NUMBER(#{good_qty}),
-			remark = #{remark},
-			updated_date = SYSDATE
+		insp_type = #{insp_type},
+		result = #{result},
+		insp_status = CASE WHEN #{result} = '대기' THEN '검사 예정' ELSE '검사 완료' END,
+		inspection_qty = TO_NUMBER(#{inspection_qty}),
+		good_qty = CASE WHEN #{result} = '대기' THEN 0 ELSE TO_NUMBER(#{good_qty}) END,
+		remark = #{remark},
+		updated_date = SYSDATE
 		WHERE insp_id = TO_NUMBER(#{insp_id})
 		AND NVL(use_yn, 'Y') = 'Y'
+	</update>
+	<!-- 검사결과 변경 시 defect_list.use_yn 일괄 업데이트 -->
+	<update id="_update_Defect_UseYn_ByInspection"
+		parameterType="map">
+		UPDATE defect_list
+		SET use_yn = CASE WHEN #{result} = '조건부' THEN 'Y' ELSE 'N' END,
+		updated_date = SYSDATE
+		WHERE insp_id = TO_NUMBER(#{insp_id})
+	</update>
+
+	<!-- 검사결과 변경 시 defect_action.use_yn 일괄 업데이트 -->
+	<update id="_update_DefectAction_UseYn_ByInspection"
+		parameterType="map">
+		UPDATE defect_action
+		SET use_yn = CASE WHEN #{result} = '조건부' THEN 'Y' ELSE 'N' END,
+		updated_date = SYSDATE
+		WHERE defect_list_id IN (
+		SELECT defect_list_id FROM defect_list
+		WHERE insp_id = TO_NUMBER(#{insp_id})
+		)
 	</update>
 
 	<select id="_select_Defect"
 		resultType="kr.or.saeroi.dto.DefectDTO">
 		SELECT
-			dl.defect_list_id,
-			dl.doc_no,
-			NVL(dl.doc_seq, 0) AS doc_seq,
-			d.defect_id,
-			dl.insp_id,
-			i.doc_no AS insp_doc_no,
-			NVL(i.inspection_qty, 0) AS inspection_qty,
-			NVL(i.good_qty, 0) AS good_qty,
-			d.defect_code,
-			d.defect_type,
-			TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS defect_date,
-			it.item_code,
-			it.item_name,
-			it.item_unit,
-			CASE
-				WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
-				THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date, 'YYYYMMDD'), 1, 1)
-				ELSE w.product_lot
-			END AS product_lot,
-			d.defect_name,
-			d.action_dept,
-			d.action_dept AS dept,
-			e.ename,
-			NVL(dl.defect_qty, 0) AS defect_qty,
-			dl.remark,
-			NVL(dl.use_yn, 'Y') AS use_yn,
-			p.doc_no AS prod_doc_no,
-			TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
-			NVL(p.prod_qty, 0) AS prod_qty,
-			NVL(p.loss_qty, 0) AS loss_qty,
-			p.prod_status,
-			w.doc_no AS work_order_doc_no,
-			NVL(w.order_qty, 0) AS order_qty,
-			TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date
+		dl.defect_list_id,
+		dl.doc_no,
+		NVL(dl.doc_seq, 0) AS doc_seq,
+		d.defect_id,
+		dl.insp_id,
+		i.doc_no AS insp_doc_no,
+		NVL(i.inspection_qty, 0) AS inspection_qty,
+		NVL(i.good_qty, 0) AS good_qty,
+		d.defect_code,
+		d.defect_type,
+		TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS defect_date,
+		it.item_code,
+		it.item_name,
+		it.item_unit,
+		CASE
+		WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
+		THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date,
+		'YYYYMMDD'), 1, 1)
+		ELSE w.product_lot
+		END AS product_lot,
+		d.defect_name,
+		d.action_dept,
+		d.action_dept AS dept,
+		e.ename,
+		NVL(dl.defect_qty, 0) AS defect_qty,
+		dl.remark,
+		NVL(dl.use_yn, 'Y') AS use_yn,
+		p.doc_no AS prod_doc_no,
+		TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
+		NVL(p.prod_qty, 0) AS prod_qty,
+		NVL(p.loss_qty, 0) AS loss_qty,
+		p.prod_status,
+		w.doc_no AS work_order_doc_no,
+		NVL(w.order_qty, 0) AS order_qty,
+		TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date
 		FROM defect_list dl,
-			defect d,
-			inspection i,
-			production p,
-			work_order w,
-			production_plan pr,
-			item it,
-			emp e
+		defect d,
+		inspection i,
+		production p,
+		work_order w,
+		production_plan pr,
+		item it,
+		emp e
 		WHERE dl.defect_id = d.defect_id
 		AND dl.insp_id = i.insp_id
-		AND i.prod_id = p.prod_id
+		AND
+		i.prod_id = p.prod_id
 		AND p.order_id = w.order_id
-		AND w.prod_plan_id = pr.prod_plan_id
+		AND w.prod_plan_id =
+		pr.prod_plan_id
 		AND pr.item_id = it.item_id
 		AND i.emp_id = e.emp_id
-		AND NVL(dl.use_yn, 'Y') = 'Y'
+		AND
+		NVL(dl.use_yn, 'Y') = 'Y'
 		AND NVL(i.use_yn, 'Y') = 'Y'
 
 		<if test="startDate != null and startDate != ''">
-			AND dl.defect_date &gt;= TO_DATE(#{startDate}, 'YYYY-MM-DD')
+			AND dl.defect_date &gt;= TO_DATE(#{startDate},
+			'YYYY-MM-DD')
 		</if>
 		<if test="endDate != null and endDate != ''">
-			AND dl.defect_date &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+			AND dl.defect_date &lt; TO_DATE(#{endDate}, 'YYYY-MM-DD')
+			+ 1
 		</if>
 
 		<if test="keyword != null and keyword != ''">
 			<choose>
 				<when test="searchType == 'defectCode'">
-					AND UPPER(REPLACE(d.defect_code, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					AND UPPER(REPLACE(d.defect_code, ' ', '')) LIKE '%'
+					|| UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 				</when>
 				<when test="searchType == 'itemName'">
-					AND UPPER(REPLACE(it.item_name, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					AND UPPER(REPLACE(it.item_name, ' ', '')) LIKE '%'
+					|| UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 				</when>
 				<when test="searchType == 'productLot'">
-					AND UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					AND UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%'
+					|| UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 				</when>
 				<when test="searchType == 'defectName'">
-					AND UPPER(REPLACE(d.defect_name, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					AND UPPER(REPLACE(d.defect_name, ' ', '')) LIKE '%'
+					|| UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 				</when>
 				<when test="searchType == 'ename'">
-					AND UPPER(REPLACE(e.ename, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					AND UPPER(REPLACE(e.ename, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 				</when>
 				<otherwise>
 					AND (
-						UPPER(REPLACE(d.defect_code, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						OR UPPER(REPLACE(it.item_name, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						OR UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						OR UPPER(REPLACE(d.defect_name, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
-						OR UPPER(REPLACE(e.ename, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					UPPER(REPLACE(d.defect_code, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					OR UPPER(REPLACE(it.item_name, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					OR UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					OR UPPER(REPLACE(d.defect_name, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					OR UPPER(REPLACE(e.ename, ' ', '')) LIKE '%' ||
+					UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 					)
 				</otherwise>
 			</choose>
@@ -579,105 +634,112 @@
 	<select id="_select_Defect_By_Inspection"
 		resultType="kr.or.saeroi.dto.DefectDTO">
 		SELECT
-			dl.defect_list_id,
-			dl.doc_no,
-			d.defect_id,
-			dl.insp_id,
-			i.doc_no AS insp_doc_no,
-			NVL(i.inspection_qty, 0) AS inspection_qty,
-			NVL(i.good_qty, 0) AS good_qty,
-			d.defect_code,
-			d.defect_type,
-			TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS defect_date,
-			it.item_code,
-			it.item_name,
-			it.item_unit,
-			CASE
-				WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
-				THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date, 'YYYYMMDD'), 1, 1)
-				ELSE w.product_lot
-			END AS product_lot,
-			d.defect_name,
-			d.action_dept,
-			d.action_dept AS dept,
-			e.ename,
-			NVL(dl.defect_qty, 0) AS defect_qty,
-			dl.remark,
-			NVL(dl.use_yn, 'Y') AS use_yn
+		dl.defect_list_id,
+		dl.doc_no,
+		d.defect_id,
+		dl.insp_id,
+		i.doc_no AS insp_doc_no,
+		NVL(i.inspection_qty, 0) AS inspection_qty,
+		NVL(i.good_qty, 0) AS good_qty,
+		d.defect_code,
+		d.defect_type,
+		TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS defect_date,
+		it.item_code,
+		it.item_name,
+		it.item_unit,
+		CASE
+		WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
+		THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date,
+		'YYYYMMDD'), 1, 1)
+		ELSE w.product_lot
+		END AS product_lot,
+		d.defect_name,
+		d.action_dept,
+		d.action_dept AS dept,
+		e.ename,
+		NVL(dl.defect_qty, 0) AS defect_qty,
+		dl.remark,
+		NVL(dl.use_yn, 'Y') AS use_yn
 		FROM defect_list dl,
-			defect d,
-			inspection i,
-			production p,
-			work_order w,
-			production_plan pr,
-			item it,
-			emp e
+		defect d,
+		inspection i,
+		production p,
+		work_order w,
+		production_plan pr,
+		item it,
+		emp e
 		WHERE dl.defect_id = d.defect_id
 		AND dl.insp_id = i.insp_id
-		AND i.prod_id = p.prod_id
+		AND
+		i.prod_id = p.prod_id
 		AND p.order_id = w.order_id
-		AND w.prod_plan_id = pr.prod_plan_id
+		AND w.prod_plan_id =
+		pr.prod_plan_id
 		AND pr.item_id = it.item_id
 		AND i.emp_id = e.emp_id
-		AND dl.insp_id = TO_NUMBER(#{insp_id})
+		AND
+		dl.insp_id = TO_NUMBER(#{insp_id})
 		AND NVL(dl.use_yn, 'Y') = 'Y'
-		AND NVL(i.use_yn, 'Y') = 'Y'
+		AND
+		NVL(i.use_yn, 'Y') = 'Y'
 		ORDER BY dl.defect_list_id DESC
 	</select>
 
 	<insert id="_insert_defect" parameterType="map">
-		<selectKey keyProperty="defect_list_id" resultType="int" order="BEFORE">
+		<selectKey keyProperty="defect_list_id" resultType="int"
+			order="BEFORE">
 			SELECT NVL(MAX(defect_list_id), 0) + 1 FROM defect_list
 		</selectKey>
 
 		INSERT INTO defect_list (
-			defect_list_id,
-			doc_no,
-			doc_seq,
-			defect_id,
-			insp_id,
-			defect_date,
-			defect_qty,
-			defect_photo,
-			remark,
-			created_date,
-			updated_date,
-			use_yn
+		defect_list_id,
+		doc_no,
+		doc_seq,
+		defect_id,
+		insp_id,
+		defect_date,
+		defect_qty,
+		defect_photo,
+		remark,
+		created_date,
+		updated_date,
+		use_yn
 		)
 		VALUES (
-			#{defect_list_id},
-			'DEF-' || TO_CHAR(TO_DATE(#{defect_date}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
-			LPAD(
-				(SELECT NVL(MAX(doc_seq), 0) + 1
-				FROM defect_list
-				WHERE TRUNC(defect_date) = TRUNC(TO_DATE(#{defect_date}, 'YYYY-MM-DD'))),
-				4,
-				'0'
-			),
-			(SELECT NVL(MAX(doc_seq), 0) + 1
-			FROM defect_list
-			WHERE TRUNC(defect_date) = TRUNC(TO_DATE(#{defect_date}, 'YYYY-MM-DD'))),
-			TO_NUMBER(#{defect_id}),
-			TO_NUMBER(#{insp_id}),
-			TO_DATE(#{defect_date}, 'YYYY-MM-DD'),
-			TO_NUMBER(#{defect_qty}),
-			#{defect_photo},
-			#{remark},
-			SYSDATE,
-			SYSDATE,
-			'Y'
+		#{defect_list_id},
+		'DEF-' || TO_CHAR(TO_DATE(#{defect_date}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-'
+		||
+		LPAD(
+		(SELECT NVL(MAX(doc_seq), 0) + 1
+		FROM defect_list
+		WHERE TRUNC(defect_date) = TRUNC(TO_DATE(#{defect_date}, 'YYYY-MM-DD'))),
+		4,
+		'0'
+		),
+		(SELECT NVL(MAX(doc_seq), 0) + 1
+		FROM defect_list
+		WHERE TRUNC(defect_date) = TRUNC(TO_DATE(#{defect_date}, 'YYYY-MM-DD'))),
+		TO_NUMBER(#{defect_id}),
+		TO_NUMBER(#{insp_id}),
+		TO_DATE(#{defect_date}, 'YYYY-MM-DD'),
+		TO_NUMBER(#{defect_qty}),
+		#{defect_photo},
+		#{remark},
+		SYSDATE,
+		SYSDATE,
+		'Y'
 		)
 	</insert>
 
 	<select id="_select_Defect_option"
 		resultType="kr.or.saeroi.dto.DefectDTO">
 		SELECT
-			defect_id,
-			defect_code,
-			defect_type,
-			defect_name,
-			action_dept,
-			action_dept AS dept
+		defect_id,
+		defect_code,
+		defect_type,
+		defect_name,
+		action_dept,
+		action_dept AS dept
 		FROM defect
 		WHERE defect_name IS NOT NULL
 		ORDER BY defect_name
@@ -686,7 +748,7 @@
 	<update id="_delete_Defect" parameterType="map">
 		UPDATE defect_list
 		SET use_yn = 'N',
-			updated_date = SYSDATE
+		updated_date = SYSDATE
 		WHERE defect_list_id IN
 		<foreach collection="defect_list_id" item="id" open="("
 			separator="," close=")">
@@ -697,264 +759,273 @@
 	<select id="_select_Defect_detail"
 		resultType="kr.or.saeroi.dto.DefectDTO">
 		SELECT
-			dl.defect_list_id,
-			dl.doc_no,
-			NVL(dl.doc_seq, 0) AS doc_seq,
-			d.defect_id,
-			dl.insp_id,
-			i.doc_no AS insp_doc_no,
-			NVL(i.inspection_qty, 0) AS inspection_qty,
-			NVL(i.good_qty, 0) AS good_qty,
-			d.defect_code,
-			d.defect_type,
-			TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS defect_date,
-			it.item_code,
-			it.item_name,
-			it.item_unit,
-			dl.defect_photo,
-			CASE
-				WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
-				THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date, 'YYYYMMDD'), 1, 1)
-				ELSE w.product_lot
-			END AS product_lot,
-			d.defect_name,
-			d.action_dept,
-			d.action_dept AS dept,
-			e.ename,
-			NVL(dl.defect_qty, 0) AS defect_qty,
-			dl.remark,
-			TO_CHAR(dl.created_date, 'YYYY-MM-DD HH24:MI') AS created_date,
-			TO_CHAR(dl.updated_date, 'YYYY-MM-DD HH24:MI') AS updated_date,
-			NVL(dl.use_yn, 'Y') AS use_yn,
-			p.doc_no AS prod_doc_no,
-			TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
-			NVL(p.prod_qty, 0) AS prod_qty,
-			NVL(p.loss_qty, 0) AS loss_qty,
-			p.prod_status,
-			w.doc_no AS work_order_doc_no,
-			NVL(w.order_qty, 0) AS order_qty,
-			TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date
+		dl.defect_list_id,
+		dl.doc_no,
+		NVL(dl.doc_seq, 0) AS doc_seq,
+		d.defect_id,
+		dl.insp_id,
+		i.doc_no AS insp_doc_no,
+		NVL(i.inspection_qty, 0) AS inspection_qty,
+		NVL(i.good_qty, 0) AS good_qty,
+		d.defect_code,
+		d.defect_type,
+		TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS defect_date,
+		it.item_code,
+		it.item_name,
+		it.item_unit,
+		dl.defect_photo,
+		CASE
+		WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
+		THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date,
+		'YYYYMMDD'), 1, 1)
+		ELSE w.product_lot
+		END AS product_lot,
+		d.defect_name,
+		d.action_dept,
+		d.action_dept AS dept,
+		e.ename,
+		NVL(dl.defect_qty, 0) AS defect_qty,
+		dl.remark,
+		TO_CHAR(dl.created_date, 'YYYY-MM-DD HH24:MI') AS created_date,
+		TO_CHAR(dl.updated_date, 'YYYY-MM-DD HH24:MI') AS updated_date,
+		NVL(dl.use_yn, 'Y') AS use_yn,
+		p.doc_no AS prod_doc_no,
+		TO_CHAR(p.prod_date, 'YYYY-MM-DD') AS prod_date,
+		NVL(p.prod_qty, 0) AS prod_qty,
+		NVL(p.loss_qty, 0) AS loss_qty,
+		p.prod_status,
+		w.doc_no AS work_order_doc_no,
+		NVL(w.order_qty, 0) AS order_qty,
+		TO_CHAR(w.order_date, 'YYYY-MM-DD') AS order_date
 		FROM defect_list dl,
-			defect d,
-			inspection i,
-			production p,
-			work_order w,
-			production_plan pr,
-			item it,
-			emp e
+		defect d,
+		inspection i,
+		production p,
+		work_order w,
+		production_plan pr,
+		item it,
+		emp e
 		WHERE dl.defect_id = d.defect_id
 		AND dl.insp_id = i.insp_id
-		AND i.prod_id = p.prod_id
+		AND
+		i.prod_id = p.prod_id
 		AND p.order_id = w.order_id
-		AND w.prod_plan_id = pr.prod_plan_id
+		AND w.prod_plan_id =
+		pr.prod_plan_id
 		AND pr.item_id = it.item_id
 		AND i.emp_id = e.emp_id
-		AND dl.defect_list_id = TO_NUMBER(#{defect_list_id})
-		AND NVL(dl.use_yn, 'Y') = 'Y'
+		AND
+		dl.defect_list_id = TO_NUMBER(#{defect_list_id})
+		AND NVL(dl.use_yn,
+		'Y') = 'Y'
 	</select>
 
 	<update id="_update_Defect" parameterType="map">
 		UPDATE defect_list
-		SET defect_date = TO_DATE(#{defect_date}, 'YYYY-MM-DD'),
-			defect_id = TO_NUMBER(#{defect_id}),
-			defect_qty = TO_NUMBER(#{defect_qty}),
-			remark = #{remark},
-			updated_date = SYSDATE
+		SET
+		defect_date = TO_DATE(#{defect_date}, 'YYYY-MM-DD'),
+		defect_id = TO_NUMBER(#{defect_id}),
+		defect_qty = TO_NUMBER(#{defect_qty}),
+		remark = #{remark},
+		updated_date = SYSDATE
 		WHERE defect_list_id = TO_NUMBER(#{defect_list_id})
-		AND NVL(use_yn, 'Y') = 'Y'
+		AND
+		NVL(use_yn, 'Y') = 'Y'
 	</update>
 
 	<select id="_select_Defect_action"
 		resultType="kr.or.saeroi.dto.DefectDTO">
 		SELECT
-			NVL(defect_action_id, 0) AS defect_action_id,
-			action_type,
-			defect_list_id,
-			NVL(sort_no, 0) AS sort_no,
-			action_date,
-			dept,
-			NVL(action_emp_id, 0) AS action_emp_id,
-			action_ename,
-			action_content
+		NVL(defect_action_id, 0) AS defect_action_id,
+		action_type,
+		defect_list_id,
+		NVL(sort_no, 0) AS sort_no,
+		action_date,
+		dept,
+		NVL(action_emp_id, 0) AS action_emp_id,
+		action_ename,
+		action_content
 		FROM (
-			SELECT
-				NVL(da.defect_action_id, 0) AS defect_action_id,
-				da.action_type,
-				dl.defect_list_id,
-				NVL(da.sort_no, 999) AS sort_no,
-				TO_CHAR(NVL(da.action_date, dl.defect_date), 'YYYY-MM-DD') AS action_date,
-				d.action_dept AS dept,
-				NVL(da.emp_id, 0) AS action_emp_id,
-				NVL(e.ename, '-') AS action_ename,
-				da.action_content,
-				CASE
-					WHEN da.defect_list_id = dl.defect_list_id THEN 2
-					ELSE 1
-				END AS sort_group
-			FROM defect_list dl,
-				defect d,
-				defect_action da,
-				emp e
-			WHERE dl.defect_id = d.defect_id
-			AND da.emp_id = e.emp_id(+)
-			AND dl.defect_list_id = TO_NUMBER(#{defect_list_id})
-			AND NVL(da.use_yn, 'Y') = 'Y'
-			AND (
-    da.defect_list_id = dl.defect_list_id
-    OR (
-        da.defect_id = dl.defect_id
-        AND da.defect_list_id IS NULL
-        AND NOT EXISTS (
-            SELECT 1 FROM defect_action
-            WHERE defect_list_id = dl.defect_list_id
-            AND action_type = 'DIRECT'
-        )
-    )
-)
+		SELECT
+		NVL(da.defect_action_id, 0) AS defect_action_id,
+		da.action_type,
+		dl.defect_list_id,
+		NVL(da.sort_no, 999) AS sort_no,
+		TO_CHAR(NVL(da.action_date, dl.defect_date), 'YYYY-MM-DD') AS action_date,
+		d.action_dept AS dept,
+		NVL(da.emp_id, 0) AS action_emp_id,
+		NVL(e.ename, '-') AS action_ename,
+		da.action_content,
+		CASE
+		WHEN da.defect_list_id = dl.defect_list_id THEN 2
+		ELSE 1
+		END AS sort_group
+		FROM defect_list dl,
+		defect d,
+		defect_action da,
+		emp e
+		WHERE dl.defect_id = d.defect_id
+		AND da.emp_id = e.emp_id(+)
+		AND dl.defect_list_id = TO_NUMBER(#{defect_list_id})
+		AND NVL(da.use_yn, 'Y') = 'Y'
+		AND (
+		da.defect_list_id = dl.defect_list_id
+		OR (
+		da.defect_id = dl.defect_id
+		AND da.defect_list_id IS NULL
+		AND NOT EXISTS (
+		SELECT 1 FROM defect_action
+		WHERE defect_list_id = dl.defect_list_id
+		AND action_type = 'DIRECT'
+		)
+		)
+		)
 		)
 		ORDER BY
-			sort_group ASC,
-			sort_no ASC,
-			defect_action_id ASC
+		sort_group ASC,
+		sort_no ASC,
+		defect_action_id ASC
 	</select>
 
 	<select id="_select_Defect_Action_By_Inspection"
 		resultType="kr.or.saeroi.dto.DefectDTO">
 		SELECT
-			NVL(defect_action_id, 0) AS defect_action_id,
-			action_type,
-			defect_list_id,
-			defect_name,
-			NVL(sort_no, 0) AS sort_no,
-			action_date,
-			dept,
-			NVL(action_emp_id, 0) AS action_emp_id,
-			action_ename,
-			action_content
+		NVL(defect_action_id, 0) AS defect_action_id,
+		action_type,
+		defect_list_id,
+		defect_name,
+		NVL(sort_no, 0) AS sort_no,
+		action_date,
+		dept,
+		NVL(action_emp_id, 0) AS action_emp_id,
+		action_ename,
+		action_content
 		FROM (
-			SELECT
-				NVL(da.defect_action_id, 0) AS defect_action_id,
-				da.action_type,
-				dl.defect_list_id,
-				d.defect_name,
-				NVL(da.sort_no, 999) AS sort_no,
-				TO_CHAR(NVL(da.action_date, dl.defect_date), 'YYYY-MM-DD') AS action_date,
-				d.action_dept AS dept,
-				NVL(da.emp_id, 0) AS action_emp_id,
-				NVL(e.ename, '-') AS action_ename,
-				da.action_content,
-				CASE
-					WHEN da.defect_list_id = dl.defect_list_id THEN 2
-					ELSE 1
-				END AS sort_group
-			FROM defect_list dl,
-				defect d,
-				defect_action da,
-				emp e
-			WHERE dl.defect_id = d.defect_id
-			AND da.emp_id = e.emp_id(+)
-			AND dl.insp_id = TO_NUMBER(#{insp_id})
-			AND NVL(dl.use_yn, 'Y') = 'Y'
-			AND NVL(da.use_yn, 'Y') = 'Y'
-			AND (
-				da.defect_list_id = dl.defect_list_id
-				OR (
-					da.defect_id = dl.defect_id
-					AND da.defect_list_id IS NULL
-					AND NOT EXISTS (
-						SELECT 1 FROM defect_action
-						WHERE defect_list_id = dl.defect_list_id
-						AND action_type = 'DIRECT'
-						AND NVL(use_yn, 'Y') = 'Y'
-					)
-				)
-			)
+		SELECT
+		NVL(da.defect_action_id, 0) AS defect_action_id,
+		da.action_type,
+		dl.defect_list_id,
+		d.defect_name,
+		NVL(da.sort_no, 999) AS sort_no,
+		TO_CHAR(NVL(da.action_date, dl.defect_date), 'YYYY-MM-DD') AS action_date,
+		d.action_dept AS dept,
+		NVL(da.emp_id, 0) AS action_emp_id,
+		NVL(e.ename, '-') AS action_ename,
+		da.action_content,
+		CASE
+		WHEN da.defect_list_id = dl.defect_list_id THEN 2
+		ELSE 1
+		END AS sort_group
+		FROM defect_list dl,
+		defect d,
+		defect_action da,
+		emp e
+		WHERE dl.defect_id = d.defect_id
+		AND da.emp_id = e.emp_id(+)
+		AND dl.insp_id = TO_NUMBER(#{insp_id})
+		AND NVL(dl.use_yn, 'Y') = 'Y'
+		AND NVL(da.use_yn, 'Y') = 'Y'
+		AND (
+		da.defect_list_id = dl.defect_list_id
+		OR (
+		da.defect_id = dl.defect_id
+		AND da.defect_list_id IS NULL
+		AND NOT EXISTS (
+		SELECT 1 FROM defect_action
+		WHERE defect_list_id = dl.defect_list_id
+		AND action_type = 'DIRECT'
+		AND NVL(use_yn, 'Y') = 'Y'
+		)
+		)
+		)
 		)
 		ORDER BY
-			defect_list_id DESC,
-			sort_group ASC,
-			sort_no ASC,
-			defect_action_id ASC
+		defect_list_id DESC,
+		sort_group ASC,
+		sort_no ASC,
+		defect_action_id ASC
 	</select>
 
 	<insert id="_insert_Defect_action" parameterType="map">
-		INSERT INTO defect_action (
-			defect_action_id,
-			action_type,
-			defect_list_id,
-			sort_no,
-			action_date,
-			emp_id,
-			action_content,
-			use_yn,
-			created_date,
-			updated_date
+		INSERT INTO
+		defect_action (
+		defect_action_id,
+		action_type,
+		defect_list_id,
+		sort_no,
+		action_date,
+		emp_id,
+		action_content,
+		use_yn,
+		created_date,
+		updated_date
 		)
 		VALUES (
-			(SELECT NVL(MAX(defect_action_id), 0) + 1 FROM defect_action),
-			'DIRECT',
-			TO_NUMBER(#{defect_list_id}),
-			999,
-			NVL(TO_DATE(#{action_date}, 'YYYY-MM-DD'), SYSDATE),
-			TO_NUMBER(#{emp_id}),
-			#{action_content},
-			'Y',
-			SYSDATE,
-			SYSDATE
+		(SELECT NVL(MAX(defect_action_id), 0) + 1 FROM defect_action),
+		'DIRECT',
+		TO_NUMBER(#{defect_list_id}),
+		999,
+		NVL(TO_DATE(#{action_date}, 'YYYY-MM-DD'), SYSDATE),
+		TO_NUMBER(#{emp_id}),
+		#{action_content},
+		'Y',
+		SYSDATE,
+		SYSDATE
 		)
 	</insert>
 
 	<select id="_select_Defect_action_emp_option"
 		resultType="kr.or.saeroi.dto.DefectDTO">
 		SELECT
-			e.emp_id AS action_emp_id,
-			e.ename AS action_ename,
-			e.dept
+		e.emp_id AS action_emp_id,
+		e.ename AS action_ename,
+		e.dept
 		FROM emp e
 		WHERE e.dept = #{dept}
 		AND e.status = '재직'
-		AND e.ename IS NOT NULL
+		AND e.ename IS NOT
+		NULL
 		ORDER BY
-			CASE
-				WHEN e.role = 'MANAGER' THEN 1
-				WHEN e.role = 'ADMIN' THEN 2
-				ELSE 3
-			END,
-			e.ename
+		CASE
+		WHEN e.role = 'MANAGER' THEN 1
+		WHEN e.role = 'ADMIN' THEN 2
+		ELSE 3
+		END,
+		e.ename
 	</select>
-	
-<!-- 대시보드 최근 7일 불량유형별 수량 TOP5 조회 -->
-<select id="_select_Dashboard_DefectTop5"
-	resultType="kr.or.saeroi.dto.DefectDTO">
-	SELECT
+
+	<!-- 대시보드 최근 7일 불량유형별 수량 TOP5 조회 -->
+	<select id="_select_Dashboard_DefectTop5"
+		resultType="kr.or.saeroi.dto.DefectDTO">
+		SELECT
 		defect_type,
 		defect_qty,
 		sort_no
-	FROM (
-		SELECT
-			top_data.*,
-			ROW_NUMBER() OVER (
-				ORDER BY top_data.defect_qty DESC, top_data.defect_type ASC
-			) AS rn
 		FROM (
-			SELECT
-				d.defect_type AS defect_type,
-				SUM(NVL(dl.defect_qty, 0)) AS defect_qty,
-				ROUND(
-					SUM(NVL(dl.defect_qty, 0))
-					/ SUM(SUM(NVL(dl.defect_qty, 0))) OVER ()
-					* 100
-				) AS sort_no
-			FROM defect_list dl,
-				defect d
-			WHERE dl.defect_id = d.defect_id
-			AND NVL(dl.use_yn, 'Y') = 'Y'
-			AND dl.defect_date &gt;= TRUNC(SYSDATE) - 6
-			AND dl.defect_date &lt; TRUNC(SYSDATE) + 1
-			GROUP BY d.defect_type
+		SELECT
+		top_data.*,
+		ROW_NUMBER() OVER (
+		ORDER BY top_data.defect_qty DESC, top_data.defect_type ASC
+		) AS rn
+		FROM (
+		SELECT
+		d.defect_type AS defect_type,
+		SUM(NVL(dl.defect_qty, 0)) AS defect_qty,
+		ROUND(
+		SUM(NVL(dl.defect_qty, 0))
+		/ SUM(SUM(NVL(dl.defect_qty, 0))) OVER ()
+		* 100
+		) AS sort_no
+		FROM defect_list dl,
+		defect d
+		WHERE dl.defect_id = d.defect_id
+		AND NVL(dl.use_yn, 'Y') = 'Y'
+		AND dl.defect_date &gt;= TRUNC(SYSDATE) - 6
+		AND dl.defect_date &lt; TRUNC(SYSDATE) + 1
+		GROUP BY d.defect_type
 		) top_data
-	)
-	WHERE rn &lt;= 5
-	ORDER BY defect_qty DESC, defect_type ASC
-</select>
+		)
+		WHERE rn &lt;= 5
+		ORDER BY defect_qty DESC, defect_type ASC
+	</select>
 </mapper>

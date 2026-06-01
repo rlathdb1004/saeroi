@@ -108,6 +108,42 @@ public class DashboardController {
 
 		return result;
 	}
+	
+	// 대시보드 현장 이슈와 LOT 간략 목록을 조회한다.
+	@GetMapping("/dashboard/detail/list")
+	@ResponseBody
+	public Map<String, Object> dashboardDetailList(
+			@RequestParam(value = "detailType", required = false) String detailType) {
+
+		Map<String, Object> result = new HashMap<>();
+
+		if (!isAllowedDashboardDetailType(detailType)) {
+			result.put("success", false);
+			result.put("message", "허용되지 않은 상세 유형입니다.");
+			return result;
+		}
+
+		Map<String, Object> param = new HashMap<>();
+		param.put("detailType", detailType);
+
+		List<Map<String, Object>> detailList = chartService.dashboardDetailList(param);
+
+		result.put("success", true);
+		result.put("detailType", detailType);
+		result.put("detailList", detailList);
+
+		return result;
+	}
+
+	// 대시보드 현장 이슈와 LOT 상세 유형을 확인한다.
+	private boolean isAllowedDashboardDetailType(String detailType) {
+		return "defectIssue".equals(detailType)
+				|| "equipmentIssue".equals(detailType)
+				|| "delayLot".equals(detailType)
+				|| "inspectionWaitLot".equals(detailType)
+				|| "shipmentWaitLot".equals(detailType);
+	}
+	
 
 	// KPI 상세 모달에서 허용된 KPI 유형인지 확인한다.
 	private boolean isAllowedKpiType(String kpiType) {
