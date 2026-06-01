@@ -10,6 +10,7 @@ public class EquipmentStatusDTO {
 
 	private int history_id;
 	private int equip_id;
+	private int equip_main_id;
 	private int trouble_id;
 	private String equip_code;
 	private String equip_name;
