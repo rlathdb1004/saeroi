@@ -19,7 +19,7 @@
 									or sessionScope.loginUser.role eq 'MANAGER'}">
                             <c:if test="${mode ne 'edit'}">
                                 <button type="button" class="detail_btn_green"
-                                    onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/trouble_detail?trouble_id=${eqp.trouble_id}&mode=edit'">
+                                    onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/trouble_detail?trouble_id=${eqp.trouble_id}&history_id=${param.history_id}&mode=edit'">
 
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -46,7 +46,7 @@
                                 </button>
 
                                 <button type="button" class="detail_btn_line"
-                                    onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/trouble_detail?trouble_id=${eqp.trouble_id}'">
+                                    onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/trouble_detail?trouble_id=${eqp.trouble_id}&history_id=${param.history_id}'">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                                         style="vertical-align: -3px; margin-right: 6px;" aria-hidden="true">
@@ -61,7 +61,7 @@
                         </c:if>
 
                         <button type="button" class="detail_btn_line"
-                            onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/detail?history_id=${eqp.history_id}'">
+                            onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/detail?history_id=${param.history_id}'">
 
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -84,7 +84,7 @@
                         <form id="updateForm" method="post"
                             action="${pageContext.request.contextPath}/equipment_trouble/update">
 
-                            <input type="hidden" name="history_id" value="${eqp.history_id}">
+                            <input type="hidden" name="history_id" value="${param.history_id}">
                             <input type="hidden" name="equip_id" value="${eqp.equip_id}">
                             <input type="hidden" name="trouble_id" value="${eqp.trouble_id}">
 
@@ -98,13 +98,12 @@
 
                                         <th>고장 원인</th>
                                         <td>
-                                            <input type="text" name="trouble_content" value=" ${eqp.trouble_content}">
+                                            <input type="text" name="trouble_content" value="${eqp.trouble_content}">
                                         </td>
 
                                         <th>고장 발생 일시</th>
                                         <td>
-                                            <input type="datetime-local" name="trouble_date"
-                                                value="${eqp.trouble_date}">
+                                            <input type="datetime-local" name="trouble_date" value="${troubleDate}">
                                         </td>
                                     </tr>
 
@@ -128,8 +127,7 @@
 
                                         <th>해결 일시</th>
                                         <td>
-                                            <input type="datetime-local" name="resolve_date"
-                                                value="${eqp.resolve_date}">
+                                           <input type="datetime-local" name="resolve_date" value="${resolveDate}">
                                         </td>
                                     </tr>
 

@@ -1,5 +1,6 @@
 package kr.or.saeroi.controller;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,11 +80,33 @@ public class LotController {
 			@RequestParam("orderId") Integer orderId,
 			Model model) {
 
-		// 작업지시 ID 기준으로 LOT 전체 이력을 조회한다.
+		// 작업지시 ID 기준으로 LOT 기본 정보를 조회한다.
 		LotDTO lot = lotService.selectLotHistoryDetail(orderId);
 
-		// 상세 JSP에서 사용할 LOT 이력 데이터이다.
+		// LOT에 연결된 자재, 생산, 검사, 불량, 완제품 입출고 이력을 각각 조회한다.
+		List<LotDTO> materialHistoryList = Collections.emptyList();
+		List<LotDTO> productionHistoryList = Collections.emptyList();
+		List<LotDTO> inspectionHistoryList = Collections.emptyList();
+		List<LotDTO> defectHistoryList = Collections.emptyList();
+		List<LotDTO> productInoutHistoryList = Collections.emptyList();
+
+		if (lot != null) {
+			materialHistoryList = lotService.selectLotMaterialHistoryList(orderId);
+			productionHistoryList = lotService.selectLotProductionHistoryList(orderId);
+			inspectionHistoryList = lotService.selectLotInspectionHistoryList(orderId);
+			defectHistoryList = lotService.selectLotDefectHistoryList(orderId);
+			productInoutHistoryList = lotService.selectLotProductInoutHistoryList(orderId);
+		}
+
+		// 상세 JSP에서 사용할 LOT 기본 정보이다.
 		model.addAttribute("lot", lot);
+
+		// 상세 JSP에서 섹션별로 사용할 LOT 연결 이력이다.
+		model.addAttribute("materialHistoryList", materialHistoryList);
+		model.addAttribute("productionHistoryList", productionHistoryList);
+		model.addAttribute("inspectionHistoryList", inspectionHistoryList);
+		model.addAttribute("defectHistoryList", defectHistoryList);
+		model.addAttribute("productInoutHistoryList", productInoutHistoryList);
 
 		// 공통 header.jsp에서 사용할 상단 제목이다.
 		model.addAttribute("headerTitle", "LOT 이력추적");
