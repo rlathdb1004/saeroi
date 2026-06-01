@@ -278,7 +278,7 @@ public class LoginDAO {
 	    List<LoginDTO> list = new ArrayList<>();
 
 	    String sql =
-	        "SELECT EMPNO, ENAME " +
+	        "SELECT EMP_ID, EMPNO, ENAME " +
 	        "FROM EMP " +
 //	        "WHERE STATUS = '재직' " +
 	        "ORDER BY ENAME";
@@ -290,7 +290,8 @@ public class LoginDAO {
 	        while (rs.next()) {
 
 	            LoginDTO dto = new LoginDTO();
-
+	            
+	            dto.setEmp_id(rs.getInt("EMP_ID"));
 	            dto.setEmpno(rs.getString("EMPNO"));
 	            dto.setEname(rs.getString("ENAME"));
 

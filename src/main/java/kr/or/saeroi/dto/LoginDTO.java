@@ -5,6 +5,7 @@ import lombok.Data;
 
 @Data
 public class LoginDTO {	
+	private int emp_id;
 	private String empno;
 	private String emp_pw;
 	private String ename;	

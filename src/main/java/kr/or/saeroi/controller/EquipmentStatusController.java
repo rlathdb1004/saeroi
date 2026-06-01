@@ -1,5 +1,6 @@
 package kr.or.saeroi.controller;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
@@ -113,10 +114,50 @@ public class EquipmentStatusController {
         return "redirect:/equipment/equipmentstatus";
     }
     
+
     @PostMapping("/equipment_trouble/insert")
-    public String trouble_insert(EquipmentStatusDTO dto) {
+    public String trouble_insert(
+            @RequestParam int equip_id,
+            @RequestParam int emp_id,
+            @RequestParam String trouble_content,
+            @RequestParam(required = false) String trouble_resolve,
+            @RequestParam(required = false) String remark,
+            @RequestParam String trouble_date,
+            @RequestParam(required = false) String resolve_date,
+            @RequestParam int history_id
+    ) {
+
+        EquipmentTroubleDTO dto = new EquipmentTroubleDTO();
+
+        dto.setEquip_id(equip_id);
+        dto.setEmp_id(emp_id);
+        dto.setTrouble_content(trouble_content);
+        dto.setTrouble_resolve(trouble_resolve);
+        dto.setRemark(remark);
+
+        dto.setTrouble_date(
+            Timestamp.valueOf(
+                trouble_date.replace("T", " ") + ":00"
+            )
+        );
+
+        if(resolve_date != null && !resolve_date.isEmpty()) {
+            dto.setResolve_date(
+                Timestamp.valueOf(
+                    resolve_date.replace("T", " ") + ":00"
+                )
+            );
+        }
+
         service.trouble_insert(dto);
-        return "redirect:/equipment/equipmentstatus/detail?history_id=\" + dto.getHistory_id()";
+
+        return "redirect:/equipment/equipmentstatus/detail?history_id=" + history_id;
+    }
+    
+    @PostMapping("/equipment_maintenance/insert")
+    public String maintenance_insert(EquipmentMaintenanceDTO dto) {
+        service.maintenance_insert(dto);
+        return "redirect:/equipment/equipmentstatus/detail?history_id=" + dto.getHistory_id();
     }
     
     @PostMapping("/equipment_trouble/update")
