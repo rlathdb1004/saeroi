@@ -346,7 +346,7 @@
 			</span>
 
 			<div class="dash-lot-info">
-				<span>출하대기 LOT</span>
+				<span>완제품 출하대기 LOT</span>
 				<strong class="dash-blue-text">7건</strong>
 			</div>
 
@@ -462,7 +462,7 @@
 					<h3>생산원가 추이</h3>
 
 					<div class="dash-card-head-right">
-						<span class="dash-unit-text">단위: 만원</span>
+						<span class="dash-unit-text">단위: 원/EA</span>
 					</div>
 				</div>
 
@@ -473,102 +473,133 @@
 				<div class="dash-chart-summary">
 					<div class="dash-summary-item">
 						<span class="dash-summary-label">이번 주 평균 원가</span>
-						<strong class="dash-summary-value dash-black-text">856 만원</strong>
+						<strong class="dash-summary-value dash-black-text">
+							<fmt:formatNumber value="${dashCostWeekAvg}" pattern="#,##0" /> 원/EA
+						</strong>
 					</div>
 
 					<div class="dash-summary-item">
 						<span class="dash-summary-label">목표 대비</span>
-						<strong class="dash-summary-value dash-green-text">▼ 3.9%</strong>
+						<strong class="dash-summary-value ${dashCostTargetCompareClass}">
+							${dashCostTargetCompareArrow}
+							<fmt:formatNumber value="${dashCostTargetCompareRate}" pattern="#,##0.0" />%
+						</strong>
 					</div>
 
 					<div class="dash-summary-item">
 						<span class="dash-summary-label">전주 대비</span>
-						<strong class="dash-summary-value dash-green-text">▼ 1.2%</strong>
+						<strong class="dash-summary-value ${dashCostWeekCompareClass}">
+							${dashCostWeekCompareArrow}
+							<fmt:formatNumber value="${dashCostWeekCompareRate}" pattern="#,##0.0" />%
+						</strong>
 					</div>
 				</div>
 			</article>
 
 			<article class="dash-card dash-facility-card">
-	<div class="dash-card-head">
-		<h3>설비 가동 현황</h3>
+				<div class="dash-card-head">
+					<h3>설비 가동 현황</h3>
 
-		<div class="dash-card-head-right dash-facility-head-right">
-			<div class="dash-facility-head-meta">
-				<span class="dash-unit-text">단위: %</span>
-				<span class="dash-total-text">전체 48대</span>
-			</div>
+					<div class="dash-card-head-right dash-facility-head-right">
+						<div class="dash-facility-head-meta">
+							<span class="dash-unit-text">단위: %</span>
+							<span class="dash-total-text">
+								전체 <fmt:formatNumber value="${dashFacilityTotalCount}" pattern="#,##0" />대
+							</span>
+						</div>
 
-			<div class="dash-facility-toggle" aria-label="설비 가동 차트 표시 선택">
-				<button type="button" class="dash-facility-toggle-btn is-active" data-facility-index="0">
-					<i class="dash-facility-toggle-dot dash-facility-toggle-green"></i>
-					가동
-				</button>
+						<div class="dash-facility-toggle" aria-label="설비 가동 차트 표시 선택">
+							<button type="button" class="dash-facility-toggle-btn is-active" data-facility-index="0">
+								<i class="dash-facility-toggle-dot dash-facility-toggle-green"></i>
+								가동
+							</button>
 
-				<button type="button" class="dash-facility-toggle-btn is-active" data-facility-index="1">
-					<i class="dash-facility-toggle-dot dash-facility-toggle-gray"></i>
-					비가동
-				</button>
-			</div>
-		</div>
-	</div>
-
-	<div class="dash-facility-body">
-		<div class="dash-facility-chart">
-			<canvas id="facilityChart"></canvas>
-
-			<div class="dash-facility-center">
-				<strong>82.3%</strong>
-				<span>가동률</span>
-			</div>
-		</div>
-
-		<ul class="dash-facility-list">
-			<li>
-				<i class="dash-legend-dot dash-legend-green"></i>
-				<span>가동</span>
-				<div class="dash-facility-meta">
-					<strong>32대</strong>
-					<em class="dash-green-text">66.7%</em>
+							<button type="button" class="dash-facility-toggle-btn is-active" data-facility-index="1">
+								<i class="dash-facility-toggle-dot dash-facility-toggle-gray"></i>
+								비가동
+							</button>
+						</div>
+					</div>
 				</div>
-			</li>
 
-			<li>
-				<i class="dash-legend-dot dash-legend-orange"></i>
-				<span>대기</span>
-				<div class="dash-facility-meta">
-					<strong>10대</strong>
-					<em class="dash-orange-text">20.8%</em>
+				<div class="dash-facility-body">
+					<div class="dash-facility-chart">
+						<canvas id="facilityChart"></canvas>
+
+						<div class="dash-facility-center">
+							<strong>
+								<fmt:formatNumber value="${dashFacilityRunRate}" pattern="#,##0.0" />%
+							</strong>
+							<span>가동률</span>
+						</div>
+					</div>
+
+					<ul class="dash-facility-list">
+						<li>
+							<i class="dash-legend-dot dash-legend-green"></i>
+							<span>가동</span>
+							<div class="dash-facility-meta">
+								<strong>
+									<fmt:formatNumber value="${dashFacilityRunningCount}" pattern="#,##0" />대
+								</strong>
+								<em class="dash-green-text">
+									<fmt:formatNumber value="${dashFacilityRunRate}" pattern="#,##0.0" />%
+								</em>
+							</div>
+						</li>
+
+						<li>
+							<i class="dash-legend-dot dash-legend-orange"></i>
+							<span>점검/대기</span>
+							<div class="dash-facility-meta">
+								<strong>
+									<fmt:formatNumber value="${dashFacilityCheckCount}" pattern="#,##0" />대
+								</strong>
+								<em class="dash-orange-text">
+									<fmt:formatNumber value="${dashFacilityCheckRate}" pattern="#,##0.0" />%
+								</em>
+							</div>
+						</li>
+
+						<li>
+							<i class="dash-legend-dot dash-legend-red"></i>
+							<span>비가동/정지</span>
+							<div class="dash-facility-meta">
+								<strong>
+									<fmt:formatNumber value="${dashFacilityStopCount}" pattern="#,##0" />대
+								</strong>
+								<em class="dash-red-text">
+									<fmt:formatNumber value="${dashFacilityStopRate}" pattern="#,##0.0" />%
+								</em>
+							</div>
+						</li>
+					</ul>
 				</div>
-			</li>
 
-			<li>
-				<i class="dash-legend-dot dash-legend-red"></i>
-				<span>정지</span>
-				<div class="dash-facility-meta">
-					<strong>6대</strong>
-					<em class="dash-red-text">12.5%</em>
+				<div class="dash-chart-summary dash-chart-summary-neutral">
+					<div class="dash-summary-item">
+						<span class="dash-summary-label">가동률 목표</span>
+						<strong class="dash-summary-value">
+							<fmt:formatNumber value="${dashFacilityTargetRate}" pattern="#,##0.0" />%
+						</strong>
+					</div>
+
+					<div class="dash-summary-item">
+						<span class="dash-summary-label">목표 대비</span>
+						<strong class="dash-summary-value ${dashFacilityTargetClass}">
+							${dashFacilityTargetArrow}
+							<fmt:formatNumber value="${dashFacilityTargetGap}" pattern="#,##0.0" />%p
+						</strong>
+					</div>
+
+					<div class="dash-summary-item">
+						<span class="dash-summary-label">비가동률</span>
+						<strong class="dash-summary-value dash-orange-text">
+							<fmt:formatNumber value="${dashFacilityNonRunRate}" pattern="#,##0.0" />%
+						</strong>
+					</div>
 				</div>
-			</li>
-		</ul>
-	</div>
-
-	<div class="dash-chart-summary dash-chart-summary-neutral">
-		<div class="dash-summary-item">
-			<span class="dash-summary-label">가동률 목표</span>
-			<strong class="dash-summary-value">80.0%</strong>
-		</div>
-
-		<div class="dash-summary-item">
-			<span class="dash-summary-label">목표 대비</span>
-			<strong class="dash-summary-value dash-green-text">+2.3%p</strong>
-		</div>
-
-		<div class="dash-summary-item">
-			<span class="dash-summary-label">전일 대비</span>
-			<strong class="dash-summary-value dash-green-text">+0.8%p</strong>
-		</div>
-	</div>
-</article>
+			</article>
 		</div>
 
 	</section>
@@ -589,7 +620,7 @@
 						<div class="dash-flow-scroll">
 							<div class="dash-flow-list">
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step" onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn'">
 									<span>
 										<svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M3 7L12 2L21 7L12 12L3 7Z"></path>
@@ -602,7 +633,7 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step" onclick="location.href='${pageContext.request.contextPath}/production/productionplan'">
 									<span>
 										<svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M8 2V5"></path>
@@ -617,7 +648,7 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step" onclick="location.href='${pageContext.request.contextPath}/production/workorder'">
 									<span>
 										<svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M8 6H21"></path>
@@ -633,7 +664,7 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step" onclick="location.href='${pageContext.request.contextPath}/production/processprogress'">
 									<span>
 										<svg viewBox="0 0 24 24" aria-hidden="true">
 											<circle cx="12" cy="12" r="3"></circle>
@@ -645,7 +676,7 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step" onclick="location.href='${pageContext.request.contextPath}/production/productionresult'">
 									<span>
 										<svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M4 19V5"></path>
@@ -660,7 +691,7 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step" onclick="location.href='${pageContext.request.contextPath}/quality/inspection'">
 									<span>
 										<svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M12 22S20 18 20 10V5L12 2L4 5V10C4 18 12 22 12 22Z"></path>
@@ -672,7 +703,7 @@
 
 								<em>›</em>
 
-								<div class="dash-flow-step">
+								<div class="dash-flow-step" onclick="location.href='${pageContext.request.contextPath}/inventory/inventoryStatus'">
 									<span>
 										<svg viewBox="0 0 24 24" aria-hidden="true">
 											<path d="M3 7H16V17H3Z"></path>
@@ -749,7 +780,7 @@
 		<article class="dash-card dash-bottom-card">
 			<div class="dash-card-head">
 				<h3>최근 작업지시</h3>
-				<a href="${pageContext.request.contextPath}/production/workOrder"
+				<a href="${pageContext.request.contextPath}/production/workorder"
 					class="dash-more-link">더보기</a>
 			</div>
 
@@ -1004,6 +1035,48 @@
 		const defectYAxisStep = defectYAxisMax <= 5
 			? 1
 			: Math.ceil(defectYAxisMax / 5);
+
+		// 생산원가 추이 DB 데이터이다.
+		const costLabels = [
+			<c:forEach var="row" items="${dashCostTrendList}" varStatus="status">
+				"${row.LABEL}"<c:if test="${!status.last}">,</c:if>
+			</c:forEach>
+		];
+
+		const costActualData = [
+			<c:forEach var="row" items="${dashCostTrendList}" varStatus="status">
+				<c:choose>
+					<c:when test="${empty row.ACTUALCOST}">null</c:when>
+					<c:otherwise>${row.ACTUALCOST}</c:otherwise>
+				</c:choose><c:if test="${!status.last}">,</c:if>
+			</c:forEach>
+		];
+
+		const costTargetData = [
+			<c:forEach var="row" items="${dashCostTrendList}" varStatus="status">
+				<c:choose>
+					<c:when test="${empty row.TARGETCOST}">0</c:when>
+					<c:otherwise>${row.TARGETCOST}</c:otherwise>
+				</c:choose><c:if test="${!status.last}">,</c:if>
+			</c:forEach>
+		];
+
+		// 생산원가 추이 Y축 최대값을 DB 데이터 기준으로 계산한다.
+		const costValidValues = costActualData
+			.concat(costTargetData)
+			.filter(function(value) {
+				return value !== null && value !== undefined && !Number.isNaN(Number(value));
+			});
+
+		const costMaxValue = Math.max(...costValidValues, 0);
+
+		const costYAxisMax = costMaxValue <= 0
+			? 1000
+			: Math.ceil((costMaxValue * 1.2) / 100) * 100;
+
+		const costYAxisStep = costYAxisMax <= 1000
+			? 200
+			: Math.ceil((costYAxisMax / 5) / 100) * 100;
 
 		// 숫자 포맷터이다.
 		const dashNumberFormatter = new Intl.NumberFormat("ko-KR");
@@ -1419,7 +1492,7 @@
 
 			// 불량 추이 그래프 클릭 시 품질 리포트로 이동한다.
 			defectOption.onClick = function() {
-				location.href = "${pageContext.request.contextPath}/report/qualityreport";
+				location.href = "${pageContext.request.contextPath}/report/chart";
 			};
 
 			// 불량 추이 그래프에 마우스를 올리면 클릭 가능하게 보여준다.
@@ -1464,13 +1537,13 @@
 
 		if (costCanvas != null) {
 			const costOption = dashCreateLineOption(
-					1200,
-					200,
+					costYAxisMax,
+					costYAxisStep,
 					function(value) {
 						return dashFormatNumber(value);
 					},
 					function(value) {
-						return dashFormatNumber(value) + " 만원";
+						return dashFormatNumber(value) + " 원/EA";
 					}
 			);
 
@@ -1497,16 +1570,21 @@
 				target.style.cursor = elements != null && elements.length > 0 ? "pointer" : "default";
 			};
 
+			// 생산원가 그래프 클릭 시 생산 리포트로 이동한다.
+			costOption.onClick = function() {
+				location.href = "${pageContext.request.contextPath}/report/productionreport";
+			};
+
 			dashCreateChart("생산원가 추이 차트", costCanvas, {
 				type : "bar",
 				plugins : [ dashValueBadgePlugin ],
 				data : {
-					labels : labels,
+					labels : costLabels,
 					datasets : [
 						{
 							type : "bar",
 							label : "생산원가",
-							data : [ 920, 900, 800, 770, 790, 790, 820 ],
+							data : costActualData,
 							backgroundColor : function(context) {
 								if (context.active) {
 									return "#1F7A57";
@@ -1532,7 +1610,7 @@
 						{
 							type : "line",
 							label : "목표원가",
-							data : [ 820, 820, 820, 820, 820, 820, 820 ],
+							data : costTargetData,
 							borderColor : chartGray,
 							borderWidth : 2,
 							borderDash : [ 6, 6 ],
@@ -1616,7 +1694,10 @@
 					labels : [ "가동", "비가동" ],
 					datasets : [
 						{
-							data : [ 82.3, 17.7 ],
+							data : [
+								Number("${dashFacilityRunRate}"),
+								Number("${dashFacilityNonRunRate}")
+							],
 							backgroundColor : function(context) {
 								const chart = context.chart;
 								const chartArea = chart.chartArea;
@@ -1659,15 +1740,21 @@
 					cutout : "68%",
 					rotation : -90,
 					circumference : 180,
-					onHover : function(event, elements) {
+
+					// 설비 가동 현황에 마우스를 올리면 클릭 가능하게 보여준다.
+					onHover : function(event) {
 						const target = event.native != null ? event.native.target : event.target;
 
-						if (target == null) {
-							return;
+						if (target != null) {
+							target.style.cursor = "pointer";
 						}
-
-						target.style.cursor = elements != null && elements.length > 0 ? "pointer" : "default";
 					},
+
+					// 설비 가동 현황 클릭 시 설비 가동 현황 페이지로 이동한다.
+					onClick : function() {
+						location.href = "${pageContext.request.contextPath}/equipment/equipmentstatus";
+					},
+
 					plugins : {
 						legend : {
 							display : false
@@ -1685,7 +1772,7 @@
 							},
 							callbacks : {
 								label : function(context) {
-									return context.label + ": " + context.raw + "%";
+									return context.label + ": " + Number(context.raw).toFixed(1) + "%";
 								}
 							}
 						}
