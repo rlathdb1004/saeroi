@@ -859,6 +859,28 @@ public class InventoryDAOImpl implements InventoryDAO {
 				dto.setInoutType(rs.getString("INOUT_TYPE"));
 				dto.setMaterialLot(rs.getString("MATERIAL_LOT"));
 				dto.setInoutQty(rs.getInt("INOUT_QTY"));
+
+				// =====================================================
+				// 팀장님 피드백 반영
+				// 재고 상세 하단 내역서에서 "몇 개가 입고됐고,
+				// 몇 개가 출고/사용됐는지" 한눈에 보이도록
+				// 입고수량 / 출고수량을 분리해서 DTO에 담는다.
+				//
+				// MI      : 입고수량
+				// MO      : 출고수량
+				// MO-PROD : 작업지시 자동투입이므로 사용/출고수량
+				// 그 외   : 출고수량으로 처리
+				// =====================================================
+				if ("MI".equals(rs.getString("INOUT_TYPE"))) {
+
+					dto.setInQty(rs.getInt("INOUT_QTY"));
+					dto.setOutQty(0);
+
+				} else {
+
+					dto.setInQty(0);
+					dto.setOutQty(rs.getInt("INOUT_QTY"));
+				}
 				dto.setInoutDate(rs.getDate("INOUT_DATE"));
 				dto.setStatus(rs.getString("STATUS"));
 				dto.setHistoryRemark(rs.getString("REMARK"));
