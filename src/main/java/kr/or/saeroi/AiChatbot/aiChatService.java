@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import dev.langchain4j.memory.ChatMemory;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.chat.ChatLanguageModel;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.service.AiServices;
 
 @Service
@@ -22,9 +23,13 @@ public class aiChatService {
 
 	@Autowired
 	private DbTool dbTool;
+
+	@Autowired
+	private ContentRetriever contentRetriever;
 	
 	@Value("${gemini.api.key}")
 	private String apikey;
+	
 	
 	private final Map<String, MesAssistant> assistantCache = new ConcurrentHashMap<>();
 	
@@ -39,6 +44,7 @@ public class aiChatService {
 	                .chatLanguageModel(geminiModel)
 	                .chatMemory(userChatMemory)
 	                .tools(dbTool)
+	                .contentRetriever(contentRetriever)
 	                .build();
 			assistantCache.put(empno, assistant);
 		}

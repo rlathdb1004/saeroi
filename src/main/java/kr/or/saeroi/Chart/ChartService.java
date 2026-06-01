@@ -39,4 +39,8 @@ public interface ChartService {
 	
 	// KPI 상세 모달 주차별 데이터를 조회한다.
 	public List<Map<String, Object>> dashboardKpiWeekDetail(Map<String, Object> param);
+	
+	// 대시보드 현장 이슈와 LOT 간략 목록을 조회한다.
+	public List<Map<String, Object>> dashboardDetailList(Map<String, Object> param);
+	
 }
