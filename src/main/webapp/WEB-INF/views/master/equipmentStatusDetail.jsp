@@ -234,20 +234,25 @@
 										<tr>
 											<th>정비 종류</th>
 											<th>정비 내용</th>
+											<th>정비자</th>
 											<th>정비 시간</th>
-											<th>상세</th>
+											<th>비고</th>
+											
 										</tr>
 
 										<c:forEach var="m" items="${maintenanceList}">
 											<tr>
 												<td>${m.equip_main_type}</td>
 												<td>${m.equip_main_content}</td>
+												<td>${m.ename}</td>
 												<td>${m.equip_main_time}</td>
-												<td>
+												<td>${m.remark}</td>
+
+												<!-- <td>
 													<button type="button" class="coDetailBtn"
 														onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/main_detail?equip_main_id=${eqp.equip_main_id}'">
 														보기</button>
-												</td>
+												</td> -->
 											</tr>
 										</c:forEach>
 									</c:when>
@@ -290,9 +295,10 @@
 										<tr>
 											<th>고장원인</th>
 											<th>고장일시</th>
-											<th>해결방법</th>
+											<th>작업자</th>
+											<th>해결방안</th>
 											<th>해결일시</th>
-											<th>상세</th>
+											<th>비고</th>
 										</tr>
 										<c:forEach var="t" items="${troubleList}">
 											<tr>
@@ -301,16 +307,15 @@
 													<fmt:formatDate value="${t.trouble_date}"
 														pattern="yyyy-MM-dd HH:mm" />
 												</td>
-												<td>${t.trouble_resolve}</td>
+												<td>${t.ename}</td>
+												<td>${t.trouble_resolve}</td>												
 												<td>
-													<fmt:formatDate value="${t.resolve_date}"
-														pattern="yyyy-MM-dd HH:mm" />
+													<c:if test="${not empty t.resolve_date}">
+														<fmt:formatDate value="${t.resolve_date}"
+															pattern="yyyy-MM-dd HH:mm" />
+													</c:if>
 												</td>
-												<td>
-													<button type="button" class="coDetailBtn"
-														onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/trouble_detail?trouble_id=${eqp.trouble_id}'">
-														보기</button>
-												</td>
+												<td>${t.remark}</td>
 											</tr>
 										</c:forEach>
 									</c:when>
@@ -342,6 +347,8 @@
 								onsubmit="return checkEquipmentInsert();">
 
 								<div class="modal_body modal_body_2col">
+									<input type="hidden" name="equip_id" value="${eqp.equip_id}">
+									<input type="hidden" name="history_id" value="${eqp.history_id}">
 
 									<div class="modal_item">
 										<label class="modal_label">
@@ -355,14 +362,14 @@
 										<label class="modal_label">
 											작업자<span class="modal_required">*</span>
 										</label>
-										<select name="empno" class="modal_select id_select" required>
-												<option value="">선택</option>
-												<c:forEach var="emp" items="${empList}">
-													<option value="${emp.empno}">
-														${emp.ename} 
-													</option>
-												</c:forEach>
-											</select>
+										<select name="emp_id" class="modal_select id_select" required>
+											<option value="">선택</option>
+											<c:forEach var="emp" items="${empList}">
+												<option value="${emp.emp_id}">
+													${emp.ename}
+												</option>
+											</c:forEach>
+										</select>
 									</div>
 
 									<div class="modal_item">
@@ -425,6 +432,8 @@
 									onsubmit="return checkEquipmentInsert();">
 
 									<div class="modal_body modal_body_2col">
+										<input type="hidden" name="equip_id" value="${eqp.equip_id}">
+										<input type="hidden" name="history_id" value="${eqp.history_id}">
 
 										<div class="modal_item">
 											<label class="modal_label">
@@ -453,11 +462,11 @@
 											<label class="modal_label">
 												작업자<span class="modal_required">*</span>
 											</label>
-											<select name="empno" class="modal_select id_select" required>
+											<select name="emp_id" class="modal_select id_select" required>
 												<option value="">선택</option>
 												<c:forEach var="emp" items="${empList}">
-													<option value="${emp.empno}">
-														${emp.ename} 
+													<option value="${emp.emp_id}">
+														${emp.ename}
 													</option>
 												</c:forEach>
 											</select>
@@ -474,8 +483,7 @@
 											<label class="modal_label">
 												고장 해결일
 											</label>
-											<input type="datetime-local" name="trouble_date" class="modal_input"
-												required>
+											<input type="datetime-local" name="resolve_date" class="modal_input">
 										</div>
 
 										<div class="modal_item">
