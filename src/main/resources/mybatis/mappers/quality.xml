@@ -64,6 +64,19 @@
 						UPPER(REPLACE(i.doc_no, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 						OR UPPER(REPLACE(it.item_name, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 						OR UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+						OR EXISTS (
+							SELECT 1
+							FROM defect_list dl
+							WHERE dl.insp_id = i.insp_id
+							  AND NVL(dl.use_yn, 'Y') = 'Y'
+							  AND UPPER(REPLACE(
+								CASE
+									WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
+									THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date, 'YYYYMMDD'), 1, 1)
+									ELSE w.product_lot
+								END, ' ', ''
+							  )) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+						)
 						OR UPPER(REPLACE(e.ename, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 						OR UPPER(REPLACE(i.result, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 					)
@@ -75,7 +88,22 @@
 					AND UPPER(REPLACE(it.item_name, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
 				</when>
 				<when test="searchType == 'productLot'">
-					AND UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+					AND (
+						UPPER(REPLACE(w.product_lot, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+						OR EXISTS (
+							SELECT 1
+							FROM defect_list dl
+							WHERE dl.insp_id = i.insp_id
+							  AND NVL(dl.use_yn, 'Y') = 'Y'
+							  AND UPPER(REPLACE(
+								CASE
+									WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
+									THEN REGEXP_REPLACE(w.product_lot, '[0-9]{8}', TO_CHAR(dl.defect_date, 'YYYYMMDD'), 1, 1)
+									ELSE w.product_lot
+								END, ' ', ''
+							  )) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
+						)
+					)
 				</when>
 				<when test="searchType == 'ename'">
 					AND UPPER(REPLACE(e.ename, ' ', '')) LIKE '%' || UPPER(REPLACE(#{keyword}, ' ', '')) || '%'
@@ -343,7 +371,7 @@
 			TO_NUMBER(#{prod_id}),
 			#{insp_type},
 			TO_DATE(#{insp_date}, 'YYYY-MM-DD'),
-			'완료',
+			CASE WHEN #{result} = '대기' THEN '검사 예정' ELSE '검사 완료' END,
 			#{result},
 			TO_NUMBER(#{inspection_qty}),
 			TO_NUMBER(#{good_qty}),
