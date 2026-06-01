@@ -307,4 +307,61 @@ public class InoutDTO {
 	public void setInventoryStock(int inventoryStock) {
 		this.inventoryStock = inventoryStock;
 	}
+
+	// =============================================================
+	// 화면 표시용 입출고번호
+	// -------------------------------------------------------------
+	// 목록 JSP에서 ${inout.docNo}만 출력하면
+	// 기존 데이터 중 DOC_NO가 비어 있는 행은 입출고번호 칸이 빈칸으로 보인다.
+	//
+	// 공통 JSP / 공통 CSS는 건드리지 않고,
+	// DTO 안에서 화면 표시용 값을 만들어 준다.
+	//
+	// 우선순위:
+	// 1. DB에 DOC_NO가 있으면 그대로 사용
+	// 2. DOC_NO가 비어 있으면 입출고구분 + 입출고일자 + INOUT_ID로 표시용 번호 생성
+	//
+	// 예:
+	// MI      → RM-MI-20260601-0001
+	// MO-PROD → RM-MO-20260601-0001
+	// =============================================================
+	public String getDisplayDocNo() {
+
+		if (docNo != null
+				&& !docNo.trim().equals("")) {
+
+			return docNo;
+		}
+
+		String typeText =
+			"IN";
+
+		if ("MI".equals(inoutType)) {
+
+			typeText =
+				"MI";
+
+		} else if ("MO-PROD".equals(inoutType)) {
+
+			typeText =
+				"MO";
+		}
+
+		String dateText =
+			"00000000";
+
+		if (inoutDate != null) {
+
+			dateText =
+				inoutDate.toString().replace("-", "");
+		}
+
+		return "RM-"
+				+ typeText
+				+ "-"
+				+ dateText
+				+ "-"
+				+ String.format("%04d", inoutId);
+	}
+
 }
