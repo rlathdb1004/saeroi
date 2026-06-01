@@ -43,6 +43,8 @@ public class DashboardController {
 		setDashboardDefectTop5(model);
 		setDashboardProductionChart(model);
 		setDashboardDefectChart(model);
+		setDashboardCostChart(model);
+		setDashboardFacilityChart(model);
 
 		return "dashboard.tiles";
 	}
@@ -55,6 +57,8 @@ public class DashboardController {
 		setDashboardDefectTop5(model);
 		setDashboardProductionChart(model);
 		setDashboardDefectChart(model);
+		setDashboardCostChart(model);
+		setDashboardFacilityChart(model);
 
 		return "dashboard.tiles";
 	}
@@ -168,6 +172,113 @@ public class DashboardController {
 		} else {
 			model.addAttribute("dashDefectWeekCompareArrow", "-");
 			model.addAttribute("dashDefectWeekCompareClass", "dash-neutral-text");
+		}
+	}
+	
+	// 대시보드 생산원가 추이 데이터를 조회한다.
+	private void setDashboardCostChart(Model model) {
+		List<Map<String, Object>> dashCostTrendList =
+				chartService.dashboardCostTrend();
+
+		Map<String, Object> dashCostSummary =
+				chartService.dashboardCostSummary();
+
+		model.addAttribute("dashCostTrendList", dashCostTrendList);
+
+		model.addAttribute("dashCostWeekAvg",
+				getNumberValue(dashCostSummary, "CURRACTUALCOST"));
+
+		BigDecimal targetCompareRate =
+				getNumberValue(dashCostSummary, "TARGETCOMPARERATE");
+
+		model.addAttribute("dashCostTargetCompareRate", targetCompareRate.abs());
+
+		String targetCompareType =
+				String.valueOf(dashCostSummary.get("TARGETCOMPARETYPE"));
+
+		if ("bad".equals(targetCompareType)) {
+			model.addAttribute("dashCostTargetCompareArrow", "▲");
+			model.addAttribute("dashCostTargetCompareClass", "dash-red-text");
+		} else if ("good".equals(targetCompareType)) {
+			model.addAttribute("dashCostTargetCompareArrow", "▼");
+			model.addAttribute("dashCostTargetCompareClass", "dash-green-text");
+		} else {
+			model.addAttribute("dashCostTargetCompareArrow", "-");
+			model.addAttribute("dashCostTargetCompareClass", "dash-neutral-text");
+		}
+
+		BigDecimal weekCompareRate =
+				getNumberValue(dashCostSummary, "WEEKCOMPARERATE");
+
+		model.addAttribute("dashCostWeekCompareRate", weekCompareRate.abs());
+
+		String weekCompareType =
+				String.valueOf(dashCostSummary.get("WEEKCOMPARETYPE"));
+
+		if ("bad".equals(weekCompareType)) {
+			model.addAttribute("dashCostWeekCompareArrow", "▲");
+			model.addAttribute("dashCostWeekCompareClass", "dash-red-text");
+		} else if ("good".equals(weekCompareType)) {
+			model.addAttribute("dashCostWeekCompareArrow", "▼");
+			model.addAttribute("dashCostWeekCompareClass", "dash-green-text");
+		} else {
+			model.addAttribute("dashCostWeekCompareArrow", "-");
+			model.addAttribute("dashCostWeekCompareClass", "dash-neutral-text");
+		}
+	}
+	
+	// 대시보드 설비 가동 현황 데이터를 조회한다.
+	private void setDashboardFacilityChart(Model model) {
+		Map<String, Object> dashFacilityStatus =
+				chartService.dashboardFacilityStatus();
+
+		model.addAttribute("dashFacilityTotalCount",
+				getNumberValue(dashFacilityStatus, "TOTALCOUNT"));
+
+		model.addAttribute("dashFacilityRunningCount",
+				getNumberValue(dashFacilityStatus, "RUNNINGCOUNT"));
+
+		model.addAttribute("dashFacilityCheckCount",
+				getNumberValue(dashFacilityStatus, "CHECKCOUNT"));
+
+		model.addAttribute("dashFacilityStopCount",
+				getNumberValue(dashFacilityStatus, "STOPCOUNT"));
+
+		model.addAttribute("dashFacilityNonRunningCount",
+				getNumberValue(dashFacilityStatus, "NONRUNNINGCOUNT"));
+
+		model.addAttribute("dashFacilityRunRate",
+				getNumberValue(dashFacilityStatus, "RUNRATE"));
+
+		model.addAttribute("dashFacilityNonRunRate",
+				getNumberValue(dashFacilityStatus, "NONRUNRATE"));
+
+		model.addAttribute("dashFacilityCheckRate",
+				getNumberValue(dashFacilityStatus, "CHECKRATE"));
+
+		model.addAttribute("dashFacilityStopRate",
+				getNumberValue(dashFacilityStatus, "STOPRATE"));
+
+		model.addAttribute("dashFacilityTargetRate",
+				getNumberValue(dashFacilityStatus, "TARGETRATE"));
+
+		BigDecimal targetGap =
+				getNumberValue(dashFacilityStatus, "TARGETGAP");
+
+		model.addAttribute("dashFacilityTargetGap", targetGap.abs());
+
+		String targetType =
+				String.valueOf(dashFacilityStatus.get("TARGETTYPE"));
+
+		if ("good".equals(targetType)) {
+			model.addAttribute("dashFacilityTargetArrow", "+");
+			model.addAttribute("dashFacilityTargetClass", "dash-green-text");
+		} else if ("bad".equals(targetType)) {
+			model.addAttribute("dashFacilityTargetArrow", "-");
+			model.addAttribute("dashFacilityTargetClass", "dash-red-text");
+		} else {
+			model.addAttribute("dashFacilityTargetArrow", "");
+			model.addAttribute("dashFacilityTargetClass", "dash-neutral-text");
 		}
 	}
 	

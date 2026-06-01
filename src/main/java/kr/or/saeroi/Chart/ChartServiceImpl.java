@@ -50,4 +50,25 @@ public class ChartServiceImpl implements ChartService{
 		return map;
 	}
 	
+	// 대시보드 생산원가 추이 최근 7일 데이터를 조회한다.
+	@Override
+	public List<Map<String, Object>> dashboardCostTrend() {
+		List<Map<String, Object>> list = chartDAO.dashboardCostTrend();
+		return list;
+	}
+
+	// 대시보드 생산원가 추이 이번주 요약 데이터를 조회한다.
+	@Override
+	public Map<String, Object> dashboardCostSummary() {
+		Map<String, Object> map = chartDAO.dashboardCostSummary();
+		return map;
+	}
+	
+	// 대시보드 설비 가동 현황 데이터를 조회한다.
+	@Override
+	public Map<String, Object> dashboardFacilityStatus() {
+		Map<String, Object> map = chartDAO.dashboardFacilityStatus();
+		return map;
+	}
+	
 }
