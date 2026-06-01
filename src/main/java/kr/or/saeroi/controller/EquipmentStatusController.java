@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.or.saeroi.common.PageDTO;
 import kr.or.saeroi.dao.EquipmentStatusDAO;
+import kr.or.saeroi.dto.EquipmentDTO;
 import kr.or.saeroi.dto.EquipmentMaintenanceDTO;
 import kr.or.saeroi.dto.EquipmentStatusDTO;
 import kr.or.saeroi.dto.EquipmentTroubleDTO;
@@ -160,9 +161,25 @@ public class EquipmentStatusController {
         return "redirect:/equipment/equipmentstatus/detail?history_id=" + dto.getHistory_id();
     }
     
+    @GetMapping("/equipment/equipmentstatus/trouble_detail")
+    public String equipment_trouble_detail(
+            @RequestParam("trouble_id") int trouble_id,
+            @RequestParam(required = false) String mode,
+            Model model) {
+
+        EquipmentTroubleDTO dto = service.equipment_trouble_detail(trouble_id);
+        List<LoginDTO> empList = loginService.emp_list();
+        
+        model.addAttribute("eqp", dto);
+        model.addAttribute("empList",empList);
+        model.addAttribute("mode", mode);
+
+        return "master/equipmentTroubleDetail.tiles";
+    }
+    
     @PostMapping("/equipment_trouble/update")
-    public String update_trouble(EquipmentStatusDTO dto) {
+    public String update_trouble(EquipmentTroubleDTO dto) {
         service.trouble_update(dto);
-        return "redirect:/equipment/equipmentstatus/detail?history_id=" + dto.getHistory_id();
+        return "redirect:/equipment/equipmentstatus/trouble_detail?trouble_id=" + dto.getTrouble_id();
     }
 }

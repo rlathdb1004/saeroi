@@ -323,34 +323,7 @@ public class EquipmentStatusDAO {
 	    return result;
 	}
 	
-	public int truoble_update(EquipmentStatusDTO dto) {
-		int result = 0;
-
-	    String sql =
-	        "UPDATE EQUIPMENT_TROUBLE " +
-	        "SET RUNTIME_MIN = ?, " +
-	        "    DOWNTIME_MIN = ?, " +
-	        "    DOWN_REASON = ?, " +
-	        "    REMARK = ? " +	          
-	        "WHERE HISTORY_ID = ?";
-
-	    try (
-	        Connection conn = dataSource.getConnection();
-	        PreparedStatement ps = conn.prepareStatement(sql)
-	    ) {
-
-	        ps.setInt(1, dto.getRuntime_min());
-	        ps.setInt(2, dto.getDowntime_min());
-	        ps.setString(3, dto.getDown_reason());
-	        ps.setString(4, dto.getRemark());
-	        ps.setInt(5, dto.getHistory_id());
-
-	        result = ps.executeUpdate();
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	    return result;
-	}
+	
 	
 	public int delete(List<Integer> ids) {
 
@@ -573,6 +546,82 @@ public class EquipmentStatusDAO {
 	    }
 	    return result;
 	}
+	
+	
+	public EquipmentTroubleDTO trouble_detail(int trouble_id) {
+		EquipmentTroubleDTO dto = null;
+
+	    String sql =
+	        "SELECT t.*, e.ENAME, eh. eq.EQUIP_NAME " +	        	        
+	        "FROM EQUIPMENT_TROUBLE t " +	                
+	        "LEFT JOIN emp e ON t.emp_id = e.emp_id "+	        
+	        "LEFT JOIN equipment eq ON t.equip_id = eq.equip_id " +
+	        "WHERE t.TROUBLE_ID = ?";
+
+	    try (Connection conn = dataSource.getConnection();
+	         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+	        ps.setInt(1, trouble_id);
+
+	        try (ResultSet rs = ps.executeQuery()) {
+
+	        	if (rs.next()) {
+
+	        	    dto = new EquipmentTroubleDTO();
+
+	        	    dto.setTrouble_id(rs.getInt("TROUBLE_ID"));
+	        	    dto.setEquip_id(rs.getInt("EQUIP_ID"));	        	    
+	        	    dto.setEmp_id(rs.getInt("EMP_ID"));
+	        	    dto.setTrouble_content(rs.getString("TROUBLE_CONTENT"));	        	    
+	        	    dto.setTrouble_date(rs.getTimestamp("TROUBLE_DATE"));
+	        	    dto.setTrouble_resolve(rs.getString("TROUBLE_RESOLVE"));
+	        	    dto.setResolve_date(rs.getTimestamp("RESOLVE_DATE"));	        	    
+	        	    dto.setRemark(rs.getString("REMARK"));
+	        	    dto.setEname(rs.getString("ename"));
+	        	    dto.setEquip_name(rs.getString("equip_name"));
+	        	}
+	        }
+	    } catch (Exception e) {
+	        throw new RuntimeException("설비 고장 이력 상세 조회 실패", e);
+	    }
+
+	    return dto;
+	}
+	
+	public int truoble_update(EquipmentTroubleDTO dto) {
+		int result = 0;
+
+	    String sql =
+	        "UPDATE EQUIPMENT_TROUBLE " +
+	        "SET EMP_ID = ?, " +
+	        "    TROUBLE_CONTENT = ?, " +
+	        "    TROUBLE_DATE = ?, " +
+	        "    TROUBLE_RESOLVE = ?, " +
+	        "    RESOLVE_DATE = ?, " +
+	        "    UPDATED_DATE = SYSDATE, " +
+	        "    REMARK = ? " +	          
+	        "WHERE TROUBLE_ID = ?";
+
+	    try (
+	        Connection conn = dataSource.getConnection();
+	        PreparedStatement ps = conn.prepareStatement(sql)
+	    ) {
+
+	        ps.setInt(1, dto.getEmp_id());
+	        ps.setString(2, dto.getTrouble_content());
+	        ps.setTimestamp(3, dto.getTrouble_date());
+	        ps.setString(4, dto.getTrouble_resolve());
+	        ps.setTimestamp(5, dto.getResolve_date());
+	        ps.setString(6, dto.getRemark());
+	        ps.setInt(7, dto.getHistory_id());
+
+	        result = ps.executeUpdate();
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    return result;
+	}
+
 
 	
 }

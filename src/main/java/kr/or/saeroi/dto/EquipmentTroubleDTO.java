@@ -16,4 +16,5 @@ public class EquipmentTroubleDTO {
 	private String trouble_resolve;	
 	private String remark;
 	private int history_id;
+	private String equip_name;
 }

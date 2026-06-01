@@ -212,125 +212,183 @@
 						<div class="detail_card">
 							<div class="detail_card_title">
 								정비 이력
-								<button type="button" class="detail_add_btn modal_open_btn"
-									data_modal_target="#eqp_main_insert">
+								<div style="display:flex; gap:8px;">
+									<button type="button" class="detail_add_btn modal_open_btn"
+										data_modal_target="#eqp_main_insert">
+										<svg viewBox="0 0 24 24" fill="none">
+											<path d="M12 5V19" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round">
+											</path>
+											<path d="M5 12H19" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round">
+											</path>
+										</svg>
+										등록
+									</button>
 
-									<svg viewBox="0 0 24 24" fill="none">
-										<path d="M12 5V19" stroke="currentColor" stroke-width="2"
-											stroke-linecap="round">
-										</path>
-
-										<path d="M5 12H19" stroke="currentColor" stroke-width="2"
-											stroke-linecap="round">
-										</path>
-									</svg>
-
-									등록
-								</button>
+									<button type="button" class="search-btn search-btn-sub" onclick="deleteCheck()">
+										<svg viewBox="0 0 24 24" fill="none">
+											<path d="M4 7H20" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round">
+											</path>
+											<path d="M10 11V17" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round">
+											</path>
+											<path d="M14 11V17" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round">
+											</path>
+											<path d="M6 7L7 21H17L18 7" stroke="currentColor" stroke-width="2"
+												stroke-linejoin="round">
+											</path>
+											<path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
+												stroke-linejoin="round">
+											</path>
+										</svg>
+										선택 삭제
+									</button>
+								</div>
 
 							</div>
 
-							<table class="detail_info_table">
-								<c:choose>
-									<c:when test="${not empty maintenanceList}">
-										<tr>
-											<th>정비 종류</th>
-											<th>정비 내용</th>
-											<th>정비자</th>
-											<th>정비 시간</th>
-											<th>비고</th>
-
-										</tr>
-
-										<c:forEach var="m" items="${maintenanceList}">
+							<div class="coTableWrap">
+								<table class="coTable">
+									<c:choose>
+										<c:when test="${not empty maintenanceList}">
 											<tr>
-												<td>${m.equip_main_type}</td>
-												<td>${m.equip_main_content}</td>
-												<td>${m.ename}</td>
-												<td>${m.equip_main_time}</td>
-												<td>${m.remark}</td>
-
-												<!-- <td>
-													<button type="button" class="coDetailBtn"
-														onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/main_detail?equip_main_id=${eqp.equip_main_id}'">
-														보기</button>
-												</td> -->
+												<th class="mobile_show"><label id="checkAllLabel">선택</label>
+													<input type="checkbox" id="checkAll" style="display: none;">
+												</th>
+												<th class="mobile_show">정비 종류</th>
+												<th class="mobile_hidden">정비 내용</th>
+												<th class="mobile_hidden">작업자</th>
+												<th class="mobile_show">정비 시간</th>												
+												<th class="mobile_show">상세</th>
 											</tr>
-										</c:forEach>
-									</c:when>
 
-									<c:otherwise>
-										<tr>
-											<td colspan="5" style="text-align:center;">
-												정비 이력이 없습니다.
-											</td>
-										</tr>
-									</c:otherwise>
-								</c:choose>
-							</table>
+											<c:forEach var="m" items="${maintenanceList}">
+												<tr>
+													<td class="mobile_show">
+														<input type="checkbox" name="equip_main_ids"
+															value="${m.equip_main_id}">
+													</td>
+													<td class="mobile_show">${m.equip_main_type}</td>
+													<td class="mobile_hidden">${m.equip_main_content}</td>
+													<td class="mobile_hidden">${m.ename}</td>
+													<td class="mobile_show">${m.equip_main_time}</td>													
+													<td class="mobile_show">
+														<button type="button" class="coDetailBtn"
+															onclick="location.href='${pageContext.request.contextPath}/equipment/equipment_maintenance/detail?equip_main_id=${m.equip_main_id}'">
+															보기</button>
+													</td>
+												</tr>
+											</c:forEach>
+										</c:when>
+
+										<c:otherwise>
+											<tr>
+												<td colspan="5" style="text-align:center;">
+													정비 이력이 없습니다.
+												</td>
+											</tr>
+										</c:otherwise>
+									</c:choose>
+								</table>
+							</div>
 						</div>
 
 
 						<div class="detail_card">
 							<div class="detail_card_title">
 								고장 이력
-								<button type="button" class="detail_add_btn modal_open_btn"
-									data_modal_target="#eqp_trouble_insert">
+								<div style="display:flex; gap:8px;">
+									<button type="button" class="detail_add_btn modal_open_btn"
+										data_modal_target="#eqp_main_insert">
+										<svg viewBox="0 0 24 24" fill="none">
+											<path d="M12 5V19" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round">
+											</path>
+											<path d="M5 12H19" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round">
+											</path>
+										</svg>
+										등록
+									</button>
 
-									<svg viewBox="0 0 24 24" fill="none">
-										<path d="M12 5V19" stroke="currentColor" stroke-width="2"
-											stroke-linecap="round">
-										</path>
-
-										<path d="M5 12H19" stroke="currentColor" stroke-width="2"
-											stroke-linecap="round">
-										</path>
-									</svg>
-
-									등록
-								</button>
+									<button type="button" class="search-btn search-btn-sub" onclick="deleteCheck()">
+										<svg viewBox="0 0 24 24" fill="none">
+											<path d="M4 7H20" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round">
+											</path>
+											<path d="M10 11V17" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round">
+											</path>
+											<path d="M14 11V17" stroke="currentColor" stroke-width="2"
+												stroke-linecap="round">
+											</path>
+											<path d="M6 7L7 21H17L18 7" stroke="currentColor" stroke-width="2"
+												stroke-linejoin="round">
+											</path>
+											<path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
+												stroke-linejoin="round">
+											</path>
+										</svg>
+										선택 삭제
+									</button>
+								</div>
 							</div>
 
-							<table class="detail_info_table">
-								<c:choose>
-									<c:when test="${not empty troubleList}">
-										<tr>
-											<th>고장원인</th>
-											<th>고장일시</th>
-											<th>작업자</th>
-											<th>해결방안</th>
-											<th>해결일시</th>
-											<th>비고</th>
-										</tr>
-										<c:forEach var="t" items="${troubleList}">
+							<div class="coTableWrap">
+								<table class="coTable">
+									<c:choose>
+										<c:when test="${not empty troubleList}">
 											<tr>
-												<td>${t.trouble_content}</td>
-												<td>
-													<fmt:formatDate value="${t.trouble_date}"
-														pattern="yyyy-MM-dd HH:mm" />
-												</td>
-												<td>${t.ename}</td>
-												<td>${t.trouble_resolve}</td>
-												<td>
-													<c:if test="${not empty t.resolve_date}">
-														<fmt:formatDate value="${t.resolve_date}"
-															pattern="yyyy-MM-dd HH:mm" />
-													</c:if>
-												</td>
-												<td>${t.remark}</td>
+												<th class="mobile_show"><label id="checkAllLabel">선택</label>
+													<input type="checkbox" id="checkAll" style="display: none;">
+												</th>
+												<th>고장원인</th>
+												<th>고장일시</th>	
+												<th class="mobile_hidden">해결방안</th>
+												<th>해결일시</th>												
+												<th class="mobile_show">상세</th>
 											</tr>
-										</c:forEach>
-									</c:when>
+											<c:forEach var="t" items="${troubleList}">
+												<tr>
+													<td class="mobile_show">
+														<input type="checkbox" name="equip_main_ids"
+															value="${m.equip_main_id}">
+													</td>
+													<td>${t.trouble_content}</td>
+													<td>
+														<fmt:formatDate value="${t.trouble_date}"
+															pattern="yyyy-MM-dd HH:mm" />
+													</td>													
+													<td class="mobile_hidden">${t.trouble_resolve}</td>
+													<td>
+														<c:if test="${not empty t.resolve_date}">
+															<fmt:formatDate value="${t.resolve_date}"
+																pattern="yyyy-MM-dd HH:mm" />
+														</c:if>
+													</td>
+													
+													<td class="mobile_show">
+														<button type="button" class="coDetailBtn"
+															onclick="location.href='${pageContext.request.contextPath}/equipment/equipmentstatus/trouble_detail?trouble_id=${t.trouble_id}'">
+															보기</button>
+													</td>
+												</tr>
+											</c:forEach>
+										</c:when>
 
-									<c:otherwise>
-										<tr>
-											<td colspan="6" style="text-align:center;">
-												고장 이력이 없습니다.
-											</td>
-										</tr>
-									</c:otherwise>
-								</c:choose>
-							</table>
+										<c:otherwise>
+											<tr>
+												<td colspan="6" style="text-align:center;">
+													고장 이력이 없습니다.
+												</td>
+											</tr>
+										</c:otherwise>
+									</c:choose>
+								</table>
+							</div>
 						</div>
 					</c:otherwise>
 
