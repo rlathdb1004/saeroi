@@ -33,6 +33,9 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 	// =========================================================================
 	// 재고 목록 조회
+	// 검색어는 띄어쓰기를 무시해서 검색한다.
+	// 예) 'EV6배터리'로 검색해도 'EV6 배터리'가 검색된다.
+	// 공통 JSP / Controller / Service는 건드리지 않고 DAO SQL에서만 처리한다.
 	// =========================================================================
 	@Override
 	public List<InventoryDTO> selectInventoryList(
@@ -103,10 +106,11 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 					// =====================================================
 					// 품목코드 검색
-					// 대문자 / 소문자 구분 없이 검색하기 위해 UPPER 적용
-					// 예) RM, rm, Rm 모두 검색 가능
+					// 대문자 / 소문자 구분 없이 검색하고,
+					// REPLACE로 DB값과 검색어의 띄어쓰기를 모두 제거해서 비교한다.
+					// 예) RM 001 = RM001
 					// =====================================================
-					sql += " AND UPPER(I.ITEM_CODE) LIKE UPPER(?) ";
+					sql += " AND REPLACE(UPPER(I.ITEM_CODE), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
 				}
 
 				// =========================================================
@@ -116,9 +120,10 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 					// =====================================================
 					// 품목명 검색
-					// 영문 품목명도 대문자 / 소문자 구분 없이 검색
+					// 영문 품목명도 대문자 / 소문자 구분 없이 검색하고,
+					// 띄어쓰기 차이도 무시한다.
 					// =====================================================
-					sql += " AND UPPER(I.ITEM_NAME) LIKE UPPER(?) ";
+					sql += " AND REPLACE(UPPER(I.ITEM_NAME), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
 				}
 
 				// =========================================================
@@ -130,13 +135,14 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 					// =====================================================
 					// 전체 검색
-					// 문자 컬럼은 모두 UPPER 처리해서 대소문자 구분 없이 검색
+					// 문자 컬럼은 모두 UPPER + REPLACE 처리해서
+					// 대소문자와 띄어쓰기 차이를 무시하고 검색한다.
 					// =====================================================
-					sql += "     UPPER(I.ITEM_CODE) LIKE UPPER(?) ";
-					sql += "     OR UPPER(I.ITEM_NAME) LIKE UPPER(?) ";
-					sql += "     OR UPPER(INV.STOCK_LOCATION) LIKE UPPER(?) ";
-					sql += "     OR UPPER(INV.REMARK) LIKE UPPER(?) ";
-					sql += "     OR UPPER(I.ITEM_UNIT) LIKE UPPER(?) ";
+					sql += "     REPLACE(UPPER(I.ITEM_CODE), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(I.ITEM_NAME), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(INV.STOCK_LOCATION), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(INV.REMARK), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
+					sql += "     OR REPLACE(UPPER(I.ITEM_UNIT), ' ', '') LIKE REPLACE(UPPER(?), ' ', '') ";
 
 					// =====================================================
 					// 품목유형 한글 검색
@@ -517,9 +523,18 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 			int idx = 1;
 
+			// =====================================================
+			// 방금 등록한 재고를 목록 첫 줄에 고정하려면
+			// Controller까지 신규 INVENTORY_ID를 돌려줘야 한다.
+			// 그래서 selectNextInventoryId(conn)를 변수에 담아
+			// INSERT에도 쓰고, 성공 후 반환값으로도 사용한다.
+			// =====================================================
+			int newInventoryId =
+				selectNextInventoryId(conn);
+
 			pstmt.setInt(
 				idx++,
-				selectNextInventoryId(conn));
+				newInventoryId);
 
 			pstmt.setInt(
 				idx++,
@@ -539,6 +554,17 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 			result =
 				pstmt.executeUpdate();
+
+			// =====================================================
+			// INSERT 성공 시 영향받은 행 수 1이 아니라
+			// 신규 재고번호를 반환한다.
+			// 그래야 Controller에서 방금 등록한 재고를
+			// 목록 첫 번째 줄에 정확히 올릴 수 있다.
+			// =====================================================
+			if (result > 0) {
+
+				result = newInventoryId;
+			}
 
 			pstmt.close();
 			conn.close();

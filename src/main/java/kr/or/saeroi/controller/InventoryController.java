@@ -479,6 +479,7 @@ public class InventoryController {
 			@RequestParam(value = "keyword", defaultValue = "") String keyword,
 			@RequestParam(value = "startDate", defaultValue = "") String startDate,
 			@RequestParam(value = "endDate", defaultValue = "") String endDate,
+			@RequestParam(value = "topInventoryId", defaultValue = "0") int topInventoryId,
 			Model model) {
 
 		// =============================================================
@@ -538,6 +539,47 @@ public class InventoryController {
 				}
 			});
 
+		// =============================================================
+		// 재고 등록 직후 첫 줄 고정 처리
+		// 등록 메소드에서 방금 등록된 INVENTORY_ID를 topInventoryId로 넘긴다.
+		// 날짜/시간 정렬이 꼬이거나 검색조건이 남아 있어도
+		// 방금 등록한 재고가 1페이지 첫 번째 줄에 보이도록 한다.
+		// 공통 페이징 파일은 건드리지 않고 현재 Controller에서만 처리한다.
+		// =============================================================
+		if (topInventoryId > 0) {
+
+			InventoryDTO topInventory = null;
+
+			for (int i = 0; i < list.size(); i++) {
+
+				InventoryDTO inventory =
+					list.get(i);
+
+				if (inventory.getInventoryId() == topInventoryId) {
+
+					topInventory = inventory;
+					list.remove(i);
+					break;
+				}
+			}
+
+			// =========================================================
+			// 혹시 날짜 검색조건 때문에 목록에 빠져 있으면
+			// 상세조회로 다시 가져와서 맨 위에 추가한다.
+			// =========================================================
+			if (topInventory == null) {
+
+				topInventory =
+					inventoryService.getInventoryDetail(
+						topInventoryId);
+			}
+
+			if (topInventory != null) {
+
+				list.add(0, topInventory);
+			}
+		}
+
 		int totalCount =
 			list.size();
 
@@ -596,9 +638,16 @@ public class InventoryController {
 		dto.setStockLocation(stockLocation);
 		dto.setRemark(remark);
 
-		inventoryService.addInventory(dto);
+		// =============================================================
+		// 재고 등록 후 방금 등록된 재고번호를 받아온다.
+		// 이 번호를 목록 URL에 넘겨서 inventoryList()에서
+		// 해당 재고를 강제로 1페이지 첫 줄에 올린다.
+		// =============================================================
+		int topInventoryId =
+			inventoryService.addInventory(dto);
 
-		return "redirect:/inventory/stockList";
+		return "redirect:/inventory/stockList?topInventoryId="
+				+ topInventoryId;
 	}
 
 	@RequestMapping("/inventory/stockList/delete")
