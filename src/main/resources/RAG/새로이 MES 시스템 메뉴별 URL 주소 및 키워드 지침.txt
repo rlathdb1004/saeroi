@@ -1,0 +1,20 @@
+[새로이 MES 시스템 메뉴별 URL 주소 및 키워드 지침]
+- 메뉴명: 작업지시 관리
+  주소 경로: /production/workorder
+  관련 키워드: 작업지시, 작업지시서, 지시서, workorder, workorderlist, 내 작업지시, 오늘 작업
+  
+- 메뉴명: 생산계획 조회
+  주소 경로: /production/productionplan
+  관련 키워드: 생산계획, 계획, productionplan, 일일계획, 생산량
+
+- 메뉴명: 자재 입출고 현황
+  주소 경로: /inventory/materialIn
+  관련 키워드: 입출고, 출고, 입고, 인아웃, inout, materialIn, 출고기록, 입고기록
+
+- 메뉴명: 재고 조회
+  주소 경로: /inventory/inventoryStatus
+  관련 키워드: 재고, 재고현황, inventory, inventorystatus, 현재재고
+
+- 메뉴명: 품질 검사 내역
+  주소 경로: /quality/inspection
+  관련 키워드: 품질, 검사, 불량, 불량율, quality, inspection, 퀄리티조회

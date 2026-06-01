@@ -193,7 +193,7 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>2.17.2</version>
 		</dependency>
-		
+
 		<!-- QR Code -->
 		<dependency>
 			<groupId>com.google.zxing</groupId>
@@ -282,6 +282,20 @@
 		<dependency>
 			<groupId>dev.langchain4j</groupId>
 			<artifactId>langchain4j-google-ai-gemini</artifactId>
+			<version>0.36.2</version>
+		</dependency>
+
+		<!-- RAG 및 문서 처리를 위한 핵심 라이브러리 -->
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-core</artifactId>
+			<version>0.36.2</version> <!-- 사용 중인 버전과 맞추거나 최신 안정 버전 사용 -->
+		</dependency>
+
+		<!-- 문서 파일(TXT, PDF, Word 등)을 읽어오기 위한 도구 -->
+		<dependency>
+			<groupId>dev.langchain4j</groupId>
+			<artifactId>langchain4j-document-parser-apache-tika</artifactId>
 			<version>0.36.2</version>
 		</dependency>
 
