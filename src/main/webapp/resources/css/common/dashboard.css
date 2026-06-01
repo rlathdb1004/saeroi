@@ -2535,3 +2535,46 @@
 	transform: translateY(0);
 	box-shadow: 0 4px 10px rgba(31, 122, 87, 0.08);
 }
+
+/* 긴급 이슈가 없을 때 긴급 알림 카드이다. */
+.dashboard-page .dash-alert-main.dash-issue-normal {
+	border-color: #DCE6E1;
+	background-color: #FBFDFB;
+	color: var(--dash-text);
+}
+
+/* 긴급 이슈가 없을 때 벨 아이콘이다. */
+.dashboard-page .dash-alert-main.dash-issue-normal .dash-alert-bell {
+	background-color: #F3F7F5;
+	color: var(--dash-green);
+}
+
+/* 긴급 이슈가 없을 때 건수 배지이다. */
+.dashboard-page .dash-alert-main.dash-issue-normal em {
+	border-color: #DCE6E1;
+	background-color: #FFFFFF;
+	color: var(--dash-green);
+}
+
+/* 긴급 이슈가 있을 때 긴급 알림 카드이다. */
+.dashboard-page .dash-alert-main.dash-issue-danger {
+	border-color: #F1D5D5;
+	background-color: #FFFBFB;
+	color: var(--dash-red);
+}
+
+/* 긴급 이슈가 없을 때 이슈 없음 카드가 한 줄을 차지하게 한다. */
+.dashboard-page .dash-alert-items.dash-alert-items-empty {
+	grid-template-columns: 1fr;
+}
+
+/* 긴급 이슈 없음 카드이다. */
+.dashboard-page .dash-alert-empty-card {
+	border-color: #DCE6E1;
+	background-color: #FBFDFB;
+}
+
+/* 긴급 이슈 없음 카드의 점 색상이다. */
+.dashboard-page .dash-alert-empty-card .dash-alert-text::before {
+	background-color: var(--dash-green);
+}

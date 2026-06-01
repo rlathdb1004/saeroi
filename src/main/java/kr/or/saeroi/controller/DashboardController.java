@@ -38,6 +38,7 @@ public class DashboardController {
 	@GetMapping("/dashboard")
 	public String main(Model model, HttpSession session) {
 		// 첫 화면 대시보드에 필요한 데이터를 조회한다.
+		setDashboardKpi(model);
 		setDashboardNotice(model, session);
 		setDashboardWorkOrder(model);
 		setDashboardDefectTop5(model);
@@ -45,6 +46,8 @@ public class DashboardController {
 		setDashboardDefectChart(model);
 		setDashboardCostChart(model);
 		setDashboardFacilityChart(model);
+		setDashboardLotStatus(model);
+		setDashboardIssueStatus(model);
 
 		return "dashboard.tiles";
 	}
@@ -52,6 +55,7 @@ public class DashboardController {
 	@GetMapping("/")
 	public String dashboard(Model model, HttpSession session) {
 		// 대시보드 메뉴 진입 시 필요한 데이터를 조회한다.
+		setDashboardKpi(model);
 		setDashboardNotice(model, session);
 		setDashboardWorkOrder(model);
 		setDashboardDefectTop5(model);
@@ -59,10 +63,149 @@ public class DashboardController {
 		setDashboardDefectChart(model);
 		setDashboardCostChart(model);
 		setDashboardFacilityChart(model);
+		setDashboardLotStatus(model);
+		setDashboardIssueStatus(model);
 
 		return "dashboard.tiles";
 	}
+	
+	// 대시보드 KPI 핵심 6대 지표 데이터를 조회한다.
+	private void setDashboardKpi(Model model) {
+		Map<String, Object> dashKpiSummary = chartService.dashboardKpiSummary();
 
+		BigDecimal prodTargetQty = getNumberValue(dashKpiSummary, "PRODTARGETQTY");
+		BigDecimal prevProdTargetQty = getNumberValue(dashKpiSummary, "PREVPRODTARGETQTY");
+		BigDecimal prodActualQty = getNumberValue(dashKpiSummary, "PRODACTUALQTY");
+		BigDecimal achievementRate = getNumberValue(dashKpiSummary, "ACHIEVEMENTRATE");
+		BigDecimal achievementComparePoint = getNumberValue(dashKpiSummary, "ACHIEVEMENTCOMPAREPOINT");
+
+		model.addAttribute("dashKpiProdTargetQty", prodTargetQty);
+		model.addAttribute("dashKpiPrevProdTargetQty", prevProdTargetQty);
+		model.addAttribute("dashKpiProdActualQty", prodActualQty);
+		model.addAttribute("dashKpiAchievementRate", achievementRate);
+		model.addAttribute("dashKpiAchievementComparePoint", achievementComparePoint.abs());
+
+		setCompareDisplay(model,
+				achievementComparePoint,
+				"dashKpiAchievementCompare",
+				true,
+				prevProdTargetQty.compareTo(BigDecimal.ZERO) > 0);
+
+		BigDecimal todayProdQty = getNumberValue(dashKpiSummary, "TODAYPRODQTY");
+		BigDecimal prevProdQty = getNumberValue(dashKpiSummary, "PREVPRODQTY");
+		BigDecimal todayProdCompareQty = getNumberValue(dashKpiSummary, "TODAYPRODCOMPAREQTY");
+
+		model.addAttribute("dashKpiTodayProdQty", todayProdQty);
+		model.addAttribute("dashKpiPrevProdQty", prevProdQty);
+		model.addAttribute("dashKpiTodayProdCompareQty", todayProdCompareQty.abs());
+
+		setCompareDisplay(model,
+				todayProdCompareQty,
+				"dashKpiTodayProdCompare",
+				true,
+				prevProdQty.compareTo(BigDecimal.ZERO) > 0);
+
+		BigDecimal defectRate = getNumberValue(dashKpiSummary, "DEFECTRATE");
+		BigDecimal defectQty = getNumberValue(dashKpiSummary, "DEFECTQTY");
+		BigDecimal inspectionQty = getNumberValue(dashKpiSummary, "INSPECTIONQTY");
+		BigDecimal defectComparePoint = getNumberValue(dashKpiSummary, "DEFECTCOMPAREPOINT");
+
+		model.addAttribute("dashKpiDefectRate", defectRate);
+		model.addAttribute("dashKpiDefectQty", defectQty);
+		model.addAttribute("dashKpiInspectionQty", inspectionQty);
+		model.addAttribute("dashKpiDefectComparePoint", defectComparePoint.abs());
+
+		setCompareDisplay(model,
+				defectComparePoint,
+				"dashKpiDefectCompare",
+				false,
+				prevProdQty.compareTo(BigDecimal.ZERO) > 0);
+
+		BigDecimal costActual = getNumberValue(dashKpiSummary, "COSTACTUAL");
+		BigDecimal costPrev = getNumberValue(dashKpiSummary, "COSTPREV");
+		BigDecimal costTarget = getNumberValue(dashKpiSummary, "COSTTARGET");
+		BigDecimal costCompareValue = getNumberValue(dashKpiSummary, "COSTCOMPAREVALUE");
+
+		model.addAttribute("dashKpiCostActual", costActual);
+		model.addAttribute("dashKpiCostPrev", costPrev);
+		model.addAttribute("dashKpiCostTarget", costTarget);
+		model.addAttribute("dashKpiCostCompareValue", costCompareValue.abs());
+
+		setCompareDisplay(model,
+				costCompareValue,
+				"dashKpiCostCompare",
+				false,
+				costPrev.compareTo(BigDecimal.ZERO) > 0);
+
+		BigDecimal oeeRate = getNumberValue(dashKpiSummary, "OEERATE");
+		BigDecimal oeeRunTime = getNumberValue(dashKpiSummary, "OEERUNTIME");
+		BigDecimal oeePlanTime = getNumberValue(dashKpiSummary, "OEEPLANTIME");
+		BigDecimal prevOeePlanTime = getNumberValue(dashKpiSummary, "PREVOEEPLANTIME");
+		BigDecimal oeeComparePoint = getNumberValue(dashKpiSummary, "OEECOMPAREPOINT");
+
+		model.addAttribute("dashKpiOeeRate", oeeRate);
+		model.addAttribute("dashKpiOeeRunTime", oeeRunTime);
+		model.addAttribute("dashKpiOeePlanTime", oeePlanTime);
+		model.addAttribute("dashKpiPrevOeePlanTime", prevOeePlanTime);
+		model.addAttribute("dashKpiOeeComparePoint", oeeComparePoint.abs());
+
+		setCompareDisplay(model,
+				oeeComparePoint,
+				"dashKpiOeeCompare",
+				true,
+				prevOeePlanTime.compareTo(BigDecimal.ZERO) > 0);
+
+		BigDecimal delayOrderCount = getNumberValue(dashKpiSummary, "DELAYORDERCOUNT");
+		BigDecimal delayQty = getNumberValue(dashKpiSummary, "DELAYQTY");
+		BigDecimal delayCompareCount = getNumberValue(dashKpiSummary, "DELAYCOMPARECOUNT");
+
+		model.addAttribute("dashKpiDelayOrderCount", delayOrderCount);
+		model.addAttribute("dashKpiDelayQty", delayQty);
+		model.addAttribute("dashKpiDelayCompareCount", delayCompareCount.abs());
+
+		setCompareDisplay(model,
+				delayCompareCount,
+				"dashKpiDelayCompare",
+				false,
+				true);
+	}
+
+	// 전일 대비 표시 방향과 색상을 세팅한다.
+	private void setCompareDisplay(Model model, BigDecimal compareValue, String prefix, boolean increaseGood, boolean hasPrevData) {
+		String arrow = "";
+		String className = "dash-neutral-text";
+
+		if (!hasPrevData) {
+			model.addAttribute(prefix + "Arrow", arrow);
+			model.addAttribute(prefix + "Class", className);
+			model.addAttribute(prefix + "NoPrevData", true);
+
+			return;
+		}
+
+		if (compareValue.compareTo(BigDecimal.ZERO) > 0) {
+			arrow = "▲";
+
+			if (increaseGood) {
+				className = "dash-green-text";
+			} else {
+				className = "dash-red-text";
+			}
+		} else if (compareValue.compareTo(BigDecimal.ZERO) < 0) {
+			arrow = "▼";
+
+			if (increaseGood) {
+				className = "dash-red-text";
+			} else {
+				className = "dash-green-text";
+			}
+		}
+
+		model.addAttribute(prefix + "Arrow", arrow);
+		model.addAttribute(prefix + "Class", className);
+		model.addAttribute(prefix + "NoPrevData", false);
+	}
+	
 	// 대시보드 공지사항 최근 5개를 조회한다.
 	private void setDashboardNotice(Model model, HttpSession session) {
 		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
@@ -282,6 +425,72 @@ public class DashboardController {
 		}
 	}
 	
+	// 대시보드 LOT 현황 데이터를 조회한다.
+	private void setDashboardLotStatus(Model model) {
+		Map<String, Object> dashLotStatus =
+				chartService.dashboardLotStatus();
+
+		model.addAttribute("dashDelayLotCount",
+				getNumberValue(dashLotStatus, "DELAYLOTCOUNT"));
+
+		model.addAttribute("dashInspectionWaitLotCount",
+				getNumberValue(dashLotStatus, "INSPECTIONWAITLOTCOUNT"));
+
+		model.addAttribute("dashFinishedShipWaitLotCount",
+				getNumberValue(dashLotStatus, "FINISHEDSHIPWAITLOTCOUNT"));
+	}
+	
+	
+	// 대시보드 현장 이슈 데이터를 조회한다.
+	private void setDashboardIssueStatus(Model model) {
+		Map<String, Object> dashIssueStatus =
+				chartService.dashboardIssueStatus();
+
+		BigDecimal issueCount =
+				getNumberValue(dashIssueStatus, "ISSUECOUNT");
+
+		model.addAttribute("dashIssueTotalCount", issueCount);
+
+		if (issueCount.compareTo(BigDecimal.ZERO) > 0) {
+			model.addAttribute("dashIssueBoxClass", "dash-issue-danger");
+		} else {
+			model.addAttribute("dashIssueBoxClass", "dash-issue-normal");
+		}
+
+		model.addAttribute("dashDefectIssueYn",
+				getStringValue(dashIssueStatus, "DEFECTISSUEYN"));
+
+		model.addAttribute("dashDefectIssueRate",
+				getNumberValue(dashIssueStatus, "DEFECTRATE"));
+
+		model.addAttribute("dashDefectStandardRate",
+				getNumberValue(dashIssueStatus, "DEFECTSTANDARDRATE"));
+
+		model.addAttribute("dashDefectIssueTime",
+				getStringValue(dashIssueStatus, "DEFECTISSUETIME"));
+
+		model.addAttribute("dashTroubleIssueYn",
+				getStringValue(dashIssueStatus, "TROUBLEISSUEYN"));
+
+		model.addAttribute("dashTroubleCount",
+				getNumberValue(dashIssueStatus, "TROUBLECOUNT"));
+
+		model.addAttribute("dashTroubleIssueTime",
+				getStringValue(dashIssueStatus, "TROUBLEISSUETIME"));
+
+		model.addAttribute("dashTroubleMessage",
+				getStringValue(dashIssueStatus, "TROUBLEMESSAGE"));
+
+		model.addAttribute("dashDelayIssueYn",
+				getStringValue(dashIssueStatus, "DELAYISSUEYN"));
+
+		model.addAttribute("dashDelayOrderCount",
+				getNumberValue(dashIssueStatus, "DELAYORDERCOUNT"));
+
+		model.addAttribute("dashDelayIssueTime",
+				getStringValue(dashIssueStatus, "DELAYISSUETIME"));
+	}
+	
 	// Map 숫자 값을 안전하게 BigDecimal로 변환한다.
 	private BigDecimal getNumberValue(Map<String, Object> map, String key) {
 		if (map == null || map.get(key) == null) {
@@ -299,5 +508,14 @@ public class DashboardController {
 		}
 
 		return BigDecimal.ZERO;
+	}
+	
+	// Map 문자 값을 안전하게 String으로 변환한다.
+	private String getStringValue(Map<String, Object> map, String key) {
+		if (map == null || map.get(key) == null) {
+			return "";
+		}
+
+		return String.valueOf(map.get(key));
 	}
 }

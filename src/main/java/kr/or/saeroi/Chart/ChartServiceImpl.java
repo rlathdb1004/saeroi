@@ -22,6 +22,13 @@ public class ChartServiceImpl implements ChartService{
 		return list;
 	}
 	
+	// 대시보드 KPI 핵심 6대 지표를 조회한다.
+	@Override
+	public Map<String, Object> dashboardKpiSummary() {
+		Map<String, Object> map = chartDAO.dashboardKpiSummary();
+		return map;
+	}
+	
 	// 대시보드 생산실적 추이 최근 7일 데이터를 조회한다.
 	@Override
 	public List<Map<String, Object>> dashboardProductionTrend() {
@@ -68,6 +75,20 @@ public class ChartServiceImpl implements ChartService{
 	@Override
 	public Map<String, Object> dashboardFacilityStatus() {
 		Map<String, Object> map = chartDAO.dashboardFacilityStatus();
+		return map;
+	}
+	
+	// 대시보드 LOT 현황 데이터를 조회한다.
+	@Override
+	public Map<String, Object> dashboardLotStatus() {
+		Map<String, Object> map = chartDAO.dashboardLotStatus();
+		return map;
+	}
+	
+	// 대시보드 현장 이슈 데이터를 조회한다.
+	@Override
+	public Map<String, Object> dashboardIssueStatus() {
+		Map<String, Object> map = chartDAO.dashboardIssueStatus();
 		return map;
 	}
 	
