@@ -26,6 +26,15 @@ public class ProductionController {
 	@Autowired
 	private ProductionService productionService;
 
+	// 생산관리 기본 주소 접근 시 생산실적 등록 화면으로 이동한다.
+	// /production, /production/ 직접 접근 또는 사이드바 상위 메뉴 클릭 시 404를 방지한다.
+	@RequestMapping(value = { "/production", "/production/" }, method = RequestMethod.GET)
+	public String productionRoot() {
+
+		System.out.println("### productionRoot 호출됨 ###");
+
+		return "redirect:/production/productionresult";
+	}
 
 	// =========================================================
 	// 1. 생산계획 관리
@@ -35,8 +44,7 @@ public class ProductionController {
 	@RequestMapping("/production/productionplan")
 	public String productionPlan(ProductionDTO productionDTO,
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size,
-			Model model) {
+			@RequestParam(value = "size", defaultValue = "5") int size, Model model) {
 
 		int totalCount = productionService.selectProductionPlanCount(productionDTO);
 
@@ -70,13 +78,10 @@ public class ProductionController {
 		return "production/productionplan.tiles";
 	}
 
-
 	// 생산계획 상세 화면이다.
 	@RequestMapping("/production/productionplan/detail")
-	public String productionPlanDetail(
-			@RequestParam("prodPlanId") Integer prodPlanId,
-			@RequestParam(value = "mode", required = false) String mode,
-			Model model) {
+	public String productionPlanDetail(@RequestParam("prodPlanId") Integer prodPlanId,
+			@RequestParam(value = "mode", required = false) String mode, Model model) {
 
 		ProductionDTO production = productionService.selectProductionPlanDetail(prodPlanId);
 
@@ -89,72 +94,68 @@ public class ProductionController {
 		return "production/productionplandetail.tiles";
 	}
 
-
 	// 생산계획을 등록한다.
 	@RequestMapping(value = "/production/productionplan/insert", method = RequestMethod.POST)
-	public String insertProductionPlan(
-			ProductionDTO productionDTO,
-			RedirectAttributes rttr) {
+	public String insertProductionPlan(ProductionDTO productionDTO, RedirectAttributes rttr) {
 
 		try {
 			productionService.insertProductionPlan(productionDTO);
 			rttr.addFlashAttribute("msg", "생산계획이 등록되었습니다.");
 
 		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", e.getMessage());
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", "생산계획 등록 중 오류가 발생했습니다.");
 		}
 
 		return "redirect:/production/productionplan";
 	}
 
-
 	// 생산계획 상세 수정 처리이다.
 	@RequestMapping(value = "/production/productionplan/update", method = RequestMethod.POST)
-	public String updateProductionPlan(
-			ProductionDTO productionDTO,
-			RedirectAttributes rttr) {
+	public String updateProductionPlan(ProductionDTO productionDTO, RedirectAttributes rttr) {
 
 		try {
 			productionService.updateProductionPlan(productionDTO);
 			rttr.addFlashAttribute("msg", "생산계획이 수정되었습니다.");
 
 		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", e.getMessage());
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", "생산계획 수정 중 오류가 발생했습니다.");
 		}
 
-		return "redirect:/production/productionplan/detail?prodPlanId="
-				+ productionDTO.getProdPlanId();
+		return "redirect:/production/productionplan/detail?prodPlanId=" + productionDTO.getProdPlanId();
 	}
-	
+
 	// 생산계획 선택 삭제 처리이다.
 	// 작업지시가 생성된 생산계획은 Service에서 삭제를 제한한다.
 	@RequestMapping(value = "/production/productionplan/delete", method = RequestMethod.POST)
-	public String deleteProductionPlan(
-			@RequestParam(value = "prodPlanIds", required = false) List<Integer> prodPlanIds,
+	public String deleteProductionPlan(@RequestParam(value = "prodPlanIds", required = false) List<Integer> prodPlanIds,
 			RedirectAttributes rttr) {
 
 		try {
 			int deleteCount = productionService.deleteProductionPlanList(prodPlanIds);
 
-			rttr.addFlashAttribute("msg",
-					deleteCount + "건의 생산계획이 삭제되었습니다.");
+			rttr.addFlashAttribute("msg", deleteCount + "건의 생산계획이 삭제되었습니다.");
 
 		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", e.getMessage());
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", "생산계획 삭제 중 오류가 발생했습니다.");
 		}
 
 		return "redirect:/production/productionplan";
 	}
-
 
 	// =========================================================
 	// 2. 작업지시 관리
@@ -162,11 +163,8 @@ public class ProductionController {
 
 	// 작업지시 관리 목록 화면이다.
 	@RequestMapping("/production/workorder")
-	public String workOrder(
-			ProductionDTO productionDTO,
-			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size,
-			Model model) {
+	public String workOrder(ProductionDTO productionDTO, @RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "5") int size, Model model) {
 
 		int totalCount = productionService.selectWorkOrderCount(productionDTO);
 
@@ -183,8 +181,7 @@ public class ProductionController {
 
 		// 작업지시 등록 모달 생산계획 목록이다.
 		// includePastPlan = Y이면 지난 생산계획도 포함한다.
-		List<ProductionDTO> workOrderPlanList =
-				productionService.selectWorkOrderPlanList(productionDTO);
+		List<ProductionDTO> workOrderPlanList = productionService.selectWorkOrderPlanList(productionDTO);
 
 		List<ProductionDTO> lineList = productionService.selectLineList();
 		List<ProductionDTO> empList = productionService.selectWorkOrderEmpList();
@@ -212,17 +209,13 @@ public class ProductionController {
 		return "production/workorder.tiles";
 	}
 
-
 	// 작업지시 인쇄 화면이다.
 	// orderId가 있으면 단건 작업지시서를 인쇄하고,
 	// orderId가 없으면 검색조건에 맞는 전체 작업지시서를 인쇄한다.
 	@RequestMapping("/production/workorder/print")
-	public String workOrderPrint(
-			ProductionDTO productionDTO,
-			Model model) {
+	public String workOrderPrint(ProductionDTO productionDTO, Model model) {
 
-		List<ProductionDTO> printList =
-				productionService.selectWorkOrderPrintDetailList(productionDTO);
+		List<ProductionDTO> printList = productionService.selectWorkOrderPrintDetailList(productionDTO);
 
 		model.addAttribute("printList", printList);
 
@@ -237,16 +230,12 @@ public class ProductionController {
 		return "production/workorderprint.tiles";
 	}
 
-
 	// 작업지시 QR 이미지를 실시간으로 생성해서 PNG로 응답한다.
 	@RequestMapping(value = "/production/workorder/qr", method = RequestMethod.GET)
-	public void workOrderQr(
-			@RequestParam("orderId") Integer orderId,
-			HttpServletResponse response) throws IOException {
+	public void workOrderQr(@RequestParam("orderId") Integer orderId, HttpServletResponse response) throws IOException {
 
 		try {
-			byte[] qrImageBytes =
-					productionService.createWorkOrderQrImageBytes(orderId);
+			byte[] qrImageBytes = productionService.createWorkOrderQrImageBytes(orderId);
 
 			response.setContentType("image/png");
 			response.setContentLength(qrImageBytes.length);
@@ -257,56 +246,45 @@ public class ProductionController {
 			response.getOutputStream().flush();
 
 		} catch (IllegalArgumentException e) {
-			response.sendError(
-					HttpServletResponse.SC_BAD_REQUEST,
-					e.getMessage());
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
 
 		} catch (Exception e) {
-			response.sendError(
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					"작업지시 QR 코드 생성 중 오류가 발생했습니다.");
+			e.printStackTrace();
+			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "작업지시 QR 코드 생성 중 오류가 발생했습니다.");
 		}
 	}
 
-
 	// 작업지시를 등록한다.
 	@RequestMapping(value = "/production/workorder/insert", method = RequestMethod.POST)
-	public String insertWorkOrder(
-			ProductionDTO productionDTO,
-			RedirectAttributes rttr) {
+	public String insertWorkOrder(ProductionDTO productionDTO, RedirectAttributes rttr) {
 
 		try {
 			/*
-			 * Service 처리 흐름:
-			 * 1. WORK_ORDER 등록
-			 * 2. 생성된 orderId 확보
-			 * 3. 생성된 작업지시 상세 재조회
-			 * 4. LOT 기반 QR URL/이미지 생성
-			 * 5. work_order.qr_url, qr_image_path 저장
-			 * 6. BOM 기준 MATERIAL_INOUT 자동 생성
+			 * Service 처리 흐름: 1. WORK_ORDER 등록 2. 생성된 orderId 확보 3. 생성된 작업지시 상세 재조회 4. LOT
+			 * 기반 QR URL/이미지 생성 5. work_order.qr_url, qr_image_path 저장 6. BOM 기준
+			 * MATERIAL_INOUT 자동 생성
 			 */
 			productionService.insertWorkOrder(productionDTO);
 
-			rttr.addFlashAttribute("msg",
-					"작업지시가 등록되었고 QR코드와 BOM 기준 원자재 투입 이력이 생성되었습니다.");
+			rttr.addFlashAttribute("msg", "작업지시가 등록되었고 QR코드와 BOM 기준 원자재 투입 이력이 생성되었습니다.");
 
 		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", e.getMessage());
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", "작업지시 등록 중 오류가 발생했습니다.");
 		}
 
 		return "redirect:/production/workorder";
 	}
 
-
 	// 작업지시 상세 화면이다.
 	@RequestMapping("/production/workorder/detail")
-	public String workOrderDetail(
-			@RequestParam("orderId") Integer orderId,
-			@RequestParam(value = "mode", required = false) String mode,
-			Model model) {
+	public String workOrderDetail(@RequestParam("orderId") Integer orderId,
+			@RequestParam(value = "mode", required = false) String mode, Model model) {
 
 		ProductionDTO workOrder = productionService.selectWorkOrderDetail(orderId);
 
@@ -320,21 +298,20 @@ public class ProductionController {
 		try {
 			appliedBom = productionService.selectWorkOrderAppliedBom(orderId);
 
-			List<ProductionDTO> tempBomMaterialList =
-					productionService.selectWorkOrderBomMaterialList(orderId);
+			List<ProductionDTO> tempBomMaterialList = productionService.selectWorkOrderBomMaterialList(orderId);
 
 			if (tempBomMaterialList != null) {
 				bomMaterialList = tempBomMaterialList;
 			}
 
-			List<ProductionDTO> tempMaterialInoutList =
-					productionService.selectWorkOrderMaterialInoutList(orderId);
+			List<ProductionDTO> tempMaterialInoutList = productionService.selectWorkOrderMaterialInoutList(orderId);
 
 			if (tempMaterialInoutList != null) {
 				materialInoutList = tempMaterialInoutList;
 			}
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			appliedBom = null;
 			bomMaterialList = Collections.emptyList();
 			materialInoutList = Collections.emptyList();
@@ -356,28 +333,25 @@ public class ProductionController {
 		return "production/workorderdetail.tiles";
 	}
 
-
 	// 작업지시 상세 수정 처리이다.
 	@RequestMapping(value = "/production/workorder/update", method = RequestMethod.POST)
-	public String updateWorkOrder(
-			ProductionDTO productionDTO,
-			RedirectAttributes rttr) {
+	public String updateWorkOrder(ProductionDTO productionDTO, RedirectAttributes rttr) {
 
 		try {
 			productionService.updateWorkOrder(productionDTO);
 			rttr.addFlashAttribute("msg", "작업지시 정보가 수정되었습니다.");
 
 		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", e.getMessage());
 
 		} catch (Exception e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", "작업지시 수정 중 오류가 발생했습니다.");
 		}
 
-		return "redirect:/production/workorder/detail?orderId="
-				+ productionDTO.getOrderId();
+		return "redirect:/production/workorder/detail?orderId=" + productionDTO.getOrderId();
 	}
-
 
 	// =========================================================
 	// 3. 생산실적 등록
@@ -385,11 +359,9 @@ public class ProductionController {
 
 	// 생산실적 등록 목록 화면이다.
 	@RequestMapping("/production/productionresult")
-	public String productionResult(
-			ProductionDTO productionDTO,
+	public String productionResult(ProductionDTO productionDTO,
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size,
-			Model model) {
+			@RequestParam(value = "size", defaultValue = "5") int size, Model model) {
 
 		int totalCount = productionService.selectProductionResultCount(productionDTO);
 
@@ -401,27 +373,24 @@ public class ProductionController {
 		productionDTO.setStartRow(startRow);
 		productionDTO.setEndRow(endRow);
 
-		List<ProductionDTO> list =
-				productionService.selectProductionResultList(productionDTO);
+		List<ProductionDTO> list = productionService.selectProductionResultList(productionDTO);
 
-		List<String> productionResultStatusList =
-				productionService.selectProductionResultStatusList();
+		List<String> productionResultStatusList = productionService.selectProductionResultStatusList();
 
-		List<ProductionDTO> productionResultOrderList =
-				productionService.selectProductionResultOrderList();
+		List<ProductionDTO> productionResultOrderList = productionService.selectProductionResultOrderList();
 
 		List<ProductionDTO> empList = productionService.selectWorkOrderEmpList();
 
 		// QR 스캔으로 진입한 경우 자동입력할 작업지시 정보이다.
 		ProductionDTO qrOrder = null;
 
-		if ("Y".equals(productionDTO.getOpenModal())
-				&& productionDTO.getOrderId() != null) {
+		if ("Y".equals(productionDTO.getOpenModal()) && productionDTO.getOrderId() != null) {
 
 			try {
 				qrOrder = productionService.selectProductionResultOrderByQr(productionDTO);
 
 			} catch (Exception e) {
+				e.printStackTrace();
 				qrOrder = null;
 			}
 		}
@@ -451,34 +420,41 @@ public class ProductionController {
 		return "production/productionresult.tiles";
 	}
 
-
 	// 생산실적을 등록한다.
 	@RequestMapping(value = "/production/productionresult/insert", method = RequestMethod.POST)
-	public String insertProductionResult(
-			ProductionDTO productionDTO,
-			RedirectAttributes rttr) {
+	public String insertProductionResult(ProductionDTO productionDTO, RedirectAttributes rttr) {
 
 		try {
+			System.out.println("===== 생산실적 등록 DTO 확인 =====");
+			System.out.println("orderId = " + productionDTO.getOrderId());
+			System.out.println("empId = " + productionDTO.getEmpId());
+			System.out.println("orderQty = " + productionDTO.getOrderQty());
+			System.out.println("prodQty = " + productionDTO.getProdQty());
+			System.out.println("lossQty = " + productionDTO.getLossQty());
+			System.out.println("prodDate = " + productionDTO.getProdDate());
+			System.out.println("prodStatus = " + productionDTO.getProdStatus());
+			System.out.println("remark = " + productionDTO.getRemark());
+			System.out.println("================================");
+
 			productionService.insertProductionResult(productionDTO);
 			rttr.addFlashAttribute("msg", "생산실적이 등록되었습니다.");
 
 		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", e.getMessage());
 
 		} catch (Exception e) {
-			rttr.addFlashAttribute("msg", "생산실적 등록 중 오류가 발생했습니다.");
+			e.printStackTrace();
+			rttr.addFlashAttribute("msg", "생산실적 등록 중 오류: " + getRootMessage(e));
 		}
 
 		return "redirect:/production/productionresult";
 	}
 
-
 	// 생산실적 상세 화면이다.
 	@RequestMapping("/production/productionresult/detail")
-	public String productionResultDetail(
-			@RequestParam("prodId") Integer prodId,
-			@RequestParam(value = "mode", required = false) String mode,
-			Model model) {
+	public String productionResultDetail(@RequestParam("prodId") Integer prodId,
+			@RequestParam(value = "mode", required = false) String mode, Model model) {
 
 		ProductionDTO result = productionService.selectProductionResultDetail(prodId);
 		List<ProductionDTO> empList = productionService.selectWorkOrderEmpList();
@@ -493,28 +469,25 @@ public class ProductionController {
 		return "production/productionresultdetail.tiles";
 	}
 
-
 	// 생산실적 상세 수정 처리이다.
 	@RequestMapping(value = "/production/productionresult/update", method = RequestMethod.POST)
-	public String updateProductionResult(
-			ProductionDTO productionDTO,
-			RedirectAttributes rttr) {
+	public String updateProductionResult(ProductionDTO productionDTO, RedirectAttributes rttr) {
 
 		try {
 			productionService.updateProductionResult(productionDTO);
 			rttr.addFlashAttribute("msg", "생산실적 정보가 수정되었습니다.");
 
 		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", e.getMessage());
 
 		} catch (Exception e) {
-			rttr.addFlashAttribute("msg", "생산실적 수정 중 오류가 발생했습니다.");
+			e.printStackTrace();
+			rttr.addFlashAttribute("msg", "생산실적 수정 중 오류: " + getRootMessage(e));
 		}
 
-		return "redirect:/production/productionresult/detail?prodId="
-				+ productionDTO.getProdId();
+		return "redirect:/production/productionresult/detail?prodId=" + productionDTO.getProdId();
 	}
-
 
 	// =========================================================
 	// 4. 공정진행 현황
@@ -522,11 +495,9 @@ public class ProductionController {
 
 	// 공정진행 현황 목록 화면이다.
 	@RequestMapping("/production/processprogress")
-	public String processProgress(
-			ProductionDTO productionDTO,
+	public String processProgress(ProductionDTO productionDTO,
 			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "5") int size,
-			Model model) {
+			@RequestParam(value = "size", defaultValue = "5") int size, Model model) {
 
 		int totalCount = productionService.selectProcessProgressCount(productionDTO);
 
@@ -538,14 +509,11 @@ public class ProductionController {
 		productionDTO.setStartRow(startRow);
 		productionDTO.setEndRow(endRow);
 
-		List<ProductionDTO> list =
-				productionService.selectProcessProgressList(productionDTO);
+		List<ProductionDTO> list = productionService.selectProcessProgressList(productionDTO);
 
-		List<String> processProgressStatusList =
-				productionService.selectProcessProgressStatusList();
+		List<String> processProgressStatusList = productionService.selectProcessProgressStatusList();
 
-		List<ProductionDTO> processProgressOrderList =
-				productionService.selectProductionResultOrderList();
+		List<ProductionDTO> processProgressOrderList = productionService.selectProductionResultOrderList();
 
 		List<ProductionDTO> empList = productionService.selectWorkOrderEmpList();
 
@@ -569,34 +537,30 @@ public class ProductionController {
 		return "production/processprogress.tiles";
 	}
 
-
 	// 공정진행을 등록한다.
 	@RequestMapping(value = "/production/processprogress/insert", method = RequestMethod.POST)
-	public String insertProcessProgress(
-			ProductionDTO productionDTO,
-			RedirectAttributes rttr) {
+	public String insertProcessProgress(ProductionDTO productionDTO, RedirectAttributes rttr) {
 
 		try {
 			productionService.insertProductionResult(productionDTO);
 			rttr.addFlashAttribute("msg", "공정진행 정보가 등록되었습니다.");
 
 		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", e.getMessage());
 
 		} catch (Exception e) {
-			rttr.addFlashAttribute("msg", "공정진행 등록 중 오류가 발생했습니다.");
+			e.printStackTrace();
+			rttr.addFlashAttribute("msg", "공정진행 등록 중 오류: " + getRootMessage(e));
 		}
 
 		return "redirect:/production/processprogress";
 	}
 
-
 	// 공정진행 상세 화면이다.
 	@RequestMapping("/production/processprogress/detail")
-	public String processProgressDetail(
-			@RequestParam("orderId") Integer orderId,
-			@RequestParam(value = "mode", required = false) String mode,
-			Model model) {
+	public String processProgressDetail(@RequestParam("orderId") Integer orderId,
+			@RequestParam(value = "mode", required = false) String mode, Model model) {
 
 		ProductionDTO progress = productionService.selectProcessProgressDetail(orderId);
 		List<ProductionDTO> empList = productionService.selectWorkOrderEmpList();
@@ -611,25 +575,54 @@ public class ProductionController {
 		return "production/processprogressdetail.tiles";
 	}
 
-
 	// 공정진행 상세 수정 처리이다.
 	@RequestMapping(value = "/production/processprogress/update", method = RequestMethod.POST)
-	public String updateProcessProgress(
-			ProductionDTO productionDTO,
-			RedirectAttributes rttr) {
+	public String updateProcessProgress(ProductionDTO productionDTO, RedirectAttributes rttr) {
 
 		try {
 			productionService.updateProductionResult(productionDTO);
 			rttr.addFlashAttribute("msg", "공정진행 정보가 수정되었습니다.");
 
 		} catch (IllegalArgumentException e) {
+			e.printStackTrace();
 			rttr.addFlashAttribute("msg", e.getMessage());
 
 		} catch (Exception e) {
-			rttr.addFlashAttribute("msg", "공정진행 수정 중 오류가 발생했습니다.");
+			e.printStackTrace();
+			rttr.addFlashAttribute("msg", "공정진행 수정 중 오류: " + getRootMessage(e));
 		}
 
-		return "redirect:/production/processprogress/detail?orderId="
-				+ productionDTO.getOrderId();
+		return "redirect:/production/processprogress/detail?orderId=" + productionDTO.getOrderId();
+	}
+
+	// =========================================================
+	// 오류 메시지 보조 메소드
+	// =========================================================
+
+	// 중첩 예외의 가장 안쪽 메시지를 가져온다.
+	// JSP alert 안에서 깨지지 않도록 줄바꿈과 큰따옴표를 정리한다.
+	private String getRootMessage(Exception e) {
+
+		Throwable root = e;
+
+		while (root.getCause() != null) {
+			root = root.getCause();
+		}
+
+		String message = root.getMessage();
+
+		if (message == null || message.trim().length() == 0) {
+			message = e.getClass().getName();
+		}
+
+		message = message.replace("\r", " ");
+		message = message.replace("\n", " ");
+		message = message.replace("\"", "'");
+
+		if (message.length() > 300) {
+			message = message.substring(0, 300) + "...";
+		}
+
+		return message;
 	}
 }
