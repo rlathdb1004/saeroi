@@ -44,6 +44,80 @@ public class DbTool {
 	@Autowired // 재고조회 //작업지시
 	private ProductionDAO productionDAO;
 
+	@Tool("공정진행현황을 조회합니다."
+			+ "1.만약 사용자가 날짜를 조회했다면 startDate와 endDate에 YYYY-MM-DD 형식을 지켜서 넘겨주고, 언급하지 않았다면 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
+			+ "2.사용자가 특정 품목 구분이나 검색어를 언급하면 keyword에 넣고, itemType(진행상태)은 '전체', '대기', '완료', '진행중', 등으로 지정할 수 있습니다."
+			)
+	public String getselectProcessProgressList(String startDate, String endDate, String itemType, String keyword) {
+		try {
+			
+			ProductionDTO productionDTO = new ProductionDTO();
+			
+			startDate = cleanParam(startDate);
+            endDate = cleanParam(endDate);
+            itemType = cleanParam(itemType);
+            keyword = cleanParam(keyword);
+            
+            // 💡 정제된 값이 빈 문자열("")이 아닐 때만 DTO에 안전하게 세팅합니다.
+            if (!startDate.isEmpty()) productionDTO.setStartDate(startDate);
+            if (!endDate.isEmpty()) productionDTO.setEndDate(endDate);
+            if (!itemType.isEmpty()) productionDTO.setItemType(itemType);
+            if (!keyword.isEmpty()) productionDTO.setKeyword(keyword);
+			
+            // 필요 시 페이징 안전장치 추가
+			productionDTO.setStartRow(1);
+			productionDTO.setEndRow(50);
+
+			List<ProductionDTO> list = productionDAO.selectProcessProgressList(productionDTO);
+			System.out.println("ai" + list);
+			if(list == null || list.isEmpty()) {
+				return "공정진행현황 조회 결과가 없습니다.";
+			}
+			
+			// 주소값 깨짐 방지 및 AI 가독성을 위해 ObjectMapper 권장 (선택사항)
+			com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+			return objectMapper.writeValueAsString(list);
+		} catch (Exception e) {
+			return "공정진행현황조회 중 오류: " + e.getMessage();
+		}
+	}
+
+	@Tool("생산실적을 조회합니다."
+			+ "1.만약 사용자가 날짜를 조회했다면 startDate와 endDate에 YYYY-MM-DD 형식을 지켜서 넘겨주고, 언급하지 않았다면 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
+			+ "2.사용자가 특정 품목 구분이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기', '완료', '보류', 등으로 지정할 수 있습니다."
+			+ "3.")
+	public String getselectProductionResultList(String startDate, String endDate, String itemType, String keyword) {
+		try {
+			// 메서드 내부에서 직접 DTO를 생성하고 바인딩합니다.
+			ProductionDTO productionDTO = new ProductionDTO();
+			
+			startDate = cleanParam(startDate);
+            endDate = cleanParam(endDate);
+            itemType = cleanParam(itemType);
+            keyword = cleanParam(keyword);
+            
+            // 💡 정제된 값이 빈 문자열("")이 아닐 때만 DTO에 안전하게 세팅합니다.
+            if (!startDate.isEmpty()) productionDTO.setStartDate(startDate);
+            if (!endDate.isEmpty()) productionDTO.setEndDate(endDate);
+            if (!itemType.isEmpty()) productionDTO.setItemType(itemType);
+            if (!keyword.isEmpty()) productionDTO.setKeyword(keyword);
+			
+            productionDTO.setStartRow(1);
+			productionDTO.setEndRow(50);
+
+			List<ProductionDTO> list = productionDAO.selectProductionResultList(productionDTO);
+			System.out.println("ai" + list);
+			if(list == null || list.isEmpty()) {
+				return "해당 조건으로 조회된 생산실적 조회 결과가 없습니다.";
+			}
+			
+			com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+			return objectMapper.writeValueAsString(list);
+		} catch (Exception e) {
+			return "생산실적조회 중 오류: " + e.getMessage();
+		}
+	}
+
 	@Tool("특정 작업지시서의 상세 정보를 조회합니다."
 			+ "1.만약 사용자가 날짜를 조회했다면 startDate와 endDate에 YYYY-MM-DD 형식을 지켜서 넘겨주고, 언급하지 않았다면 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
 			+ "2.사용자가 특정 품목 구분이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기', '완료', '보류', 등으로 지정할 수 있습니다."
@@ -63,32 +137,45 @@ public class DbTool {
 		}
 	}
 	
-	@Tool("작업지시를 조회합니다"
-			+ "만약 사용자가 날짜를 조회했다면 startDate와 endDate에 YYYY-MM-DD 형식을 지켜서 넘겨주고, 언급하지 않았다면 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
-			+ "사용자가 특정 품목 구분이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기', '완료', '보류', 등으로 지정할 수 있습니다."
-			)
-	public String getworkorder(String startDate, String endDate, String itemType, String keyword) {
+	@Tool("작업지시 목록을 조회하거나 특정 담당자(사원)의 작업지시서를 검색합니다. "
+			+ "1. 사용자가 '박민호 관리자', '내가 맡은' 등 특정 사원 이름이나 대상자를 언급하면 ename 매개변수에 해당 이름을 넣어주세요. "
+			+ "2. 이번 주, 오늘 등 기간 조건이 파악되면 startDate와 endDate에 YYYY-MM-DD 형식을 채우고, 언급이 없으면 빈 문자열(\"\")로 넘겨줍니다. "
+			+ "3. 사용자가 특정 품목이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기' 등으로 지정할 수 있습니다.")
+	public String getworkorder(String ename, String startDate, String endDate, String itemType, String keyword) {
 		try {
 			
 			ProductionDTO productionDTO = new ProductionDTO();
 			
-			if (startDate != null && !startDate.isEmpty())
-				productionDTO.setStartDate(startDate.trim());
-			if (endDate != null && !endDate.isEmpty())
-				productionDTO.setEndDate(endDate.trim());
-			if (itemType != null && !itemType.isEmpty())
-				productionDTO.setItemType(itemType.trim());
-			if (keyword != null && !keyword.isEmpty())
-				productionDTO.setKeyword(keyword.trim());
+			ename = cleanParam(ename);
+			startDate = cleanParam(startDate);
+            endDate = cleanParam(endDate);
+            itemType = cleanParam(itemType);
+            keyword = cleanParam(keyword);
+            
+            // 💡 정제된 값이 빈 문자열("")이 아닐 때만 DTO에 안전하게 세팅합니다.
+            if (!ename.isEmpty()) productionDTO.setStartDate(ename);
+            if (!startDate.isEmpty()) productionDTO.setStartDate(startDate);
+            if (!endDate.isEmpty()) productionDTO.setEndDate(endDate);
+            if (!itemType.isEmpty()) productionDTO.setItemType(itemType);
+            if (!keyword.isEmpty()) productionDTO.setKeyword(keyword);
 			
+			// 페이징 필수 데이터 안전장치
 			productionDTO.setStartRow(1);
 			productionDTO.setEndRow(50);
 			
 			List<ProductionDTO> list = productionDAO.selectWorkOrderList(productionDTO);
-			System.out.println("ai" + list);
-			return list.isEmpty() ? "해당 조건으로 조회된 생산계획 관리 조회 결과가 없습니다." : list.toString();
+			System.out.println("ai 작업지시 담당자[" + ename + "] 조회 결과: " + list);
+			
+			if (list == null || list.isEmpty()) {
+				return "해당 조건으로 조회된 작업지시 관리 조회 결과가 없습니다.";
+			}
+			
+			// 💡 데이터 주소값 깨짐 방지 및 AI 인지율 상승을 위해 JSON 오브젝트 포맷 데이터로 리턴합니다.
+			com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+			return objectMapper.writeValueAsString(list);
+			
 		} catch (Exception e) {
-			return "생산계획관리조회 중 오류: " + e.getMessage();
+			return "작업지시 조회 중 오류: " + e.getMessage();
 		}
 	}
 	
@@ -100,14 +187,16 @@ public class DbTool {
 
 			ProductionDTO productionDTO = new ProductionDTO();
 
-			if (startDate != null && !startDate.isEmpty())
-				productionDTO.setStartDate(startDate.trim());
-			if (endDate != null && !endDate.isEmpty())
-				productionDTO.setEndDate(endDate.trim());
-			if (itemType != null && !itemType.isEmpty())
-				productionDTO.setItemType(itemType.trim());
-			if (keyword != null && !keyword.isEmpty())
-				productionDTO.setKeyword(keyword.trim());
+			startDate = cleanParam(startDate);
+            endDate = cleanParam(endDate);
+            itemType = cleanParam(itemType);
+            keyword = cleanParam(keyword);
+            
+            // 💡 정제된 값이 빈 문자열("")이 아닐 때만 DTO에 안전하게 세팅합니다.
+            if (!startDate.isEmpty()) productionDTO.setStartDate(startDate);
+            if (!endDate.isEmpty()) productionDTO.setEndDate(endDate);
+            if (!itemType.isEmpty()) productionDTO.setItemType(itemType);
+            if (!keyword.isEmpty()) productionDTO.setKeyword(keyword);
 
 			productionDTO.setStartRow(1);
 			productionDTO.setEndRow(50);
@@ -120,10 +209,9 @@ public class DbTool {
 		}
 	}
 
-	@Tool("재고를 조회합니다. 사용자가 특정 품목이나 검색어를 언급하면 keyword에 넣고, searchType은 'itemCode', 'itemName' 등으로 지정합니다."
-			+ "만약 날짜를 조회했다면 YYYY-MM-DD의 형식을 지켜줘"
-			+ "만약 조회 페이징(startDate),(endDate)을 언급하지 않았다면, 무리하게 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
-			+ "출력 개수 제한(limit)이나 정렬 방식(orderBy)에 대한 요구사항이 있다면 해당 매개변수에 값을 채워줍니다.")
+	@Tool("재고를 조회합니다. 사용자가 특정 품목이나 검색어를 언급하면 keyword에 넣고, searchType은 'itemCode', 'itemName' 등으로 지정합니다. " +
+		      "만약 날짜를 조회했다면 YYYY-MM-DD의 형식을 지켜줘. " +
+		      "만약 날짜(startDate, endDate)를 언급하지 않았다면, 무리하게 채우지 말고 반드시 빈 문자열(\"\")로 넘겨주어야 합니다.")
 	public String getinventory(String searchType, String keyword, String startDate, String endDate) {
 		try {
 			String type = (searchType != null && !searchType.isEmpty()) ? searchType : null;
@@ -187,4 +275,18 @@ public class DbTool {
 		List<Map<String, Object>> list = chartDAO.chartday(searchType, searchItem);
 		return list.isEmpty() ? "해당 날짜(" + today + ")로 조회된 리포트 기록이 없습니다." : list.toString();
 	}
+	
+	
+	private String cleanParam(String param) {
+        if (param == null) return "";
+        
+        String trimmed = param.trim();
+        
+        // AI가 문자열 "null"이나 "undefined"를 보냈거나 실제로 비어있다면, 자바에서 다루기 쉽게 완전히 빈 문자열("")로 통일시킵니다.
+        if (trimmed.equalsIgnoreCase("null") || trimmed.equalsIgnoreCase("undefined") || trimmed.isEmpty()) {
+            return "";
+        }
+        return trimmed;
+    }
+
 }

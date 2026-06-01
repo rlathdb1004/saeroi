@@ -164,6 +164,134 @@ public class WorkerDAOImpl implements WorkerDAO {
 		return list;
 	}
 
+
+	// =====================================================
+	// 작업자 메인 실제 작업지시 QR 조회
+	// -----------------------------------------------------
+	// 팀원 ProductionController / ProductionService는 수정하지 않는다.
+	// 여기서는 로그인한 작업자의 오늘 작업지시 중 최신 1건만 조회한다.
+	//
+	// 화면에서는 ORDER_ID를 이용해서 기존 팀원 QR 생성 URL인
+	// /production/workorder/qr?orderId=ORDER_ID 를 img src로 사용한다.
+	//
+	// QR을 직접 누르거나 테스트 버튼을 누르면
+	// 작업자가 바로 생산실적 등록 화면으로 이동할 수 있도록
+	// WORK_ORDER.QR_URL이 있으면 QR_URL을 사용하고,
+	// 없으면 Controller에서 기본 이동 URL을 만들어 사용한다.
+	// =====================================================
+	@Override
+	public ProductionDTO selectTodayQrWorkOrder(
+			String empno,
+			String ename) {
+
+		ProductionDTO dto =
+			null;
+
+		try {
+
+			Connection conn =
+				getConnection();
+
+			String sql = "";
+
+			sql += " SELECT * ";
+			sql += " FROM ( ";
+			sql += "     SELECT ";
+			sql += "         WO.ORDER_ID, ";
+			sql += "         WO.PROD_PLAN_ID, ";
+			sql += "         WO.LINE_ID, ";
+			sql += "         WO.EMP_ID, ";
+			sql += "         WO.PRODUCT_LOT, ";
+			sql += "         WO.ORDER_QTY, ";
+			sql += "         TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE, ";
+			sql += "         WO.REMARK, ";
+			sql += "         WO.DOC_NO, ";
+			sql += "         WO.DOC_SEQ, ";
+			sql += "         WO.QR_URL, ";
+			sql += "         WO.QR_IMAGE_PATH, ";
+			sql += "         I.ITEM_ID, ";
+			sql += "         I.ITEM_CODE, ";
+			sql += "         I.ITEM_NAME, ";
+			sql += "         I.ITEM_TYPE, ";
+			sql += "         I.ITEM_UNIT, ";
+			sql += "         L.LINE_CODE, ";
+			sql += "         L.LINE_NAME, ";
+			sql += "         E.EMPNO, ";
+			sql += "         E.ENAME, ";
+			sql += "         E.DEPT, ";
+			sql += "         E.JOB ";
+			sql += "     FROM WORK_ORDER WO ";
+			sql += "     JOIN PRODUCTION_PLAN PP ";
+			sql += "       ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID ";
+			sql += "     JOIN ITEM I ";
+			sql += "       ON PP.ITEM_ID = I.ITEM_ID ";
+			sql += "     LEFT JOIN LINE L ";
+			sql += "       ON WO.LINE_ID = L.LINE_ID ";
+			sql += "     LEFT JOIN EMP E ";
+			sql += "       ON WO.EMP_ID = E.EMP_ID ";
+			sql += "     WHERE ( ";
+			sql += "         TRIM(E.EMPNO) = TRIM(?) ";
+			sql += "         OR TRIM(E.ENAME) = TRIM(?) ";
+			sql += "     ) ";
+			sql += "     AND TRUNC(WO.ORDER_DATE) = TRUNC(SYSDATE) ";
+			sql += "     ORDER BY WO.ORDER_ID DESC ";
+			sql += " ) ";
+			sql += " WHERE ROWNUM = 1 ";
+
+			PreparedStatement ps =
+				conn.prepareStatement(sql);
+
+			ps.setString(1, empno);
+			ps.setString(2, ename);
+
+			ResultSet rs =
+				ps.executeQuery();
+
+			if (rs.next()) {
+
+				dto =
+					new ProductionDTO();
+
+				dto.setOrderId(rs.getInt("ORDER_ID"));
+				dto.setProdPlanId(rs.getInt("PROD_PLAN_ID"));
+				dto.setLineId(rs.getInt("LINE_ID"));
+				dto.setEmpId(rs.getInt("EMP_ID"));
+				dto.setProductLot(rs.getString("PRODUCT_LOT"));
+				dto.setOrderQty(rs.getInt("ORDER_QTY"));
+				dto.setOrderDate(rs.getString("ORDER_DATE"));
+				dto.setRemark(rs.getString("REMARK"));
+				dto.setDocNo(rs.getString("DOC_NO"));
+				dto.setDocSeq(rs.getInt("DOC_SEQ"));
+				dto.setQrUrl(rs.getString("QR_URL"));
+				dto.setQrImagePath(rs.getString("QR_IMAGE_PATH"));
+
+				dto.setItemId(rs.getInt("ITEM_ID"));
+				dto.setItemCode(rs.getString("ITEM_CODE"));
+				dto.setItemName(rs.getString("ITEM_NAME"));
+				dto.setItemType(rs.getString("ITEM_TYPE"));
+				dto.setItemUnit(rs.getString("ITEM_UNIT"));
+
+				dto.setLineCode(rs.getString("LINE_CODE"));
+				dto.setLineName(rs.getString("LINE_NAME"));
+
+				dto.setEmpno(rs.getString("EMPNO"));
+				dto.setEname(rs.getString("ENAME"));
+				dto.setDept(rs.getString("DEPT"));
+				dto.setJob(rs.getString("JOB"));
+			}
+
+			rs.close();
+			ps.close();
+			conn.close();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return dto;
+	}
+
 	// =====================================================
 	// 로그인한 작업자 생산실적 조회
 	// 생산실적은 PRODUCTION → WORK_ORDER → EMP 기준으로 연결
