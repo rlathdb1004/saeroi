@@ -9,11 +9,15 @@ import org.springframework.stereotype.Component;
 
 import dev.langchain4j.agent.tool.Tool;
 import kr.or.saeroi.Chart.ChartDAO;
+import kr.or.saeroi.dao.EquipmentDAO;
+import kr.or.saeroi.dao.EquipmentStatusDAO;
 import kr.or.saeroi.dao.InoutDAO;
 import kr.or.saeroi.dao.InventoryDAO;
 import kr.or.saeroi.dao.LoginDAO;
 import kr.or.saeroi.dao.ProductionDAO;
 import kr.or.saeroi.dao.QualityDAO;
+import kr.or.saeroi.dto.EquipmentDTO;
+import kr.or.saeroi.dto.EquipmentStatusDTO;
 import kr.or.saeroi.dto.InoutDTO;
 import kr.or.saeroi.dto.InspectionDTO;
 import kr.or.saeroi.dto.InventoryDTO;
@@ -43,7 +47,84 @@ public class DbTool {
 
 	@Autowired // 재고조회 //작업지시
 	private ProductionDAO productionDAO;
+	
+	@Autowired // 설비
+	private EquipmentDAO equipmentDAO;
 
+	@Autowired // 설비가동현황
+	private EquipmentStatusDAO statusDAO;
+	
+
+	@Tool("설비 가동 현황을 조회합니다."
+		+ "1.설비코드(equip_code), 설비이름(equip_name), 가동일자(operation_date), 비가동이유(down_reason), 비가동시간(downtime_min), 가동시간(runtime_min)등으로 구분"
+		+ "2.가동시간 비가동시간 비가동 사유를 물어보면 작동시켜"	
+			)
+	public String getstatus(String equip_code, String equip_name, String down_reason) {
+		try {
+			
+			EquipmentStatusDTO statusDTO = new EquipmentStatusDTO();
+			
+			equip_code = cleanParam(equip_code);
+			equip_name = cleanParam(equip_name);
+			down_reason = cleanParam(down_reason);
+			
+			// 💡 정제된 값이 빈 문자열("")이 아닐 때만 DTO에 안전하게 세팅합니다.
+			if (!equip_code.isEmpty()) statusDTO.setEquip_code(equip_code);
+			if (!equip_name.isEmpty()) statusDTO.setEquip_name(equip_name);
+			if (!down_reason.isEmpty()) statusDTO.setDown_reason(down_reason);
+			
+			
+			List<EquipmentStatusDTO> list= statusDAO.eqp_status_list();
+			System.out.println("ai" + list);
+			if(list == null || list.isEmpty()) {
+				return "공정진행현황 조회 결과가 없습니다.";
+			}
+			
+			// 주소값 깨짐 방지 및 AI 가독성을 위해 ObjectMapper 권장 (선택사항)
+			com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+			return objectMapper.writeValueAsString(list);
+		} catch (Exception e) {
+			return "설비관리조회 중 오류: " + e.getMessage();
+		}
+	}
+	
+	@Tool("설비관리를 조회합니다."
+		+ "1.설비코드(equip_code), 설비명(equip_name), 설비상태(equip_status), 제조사(client_name), 설치 위치(equip_loc)등으로 구분"
+		+ "2.설비코드,설비명,설비상태,제조사등은 keyword에 넣고 itemType(구분)은 '설비코드', '설비명', '설비상태', '설비위치', '제조사' 등으로 지정할 수 있습니다."	
+		)
+	public String geteuipment(String equip_code, String equip_name, String equip_status, String client_name, String equip_loc) {
+		try {
+			
+			EquipmentDTO equipmentDTO = new EquipmentDTO();
+			
+			equip_loc = cleanParam(equip_loc);
+			equip_code = cleanParam(equip_code);
+			equip_name = cleanParam(equip_name);
+			equip_status = cleanParam(equip_status);
+			client_name = cleanParam(client_name);
+			
+			// 💡 정제된 값이 빈 문자열("")이 아닐 때만 DTO에 안전하게 세팅합니다.
+			if (!equip_loc.isEmpty()) equipmentDTO.setEquip_loc(equip_loc);
+			if (!equip_code.isEmpty()) equipmentDTO.setEquip_code(equip_code);
+			if (!equip_name.isEmpty()) equipmentDTO.setEquip_name(equip_name);
+			if (!equip_status.isEmpty()) equipmentDTO.setEquip_status(equip_status);
+			if (!client_name.isEmpty()) equipmentDTO.setClient_name(client_name);
+			
+			
+			List<EquipmentDTO> list= equipmentDAO.eqp_list();
+			System.out.println("ai" + list);
+			if(list == null || list.isEmpty()) {
+				return "공정진행현황 조회 결과가 없습니다.";
+			}
+			
+			// 주소값 깨짐 방지 및 AI 가독성을 위해 ObjectMapper 권장 (선택사항)
+			com.fasterxml.jackson.databind.ObjectMapper objectMapper = new com.fasterxml.jackson.databind.ObjectMapper();
+			return objectMapper.writeValueAsString(list);
+		} catch (Exception e) {
+			return "설비관리조회 중 오류: " + e.getMessage();
+		}
+	}
+	
 	@Tool("공정진행현황을 조회합니다."
 			+ "1.만약 사용자가 날짜를 조회했다면 startDate와 endDate에 YYYY-MM-DD 형식을 지켜서 넘겨주고, 언급하지 않았다면 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
 			+ "2.사용자가 특정 품목 구분이나 검색어를 언급하면 keyword에 넣고, itemType(진행상태)은 '전체', '대기', '완료', '진행중', 등으로 지정할 수 있습니다."

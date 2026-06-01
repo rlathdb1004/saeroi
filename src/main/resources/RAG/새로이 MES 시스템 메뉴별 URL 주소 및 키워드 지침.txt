@@ -17,4 +17,20 @@
 
 - 메뉴명: 품질 검사 내역
   주소 경로: /quality/inspection
-  관련 키워드: 품질, 검사, 불량, 불량율, quality, inspection, 퀄리티조회
+  관련 키워드: 품질, 검사, 대기,  검사자, 검사결과, quality, inspection, 퀄리티조회
+
+- 메뉴명: 품질 검사 내역
+  주소 경로: /quality/defect
+  관련 키워드: 불량, 불량명, defect, 불량조회
+
+- 메뉴명: 품질 검사 내역
+  주소 경로: /report
+  관련 키워드: 불량률, 불량수, 차트, 계획량, 작업량, 달성률, 통계, report
+
+- 메뉴명:  설비 검사 내역
+  주소 경로: /equipment/equipment
+  관련 키워드: 설비, 설비 상태, 설비명, 제조사
+ 
+- 메뉴명:  설비 가동 현황
+  주소 경로: /equipment/equipmentstatus
+  관련 키워드: 가동일자, 가동시간, 비가동시간, 비가동 이유
