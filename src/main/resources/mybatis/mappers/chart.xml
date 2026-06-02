@@ -84,9 +84,10 @@
 		JOIN item it ON (pp.item_id
 		= it.item_id)
 		<where>
+		dl.use_yn = 'Y'
 			<if
 				test="searchItem != null and searchItem != '' and searchItem != 'all'">
-				it.item_name = #{searchItem}
+				AND it.item_name = #{searchItem}
 			</if>
 		</where>
 		GROUP BY pp.prod_plan_date,
@@ -124,9 +125,10 @@
 		JOIN item it ON
 		(pp.item_id = it.item_id)
 		<where>
+			 dl.use_yn = 'Y'
 			<if
 				test="searchItem != null and searchItem != '' and searchItem != 'all'">
-				it.item_name = #{searchItem}
+				AND it.item_name = #{searchItem}
 			</if>
 		</where>
 		GROUP BY pp.prod_plan_date,
@@ -263,8 +265,8 @@
 				defect_reason dr
 				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-MM') =
 				TO_CHAR(p.prod_plan_date, 'YYYY-MM')
-				AND dr.item_name = p.item_name )
-				AS 불량사유상세
+				AND dr.item_name = p.item_name 
+				) AS 불량사유상세
 				FROM plandata p
 				LEFT OUTER
 				JOIN workdata w ON
@@ -279,7 +281,7 @@
 			</otherwise>
 		</choose>
 	</select>
-
+	<!-- /////////////////////////////////////////////////////////////////////// -->
 	<select id="sleect_item" resultType="map">
 		select * from item
 	</select>
