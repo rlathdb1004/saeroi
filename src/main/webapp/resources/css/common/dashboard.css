@@ -26,8 +26,10 @@
 	--dash-blue-soft: #F7F8FA;
 
 	width: 100%;
-	max-width: 100%;
+	max-width: 1180px;
 	min-height: calc(100vh - 110px);
+	margin: 0 auto;
+	padding: 0 20px;
 	color: var(--dash-text);
 	box-sizing: border-box;
 	overflow-x: hidden;
@@ -1493,7 +1495,9 @@
 /* 모바일 화면 대응이다. */
 @media (max-width: 768px) {
 	.dashboard-page {
+		max-width: none;
 		min-height: auto;
+		padding: 0 12px;
 	}
 
 	.dashboard-page .dash-time-card {
@@ -3053,4 +3057,294 @@
 /* 현장 이슈와 LOT 모달 행 hover 상태이다. */
 .dashboard-page .dash-dashboard-detail-row:hover td {
 	background-color: #F9FAFB;
+}
+
+@media (max-width: 768px) {
+	.dashboard-page .dash-kpi-panel {
+		padding: 14px 10px;
+	}
+
+	.dashboard-page .dash-kpi-grid {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px;
+	}
+
+	.dashboard-page .dash-kpi-card {
+		min-width: 0;
+		overflow: hidden;
+		padding: 14px 8px 10px;
+	}
+
+	.dashboard-page .dash-kpi-body {
+		gap: 8px;
+		justify-content: center;
+	}
+
+	.dashboard-page .dash-kpi-icon {
+		width: 48px;
+		height: 48px;
+		flex: 0 0 48px;
+	}
+
+	.dashboard-page .dash-kpi-value {
+		min-width: 0;
+		gap: 3px;
+		overflow: hidden;
+	}
+
+	.dashboard-page .dash-kpi-value strong {
+		font-size: 28px;
+		letter-spacing: -1px;
+	}
+
+	.dashboard-page .dash-kpi-value span {
+		font-size: 12px;
+		padding-bottom: 3px;
+	}
+
+	.dashboard-page .dash-kpi-detail {
+		gap: 3px 6px;
+		font-size: 10px;
+	}
+
+	.dashboard-page .dash-kpi-bottom {
+		font-size: 10px;
+		padding: 0 4px;
+	}
+}
+
+/* 모바일 대시보드 현장 이슈와 LOT 현황 최종 보정이다. */
+/* 현장 이슈와 LOT 카드는 모바일에서 한 줄에 하나씩 내려서 글자 깨짐을 막는다. */
+@media (max-width: 768px) {
+	.dashboard-page .dash-alert-panel {
+		display: block;
+		width: 100%;
+		padding: 16px;
+		overflow: hidden;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-alert-panel-head {
+		margin-bottom: 12px;
+	}
+
+	.dashboard-page .dash-alert-main {
+		display: grid;
+		grid-template-columns: 40px minmax(0, 1fr) 56px;
+		align-items: center;
+		gap: 10px;
+		width: 100%;
+		min-height: 68px;
+		margin-bottom: 12px;
+		padding: 0 14px;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-alert-bell {
+		width: 38px;
+		height: 38px;
+	}
+
+	.dashboard-page .dash-alert-main strong {
+		font-size: 15px;
+		white-space: nowrap;
+	}
+
+	.dashboard-page .dash-alert-main em {
+		width: 56px;
+		height: 32px;
+		font-size: 14px;
+	}
+
+	.dashboard-page .dash-alert-items {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 10px;
+		width: 100%;
+		margin-bottom: 12px;
+	}
+
+	.dashboard-page .dash-alert-card {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		min-width: 0;
+		min-height: 66px;
+		padding: 12px 14px;
+		overflow: hidden;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-alert-text {
+		width: 100%;
+		min-width: 0;
+		padding-left: 14px;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-alert-title-row {
+		display: flex;
+		align-items: center;
+		justify-content: flex-start;
+		gap: 8px;
+		width: 100%;
+		min-width: 0;
+		margin-bottom: 5px;
+	}
+
+	.dashboard-page .dash-alert-title-row strong {
+		display: block;
+		min-width: 0;
+		font-size: 13px;
+		line-height: 1.25;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.dashboard-page .dash-alert-title-row time {
+		flex-shrink: 0;
+		font-size: 12px;
+		white-space: nowrap;
+	}
+
+	.dashboard-page .dash-alert-text span {
+		display: block;
+		font-size: 11px;
+		line-height: 1.35;
+		white-space: normal;
+		word-break: keep-all;
+		overflow-wrap: anywhere;
+	}
+
+	.dashboard-page .dash-alert-text .dash-alert-desc-sub {
+		display: inline;
+		margin-left: 4px;
+	}
+
+	.dashboard-page .dash-lot-row {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 10px;
+		width: 100%;
+		min-width: 0;
+	}
+
+	.dashboard-page .dash-lot-box {
+		display: grid;
+		grid-template-columns: 42px minmax(0, 1fr) auto;
+		align-items: center;
+		column-gap: 12px;
+		width: 100%;
+		min-width: 0;
+		min-height: 68px;
+		padding: 12px 14px;
+		overflow: hidden;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-lot-icon {
+		width: 42px;
+		height: 42px;
+	}
+
+	.dashboard-page .dash-lot-icon svg {
+		width: 22px;
+		height: 22px;
+	}
+
+	.dashboard-page .dash-lot-info {
+		min-width: 0;
+	}
+
+	.dashboard-page .dash-lot-info span {
+		margin-bottom: 4px;
+		font-size: 13px;
+		line-height: 1.25;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.dashboard-page .dash-lot-info strong {
+		font-size: 24px;
+		line-height: 1;
+		white-space: nowrap;
+	}
+
+	.dashboard-page .dash-lot-arrow {
+		font-size: 20px;
+	}
+}
+
+/* 아주 작은 모바일에서는 여백과 글자 크기를 한 번 더 줄인다. */
+@media (max-width: 480px) {
+	.dashboard-page .dash-alert-panel {
+		padding: 14px;
+	}
+
+	.dashboard-page .dash-alert-main {
+		grid-template-columns: 38px minmax(0, 1fr) 52px;
+		padding: 0 12px;
+	}
+
+	.dashboard-page .dash-alert-main strong {
+		font-size: 14px;
+	}
+
+	.dashboard-page .dash-alert-main em {
+		width: 52px;
+		font-size: 13px;
+	}
+
+	.dashboard-page .dash-alert-card {
+		padding: 11px 12px;
+	}
+
+	.dashboard-page .dash-lot-box {
+		grid-template-columns: 38px minmax(0, 1fr) auto;
+		column-gap: 10px;
+		padding: 11px 12px;
+	}
+
+	.dashboard-page .dash-lot-icon {
+		width: 38px;
+		height: 38px;
+	}
+
+	.dashboard-page .dash-lot-info span {
+		font-size: 12px;
+	}
+
+	.dashboard-page .dash-lot-info strong {
+		font-size: 22px;
+	}
+}
+
+/* 대시보드 전체 영역 가운데 정렬 최종 보정이다. */
+.dashboard-page {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	max-width: none;
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+/* 대시보드 안의 직접 자식 영역을 같은 폭으로 맞춘다. */
+.dashboard-page > * {
+	width: 100%;
+	max-width: 1180px;
+}
+
+/* 모바일에서는 화면 너비에 맞게 사용한다. */
+@media (max-width: 768px) {
+	.dashboard-page {
+		padding: 0 12px;
+	}
+
+	.dashboard-page > * {
+		max-width: none;
+	}
 }

@@ -643,3 +643,524 @@
 		height: 14px;
 	}
 }
+
+/* 모바일 공통 최종 보정 영역이다. */
+/* 검색 조건, 테이블 상단 버튼, 대시보드 KPI가 모바일 폭 안에서 같이 줄어들도록 한다. */
+@media screen and (max-width: 768px) {
+	html, body {
+		width: 100%;
+		max-width: 100%;
+		overflow-x: hidden;
+	}
+
+	.main-content {
+		max-width: 100%;
+		overflow-x: hidden;
+	}
+
+	/* 검색 조건은 모바일에서 2칸 기준으로 안정적으로 배치한다. */
+	.coSearchRow, .search-row {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 14px 10px;
+		align-items: end;
+		width: 100%;
+		box-sizing: border-box;
+	}
+
+	.coSearchItem, .coSearchItemMiddle, .coSearchItemSmall, .search-item {
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+		flex: none;
+		box-sizing: border-box;
+	}
+
+	.coSearchItemLarge {
+		grid-column: 1 / -1;
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+
+	.coInput, .coSelect, .search-input, .search-select, .search-date,
+	.coSearchItem input, .coSearchItem select,
+	.coSearchItemMiddle input, .coSearchItemMiddle select,
+	.coSearchItemSmall input, .coSearchItemSmall select,
+	.search-item input, .search-item select {
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+
+	.coSearchBtnBox, .search-btn-wrap {
+		grid-column: 1 / -1;
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 10px;
+		margin-left: 0;
+		box-sizing: border-box;
+	}
+
+	.coSearchBtnBox .coBtn,
+	.search-btn-wrap .search-btn {
+		width: 100%;
+		min-width: 0;
+		height: 40px;
+		padding: 0 10px;
+		font-size: 14px;
+		white-space: nowrap;
+		box-sizing: border-box;
+	}
+
+	.coSearchBtnBox .coBtn svg,
+	.search-btn-wrap .search-btn svg {
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+	}
+
+	/* 테이블 상단은 총 건수와 버튼이 같은 줄에서 같이 줄어들도록 한다. */
+	.coTableTop {
+		width: 100%;
+		display: flex;
+		flex-wrap: nowrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		box-sizing: border-box;
+	}
+
+	.coTableTop .coTotalCount,
+	.coTotalCount {
+		width: auto;
+		min-width: 0;
+		flex: 1 1 auto;
+		font-size: 15px;
+		white-space: nowrap;
+		box-sizing: border-box;
+	}
+
+	.coTableBtnBox {
+		width: auto;
+		min-width: 0;
+		flex: 0 1 auto;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		gap: 8px;
+		box-sizing: border-box;
+	}
+
+	.coTableBtnBox .coBtn {
+		width: auto;
+		min-width: 0;
+		height: 38px;
+		padding: 0 10px;
+		font-size: 14px;
+		white-space: nowrap;
+		box-sizing: border-box;
+	}
+
+	.coTableBtnBox .coBtn svg {
+		width: 16px;
+		height: 16px;
+		flex-shrink: 0;
+	}
+
+	/* 대시보드 KPI 영역은 카드가 왼쪽으로 쏠리지 않고 부모 폭을 꽉 채우게 한다. */
+	.dashboard-page {
+		width: 100%;
+		max-width: 100%;
+		box-sizing: border-box;
+		overflow-x: hidden;
+	}
+
+	.dashboard-page .dash-kpi-panel,
+	.dashboard-page .dash-section,
+	.dashboard-page .dash-card {
+		width: 100%;
+		max-width: 100%;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-kpi-grid {
+		width: 100%;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 10px;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-kpi-card {
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+		padding: 14px 8px 10px;
+		overflow: hidden;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-kpi-body {
+		width: 100%;
+		min-width: 0;
+		gap: 8px;
+		justify-content: center;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-kpi-icon {
+		width: 46px;
+		height: 46px;
+		flex: 0 0 46px;
+	}
+
+	.dashboard-page .dash-kpi-value {
+		min-width: 0;
+		max-width: 100%;
+		gap: 3px;
+		overflow: hidden;
+		white-space: nowrap;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-kpi-value strong {
+		font-size: 28px;
+		letter-spacing: -1px;
+		line-height: 1.1;
+	}
+
+	.dashboard-page .dash-kpi-value span {
+		font-size: 12px;
+		padding-bottom: 2px;
+		white-space: nowrap;
+	}
+
+	.dashboard-page .dash-kpi-detail {
+		width: 100%;
+		min-width: 0;
+		gap: 3px 5px;
+		font-size: 10px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		box-sizing: border-box;
+	}
+
+	.dashboard-page .dash-kpi-bottom {
+		width: 100%;
+		min-width: 0;
+		font-size: 10px;
+		padding: 0 4px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		box-sizing: border-box;
+	}
+}
+
+@media screen and (max-width: 480px) {
+	/* 작은 모바일에서도 검색 조건은 2칸을 유지하고, 요소만 칸에 맞게 줄인다. */
+	.coSearchRow, .search-row {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
+	.coSearchItem, .coSearchItemMiddle, .coSearchItemSmall, .search-item {
+		width: 100%;
+		min-width: 0;
+		max-width: 100%;
+		flex: none;
+		box-sizing: border-box;
+	}
+
+	.coTableTop {
+		gap: 6px;
+	}
+
+	.coTableTop .coTotalCount,
+	.coTotalCount {
+		font-size: 14px;
+	}
+
+	.coTableBtnBox {
+		gap: 6px;
+	}
+
+	.coTableBtnBox .coBtn {
+		height: 36px;
+		padding: 0 8px;
+		font-size: 13px;
+	}
+
+	.coTableBtnBox .coBtn svg {
+		width: 15px;
+		height: 15px;
+	}
+
+	.dashboard-page .dash-kpi-grid {
+		gap: 8px;
+	}
+
+	.dashboard-page .dash-kpi-card {
+		padding: 12px 7px 10px;
+	}
+
+	.dashboard-page .dash-kpi-icon {
+		width: 42px;
+		height: 42px;
+		flex-basis: 42px;
+	}
+
+	.dashboard-page .dash-kpi-value strong {
+		font-size: 25px;
+	}
+
+	.dashboard-page .dash-kpi-value span {
+		font-size: 11px;
+	}
+}
+
+/* 모바일 공통 검색 영역 최종 보정이다. */
+/* 모든 페이지의 공통 검색 조건이 모바일 폭 안에서 깨지지 않게 한다. */
+@media screen and (max-width: 768px) {
+	html,
+	body {
+		width: 100%;
+		max-width: 100%;
+		overflow-x: hidden;
+	}
+
+	.main-content {
+		width: 100%;
+		max-width: 100%;
+		padding: 16px;
+		overflow-x: hidden;
+		box-sizing: border-box;
+	}
+
+	.coPageWrap,
+	.coContentWrap,
+	.coSearchBox,
+	.search-box {
+		width: 100%;
+		max-width: 100%;
+		box-sizing: border-box;
+		overflow: hidden;
+	}
+
+	.coSearchBox,
+	.search-box {
+		padding: 16px;
+		margin-bottom: 18px;
+	}
+
+	.coSearchRow,
+	.search-row {
+		display: grid !important;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 14px 10px;
+		width: 100%;
+		max-width: 100%;
+		align-items: end;
+		box-sizing: border-box;
+	}
+
+	.coSearchItem,
+	.coSearchItemMiddle,
+	.coSearchItemSmall,
+	.coSearchItemLarge,
+	.search-item {
+		width: 100% !important;
+		min-width: 0 !important;
+		max-width: 100% !important;
+		flex: none !important;
+		box-sizing: border-box;
+	}
+
+	.coSearchItemLarge {
+		grid-column: 1 / -1;
+	}
+
+	.coSearchItem label,
+	.coSearchItemMiddle label,
+	.coSearchItemSmall label,
+	.coSearchItemLarge label,
+	.search-item label {
+		display: block;
+		margin-bottom: 8px;
+		font-size: 14px;
+		font-weight: 700;
+		white-space: nowrap;
+	}
+
+	.coInput,
+	.coSelect,
+	.search-input,
+	.search-select,
+	.search-date,
+	.coSearchItem input,
+	.coSearchItem select,
+	.coSearchItemMiddle input,
+	.coSearchItemMiddle select,
+	.coSearchItemSmall input,
+	.coSearchItemSmall select,
+	.coSearchItemLarge input,
+	.coSearchItemLarge select,
+	.search-item input,
+	.search-item select {
+		width: 100% !important;
+		min-width: 0 !important;
+		max-width: 100% !important;
+		height: 42px;
+		box-sizing: border-box;
+		font-size: 14px;
+	}
+
+	input[type="date"] {
+		width: 100% !important;
+		min-width: 0 !important;
+		max-width: 100% !important;
+		-webkit-appearance: none;
+		appearance: none;
+		box-sizing: border-box;
+	}
+
+	.coSearchBtnBox,
+	.search-btn-wrap {
+		grid-column: 1 / -1;
+		display: grid !important;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 10px;
+		width: 100% !important;
+		min-width: 0 !important;
+		max-width: 100% !important;
+		margin-left: 0 !important;
+		box-sizing: border-box;
+	}
+
+	.coSearchBtnBox .coBtn,
+	.search-btn-wrap .search-btn {
+		width: 100% !important;
+		min-width: 0 !important;
+		height: 42px;
+		padding: 0 10px;
+		font-size: 14px;
+		box-sizing: border-box;
+		white-space: nowrap;
+	}
+}
+
+/* 모바일 공통 테이블 최종 보정이다. */
+/* 모든 페이지의 공통 테이블이 모바일 폭 안에서 튀어나가지 않게 한다. */
+@media screen and (max-width: 768px) {
+	.coTableWrap,
+	.table-wrap,
+	.list-table-wrap {
+		width: 100%;
+		max-width: 100%;
+		overflow-x: hidden;
+		box-sizing: border-box;
+	}
+
+	.coTable,
+	.list-table {
+		width: 100% !important;
+		max-width: 100% !important;
+		min-width: 0 !important;
+		table-layout: fixed;
+		border-collapse: collapse;
+		box-sizing: border-box;
+	}
+
+	.coTable colgroup,
+	.list-table colgroup {
+		display: none;
+	}
+
+	.coTable th,
+	.coTable td,
+	.list-table th,
+	.list-table td {
+		min-width: 0;
+		box-sizing: border-box;
+	}
+
+	.coTable th.mobile_hidden,
+	.coTable td.mobile_hidden,
+	.list-table th.mobile_hidden,
+	.list-table td.mobile_hidden {
+		display: none !important;
+	}
+
+	.coTable th.mobile_show,
+	.coTable td.mobile_show,
+	.list-table th.mobile_show,
+	.list-table td.mobile_show {
+		display: table-cell !important;
+		min-width: 0 !important;
+		padding: 0 8px;
+		font-size: 13px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		box-sizing: border-box;
+	}
+
+	.coTable th:first-child,
+	.coTable td:first-child,
+	.list-table th:first-child,
+	.list-table td:first-child {
+		width: 48px;
+		padding: 0 6px;
+	}
+
+	.coTable th:last-child,
+	.coTable td:last-child,
+	.list-table th:last-child,
+	.list-table td:last-child {
+		width: 72px;
+		padding: 0 6px;
+	}
+
+	.coTable td a,
+	.list-table td a {
+		display: inline-block;
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		vertical-align: middle;
+	}
+
+	.coStatus,
+	.coStatusUse,
+	.coStatusStop {
+		max-width: 100%;
+		min-width: 0;
+		height: 30px;
+		padding: 0 10px;
+		font-size: 13px;
+		line-height: 28px;
+		box-sizing: border-box;
+		white-space: nowrap;
+	}
+}
+
+/* 아주 작은 모바일에서는 검색 조건만 한 줄에 하나씩 내린다. */
+@media screen and (max-width: 480px) {
+	.coSearchRow,
+	.search-row {
+		grid-template-columns: 1fr !important;
+	}
+
+	.coSearchBtnBox,
+	.search-btn-wrap {
+		grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+	}
+}
+

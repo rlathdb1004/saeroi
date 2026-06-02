@@ -10,7 +10,7 @@
 <c:set var="currentUri" value="${pageContext.request.requestURI}" />
 
 <c:choose>
-	<c:when test="${fn:contains(currentUri, '/worker/')}">
+	<c:when test="${Worker or fn:contains(currentUri, '/worker/')}">
 		<c:url var="logoHomeUrl" value="/worker/main" />
 	</c:when>
 	<c:otherwise>
