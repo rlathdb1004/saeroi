@@ -8,8 +8,8 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
+<!-- <link rel="stylesheet" -->
+<%-- 	href="${pageContext.request.contextPath}/resources/css/common/detail.css"> --%>
 <style>
 #chart {
 	max-width: 100%;
@@ -80,14 +80,80 @@
 .report-table tr:hover {
 	background-color: #f1f3f5;
 }
+
 .dashboard-container {
 	flex-direction: column; /* 가로 배열을 세로 배열로 변경 ✨ */
 }
+
 .apexcharts-toolbar {
-    top: 30px !important;    /* 🔴 원래 0px 근처인 값을 아래로 내림 (원하는 만큼 수정 가능) */
-    right: 10px !important;  /* 우측 여백 조정 */
+	top: 30px !important; /* 🔴 원래 0px 근처인 값을 아래로 내림 (원하는 만큼 수정 가능) */
+	right: 10px !important; /* 우측 여백 조정 */
 }
 
+.detail_info_table {
+	width: 100%; /* ◀ 테이블 전체 너비 (필요시 800px 등 고정값 입력 가능) */
+	table-layout: fixed; /* ◀ 이 속성이 있어야 아래 col 너비가 정확히 먹힙니다. */
+	border-collapse: collapse;
+	margin-bottom: 20px;
+	background-color: #ffffff;
+}
+
+/* ★ 여기 아래 숫자(px)를 원하시는 크기로 변경하시면 테이블 칸 크기가 바로 바뀝니다! */
+.detail_info_table col:nth-child(1) {
+	width: 170px;
+} /* 1번째 열 (제목 칸) */
+.detail_info_table col:nth-child(2) {
+	width: auto;
+} /* 2번째 열 (내용 입력 칸) */
+.detail_info_table col:nth-child(3) {
+	width: 170px;
+} /* 3번째 열 (제목 칸) */
+.detail_info_table col:nth-child(4) {
+	width: auto;
+} /* 4번째 열 (내용 입력 칸) */
+.detail_info_table col:nth-child(5) {
+	width: 170px;
+} /* 5번째 열 (제목 칸) */
+.detail_info_table col:nth-child(6) {
+	width: auto;
+} /* 6번째 열 (내용 입력 칸) */
+
+/* 테이블 행 및 셀 내부 기존 디자인 원형 복원 */
+.detail_info_table tr {
+	border-bottom: 1px solid #dde5e1;
+}
+
+.detail_info_table th {
+	background-color: #f4f6f5;
+	color: #1f3d34;
+	font-size: 14px;
+	font-weight: 600;
+	padding: 12px 16px;
+	text-align: left;
+}
+
+.detail_info_table td {
+	padding: 12px 16px;
+	font-size: 14px;
+	color: #333333;
+}
+
+.detail_info_table input[type="text"], .detail_info_table input[type="number"],
+	.detail_info_table select {
+	width: 100%;
+	height: 36px;
+	padding: 0 10px;
+	border: 1px solid #d1d5db;
+	border-radius: 6px;
+	box-sizing: border-box;
+	font-size: 14px;
+	background-color: #ffffff;
+}
+
+.detail_info_table input:focus, .detail_info_table select:focus {
+	outline: none;
+	border-color: #2f7d62;
+}
 </style>
 </head>
 <body>
@@ -133,13 +199,10 @@
 						</c:forEach>
 					</select>
 				</div>
-				 <div class="search-btn-wrap">
-				 <button type="button"
-                    class="search-btn search-btn-sub search-reset-btn">
-                   
-                    초기화
-                </button>
-                </div>
+				<div class="search-btn-wrap">
+					<button type="button"
+						class="search-btn search-btn-sub search-reset-btn">초기화</button>
+				</div>
 			</div>
 		</div>
 	</form>
@@ -154,14 +217,26 @@
 				<h4 class="box-title" id="boxTitle">불량 원인</h4>
 				<div id="oChart"></div>
 			</div>
+
 			<div class="coTableTop">
 				<p class="coTotalCount">총 0건</p>
 			</div>
+
 			<div class="coTableWrap">
-				<table class="coTable" id="reportTable">
+				<table class="detail_info_table" id="reportTable">
+
+					<colgroup>
+						<col>
+						<col>
+						<col>
+						<col>
+						<col>
+						<col>
+					</colgroup>
+
 					<thead>
 						<tr>
-							<th style="width: 180px !important;" >일자/기간</th>
+							<th>일자/기간</th>
 							<th class="mobile_hidden">품목명</th>
 							<th>계획량</th>
 							<th>작업량</th>
@@ -170,13 +245,13 @@
 						</tr>
 					</thead>
 					<tbody id="tableBody">
-
 					</tbody>
 				</table>
 				<div id="paginationContainer"></div>
 			</div>
+
 		</div>
-		
+
 	</div>
 
 

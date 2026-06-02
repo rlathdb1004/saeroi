@@ -13,9 +13,9 @@
 	table-layout: auto;
 }
 .coTable th:first-child, .coTable td:first-child {
-	width: 100px;
-	min-width: 50px;
-	max-width: 100px;
+	width: 90px;
+	min-width: 30px;
+	max-width: 90px;
 }
 </style>
 

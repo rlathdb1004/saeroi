@@ -11,13 +11,10 @@
 	기준:
 	- URL: /production/processprogress/detail
 	- Controller return: production/processprogressdetail.tiles
-	- 생산관리 파일 구조 유지
-	  DTO / DAO / Service / Controller / Mapper는 생산관리 1개 파일로 관리
-	  JSP만 페이지별 관리
-	- 공정진행 상세는 작업지시 기준으로 조회한다.
-	- 생산실적이 있으면 production 테이블의 최신 실적 기준으로 표시한다.
+	- 공정진행 상세는 조회 전용이다.
+	- 별도 등록/수정하지 않고 생산실적 등록(PRODUCTION) 데이터를 작업지시 기준으로 누적 집계한다.
+	- 진행률 = 누적생산수량 / 작업지시수량
 	- LOSS_QTY는 불량수량이 아니라 LOSS량 / 손실수량이다.
-	- 수정 가능: 담당자, 생산수량, LOSS량, 진행상태, 비고
 --%>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -35,43 +32,6 @@
 		</div>
 
 		<div class="detail_btn_area">
-
-			<c:if test="${not empty progress}">
-
-				<button type="button" id="editBtn" class="detail_btn_green"
-					onclick="changeEditMode(true);">
-					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
-						<path d="M12 20h9"></path>
-						<path
-							d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z">
-						</path>
-					</svg>
-					수정
-				</button>
-
-				<button type="submit" id="saveBtn" class="detail_btn_green"
-					form="processProgressUpdateForm" style="display: none;">
-					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
-						<path
-							d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z">
-						</path>
-						<path d="M17 21v-8H7v8"></path>
-						<path d="M7 3v5h8"></path>
-					</svg>
-					저장
-				</button>
-
-				<button type="button" id="cancelBtn" class="detail_btn_line"
-					onclick="location.href='${contextPath}/production/processprogress/detail?orderId=${progress.orderId}'"
-					style="display: none;">
-					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
-						<path d="M18 6L6 18"></path>
-						<path d="M6 6l12 12"></path>
-					</svg>
-					취소
-				</button>
-
-			</c:if>
 
 			<button type="button" class="detail_btn_line"
 				onclick="location.href='${contextPath}/production/processprogress'">
@@ -102,380 +62,365 @@
 
 		<c:when test="${not empty progress}">
 
-			<form id="processProgressUpdateForm"
-				action="${contextPath}/production/processprogress/update"
-				method="post"
-				onsubmit="return validateProcessProgressUpdateForm();">
-
-				<input type="hidden" name="orderId" value="${progress.orderId}" />
-				<input type="hidden" name="prodId" value="${progress.prodId}" />
-				<input type="hidden" name="orderQty" value="${progress.orderQty}" />
+			<div class="detail_notice_box">
+				공정진행 현황은 생산실적 등록 데이터를 기준으로 자동 집계됩니다.
+				이 화면에서는 별도 등록이나 수정 없이 현재 진행상태만 조회합니다.
+			</div>
 
 
-				<div class="detail_card">
+			<div class="detail_card">
 
-					<div class="detail_card_title">작업지시 기준 정보</div>
+				<div class="detail_card_title">작업지시 기준 정보</div>
 
-					<table class="detail_info_table progress_detail_table">
-						<tbody>
+				<table class="detail_info_table progress_detail_table">
+					<tbody>
 
-							<tr>
-								<th>작업지시번호</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.workOrderDocNo}">
-											${progress.workOrderDocNo}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+						<tr>
+							<th>작업지시번호</th>
+							<td title="${progress.workOrderDocNo}">
+								<c:choose>
+									<c:when test="${not empty progress.workOrderDocNo}">
+										${progress.workOrderDocNo}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 
-								<th>완제품 LOT</th>
-								<td title="${progress.productLot}">
-									<c:choose>
-										<c:when test="${not empty progress.productLot}">
-											${progress.productLot}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+							<th>완제품 LOT</th>
+							<td title="${progress.productLot}">
+								<c:choose>
+									<c:when test="${not empty progress.productLot}">
+										${progress.productLot}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 
-								<th>작업지시일</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.orderDate}">
-											${progress.orderDate}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
-							</tr>
-
-
-							<tr>
-								<th>생산계획번호</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.prodPlanDocNo}">
-											${progress.prodPlanDocNo}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
-
-								<th>생산계획일</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.prodPlanDate}">
-											${progress.prodPlanDate}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
-
-								<th>납기일</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.dueDate}">
-											${progress.dueDate}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
-							</tr>
+							<th>작업지시일</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.orderDate}">
+										${progress.orderDate}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
 
 
-							<tr>
-								<th>품목코드</th>
-								<td title="${progress.itemCode}">
-									<c:choose>
-										<c:when test="${not empty progress.itemCode}">
-											${progress.itemCode}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+						<tr>
+							<th>생산계획번호</th>
+							<td title="${progress.prodPlanDocNo}">
+								<c:choose>
+									<c:when test="${not empty progress.prodPlanDocNo}">
+										${progress.prodPlanDocNo}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 
-								<th>품목명</th>
-								<td title="${progress.itemName}">
-									<c:choose>
-										<c:when test="${not empty progress.itemName}">
-											${progress.itemName}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+							<th>생산계획일</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.prodPlanDate}">
+										${progress.prodPlanDate}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 
-								<th>단위</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.itemUnit}">
-											${progress.itemUnit}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
-							</tr>
-
-
-							<tr>
-								<th>라인</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.lineName}">
-											${progress.lineName}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
-
-								<th>담당자</th>
-								<td>
-									<span data-view-value>
-										<c:choose>
-											<c:when test="${not empty progress.ename}">
-												${progress.ename}
-											</c:when>
-											<c:otherwise>-</c:otherwise>
-										</c:choose>
-									</span>
-
-									<div data-edit-box style="display: none;">
-										<select name="empId" id="empId" class="detail_select"
-											data-edit-control disabled required>
-											<option value="">선택</option>
-
-											<c:forEach var="emp" items="${empList}">
-												<option value="${emp.empId}"
-													<c:if test="${emp.empId == progress.empId}">selected</c:if>>
-													${emp.ename} / ${emp.dept}
-												</option>
-											</c:forEach>
-										</select>
-									</div>
-								</td>
-
-								<th>최근 생산일</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.prodDate}">
-											${progress.prodDate}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
-							</tr>
-
-						</tbody>
-					</table>
-
-				</div>
+							<th>납기일</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.dueDate}">
+										${progress.dueDate}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
 
 
-				<div class="detail_card">
+						<tr>
+							<th>품목코드</th>
+							<td title="${progress.itemCode}">
+								<c:choose>
+									<c:when test="${not empty progress.itemCode}">
+										${progress.itemCode}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 
-					<div class="detail_card_title">진행 수량 정보</div>
+							<th>품목명</th>
+							<td title="${progress.itemName}">
+								<c:choose>
+									<c:when test="${not empty progress.itemName}">
+										${progress.itemName}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 
-					<table class="detail_info_table progress_detail_table">
-						<tbody>
-
-							<tr>
-								<th>계획수량</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.prodPlanQty}">
-											<fmt:formatNumber value="${progress.prodPlanQty}" pattern="#,##0" />
-											${progress.itemUnit}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
-
-								<th>작업지시수량</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.orderQty}">
-											<fmt:formatNumber value="${progress.orderQty}" pattern="#,##0" />
-											${progress.itemUnit}
-										</c:when>
-										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
-
-								<th>누적생산수량</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.totalProdQty}">
-											<fmt:formatNumber value="${progress.totalProdQty}" pattern="#,##0" />
-											${progress.itemUnit}
-										</c:when>
-										<c:otherwise>0 ${progress.itemUnit}</c:otherwise>
-									</c:choose>
-								</td>
-							</tr>
+							<th>단위</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.itemUnit}">
+										${progress.itemUnit}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
 
 
-							<tr>
-								<th>최근 생산수량</th>
-								<td>
-									<span data-view-value>
-										<c:choose>
-											<c:when test="${not empty progress.prodQty}">
-												<fmt:formatNumber value="${progress.prodQty}" pattern="#,##0" />
-												${progress.itemUnit}
-											</c:when>
-											<c:otherwise>0 ${progress.itemUnit}</c:otherwise>
-										</c:choose>
-									</span>
+						<tr>
+							<th>라인</th>
+							<td title="${progress.lineName}">
+								<c:choose>
+									<c:when test="${not empty progress.lineName}">
+										${progress.lineName}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 
-									<div data-edit-box style="display: none;">
-										<input type="number" name="prodQty" id="prodQty"
-											class="detail_input"
-											value="${empty progress.prodQty ? 0 : progress.prodQty}"
-											min="1"
-											oninput="recalculateProgressRate();"
-											data-edit-control disabled required />
-									</div>
-								</td>
+							<th>담당자</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.ename}">
+										${progress.ename}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 
-								<th>누적 LOSS량</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty progress.totalLossQty}">
-											<fmt:formatNumber value="${progress.totalLossQty}" pattern="#,##0" />
-											${progress.itemUnit}
-										</c:when>
-										<c:otherwise>0 ${progress.itemUnit}</c:otherwise>
-									</c:choose>
-								</td>
+							<th>담당부서</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.dept}">
+										${progress.dept}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
 
-								<th>최근 LOSS량</th>
-								<td>
-									<span data-view-value>
-										<c:choose>
-											<c:when test="${not empty progress.lossQty}">
-												<fmt:formatNumber value="${progress.lossQty}" pattern="#,##0" />
-												${progress.itemUnit}
-											</c:when>
-											<c:otherwise>0 ${progress.itemUnit}</c:otherwise>
-										</c:choose>
-									</span>
+					</tbody>
+				</table>
 
-									<div data-edit-box style="display: none;">
-										<input type="number" name="lossQty" id="lossQty"
-											class="detail_input"
-											value="${empty progress.lossQty ? 0 : progress.lossQty}"
-											min="0"
-											data-edit-control disabled />
-									</div>
-								</td>
-							</tr>
+			</div>
 
 
-							<tr>
-								<th>진행률</th>
-								<td colspan="3">
-									<div class="progress_detail_bar_wrap">
-										<div class="progress_detail_bar">
-											<div id="progressRateBar" class="progress_detail_bar_fill"
-												style="width:${progress.progressRate}%;">
-											</div>
-										</div>
+			<div class="detail_card">
 
-										<span id="progressRateText" class="progress_detail_rate">
-											<fmt:formatNumber value="${progress.progressRate}" pattern="#,##0" />%
+				<div class="detail_card_title">진행 수량 정보</div>
+
+				<table class="detail_info_table progress_detail_table">
+					<tbody>
+
+						<tr>
+							<th>계획수량</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.prodPlanQty}">
+										<fmt:formatNumber value="${progress.prodPlanQty}" pattern="#,##0" />
+										${progress.itemUnit}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>작업지시수량</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.orderQty}">
+										<fmt:formatNumber value="${progress.orderQty}" pattern="#,##0" />
+										${progress.itemUnit}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>누적생산수량</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.totalProdQty}">
+										<fmt:formatNumber value="${progress.totalProdQty}" pattern="#,##0" />
+										${progress.itemUnit}
+									</c:when>
+									<c:otherwise>0 ${progress.itemUnit}</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+
+
+						<tr>
+							<th>잔여수량</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.orderQty}">
+										<fmt:formatNumber
+											value="${progress.orderQty - progress.totalProdQty - progress.totalLossQty}"
+											pattern="#,##0" />
+										${progress.itemUnit}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>누적 LOSS량</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.totalLossQty}">
+										<fmt:formatNumber value="${progress.totalLossQty}" pattern="#,##0" />
+										${progress.itemUnit}
+									</c:when>
+									<c:otherwise>0 ${progress.itemUnit}</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>진행상태</th>
+							<td>
+								<c:choose>
+									<c:when test="${progress.progressStatus eq '완료'}">
+										<span class="detail_status_badge detail_status_pass">
+											완료
 										</span>
+									</c:when>
+
+									<c:when test="${progress.progressStatus eq '보류' or progress.progressStatus eq '취소'}">
+										<span class="detail_status_badge detail_status_fail">
+											${progress.progressStatus}
+										</span>
+									</c:when>
+
+									<c:otherwise>
+										<span class="detail_status_badge">
+											${progress.progressStatus}
+										</span>
+									</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+
+
+						<tr>
+							<th>진행률</th>
+							<td colspan="5">
+								<div class="progress_detail_bar_wrap">
+
+									<div class="progress_detail_bar">
+										<div class="progress_detail_bar_fill"
+											style="width:${empty progress.progressRate ? 0 : progress.progressRate}%;">
+										</div>
 									</div>
-								</td>
 
-								<th>진행상태</th>
-								<td>
-									<span data-view-value>
-										<c:choose>
-											<c:when test="${progress.progressStatus eq '완료'}">
-												<span class="detail_status_badge detail_status_pass">
-													완료
-												</span>
-											</c:when>
-
-											<c:when test="${progress.progressStatus eq '보류' or progress.progressStatus eq '취소'}">
-												<span class="detail_status_badge detail_status_fail">
-													${progress.progressStatus}
-												</span>
-											</c:when>
-
-											<c:otherwise>
-												<span class="detail_status_badge">
-													${progress.progressStatus}
-												</span>
-											</c:otherwise>
-										</c:choose>
+									<span class="progress_detail_rate">
+										<fmt:formatNumber value="${empty progress.progressRate ? 0 : progress.progressRate}"
+											pattern="#,##0" />%
 									</span>
 
-									<div data-edit-box style="display: none;">
-										<select name="prodStatus" id="prodStatus"
-											class="detail_select" data-edit-control disabled required>
-											<option value="진행중"
-												<c:if test="${progress.progressStatus eq '진행중'}">selected</c:if>>
-												진행중
-											</option>
-											<option value="완료"
-												<c:if test="${progress.progressStatus eq '완료'}">selected</c:if>>
-												완료
-											</option>
-											<option value="보류"
-												<c:if test="${progress.progressStatus eq '보류'}">selected</c:if>>
-												보류
-											</option>
-										</select>
-									</div>
-								</td>
-							</tr>
+								</div>
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+
+			</div>
 
 
-							<tr>
-								<th>비고</th>
-								<td colspan="5">
-									<span data-view-value>
-										<c:choose>
-											<c:when test="${not empty progress.remark}">
-												${progress.remark}
-											</c:when>
-											<c:otherwise>-</c:otherwise>
-										</c:choose>
-									</span>
+			<div class="detail_card">
 
-									<div data-edit-box style="display: none;">
-										<input type="text" name="remark" id="remark"
-											class="detail_input"
-											value="${progress.remark}"
-											maxlength="500"
-											data-edit-control disabled />
-									</div>
-								</td>
-							</tr>
+				<div class="detail_card_title">최근 생산실적 정보</div>
 
-						</tbody>
-					</table>
+				<table class="detail_info_table progress_detail_table">
+					<tbody>
 
-					<div class="detail_help_text">
-						진행률은 누적생산수량 ÷ 작업지시수량 기준입니다.
-						LOSS량은 불량수량이 아니라 생산 중 손실수량입니다.
-					</div>
+						<tr>
+							<th>최근 실적번호</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.prodId}">
+										${progress.prodId}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
 
+							<th>최근 생산일</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.prodDate}">
+										${progress.prodDate}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>최근 상태</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.prodStatus}">
+										${progress.prodStatus}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose>
+							</td>
+						</tr>
+
+
+						<tr>
+							<th>최근 생산수량</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.prodQty}">
+										<fmt:formatNumber value="${progress.prodQty}" pattern="#,##0" />
+										${progress.itemUnit}
+									</c:when>
+									<c:otherwise>0 ${progress.itemUnit}</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>최근 LOSS량</th>
+							<td>
+								<c:choose>
+									<c:when test="${not empty progress.lossQty}">
+										<fmt:formatNumber value="${progress.lossQty}" pattern="#,##0" />
+										${progress.itemUnit}
+									</c:when>
+									<c:otherwise>0 ${progress.itemUnit}</c:otherwise>
+								</c:choose>
+							</td>
+
+							<th>집계기준</th>
+							<td>
+								생산실적 누적
+							</td>
+						</tr>
+
+					</tbody>
+				</table>
+
+				<div class="detail_help_text">
+					최근 생산실적은 해당 작업지시에 연결된 PRODUCTION 데이터 중 가장 마지막 실적 기준입니다.
+					누적생산수량과 누적 LOSS량은 같은 작업지시의 전체 생산실적 합계입니다.
 				</div>
 
-			</form>
+			</div>
 
 		</c:when>
 
 
 		<c:otherwise>
+
 			<div class="detail_card">
 				<div class="detail_empty_box">
 					조회된 공정진행 정보가 없습니다.
 				</div>
 			</div>
+
 		</c:otherwise>
 
 	</c:choose>
@@ -484,6 +429,18 @@
 
 
 <style>
+.detail_notice_box {
+	margin-bottom: 14px;
+	padding: 11px 14px;
+	border-radius: 8px;
+	background: #f7f9fb;
+	border: 1px solid #e5e8eb;
+	color: #444;
+	font-size: 13px;
+	line-height: 1.5;
+	word-break: keep-all;
+}
+
 .progress_detail_table {
 	width: 100%;
 	table-layout: fixed;
@@ -518,16 +475,6 @@
 
 .progress_detail_table td[colspan] {
 	width: auto;
-}
-
-.progress_detail_table .detail_input,
-.progress_detail_table .detail_select,
-.progress_detail_table input,
-.progress_detail_table select {
-	width: 100%;
-	max-width: 100%;
-	min-width: 0;
-	box-sizing: border-box;
 }
 
 .progress_detail_bar_wrap {
@@ -565,125 +512,27 @@
 	line-height: 1.5;
 	word-break: keep-all;
 }
+
+@media (max-width: 768px) {
+
+	.detail_notice_box {
+		font-size: 12px;
+		padding: 10px 12px;
+	}
+
+	.progress_detail_table th,
+	.progress_detail_table td {
+		font-size: 12px;
+		padding-left: 8px;
+		padding-right: 6px;
+	}
+
+	.progress_detail_bar_wrap {
+		gap: 6px;
+	}
+
+	.progress_detail_rate {
+		font-size: 12px;
+	}
+}
 </style>
-
-
-<script>
-	function changeEditMode(isEdit) {
-
-		var viewValueList = document.querySelectorAll("[data-view-value]");
-		var editBoxList = document.querySelectorAll("[data-edit-box]");
-		var editControlList = document.querySelectorAll("[data-edit-control]");
-
-		for (var i = 0; i < viewValueList.length; i++) {
-			viewValueList[i].style.display = isEdit ? "none" : "";
-		}
-
-		for (var j = 0; j < editBoxList.length; j++) {
-			editBoxList[j].style.display = isEdit ? "block" : "none";
-		}
-
-		for (var k = 0; k < editControlList.length; k++) {
-			editControlList[k].disabled = !isEdit;
-		}
-
-		document.getElementById("editBtn").style.display =
-			isEdit ? "none" : "inline-flex";
-
-		document.getElementById("saveBtn").style.display =
-			isEdit ? "inline-flex" : "none";
-
-		document.getElementById("cancelBtn").style.display =
-			isEdit ? "inline-flex" : "none";
-
-		recalculateProgressRate();
-	}
-
-
-	function recalculateProgressRate() {
-
-		var prodQtyInput = document.getElementById("prodQty");
-		var progressRateBar = document.getElementById("progressRateBar");
-		var progressRateText = document.getElementById("progressRateText");
-
-		if (prodQtyInput == null || progressRateBar == null || progressRateText == null) {
-			return;
-		}
-
-		var orderQty = Number("${empty progress.orderQty ? 0 : progress.orderQty}");
-		var prodQty = Number(prodQtyInput.value || 0);
-
-		var rate = 0;
-
-		if (orderQty > 0) {
-			rate = Math.round((prodQty / orderQty) * 100);
-		}
-
-		if (rate > 100) {
-			rate = 100;
-		}
-
-		if (rate < 0) {
-			rate = 0;
-		}
-
-		progressRateBar.style.width = rate + "%";
-		progressRateText.innerHTML = rate.toLocaleString() + "%";
-	}
-
-
-	function validateProcessProgressUpdateForm() {
-
-		var prodId = "${progress.prodId}";
-		var empId = document.getElementById("empId").value;
-		var prodQty = document.getElementById("prodQty").value;
-		var lossQty = document.getElementById("lossQty").value;
-		var prodStatus = document.getElementById("prodStatus").value;
-
-		if (prodId == null || prodId === "" || prodId === "0") {
-			alert("수정할 생산실적 정보가 없습니다. 먼저 공정진행 또는 생산실적을 등록해주세요.");
-			return false;
-		}
-
-		if (empId === "") {
-			alert("담당자를 선택해주세요.");
-			document.getElementById("empId").focus();
-			return false;
-		}
-
-		if (prodQty === "" || Number(prodQty) <= 0) {
-			alert("생산수량은 1 이상 입력해주세요.");
-			document.getElementById("prodQty").focus();
-			return false;
-		}
-
-		if (lossQty === "" || Number(lossQty) < 0) {
-			alert("LOSS량은 0 이상 입력해주세요.");
-			document.getElementById("lossQty").focus();
-			return false;
-		}
-
-		if (Number(lossQty) > Number(prodQty)) {
-			alert("LOSS량은 생산수량보다 클 수 없습니다.");
-			document.getElementById("lossQty").focus();
-			return false;
-		}
-
-		if (prodStatus === "") {
-			alert("진행상태를 선택해주세요.");
-			document.getElementById("prodStatus").focus();
-			return false;
-		}
-
-		if (!confirm("공정진행 정보를 수정하시겠습니까?")) {
-			return false;
-		}
-
-		return true;
-	}
-
-
-	<c:if test="${mode eq 'edit'}">
-		changeEditMode(true);
-	</c:if>
-</script>

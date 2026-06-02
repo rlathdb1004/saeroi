@@ -24,8 +24,31 @@
 
 		<result property="itemCode" column="ITEM_CODE" />
 		<result property="itemName" column="ITEM_NAME" />
+		<result property="itemType" column="ITEM_TYPE" />
+		<result property="itemUnit" column="ITEM_UNIT" />
+		<result property="safetyStock" column="SAFETY_STOCK" />
 		<result property="currentProcess" column="CURRENT_PROCESS" />
+		<result property="lineCode" column="LINE_CODE" />
+		<result property="lineName" column="LINE_NAME" />
 
+		<result property="clientCode" column="CLIENT_CODE" />
+		<result property="clientName" column="CLIENT_NAME" />
+		<result property="clientType" column="CLIENT_TYPE" />
+		<result property="clientBusinessNo" column="CLIENT_BUSINESS_NO" />
+		<result property="clientAddress" column="CLIENT_ADDRESS" />
+		<result property="clientManager" column="CLIENT_MANAGER" />
+		<result property="clientTel" column="CLIENT_TEL" />
+		<result property="clientDept" column="CLIENT_DEPT" />
+
+		<result property="inventoryStock" column="INVENTORY_STOCK" />
+		<result property="stockLocation" column="STOCK_LOCATION" />
+		<result property="inventoryRemark" column="INVENTORY_REMARK" />
+
+		<result property="productInQtyTotal" column="PRODUCT_IN_QTY_TOTAL" />
+		<result property="productOutQtyTotal" column="PRODUCT_OUT_QTY_TOTAL" />
+		<result property="productRemainQty" column="PRODUCT_REMAIN_QTY" />
+
+		<result property="prodPlanQty" column="PROD_PLAN_QTY" />
 		<result property="orderQty" column="ORDER_QTY" />
 		<result property="prodQty" column="PROD_QTY" />
 		<result property="lossQty" column="LOSS_QTY" />
@@ -36,13 +59,94 @@
 		<result property="progressStatus" column="PROGRESS_STATUS" />
 		<result property="inspResult" column="INSP_RESULT" />
 
+		<result property="prodPlanDate" column="PROD_PLAN_DATE" />
+		<result property="dueDate" column="DUE_DATE" />
 		<result property="orderDate" column="ORDER_DATE" />
 		<result property="prodDate" column="PROD_DATE" />
 		<result property="inspDate" column="INSP_DATE" />
 
 		<result property="ename" column="ENAME" />
 		<result property="dept" column="DEPT" />
+		<result property="workOrderEmpName" column="WORK_ORDER_EMP_NAME" />
 		<result property="remark" column="REMARK" />
+		<result property="qrUrl" column="QR_URL" />
+		<result property="qrImagePath" column="QR_IMAGE_PATH" />
+
+		<result property="inoutId" column="INOUT_ID" />
+		<result property="materialItemId" column="MATERIAL_ITEM_ID" />
+		<result property="materialItemCode" column="MATERIAL_ITEM_CODE" />
+		<result property="materialItemName" column="MATERIAL_ITEM_NAME" />
+		<result property="materialItemType" column="MATERIAL_ITEM_TYPE" />
+		<result property="materialDocNo" column="MATERIAL_DOC_NO" />
+		<result property="materialLot" column="MATERIAL_LOT" />
+		<result property="inoutType" column="INOUT_TYPE" />
+		<result property="inoutTypeName" column="INOUT_TYPE_NAME" />
+		<result property="inoutQty" column="INOUT_QTY" />
+		<result property="inoutDate" column="INOUT_DATE" />
+		<result property="inoutStatus" column="INOUT_STATUS" />
+		<result property="inoutEmpName" column="INOUT_EMP_NAME" />
+		<result property="materialRemark" column="MATERIAL_REMARK" />
+
+		<result property="prodStatus" column="PROD_STATUS" />
+		<result property="inspectionStatus" column="INSPECTION_STATUS" />
+		<result property="prodEmpName" column="PROD_EMP_NAME" />
+		<result property="prodRemark" column="PROD_REMARK" />
+
+		<result property="inspType" column="INSP_TYPE" />
+		<result property="inspStatus" column="INSP_STATUS" />
+		<result property="inspectionGoodQty" column="INSPECTION_GOOD_QTY" />
+		<result property="inspectionBadQty" column="INSPECTION_BAD_QTY" />
+		<result property="inspEmpName" column="INSP_EMP_NAME" />
+		<result property="inspRemark" column="INSP_REMARK" />
+
+		<result property="defectListId" column="DEFECT_LIST_ID" />
+		<result property="defectId" column="DEFECT_ID" />
+		<result property="defectDocNo" column="DEFECT_DOC_NO" />
+		<result property="defectCode" column="DEFECT_CODE" />
+		<result property="defectName" column="DEFECT_NAME" />
+		<result property="defectType" column="DEFECT_TYPE" />
+		<result property="defectQty" column="DEFECT_QTY" />
+		<result property="defectDate" column="DEFECT_DATE" />
+		<result property="defectPhoto" column="DEFECT_PHOTO" />
+		<result property="defectRemark" column="DEFECT_REMARK" />
+		<result property="actionCount" column="ACTION_COUNT" />
+		<result property="actionDate" column="ACTION_DATE" />
+		<result property="actionContent" column="ACTION_CONTENT" />
+
+		<result property="productInoutId" column="PRODUCT_INOUT_ID" />
+		<result property="productInoutDocNo" column="PRODUCT_INOUT_DOC_NO" />
+		<result property="productInoutType" column="PRODUCT_INOUT_TYPE" />
+		<result property="productInoutTypeName" column="PRODUCT_INOUT_TYPE_NAME" />
+		<result property="productInoutQty" column="PRODUCT_INOUT_QTY" />
+		<result property="productInoutDate" column="PRODUCT_INOUT_DATE" />
+		<result property="productInoutStatus" column="PRODUCT_INOUT_STATUS" />
+		<result property="productInoutEmpName" column="PRODUCT_INOUT_EMP_NAME" />
+		<result property="productInoutRemark" column="PRODUCT_INOUT_REMARK" />
+		<result property="productInoutProductLot" column="PRODUCT_INOUT_PRODUCT_LOT" />
+
+		<result property="productInoutItemCode" column="PRODUCT_INOUT_ITEM_CODE" />
+		<result property="productInoutItemName" column="PRODUCT_INOUT_ITEM_NAME" />
+		<result property="productInoutItemType" column="PRODUCT_INOUT_ITEM_TYPE" />
+		<result property="productInoutItemUnit" column="PRODUCT_INOUT_ITEM_UNIT" />
+		<result property="productInoutSafetyStock" column="PRODUCT_INOUT_SAFETY_STOCK" />
+		<result property="productInoutInspDocNo" column="PRODUCT_INOUT_INSP_DOC_NO" />
+
+		<result property="productInoutClientCode" column="PRODUCT_INOUT_CLIENT_CODE" />
+		<result property="productInoutClientName" column="PRODUCT_INOUT_CLIENT_NAME" />
+		<result property="productInoutClientType" column="PRODUCT_INOUT_CLIENT_TYPE" />
+		<result property="productInoutClientBusinessNo" column="PIO_CLIENT_BIZ_NO" />
+		<result property="productInoutClientAddress" column="PRODUCT_INOUT_CLIENT_ADDRESS" />
+		<result property="productInoutClientManager" column="PRODUCT_INOUT_CLIENT_MANAGER" />
+		<result property="productInoutClientTel" column="PRODUCT_INOUT_CLIENT_TEL" />
+		<result property="productInoutClientDept" column="PRODUCT_INOUT_CLIENT_DEPT" />
+
+		<result property="productInoutInventoryStock" column="PRODUCT_INOUT_INVENTORY_STOCK" />
+		<result property="productInoutStockLocation" column="PRODUCT_INOUT_STOCK_LOCATION" />
+		<result property="productInoutInventoryRemark" column="PRODUCT_INOUT_INVENTORY_REMARK" />
+
+		<result property="productInoutLotInQty" column="PRODUCT_INOUT_LOT_IN_QTY" />
+		<result property="productInoutLotOutQty" column="PRODUCT_INOUT_LOT_OUT_QTY" />
+		<result property="productInoutLotRemainQty" column="PRODUCT_INOUT_LOT_REMAIN_QTY" />
 
 	</resultMap>
 
@@ -87,33 +191,23 @@
 					<!-- 구분이 전체이거나 비어 있을 때는 화면에 보이는 주요 값들을 전체 검색한다. -->
 					<otherwise>
 						AND (
-						WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
-						OR WO.DOC_NO
-						LIKE '%' || TRIM(#{keyword}) || '%'
-						OR PP.DOC_NO LIKE '%' ||
-						TRIM(#{keyword}) || '%'
-						OR I.ITEM_CODE LIKE '%' || TRIM(#{keyword})
-						|| '%'
-						OR I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
-						OR
-						L.LINE_NAME LIKE '%' || TRIM(#{keyword}) || '%'
-						OR
-						NVL(LP.PROD_STATUS, '대기') LIKE '%' || TRIM(#{keyword}) || '%'
-						OR
-						NVL(LI.RESULT, '-') LIKE '%' || TRIM(#{keyword}) || '%'
-						OR
-						TO_CHAR(WO.ORDER_QTY) LIKE '%' || TRIM(#{keyword}) || '%'
-						OR
-						TO_CHAR(NVL(PA.TOTAL_PROD_QTY, 0)) LIKE '%' || TRIM(#{keyword}) ||
-						'%'
-						OR TO_CHAR(NVL(PA.TOTAL_LOSS_QTY, 0)) LIKE '%' ||
-						TRIM(#{keyword}) || '%'
-						OR TO_CHAR(
-						GREATEST(
-						NVL(PA.TOTAL_PROD_QTY, 0) - NVL(PA.TOTAL_LOSS_QTY, 0),
-						0
-						)
-						) LIKE '%' || TRIM(#{keyword}) || '%'
+							WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
+							OR WO.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+							OR PP.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+							OR I.ITEM_CODE LIKE '%' || TRIM(#{keyword}) || '%'
+							OR I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+							OR L.LINE_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+							OR NVL(LP.PROD_STATUS, '대기') LIKE '%' || TRIM(#{keyword}) || '%'
+							OR NVL(LI.RESULT, '-') LIKE '%' || TRIM(#{keyword}) || '%'
+							OR TO_CHAR(WO.ORDER_QTY) LIKE '%' || TRIM(#{keyword}) || '%'
+							OR TO_CHAR(NVL(PA.TOTAL_PROD_QTY, 0)) LIKE '%' || TRIM(#{keyword}) || '%'
+							OR TO_CHAR(NVL(PA.TOTAL_LOSS_QTY, 0)) LIKE '%' || TRIM(#{keyword}) || '%'
+							OR TO_CHAR(
+								GREATEST(
+									NVL(PA.TOTAL_PROD_QTY, 0) - NVL(PA.TOTAL_LOSS_QTY, 0),
+									0
+								)
+							) LIKE '%' || TRIM(#{keyword}) || '%'
 						)
 					</otherwise>
 
@@ -125,6 +219,7 @@
 
 	</sql>
 
+
 	<!-- LOT 이력 목록 총 건수를 조회한다. -->
 	<select id="selectLotHistoryCount"
 		parameterType="kr.or.saeroi.dto.LotDTO" resultType="int">
@@ -133,8 +228,7 @@
 		FROM WORK_ORDER WO
 
 		JOIN PRODUCTION_PLAN PP
-		ON
-		WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
 
 		JOIN ITEM I
 		ON PP.ITEM_ID = I.ITEM_ID
@@ -143,61 +237,52 @@
 		ON WO.LINE_ID = L.LINE_ID
 
 		LEFT JOIN (
-		SELECT
-		ORDER_ID,
-		SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
-		SUM(NVL(LOSS_QTY, 0))
-		AS
-		TOTAL_LOSS_QTY
-		FROM PRODUCTION
-		GROUP BY ORDER_ID
+			SELECT
+				ORDER_ID,
+				SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
+				SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
+			FROM PRODUCTION
+			GROUP BY ORDER_ID
 		) PA
-		ON WO.ORDER_ID =
-		PA.ORDER_ID
+		ON WO.ORDER_ID = PA.ORDER_ID
 
 		LEFT JOIN (
-		SELECT
-		P1.ORDER_ID,
-		P1.PROD_STATUS
-		FROM PRODUCTION
-		P1
-		JOIN (
-		SELECT
-		ORDER_ID,
-		MAX(PROD_ID) AS PROD_ID
-		FROM PRODUCTION
-		GROUP BY
-		ORDER_ID
-		) PM
-		ON P1.ORDER_ID = PM.ORDER_ID
-		AND P1.PROD_ID = PM.PROD_ID
-		)
-		LP
+			SELECT
+				P1.ORDER_ID,
+				P1.PROD_STATUS
+			FROM PRODUCTION P1
+			JOIN (
+				SELECT
+					ORDER_ID,
+					MAX(PROD_ID) AS PROD_ID
+				FROM PRODUCTION
+				GROUP BY ORDER_ID
+			) PM
+			ON P1.ORDER_ID = PM.ORDER_ID
+			AND P1.PROD_ID = PM.PROD_ID
+		) LP
 		ON WO.ORDER_ID = LP.ORDER_ID
 
 		LEFT JOIN (
-		SELECT
-		P2.ORDER_ID,
-		I2.RESULT
-		FROM INSPECTION I2
-		JOIN PRODUCTION P2
-		ON I2.PROD_ID = P2.PROD_ID
-		JOIN (
-		SELECT
-		P3.ORDER_ID,
-		MAX(I3.INSP_ID) AS INSP_ID
-		FROM INSPECTION I3
-		JOIN
-		PRODUCTION P3
-		ON I3.PROD_ID = P3.PROD_ID
-		GROUP BY P3.ORDER_ID
-		) IM
-		ON
-		P2.ORDER_ID = IM.ORDER_ID
-		AND I2.INSP_ID = IM.INSP_ID
+			SELECT
+				P2.ORDER_ID,
+				I2.RESULT
+			FROM INSPECTION I2
+			JOIN PRODUCTION P2
+			ON I2.PROD_ID = P2.PROD_ID
+			JOIN (
+				SELECT
+					P3.ORDER_ID,
+					MAX(I3.INSP_ID) AS INSP_ID
+				FROM INSPECTION I3
+				JOIN PRODUCTION P3
+				ON I3.PROD_ID = P3.PROD_ID
+				GROUP BY P3.ORDER_ID
+			) IM
+			ON P2.ORDER_ID = IM.ORDER_ID
+			AND I2.INSP_ID = IM.INSP_ID
 		) LI
-		ON WO.ORDER_ID
-		= LI.ORDER_ID
+		ON WO.ORDER_ID = LI.ORDER_ID
 
 		<include refid="lotHistorySearchCondition" />
 
@@ -211,273 +296,543 @@
 
 		SELECT *
 		FROM (
-		SELECT LOT_LIST.*,
-		ROWNUM AS RN
-		FROM (
-		SELECT
-		WO.ORDER_ID,
-		WO.PROD_PLAN_ID,
-		PP.ITEM_ID,
+			SELECT
+				LOT_LIST.*,
+				ROWNUM AS RN
+			FROM (
+				SELECT
+					WO.ORDER_ID,
+					WO.PROD_PLAN_ID,
+					PP.ITEM_ID,
 
-		WO.PRODUCT_LOT,
-		PP.DOC_NO AS
-		PROD_PLAN_DOC_NO,
-		WO.DOC_NO AS WORK_ORDER_DOC_NO,
+					WO.PRODUCT_LOT,
+					PP.DOC_NO AS PROD_PLAN_DOC_NO,
+					WO.DOC_NO AS WORK_ORDER_DOC_NO,
 
-		I.ITEM_CODE,
-		I.ITEM_NAME,
+					I.ITEM_CODE,
+					I.ITEM_NAME,
 
-		NVL(L.LINE_NAME, '-') AS CURRENT_PROCESS,
+					NVL(L.LINE_NAME, '-') AS CURRENT_PROCESS,
 
-		WO.ORDER_QTY,
-		NVL(PA.TOTAL_PROD_QTY, 0) AS PROD_QTY,
-		NVL(PA.TOTAL_LOSS_QTY, 0) AS
-		LOSS_QTY,
-		GREATEST(NVL(PA.TOTAL_PROD_QTY, 0) - NVL(PA.TOTAL_LOSS_QTY,
-		0), 0) AS GOOD_QTY,
+					WO.ORDER_QTY,
+					NVL(PA.TOTAL_PROD_QTY, 0) AS PROD_QTY,
+					NVL(PA.TOTAL_LOSS_QTY, 0) AS LOSS_QTY,
+					GREATEST(NVL(PA.TOTAL_PROD_QTY, 0) - NVL(PA.TOTAL_LOSS_QTY, 0), 0) AS GOOD_QTY,
 
-		CASE
-		WHEN NVL(WO.ORDER_QTY, 0) = 0 THEN 0
-		ELSE LEAST(
-		100,
-		ROUND((NVL(PA.TOTAL_PROD_QTY, 0) / WO.ORDER_QTY) * 100)
+					CASE
+						WHEN NVL(WO.ORDER_QTY, 0) = 0 THEN 0
+						ELSE LEAST(
+							100,
+							ROUND((NVL(PA.TOTAL_PROD_QTY, 0) / WO.ORDER_QTY) * 100)
+						)
+					END AS PROGRESS_RATE,
+
+					NVL(LP.PROD_STATUS, '대기') AS PROGRESS_STATUS,
+					NVL(LI.RESULT, '-') AS INSP_RESULT,
+
+					TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+					TO_CHAR(LP.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
+					TO_CHAR(LI.INSP_DATE, 'YYYY-MM-DD') AS INSP_DATE
+
+				FROM WORK_ORDER WO
+
+				JOIN PRODUCTION_PLAN PP
+				ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+
+				JOIN ITEM I
+				ON PP.ITEM_ID = I.ITEM_ID
+
+				LEFT JOIN LINE L
+				ON WO.LINE_ID = L.LINE_ID
+
+				LEFT JOIN (
+					SELECT
+						ORDER_ID,
+						SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
+						SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
+					FROM PRODUCTION
+					GROUP BY ORDER_ID
+				) PA
+				ON WO.ORDER_ID = PA.ORDER_ID
+
+				LEFT JOIN (
+					SELECT
+						P1.ORDER_ID,
+						P1.PROD_ID,
+						P1.PROD_STATUS,
+						P1.PROD_DATE,
+						P1.DOC_NO
+					FROM PRODUCTION P1
+					JOIN (
+						SELECT
+							ORDER_ID,
+							MAX(PROD_ID) AS PROD_ID
+						FROM PRODUCTION
+						GROUP BY ORDER_ID
+					) PM
+					ON P1.ORDER_ID = PM.ORDER_ID
+					AND P1.PROD_ID = PM.PROD_ID
+				) LP
+				ON WO.ORDER_ID = LP.ORDER_ID
+
+				LEFT JOIN (
+					SELECT
+						P2.ORDER_ID,
+						I2.INSP_ID,
+						I2.RESULT,
+						I2.INSP_DATE,
+						I2.DOC_NO
+					FROM INSPECTION I2
+					JOIN PRODUCTION P2
+					ON I2.PROD_ID = P2.PROD_ID
+					JOIN (
+						SELECT
+							P3.ORDER_ID,
+							MAX(I3.INSP_ID) AS INSP_ID
+						FROM INSPECTION I3
+						JOIN PRODUCTION P3
+						ON I3.PROD_ID = P3.PROD_ID
+						GROUP BY P3.ORDER_ID
+					) IM
+					ON P2.ORDER_ID = IM.ORDER_ID
+					AND I2.INSP_ID = IM.INSP_ID
+				) LI
+				ON WO.ORDER_ID = LI.ORDER_ID
+
+				<include refid="lotHistorySearchCondition" />
+
+				ORDER BY WO.ORDER_DATE DESC, WO.ORDER_ID DESC
+			) LOT_LIST
+			WHERE ROWNUM <![CDATA[<=]]> #{endRow}
 		)
-		END AS
-		PROGRESS_RATE,
-
-		NVL(LP.PROD_STATUS, '대기') AS PROGRESS_STATUS,
-		NVL(LI.RESULT, '-') AS INSP_RESULT,
-
-		TO_CHAR(WO.ORDER_DATE,
-		'YYYY-MM-DD') AS ORDER_DATE,
-		TO_CHAR(LP.PROD_DATE, 'YYYY-MM-DD') AS
-		PROD_DATE,
-		TO_CHAR(LI.INSP_DATE, 'YYYY-MM-DD') AS INSP_DATE
-
-		FROM
-		WORK_ORDER WO
-
-		JOIN PRODUCTION_PLAN PP
-		ON WO.PROD_PLAN_ID =
-		PP.PROD_PLAN_ID
-
-		JOIN ITEM I
-		ON PP.ITEM_ID = I.ITEM_ID
-
-		LEFT JOIN LINE L
-		ON
-		WO.LINE_ID = L.LINE_ID
-
-		LEFT JOIN (
-		SELECT
-		ORDER_ID,
-		SUM(NVL(PROD_QTY, 0))
-		AS TOTAL_PROD_QTY,
-		SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
-		FROM
-		PRODUCTION
-		GROUP BY ORDER_ID
-		) PA
-		ON WO.ORDER_ID = PA.ORDER_ID
-
-		LEFT JOIN (
-		SELECT
-		P1.ORDER_ID,
-		P1.PROD_ID,
-		P1.PROD_STATUS,
-		P1.PROD_DATE,
-		P1.DOC_NO
-		FROM PRODUCTION P1
-		JOIN (
-		SELECT
-		ORDER_ID,
-		MAX(PROD_ID) AS PROD_ID
-		FROM
-		PRODUCTION
-		GROUP BY ORDER_ID
-		) PM
-		ON P1.ORDER_ID = PM.ORDER_ID
-		AND
-		P1.PROD_ID = PM.PROD_ID
-		) LP
-		ON WO.ORDER_ID = LP.ORDER_ID
-
-		LEFT JOIN (
-		SELECT
-		P2.ORDER_ID,
-		I2.INSP_ID,
-		I2.RESULT,
-		I2.INSP_DATE,
-		I2.DOC_NO
-		FROM
-		INSPECTION I2
-		JOIN PRODUCTION P2
-		ON I2.PROD_ID = P2.PROD_ID
-		JOIN (
-		SELECT
-		P3.ORDER_ID,
-		MAX(I3.INSP_ID) AS INSP_ID
-		FROM INSPECTION I3
-		JOIN
-		PRODUCTION P3
-		ON I3.PROD_ID = P3.PROD_ID
-		GROUP BY P3.ORDER_ID
-		) IM
-		ON
-		P2.ORDER_ID = IM.ORDER_ID
-		AND I2.INSP_ID = IM.INSP_ID
-		) LI
-		ON WO.ORDER_ID
-		= LI.ORDER_ID
-
-		<include refid="lotHistorySearchCondition" />
-
-		ORDER BY WO.ORDER_DATE DESC,
-		WO.ORDER_ID DESC
-		) LOT_LIST
-		WHERE ROWNUM <![CDATA[<=]]>
-		#{endRow}
-		)
-		WHERE RN <![CDATA[>=]]>
-		#{startRow}
+		WHERE RN <![CDATA[>=]]> #{startRow}
 
 	</select>
 
 
-	<!-- LOT 이력 상세 정보를 조회한다. -->
+	<!-- LOT 이력 상세 기본 정보를 조회한다. -->
 	<select id="selectLotHistoryDetail" parameterType="int"
 		resultMap="lotHistoryResultMap">
 
 		SELECT
-		WO.ORDER_ID,
-		WO.PROD_PLAN_ID,
-		PP.ITEM_ID,
-
-		LP.PROD_ID,
-		LI.INSP_ID,
-
-		WO.PRODUCT_LOT,
-		PP.DOC_NO AS PROD_PLAN_DOC_NO,
-		WO.DOC_NO AS
-		WORK_ORDER_DOC_NO,
-		LP.DOC_NO AS PROD_DOC_NO,
-		LI.DOC_NO AS INSP_DOC_NO,
-
-		I.ITEM_CODE,
-		I.ITEM_NAME,
-
-		NVL(L.LINE_NAME, '-') AS CURRENT_PROCESS,
-
-		WO.ORDER_QTY,
-		NVL(PA.TOTAL_PROD_QTY, 0) AS PROD_QTY,
-		NVL(PA.TOTAL_LOSS_QTY, 0) AS LOSS_QTY,
-		GREATEST(NVL(PA.TOTAL_PROD_QTY,
-		0) - NVL(PA.TOTAL_LOSS_QTY, 0), 0) AS GOOD_QTY,
-		NVL(LI.INSPECTION_QTY,
-		0) AS INSPECTION_QTY,
-
-		CASE
-		WHEN NVL(WO.ORDER_QTY, 0) = 0 THEN 0
-		ELSE
-		LEAST(
-		100,
-		ROUND((NVL(PA.TOTAL_PROD_QTY, 0) / WO.ORDER_QTY) * 100)
-		)
-		END
-		AS PROGRESS_RATE,
-
-		NVL(LP.PROD_STATUS, '대기') AS PROGRESS_STATUS,
-		NVL(LI.RESULT, '-') AS INSP_RESULT,
-
-		TO_CHAR(WO.ORDER_DATE,
-		'YYYY-MM-DD') AS ORDER_DATE,
-		TO_CHAR(LP.PROD_DATE, 'YYYY-MM-DD') AS
-		PROD_DATE,
-		TO_CHAR(LI.INSP_DATE, 'YYYY-MM-DD') AS INSP_DATE,
-
-		E.ENAME,
-		E.DEPT,
-		WO.REMARK
+			WO.ORDER_ID,
+			WO.PROD_PLAN_ID,
+			PP.ITEM_ID,
+			LP.PROD_ID,
+			LI.INSP_ID,
+			WO.PRODUCT_LOT,
+			PP.DOC_NO AS PROD_PLAN_DOC_NO,
+			WO.DOC_NO AS WORK_ORDER_DOC_NO,
+			LP.DOC_NO AS PROD_DOC_NO,
+			LI.DOC_NO AS INSP_DOC_NO,
+			I.ITEM_CODE,
+			I.ITEM_NAME,
+			CASE
+				WHEN I.ITEM_TYPE = 'RM' THEN '원자재'
+				WHEN I.ITEM_TYPE = 'SM' THEN '부자재'
+				WHEN I.ITEM_TYPE = 'FG' THEN '완제품'
+				ELSE NVL(I.ITEM_TYPE, '-')
+			END AS ITEM_TYPE,
+			I.ITEM_UNIT,
+			NVL(I.SAFETY_STOCK, 0) AS SAFETY_STOCK,
+			CUS.CLIENT_CODE,
+			CUS.CLIENT_NAME,
+			CUS.CLIENT_TYPE,
+			CUS.BUSINESS_NO AS CLIENT_BUSINESS_NO,
+			CUS.CLIENT_ADRESS AS CLIENT_ADDRESS,
+			CUS.CLIENT_MAN AS CLIENT_MANAGER,
+			CUS.CLIENT_TEL,
+			CUS.CLIENT_DEPT,
+			NVL(IV.INVENTORY_STOCK, 0) AS INVENTORY_STOCK,
+			NVL(IV.STOCK_LOCATION, '-') AS STOCK_LOCATION,
+			IV.INVENTORY_REMARK,
+			NVL(PIS.PRODUCT_IN_QTY_TOTAL, 0) AS PRODUCT_IN_QTY_TOTAL,
+			NVL(PIS.PRODUCT_OUT_QTY_TOTAL, 0) AS PRODUCT_OUT_QTY_TOTAL,
+			NVL(PIS.PRODUCT_IN_QTY_TOTAL, 0) - NVL(PIS.PRODUCT_OUT_QTY_TOTAL, 0) AS PRODUCT_REMAIN_QTY,
+			L.LINE_CODE,
+			NVL(L.LINE_NAME, '-') AS LINE_NAME,
+			NVL(L.LINE_NAME, '-') AS CURRENT_PROCESS,
+			PP.PROD_PLAN_QTY,
+			WO.ORDER_QTY,
+			NVL(PA.TOTAL_PROD_QTY, 0) AS PROD_QTY,
+			NVL(PA.TOTAL_LOSS_QTY, 0) AS LOSS_QTY,
+			GREATEST(NVL(PA.TOTAL_PROD_QTY, 0) - NVL(PA.TOTAL_LOSS_QTY, 0), 0) AS GOOD_QTY,
+			NVL(LI.INSPECTION_QTY, 0) AS INSPECTION_QTY,
+			CASE
+				WHEN NVL(WO.ORDER_QTY, 0) = 0 THEN 0
+				ELSE LEAST(100, ROUND((NVL(PA.TOTAL_PROD_QTY, 0) / WO.ORDER_QTY) * 100))
+			END AS PROGRESS_RATE,
+			NVL(LP.PROD_STATUS, '대기') AS PROGRESS_STATUS,
+			NVL(LI.RESULT, '-') AS INSP_RESULT,
+			TO_CHAR(PP.PROD_PLAN_DATE, 'YYYY-MM-DD') AS PROD_PLAN_DATE,
+			TO_CHAR(PP.DUE_DATE, 'YYYY-MM-DD') AS DUE_DATE,
+			TO_CHAR(WO.ORDER_DATE, 'YYYY-MM-DD') AS ORDER_DATE,
+			TO_CHAR(LP.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
+			TO_CHAR(LI.INSP_DATE, 'YYYY-MM-DD') AS INSP_DATE,
+			E.ENAME,
+			E.DEPT,
+			EWO.ENAME AS WORK_ORDER_EMP_NAME,
+			WO.REMARK,
+			WO.QR_URL,
+			WO.QR_IMAGE_PATH
 
 		FROM WORK_ORDER WO
 
 		JOIN PRODUCTION_PLAN PP
-		ON
-		WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
+		ON WO.PROD_PLAN_ID = PP.PROD_PLAN_ID
 
 		JOIN ITEM I
 		ON PP.ITEM_ID = I.ITEM_ID
 
+		LEFT JOIN CLIENT CUS
+		ON I.CLIENT_ID = CUS.CLIENT_ID
+
+		LEFT JOIN (
+			SELECT
+				ITEM_ID,
+				SUM(NVL(INVENTORY_STOCK, 0)) AS INVENTORY_STOCK,
+				MAX(STOCK_LOCATION) AS STOCK_LOCATION,
+				MAX(REMARK) AS INVENTORY_REMARK
+			FROM INVENTORY
+			GROUP BY ITEM_ID
+		) IV
+		ON I.ITEM_ID = IV.ITEM_ID
+
 		LEFT JOIN LINE L
 		ON WO.LINE_ID = L.LINE_ID
 
-		LEFT JOIN (
-		SELECT
-		ORDER_ID,
-		SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
-		SUM(NVL(LOSS_QTY, 0)) AS
-		TOTAL_LOSS_QTY
-		FROM PRODUCTION
-		GROUP BY ORDER_ID
-		) PA
-		ON WO.ORDER_ID =
-		PA.ORDER_ID
+		LEFT JOIN EMP EWO
+		ON WO.EMP_ID = EWO.EMP_ID
 
 		LEFT JOIN (
-		SELECT
-		P1.ORDER_ID,
-		P1.PROD_ID,
-		P1.EMP_ID,
-		P1.PROD_STATUS,
-		P1.PROD_DATE,
-		P1.DOC_NO
-		FROM PRODUCTION P1
-		JOIN (
-		SELECT
-		ORDER_ID,
-		MAX(PROD_ID) AS PROD_ID
-		FROM PRODUCTION
-		GROUP BY ORDER_ID
-		) PM
-		ON P1.ORDER_ID = PM.ORDER_ID
-		AND P1.PROD_ID = PM.PROD_ID
+			SELECT
+				ORDER_ID,
+				SUM(NVL(PROD_QTY, 0)) AS TOTAL_PROD_QTY,
+				SUM(NVL(LOSS_QTY, 0)) AS TOTAL_LOSS_QTY
+			FROM PRODUCTION
+			GROUP BY ORDER_ID
+		) PA
+		ON WO.ORDER_ID = PA.ORDER_ID
+
+		LEFT JOIN (
+			SELECT
+				ORDER_ID,
+				SUM(CASE WHEN INOUT_TYPE IN ('MI', 'PI', '입고') THEN NVL(INOUT_QTY, 0) ELSE 0 END) AS PRODUCT_IN_QTY_TOTAL,
+				SUM(CASE WHEN INOUT_TYPE IN ('MO', 'PO', '출고') THEN NVL(INOUT_QTY, 0) ELSE 0 END) AS PRODUCT_OUT_QTY_TOTAL
+			FROM PRODUCT_INOUT
+			WHERE NVL(USE_YN, 'Y') = 'Y'
+			GROUP BY ORDER_ID
+		) PIS
+		ON WO.ORDER_ID = PIS.ORDER_ID
+
+		LEFT JOIN (
+			SELECT
+				P1.ORDER_ID,
+				P1.PROD_ID,
+				P1.EMP_ID,
+				P1.PROD_STATUS,
+				P1.PROD_DATE,
+				P1.DOC_NO
+			FROM PRODUCTION P1
+			JOIN (
+				SELECT
+					ORDER_ID,
+					MAX(PROD_ID) AS PROD_ID
+				FROM PRODUCTION
+				GROUP BY ORDER_ID
+			) PM
+			ON P1.ORDER_ID = PM.ORDER_ID
+			AND P1.PROD_ID = PM.PROD_ID
 		) LP
-		ON
-		WO.ORDER_ID = LP.ORDER_ID
+		ON WO.ORDER_ID = LP.ORDER_ID
 
 		LEFT JOIN EMP E
 		ON LP.EMP_ID = E.EMP_ID
 
-		LEFT
-		JOIN (
-		SELECT
-		P2.ORDER_ID,
-		I2.INSP_ID,
-		I2.RESULT,
-		I2.INSP_DATE,
-		I2.DOC_NO,
-		I2.INSPECTION_QTY
-		FROM INSPECTION I2
-		JOIN PRODUCTION P2
-		ON I2.PROD_ID =
-		P2.PROD_ID
-		JOIN (
-		SELECT
-		P3.ORDER_ID,
-		MAX(I3.INSP_ID) AS INSP_ID
-		FROM
-		INSPECTION I3
-		JOIN PRODUCTION P3
-		ON I3.PROD_ID = P3.PROD_ID
-		GROUP BY
-		P3.ORDER_ID
-		) IM
-		ON P2.ORDER_ID = IM.ORDER_ID
-		AND I2.INSP_ID = IM.INSP_ID
+		LEFT JOIN (
+			SELECT
+				P2.ORDER_ID,
+				I2.INSP_ID,
+				I2.RESULT,
+				I2.INSP_DATE,
+				I2.DOC_NO,
+				I2.INSPECTION_QTY
+			FROM INSPECTION I2
+			JOIN PRODUCTION P2
+			ON I2.PROD_ID = P2.PROD_ID
+			JOIN (
+				SELECT
+					P3.ORDER_ID,
+					MAX(I3.INSP_ID) AS INSP_ID
+				FROM INSPECTION I3
+				JOIN PRODUCTION P3
+				ON I3.PROD_ID = P3.PROD_ID
+				GROUP BY P3.ORDER_ID
+			) IM
+			ON P2.ORDER_ID = IM.ORDER_ID
+			AND I2.INSP_ID = IM.INSP_ID
 		) LI
 		ON WO.ORDER_ID = LI.ORDER_ID
 
 		WHERE WO.ORDER_ID = #{orderId}
+
+	</select>
+
+
+	<!-- LOT 기준 자재 투입 이력을 조회한다. -->
+	<select id="selectLotMaterialHistoryList" parameterType="int"
+		resultMap="lotHistoryResultMap">
+
+		SELECT
+			MI.INOUT_ID,
+			MI.ORDER_ID,
+			MI.ITEM_ID AS MATERIAL_ITEM_ID,
+			MAT.ITEM_CODE AS MATERIAL_ITEM_CODE,
+			MAT.ITEM_NAME AS MATERIAL_ITEM_NAME,
+			CASE
+				WHEN MAT.ITEM_TYPE = 'RM' THEN '원자재'
+				WHEN MAT.ITEM_TYPE = 'SM' THEN '부자재'
+				WHEN MAT.ITEM_TYPE = 'FG' THEN '완제품'
+				ELSE NVL(MAT.ITEM_TYPE, '-')
+			END AS MATERIAL_ITEM_TYPE,
+			NVL(MI.DOC_NO, 'MIO-' || MI.INOUT_ID) AS MATERIAL_DOC_NO,
+			MI.MATERIAL_LOT,
+			MI.INOUT_TYPE,
+			CASE
+				WHEN MI.INOUT_TYPE = 'MI' THEN '입고'
+				WHEN MI.INOUT_TYPE = 'MO' THEN '출고'
+				WHEN MI.INOUT_TYPE = 'MO-PROD' THEN '생산투입'
+				ELSE NVL(MI.INOUT_TYPE, '-')
+			END AS INOUT_TYPE_NAME,
+			NVL(MI.INOUT_QTY, 0) AS INOUT_QTY,
+			TO_CHAR(MI.INOUT_DATE, 'YYYY-MM-DD') AS INOUT_DATE,
+			NVL(MI.STATUS, '-') AS INOUT_STATUS,
+			E.ENAME AS INOUT_EMP_NAME,
+			MI.REMARK AS MATERIAL_REMARK
+		FROM MATERIAL_INOUT MI
+
+		JOIN ITEM MAT
+		ON MI.ITEM_ID = MAT.ITEM_ID
+
+		LEFT JOIN EMP E
+		ON MI.EMP_ID = E.EMP_ID
+
+		WHERE MI.ORDER_ID = #{orderId}
+		AND NVL(MI.USE_YN, 'Y') = 'Y'
+
+		ORDER BY MI.INOUT_DATE ASC, MI.INOUT_ID ASC
+
+	</select>
+
+
+	<!-- LOT 기준 생산실적 이력을 조회한다. -->
+	<select id="selectLotProductionHistoryList" parameterType="int"
+		resultMap="lotHistoryResultMap">
+
+		SELECT
+			P.PROD_ID,
+			P.ORDER_ID,
+			P.DOC_NO AS PROD_DOC_NO,
+			TO_CHAR(P.PROD_DATE, 'YYYY-MM-DD') AS PROD_DATE,
+			NVL(P.ORDER_QTY, WO.ORDER_QTY) AS ORDER_QTY,
+			NVL(P.PROD_QTY, 0) AS PROD_QTY,
+			NVL(P.LOSS_QTY, 0) AS LOSS_QTY,
+			GREATEST(NVL(P.PROD_QTY, 0) - NVL(P.LOSS_QTY, 0), 0) AS GOOD_QTY,
+			NVL(P.PROD_STATUS, '-') AS PROD_STATUS,
+			NVL(P.INSPECTION_STATUS, '-') AS INSPECTION_STATUS,
+			E.ENAME AS PROD_EMP_NAME,
+			P.REMARK AS PROD_REMARK
+		FROM PRODUCTION P
+
+		JOIN WORK_ORDER WO
+		ON P.ORDER_ID = WO.ORDER_ID
+
+		LEFT JOIN EMP E
+		ON P.EMP_ID = E.EMP_ID
+
+		WHERE P.ORDER_ID = #{orderId}
+
+		ORDER BY P.PROD_DATE ASC, P.PROD_ID ASC
+
+	</select>
+
+
+	<!-- LOT 기준 품질검사 이력을 조회한다. -->
+	<select id="selectLotInspectionHistoryList" parameterType="int"
+		resultMap="lotHistoryResultMap">
+
+		SELECT
+			I.INSP_ID,
+			I.PROD_ID,
+			P.ORDER_ID,
+			I.DOC_NO AS INSP_DOC_NO,
+			I.INSP_TYPE,
+			TO_CHAR(I.INSP_DATE, 'YYYY-MM-DD') AS INSP_DATE,
+			NVL(I.INSP_STATUS, '-') AS INSP_STATUS,
+			NVL(I.RESULT, '-') AS INSP_RESULT,
+			NVL(I.INSPECTION_QTY, 0) AS INSPECTION_QTY,
+			NVL(I.GOOD_QTY, 0) AS INSPECTION_GOOD_QTY,
+			GREATEST(NVL(I.INSPECTION_QTY, 0) - NVL(I.GOOD_QTY, 0), 0) AS INSPECTION_BAD_QTY,
+			E.ENAME AS INSP_EMP_NAME,
+			I.REMARK AS INSP_REMARK
+		FROM INSPECTION I
+
+		JOIN PRODUCTION P
+		ON I.PROD_ID = P.PROD_ID
+
+		LEFT JOIN EMP E
+		ON I.EMP_ID = E.EMP_ID
+
+		WHERE P.ORDER_ID = #{orderId}
+		AND NVL(I.USE_YN, 'Y') = 'Y'
+
+		ORDER BY I.INSP_DATE ASC, I.INSP_ID ASC
+
+	</select>
+
+
+	<!-- LOT 기준 불량 이력을 조회한다. -->
+	<select id="selectLotDefectHistoryList" parameterType="int"
+		resultMap="lotHistoryResultMap">
+
+		SELECT
+			DL.DEFECT_LIST_ID,
+			DL.DEFECT_ID,
+			DL.INSP_ID,
+			P.ORDER_ID,
+			DL.DOC_NO AS DEFECT_DOC_NO,
+			D.DEFECT_CODE,
+			D.DEFECT_NAME,
+			D.DEFECT_TYPE,
+			NVL(DL.DEFECT_QTY, 0) AS DEFECT_QTY,
+			TO_CHAR(DL.DEFECT_DATE, 'YYYY-MM-DD') AS DEFECT_DATE,
+			DL.DEFECT_PHOTO,
+			DL.REMARK AS DEFECT_REMARK,
+			NVL(DA.ACTION_COUNT, 0) AS ACTION_COUNT,
+			TO_CHAR(DA.ACTION_DATE, 'YYYY-MM-DD') AS ACTION_DATE,
+			DA.ACTION_CONTENT
+		FROM DEFECT_LIST DL
+
+		JOIN DEFECT D
+		ON DL.DEFECT_ID = D.DEFECT_ID
+
+		JOIN INSPECTION I
+		ON DL.INSP_ID = I.INSP_ID
+
+		JOIN PRODUCTION P
+		ON I.PROD_ID = P.PROD_ID
+
+		LEFT JOIN (
+			SELECT
+				DEFECT_LIST_ID,
+				COUNT(*) AS ACTION_COUNT,
+				MAX(ACTION_DATE) AS ACTION_DATE,
+				LISTAGG(ACTION_CONTENT, ', ') WITHIN GROUP (ORDER BY SORT_NO, DEFECT_ACTION_ID) AS ACTION_CONTENT
+			FROM DEFECT_ACTION
+			WHERE NVL(USE_YN, 'Y') = 'Y'
+			GROUP BY DEFECT_LIST_ID
+		) DA
+		ON DL.DEFECT_LIST_ID = DA.DEFECT_LIST_ID
+
+		WHERE P.ORDER_ID = #{orderId}
+		AND NVL(DL.USE_YN, 'Y') = 'Y'
+
+		ORDER BY DL.DEFECT_DATE ASC, DL.DEFECT_LIST_ID ASC
+
+	</select>
+
+
+	<!-- LOT 기준 완제품 입출고 이력을 조회한다. -->
+	<select id="selectLotProductInoutHistoryList" parameterType="int"
+		resultMap="lotHistoryResultMap">
+
+		SELECT
+			PIO.INOUT_ID AS PRODUCT_INOUT_ID,
+			PIO.ORDER_ID,
+			WO.PRODUCT_LOT AS PRODUCT_INOUT_PRODUCT_LOT,
+			PIO.ITEM_ID,
+			IT.ITEM_CODE AS PRODUCT_INOUT_ITEM_CODE,
+			IT.ITEM_NAME AS PRODUCT_INOUT_ITEM_NAME,
+			CASE
+				WHEN IT.ITEM_TYPE = 'RM' THEN '원자재'
+				WHEN IT.ITEM_TYPE = 'SM' THEN '부자재'
+				WHEN IT.ITEM_TYPE = 'FG' THEN '완제품'
+				ELSE NVL(IT.ITEM_TYPE, '-')
+			END AS PRODUCT_INOUT_ITEM_TYPE,
+			IT.ITEM_UNIT AS PRODUCT_INOUT_ITEM_UNIT,
+			NVL(IT.SAFETY_STOCK, 0) AS PRODUCT_INOUT_SAFETY_STOCK,
+			PIO.INSP_ID,
+			INSP.DOC_NO AS PRODUCT_INOUT_INSP_DOC_NO,
+			NVL(PIO.DOC_NO, 'PIO-' || PIO.INOUT_ID) AS PRODUCT_INOUT_DOC_NO,
+			PIO.INOUT_TYPE AS PRODUCT_INOUT_TYPE,
+			CASE
+				WHEN PIO.INOUT_TYPE IN ('MI', 'PI', '입고') THEN '입고'
+				WHEN PIO.INOUT_TYPE IN ('MO', 'PO', '출고') THEN '출고'
+				ELSE NVL(PIO.INOUT_TYPE, '-')
+			END AS PRODUCT_INOUT_TYPE_NAME,
+			NVL(PIO.INOUT_QTY, 0) AS PRODUCT_INOUT_QTY,
+			TO_CHAR(PIO.INOUT_DATE, 'YYYY-MM-DD') AS PRODUCT_INOUT_DATE,
+			NVL(PIO.STATUS, '-') AS PRODUCT_INOUT_STATUS,
+			NVL(E.ENAME, '-') AS PRODUCT_INOUT_EMP_NAME,
+			PIO.REMARK AS PRODUCT_INOUT_REMARK,
+			CUS.CLIENT_CODE AS PRODUCT_INOUT_CLIENT_CODE,
+			CUS.CLIENT_NAME AS PRODUCT_INOUT_CLIENT_NAME,
+			CUS.CLIENT_TYPE AS PRODUCT_INOUT_CLIENT_TYPE,
+			CUS.BUSINESS_NO AS PIO_CLIENT_BIZ_NO,
+			CUS.CLIENT_ADRESS AS PRODUCT_INOUT_CLIENT_ADDRESS,
+			CUS.CLIENT_MAN AS PRODUCT_INOUT_CLIENT_MANAGER,
+			CUS.CLIENT_TEL AS PRODUCT_INOUT_CLIENT_TEL,
+			CUS.CLIENT_DEPT AS PRODUCT_INOUT_CLIENT_DEPT,
+			NVL(IV.INVENTORY_STOCK, 0) AS PRODUCT_INOUT_INVENTORY_STOCK,
+			NVL(IV.STOCK_LOCATION, '-') AS PRODUCT_INOUT_STOCK_LOCATION,
+			IV.INVENTORY_REMARK AS PRODUCT_INOUT_INVENTORY_REMARK,
+			NVL(PIS.PRODUCT_IN_QTY_TOTAL, 0) AS PRODUCT_INOUT_LOT_IN_QTY,
+			NVL(PIS.PRODUCT_OUT_QTY_TOTAL, 0) AS PRODUCT_INOUT_LOT_OUT_QTY,
+			NVL(PIS.PRODUCT_IN_QTY_TOTAL, 0) - NVL(PIS.PRODUCT_OUT_QTY_TOTAL, 0) AS PRODUCT_INOUT_LOT_REMAIN_QTY
+
+		FROM PRODUCT_INOUT PIO
+
+		JOIN WORK_ORDER WO
+		ON PIO.ORDER_ID = WO.ORDER_ID
+
+		JOIN ITEM IT
+		ON PIO.ITEM_ID = IT.ITEM_ID
+
+		LEFT JOIN CLIENT CUS
+		ON IT.CLIENT_ID = CUS.CLIENT_ID
+
+		LEFT JOIN INSPECTION INSP
+		ON PIO.INSP_ID = INSP.INSP_ID
+
+		LEFT JOIN EMP E
+		ON PIO.EMP_ID = E.EMP_ID
+
+		LEFT JOIN (
+			SELECT
+				ITEM_ID,
+				SUM(NVL(INVENTORY_STOCK, 0)) AS INVENTORY_STOCK,
+				MAX(STOCK_LOCATION) AS STOCK_LOCATION,
+				MAX(REMARK) AS INVENTORY_REMARK
+			FROM INVENTORY
+			GROUP BY ITEM_ID
+		) IV
+		ON PIO.ITEM_ID = IV.ITEM_ID
+
+		LEFT JOIN (
+			SELECT
+				ORDER_ID,
+				SUM(CASE WHEN INOUT_TYPE IN ('MI', 'PI', '입고') THEN NVL(INOUT_QTY, 0) ELSE 0 END) AS PRODUCT_IN_QTY_TOTAL,
+				SUM(CASE WHEN INOUT_TYPE IN ('MO', 'PO', '출고') THEN NVL(INOUT_QTY, 0) ELSE 0 END) AS PRODUCT_OUT_QTY_TOTAL
+			FROM PRODUCT_INOUT
+			WHERE NVL(USE_YN, 'Y') = 'Y'
+			GROUP BY ORDER_ID
+		) PIS
+		ON PIO.ORDER_ID = PIS.ORDER_ID
+
+		WHERE PIO.ORDER_ID = #{orderId}
+		AND NVL(PIO.USE_YN, 'Y') = 'Y'
+
+		ORDER BY PIO.INOUT_DATE ASC, PIO.INOUT_ID ASC
 
 	</select>
 

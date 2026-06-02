@@ -16,4 +16,5 @@ public class EquipmentMaintenanceDTO {
 	private int equip_main_time;
 	private String remark;	
 	private int history_id;
+	private String equip_name;
 }

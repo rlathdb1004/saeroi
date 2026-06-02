@@ -173,8 +173,6 @@
 
 						<th class="mobile_show">작업지시번호</th>
 
-						<th class="mobile_hidden">현재공정</th>
-
 						<th class="mobile_hidden">생산수량</th>
 
 						<th class="mobile_hidden">검사결과</th>
@@ -210,11 +208,6 @@
 							<td class="mobile_show"
 								title="${lot.workOrderDocNo}">
 								${lot.workOrderDocNo}
-							</td>
-
-							<td class="mobile_hidden"
-								title="${lot.currentProcess}">
-								${lot.currentProcess}
 							</td>
 
 							<td class="mobile_hidden">
@@ -284,7 +277,7 @@
 
 					<c:if test="${empty list}">
 						<tr>
-							<td colspan="9">
+							<td colspan="8">
 								조회된 LOT 이력이 없습니다.
 							</td>
 						</tr>

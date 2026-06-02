@@ -43,37 +43,52 @@ public class EquipmentStatusService {
 
 	public List<EquipmentMaintenanceDTO> maintenance_history(
 	        int equip_id, Date operation_date) {
-
 	    return dao.maintenance_history(equip_id, operation_date);
 	}
 	
 	public List<EquipmentTroubleDTO> trouble_history(
 	        int equip_id, Date operation_date) {
-
 	    return dao.trouble_history(equip_id, operation_date);
 	}
 	
 	public int maintenance_insert(EquipmentMaintenanceDTO dto) {
-		return dao.maintenance_insert(dto);	
-		
+		return dao.maintenance_insert(dto);			
 	}	
 
 	public int trouble_insert(EquipmentTroubleDTO dto) {
-		return dao.trouble_insert(dto);	
-		
+		return dao.trouble_insert(dto);			
+	}	
+	
+	public int maintenance_update(EquipmentMaintenanceDTO dto) {
+		return dao.maintenance_update(dto);			
 	}
-	
-	
 	
 	public int trouble_update(EquipmentTroubleDTO dto) {
-		return dao.truoble_update(dto);
-		
+		return dao.truoble_update(dto);		
+	}
+	
+	public EquipmentMaintenanceDTO maintenance_detail(int equip_main_id) {		
+		return dao.maintenance_detail(equip_main_id);
 	}
 
-	public EquipmentTroubleDTO equipment_trouble_detail(int trouble_id) {
-		
+	public EquipmentTroubleDTO equipment_trouble_detail(int trouble_id) {		
 		return dao.trouble_detail(trouble_id);
 	}
+
+	public int trouble_delete(List<Integer> ids) {
+		return dao.trouble_delete(ids);		
+	}
+
+	public int maintenance_delete(List<Integer> ids) {
+		return dao.maintenance_delete(ids);		
+	}
+
+	
+
+	
+
+	
+	
 
 	
 

@@ -331,9 +331,8 @@ launcher.addEventListener('pointerup', function (e) {
         container.classList.remove('active');
         launcher.style.display = 'flex'; // 창이 닫히면 아이콘 다시 표시
     });
-    let param = JSON.parse(sessionStorage.getItem('aiChatHistory')) || [];
+    let param = [];
 	
-//     document.addEventListener
 		
 		 async function message(){
 				let prompt = document.querySelector('#prompt');
