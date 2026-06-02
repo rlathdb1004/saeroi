@@ -47,6 +47,7 @@
 	background: #F8FCF9;
 }
 
+/* 상세 페이지로 이동하는 값 링크임 */
 .lot-link {
 	display: inline-block;
 	color: #0b7a5a;
@@ -243,12 +244,16 @@
 							value="${inspection.good_qty}" min="0" style="display: none;"
 							required></td>
 
+						<th>불량수량</th>
+						<td><span class="viewMode">${inspection.defect_qty}${inspection.item_unit}</span></td>
+					</tr>
+
+					<tr>
 						<th>비고</th>
-						<td><span class="viewMode">${inspection.remark}</span> <input
-							type="text" name="remark" class="detailInput editMode"
+						<td colspan="5"><span class="viewMode">${inspection.remark}</span>
+							<input type="text" name="remark" class="detailInput editMode"
 							value="${inspection.remark}" style="display: none;"></td>
 					</tr>
-					<tr>
 				</tbody>
 			</table>
 
@@ -279,11 +284,16 @@
 
 				<tr>
 					<th>LOT번호</th>
+					<%-- LOT번호 클릭 시 LOT 상세 페이지로 이동함 --%>
 					<td><c:choose>
-							<c:when test="${not empty inspection.product_lot}">
+							<c:when
+								test="${inspection.order_id > 0 and not empty inspection.product_lot}">
 								<a class="lot-link"
-									href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${inspection.product_lot}">
+									href="${pageContext.request.contextPath}/lot/lothistory/detail?orderId=${inspection.order_id}">
 									${inspection.product_lot} </a>
+							</c:when>
+							<c:when test="${not empty inspection.product_lot}">
+								${inspection.product_lot}
 							</c:when>
 							<c:otherwise>-</c:otherwise>
 						</c:choose></td>
@@ -292,7 +302,19 @@
 					<td>${inspection.prod_doc_no}</td>
 
 					<th>작업지시번호</th>
-					<td>${inspection.work_order_doc_no}</td>
+					<%-- 작업지시번호 클릭 시 작업지시 상세 페이지로 이동함 --%>
+					<td><c:choose>
+							<c:when
+								test="${inspection.order_id > 0 and not empty inspection.work_order_doc_no}">
+								<a class="lot-link"
+									href="${pageContext.request.contextPath}/production/workorder/detail?orderId=${inspection.order_id}">
+									${inspection.work_order_doc_no}</a>
+							</c:when>
+							<c:when test="${not empty inspection.work_order_doc_no}">
+								${inspection.work_order_doc_no}
+							</c:when>
+							<c:otherwise>-</c:otherwise>
+						</c:choose></td>
 				</tr>
 
 				<tr>
@@ -332,7 +354,7 @@
 		<div class="detail_card">
 			<div class="detail_card_title">불량 정보</div>
 
-			<table class="inspection_related_table">
+			<table class="detail_info_table">
 				<thead>
 					<tr>
 						<th>불량코드</th>
@@ -346,12 +368,25 @@
 
 				<tbody>
 					<c:forEach var="defect" items="${inspectionDefectList}">
-						<tr class="inspection_related_row"
-							onclick="location.href='${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${defect.defect_list_id}'">
-							<td>${defect.defect_code}</td>
+						<%-- 불량코드와 LOT번호를 각각 상세 페이지로 연결함 --%>
+						<tr>
+							<td><a class="lot-link"
+								href="${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${defect.defect_list_id}">
+									${defect.defect_code}</a></td>
 							<td>${defect.defect_date}</td>
 							<td class="coTextLeft">${defect.item_name}</td>
-							<td>${defect.product_lot}</td>
+							<td><c:choose>
+									<c:when
+										test="${defect.order_id > 0 and not empty defect.product_lot}">
+										<a class="lot-link"
+											href="${pageContext.request.contextPath}/lot/lothistory/detail?orderId=${defect.order_id}">
+											${defect.product_lot}</a>
+									</c:when>
+									<c:when test="${not empty defect.product_lot}">
+										${defect.product_lot}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose></td>
 							<td>${defect.defect_name}</td>
 							<td>${defect.ename}</td>
 						</tr>
@@ -369,7 +404,7 @@
 		<div class="detail_card">
 			<div class="detail_card_title">조치 및 처리내역</div>
 
-			<table class="inspection_related_table">
+			<table class="detail_info_table">
 				<thead>
 					<tr>
 						<th>불량명</th>
@@ -382,7 +417,7 @@
 
 				<tbody>
 					<c:forEach var="action" items="${inspectionActionList}">
-						<tr class="inspection_related_row"
+						<tr
 							onclick="location.href='${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${action.defect_list_id}'">
 							<td>${action.defect_name}</td>
 							<td>${action.action_date}</td>

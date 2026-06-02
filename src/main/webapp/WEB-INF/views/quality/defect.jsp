@@ -13,6 +13,19 @@
 	font-size: 13px;
 	font-weight: 600;
 }
+
+/* LOT 상세로 이동하는 목록 링크임 */
+.quality_detail_link {
+	color: #0b7a5a;
+	font-weight: 700;
+	text-decoration: none;
+	border-bottom: 1px dotted #0b7a5a;
+	white-space: nowrap;
+}
+
+.quality_detail_link:hover {
+	color: #075f46;
+}
 </style>
 
 <div class="coPageWrap">
@@ -154,7 +167,16 @@
 					<td class="mobile_hidden">${defect.defect_code}</td>
 					<td class="mobile_show">${defect.defect_date}</td>
 					<td class="coTextLeft mobile_show">${defect.item_name}</td>
-					<td class="mobile_hidden">${defect.product_lot}</td>
+					<%-- LOT번호 클릭 시 LOT 상세 페이지로 이동함 --%>
+					<td class="mobile_hidden"><c:choose>
+							<c:when test="${defect.order_id > 0 and not empty defect.product_lot}">
+									${defect.product_lot}
+							</c:when>
+							<c:when test="${not empty defect.product_lot}">
+								${defect.product_lot}
+							</c:when>
+							<c:otherwise>-</c:otherwise>
+						</c:choose></td>
 					<td class="mobile_show"><span class="coStatus coStatusStop">${defect.defect_name}</span>
 					</td>
 					<td class="mobile_hidden">${defect.ename}</td>
