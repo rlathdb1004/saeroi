@@ -5,8 +5,12 @@
 	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
 
 <c:set var="canManageQuality"
-	value="${sessionScope.loginUser.role eq 'ADMIN'
-		or sessionScope.loginUser.role eq 'MANAGER'}" />
+	value="${not empty sessionScope.loginUser
+		and (sessionScope.loginUser.role eq 'ADMIN'
+		or sessionScope.loginUser.role eq 'MANAGER'
+		or sessionScope.loginUser.role eq 'QC'
+		or (sessionScope.loginUser.role eq 'WORKER'
+			and sessionScope.loginUser.dept eq '품질관리'))}" />
 
 <style>
 .inspection_related_grid {

@@ -25,7 +25,11 @@ public class EquipmentStatusService {
 	    return dao.eqp_status_search(searchType, keyword);
 	}
 
-	public int insert(EquipmentStatusDTO dto) {
+	public int insert(EquipmentStatusDTO dto) {		
+		if (dto.getPlan_time_min() == null) dto.setPlan_time_min(0);
+	    if (dto.getRuntime_min() == null) dto.setRuntime_min(0);
+	    if (dto.getDowntime_min() == null) dto.setDowntime_min(0);
+	    
 		return dao.insert(dto);		
 	}
 	

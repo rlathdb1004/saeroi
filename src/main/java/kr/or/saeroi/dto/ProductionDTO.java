@@ -88,6 +88,11 @@ public class ProductionDTO {
 	// Y이면 생산계획일자가 지난 계획도 조회한다.
 	private String includePastPlan;
 
+	// 생산실적 등록 모달에서 소량 잔량 작업지시 포함 여부이다.
+	// 기본값은 N 또는 null이며, 이 경우 잔량 20EA 이상만 조회한다.
+	// Y이면 잔량 1EA 이상 작업지시도 조회한다.
+	private String includeSmallRemain;
+
 	// QR 스캔 진입 시 등록 모달 자동 오픈 여부이다.
 	private String openModal;
 
@@ -157,8 +162,12 @@ public class ProductionDTO {
 	// 불량 상세 테이블 기준 불량수량 집계값이다.
 	private Integer defectQty;
 
+	// 품질검사 상태이다.
+	// 검사 예정 / 검사 완료 등 화면 표시와 수량검증 분기에 사용한다.
+	private String inspectionStatus;
+
 	// 생산수량 = 양품수량 + 불량수량 + LOSS량 검증 결과이다.
-	// Y: 일치, N: 불일치
+	// Y: 일치, N: 불일치, 대기: 검사 전
 	private String qtyCheckYn;
 
 	// 생산수량 - (양품수량 + 불량수량 + LOSS량) 차이값이다.
@@ -215,6 +224,9 @@ public class ProductionDTO {
 
 	// emp 테이블의 직무명이다.
 	private String job;
+
+	// emp 테이블의 권한이다.
+	private String role;
 
 
 	// =========================================================

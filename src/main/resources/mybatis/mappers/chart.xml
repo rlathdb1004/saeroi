@@ -84,10 +84,9 @@
 		JOIN item it ON (pp.item_id
 		= it.item_id)
 		<where>
-		dl.use_yn = 'Y'
 			<if
 				test="searchItem != null and searchItem != '' and searchItem != 'all'">
-				AND it.item_name = #{searchItem}
+				it.item_name = #{searchItem}
 			</if>
 		</where>
 		GROUP BY pp.prod_plan_date,
@@ -125,10 +124,9 @@
 		JOIN item it ON
 		(pp.item_id = it.item_id)
 		<where>
-			 dl.use_yn = 'Y'
 			<if
 				test="searchItem != null and searchItem != '' and searchItem != 'all'">
-				AND it.item_name = #{searchItem}
+				it.item_name = #{searchItem}
 			</if>
 		</where>
 		GROUP BY pp.prod_plan_date,
@@ -265,8 +263,8 @@
 				defect_reason dr
 				WHERE TO_CHAR(dr.prod_plan_date, 'YYYY-MM') =
 				TO_CHAR(p.prod_plan_date, 'YYYY-MM')
-				AND dr.item_name = p.item_name 
-				) AS 불량사유상세
+				AND dr.item_name = p.item_name )
+				AS 불량사유상세
 				FROM plandata p
 				LEFT OUTER
 				JOIN workdata w ON
@@ -281,7 +279,7 @@
 			</otherwise>
 		</choose>
 	</select>
-	<!-- /////////////////////////////////////////////////////////////////////// -->
+
 	<select id="sleect_item" resultType="map">
 		select * from item
 	</select>
@@ -801,12 +799,12 @@
 		GROUP BY order_id
 		) ps ON ps.order_id = wo.order_id
 		WHERE
-		wo.order_date &lt; TRUNC(CURRENT_DATE) + 1
-		AND wo.product_lot IS NOT
-		NULL
-		AND NVL(ps.close_yn, 0) = 0
+		pp.due_date &lt; TRUNC(CURRENT_DATE)
 		AND NVL(ps.total_prod_qty, 0) &lt;
 		NVL(wo.order_qty, 0)
+		AND NVL(ps.close_yn, 0) = 0
+		AND wo.product_lot IS
+		NOT NULL
 		),
 		inspection_wait_lot AS (
 		SELECT
@@ -820,46 +818,47 @@
 		p.prod_id = i.prod_id
 		JOIN work_order wo ON wo.order_id
 		= p.order_id
-		WHERE NVL(i.use_yn, 'Y') = 'Y'
-		AND wo.product_lot IS NOT
-		NULL
-		AND (
-		NVL(i.insp_status, '-') IN ('대기', '검사 예정')
-		OR NVL(i.result,
-		'-') =
-		'대기'
-		OR NVL(p.inspection_status, '-') IN ('대기', '검사 예정')
-		)
-		),
-		finished_wait_lot AS (
-		SELECT
-		COUNT(DISTINCT wo.product_lot) AS
-		finished_wait_lot_count
-		FROM product_inout pi
-		JOIN work_order wo ON
-		wo.order_id = pi.order_id
-		JOIN inspection i ON i.insp_id = pi.insp_id
-		WHERE pi.inout_date &gt;= TRUNC(CURRENT_DATE)
-		AND pi.inout_date &lt;
-		TRUNC(CURRENT_DATE) + 1
-		AND NVL(pi.use_yn, 'Y') = 'Y'
-		AND pi.inout_type
-		= 'MI'
-		AND wo.product_lot IS NOT NULL
-		AND NVL(i.use_yn, 'Y') = 'Y'
+		WHERE i.insp_date &lt; TRUNC(CURRENT_DATE) + 1
 		AND
-		i.insp_status IN ('완료', '검사 완료')
-		AND i.result IN ('합격', '조건부합격')
-		AND NOT
-		EXISTS (
+		NVL(i.use_yn, 'Y') =
+		'Y'
+		AND i.insp_status = '대기'
+		),
+		finished_wait_lot AS
+		(
+		SELECT
+		COUNT(DISTINCT wo.product_lot) AS finished_wait_lot_count
+		FROM
+		product_inout pi
+		JOIN work_order wo ON wo.order_id = pi.order_id
+		WHERE
+		pi.inout_date &lt; TRUNC(CURRENT_DATE) + 1
+		AND NVL(pi.use_yn, 'Y') =
+		'Y'
+		AND pi.inout_type = 'MI'
+
+		AND EXISTS (
+		SELECT 1
+		FROM production p
+		JOIN
+		inspection i ON i.prod_id =
+		p.prod_id
+		WHERE p.order_id = wo.order_id
+		AND
+		NVL(i.use_yn, 'Y') = 'Y'
+		AND i.insp_status = '완료'
+		)
+
+		AND NOT EXISTS (
 		SELECT 1
 		FROM product_inout po
 		WHERE po.order_id =
 		pi.order_id
-		AND NVL(po.use_yn, 'Y') = 'Y'
+		AND
+		NVL(po.use_yn, 'Y') = 'Y'
 		AND po.inout_type IN ('MO',
-		'OUT', 'SO',
-		'출고', '출하')
+		'OUT', 'SO', '출고',
+		'출하')
 		)
 		)
 		SELECT
@@ -876,1245 +875,869 @@
 	</select>
 
 	<!-- 대시보드 현장 이슈 현황 조회 -->
-	<select id="select_dashboard_issue_status" resultType="map">
-		SELECT
-		defect_issue_count + trouble_issue_count + delay_issue_count AS
-		ISSUECOUNT,
+<select id="select_dashboard_issue_status" resultType="map">
+	SELECT
+		defect_issue_count + trouble_issue_count + delay_issue_count AS ISSUECOUNT,
 
 		CASE
-		WHEN defect_issue_count = 1 THEN 'Y'
-		ELSE 'N'
-		END AS
-		DEFECTISSUEYN,
+			WHEN defect_issue_count = 1 THEN 'Y'
+			ELSE 'N'
+		END AS DEFECTISSUEYN,
 		defect_rate AS DEFECTRATE,
-		1.5 AS
-		DEFECTSTANDARDRATE,
-		NVL(defect_issue_time, TO_CHAR(CURRENT_DATE,
-		'HH24:MI')) AS
-		DEFECTISSUETIME,
+		1.5 AS DEFECTSTANDARDRATE,
+		NVL(defect_issue_time, TO_CHAR(CURRENT_DATE, 'HH24:MI')) AS DEFECTISSUETIME,
 
 		CASE
-		WHEN trouble_issue_count = 1 THEN 'Y'
-		ELSE 'N'
-		END
-		AS TROUBLEISSUEYN,
+			WHEN trouble_issue_count = 1 THEN 'Y'
+			ELSE 'N'
+		END AS TROUBLEISSUEYN,
 		trouble_count AS TROUBLECOUNT,
-		NVL(trouble_issue_time, TO_CHAR(CURRENT_DATE, 'HH24:MI')) AS
-		TROUBLEISSUETIME,
-		NVL(trouble_message, '미조치 설비 고장 없음') AS
-		TROUBLEMESSAGE,
+		NVL(trouble_issue_time, TO_CHAR(CURRENT_DATE, 'HH24:MI')) AS TROUBLEISSUETIME,
+		NVL(trouble_message, '미조치 설비 고장 없음') AS TROUBLEMESSAGE,
 
 		CASE
-		WHEN delay_issue_count = 1 THEN 'Y'
-		ELSE 'N'
-		END AS
-		DELAYISSUEYN,
+			WHEN delay_issue_count = 1 THEN 'Y'
+			ELSE 'N'
+		END AS DELAYISSUEYN,
 		delay_order_count AS DELAYORDERCOUNT,
-		NVL(delay_issue_time, TO_CHAR(CURRENT_DATE, 'MM/DD')) AS
-		DELAYISSUETIME
+		NVL(delay_issue_time, TO_CHAR(CURRENT_DATE, 'MM/DD')) AS DELAYISSUETIME
+	FROM (
+		SELECT
+			defect_rate,
+			defect_issue_time,
+			trouble_count,
+			trouble_issue_time,
+			trouble_message,
+			delay_order_count,
+			delay_issue_time,
+
+			CASE
+				WHEN defect_rate &gt; 1.5 THEN 1
+				ELSE 0
+			END AS defect_issue_count,
+
+			CASE
+				WHEN trouble_count &gt; 0 THEN 1
+				ELSE 0
+			END AS trouble_issue_count,
+
+			CASE
+				WHEN delay_order_count &gt; 0 THEN 1
+				ELSE 0
+			END AS delay_issue_count
 		FROM (
-		SELECT
-		defect_rate,
-		defect_issue_time,
-		trouble_count,
-		trouble_issue_time,
-		trouble_message,
-		delay_order_count,
-		delay_issue_time,
+			SELECT
+				CASE
+					WHEN today_prod_qty = 0 THEN 0
+					ELSE ROUND(today_defect_qty / today_prod_qty * 100, 1)
+				END AS defect_rate,
+				defect_issue_time,
+				trouble_count,
+				trouble_issue_time,
+				trouble_message,
+				delay_order_count,
+				delay_issue_time
+			FROM (
+				SELECT
+					NVL((
+						SELECT SUM(NVL(prod_qty, 0))
+						FROM production
+						WHERE prod_date &gt;= TRUNC(CURRENT_DATE)
+						AND prod_date &lt; TRUNC(CURRENT_DATE) + 1
+					), 0) AS today_prod_qty,
 
-		CASE
-		WHEN defect_rate &gt; 1.5 THEN 1
-		ELSE 0
-		END AS
-		defect_issue_count,
+					NVL((
+						SELECT SUM(NVL(dl.defect_qty, 0))
+						FROM defect_list dl
+						JOIN inspection i ON i.insp_id = dl.insp_id
+						JOIN production p ON p.prod_id = i.prod_id
+						WHERE p.prod_date &gt;= TRUNC(CURRENT_DATE)
+						AND p.prod_date &lt; TRUNC(CURRENT_DATE) + 1
+						AND NVL(dl.use_yn, 'Y') = 'Y'
+						AND NVL(i.use_yn, 'Y') = 'Y'
+					), 0) AS today_defect_qty,
 
-		CASE
-		WHEN trouble_count &gt; 0 THEN 1
-		ELSE 0
-		END AS
-		trouble_issue_count,
+					(
+						SELECT TO_CHAR(MAX(dl.defect_date), 'HH24:MI')
+						FROM defect_list dl
+						JOIN inspection i ON i.insp_id = dl.insp_id
+						JOIN production p ON p.prod_id = i.prod_id
+						WHERE p.prod_date &gt;= TRUNC(CURRENT_DATE)
+						AND p.prod_date &lt; TRUNC(CURRENT_DATE) + 1
+						AND NVL(dl.use_yn, 'Y') = 'Y'
+						AND NVL(i.use_yn, 'Y') = 'Y'
+					) AS defect_issue_time,
 
-		CASE
-		WHEN delay_order_count &gt; 0 THEN 1
-		ELSE 0
-		END
-		AS delay_issue_count
-		FROM (
-		SELECT
-		CASE
-		WHEN today_prod_qty = 0 THEN 0
-		ELSE ROUND(today_defect_qty / today_prod_qty * 100, 1)
-		END AS
-		defect_rate,
-		defect_issue_time,
-		trouble_count,
-		trouble_issue_time,
-		trouble_message,
-		delay_order_count,
-		delay_issue_time
-		FROM (
-		SELECT
-		NVL((
-		SELECT SUM(NVL(prod_qty, 0))
-		FROM production
-		WHERE prod_date &gt;=
-		TRUNC(CURRENT_DATE)
-		AND prod_date &lt; TRUNC(CURRENT_DATE) + 1
-		), 0) AS
-		today_prod_qty,
+					NVL((
+						SELECT COUNT(*)
+						FROM equipment_trouble et
+						WHERE et.resolve_date IS NULL
+						AND et.trouble_date IS NOT NULL
+						AND et.trouble_content IS NOT NULL
+					), 0) AS trouble_count,
 
-		NVL((
-		SELECT SUM(NVL(dl.defect_qty, 0))
-		FROM defect_list
-		dl
-		JOIN inspection i ON i.insp_id = dl.insp_id
-		JOIN production p ON
-		p.prod_id = i.prod_id
-		WHERE p.prod_date &gt;= TRUNC(CURRENT_DATE)
-		AND
-		p.prod_date &lt; TRUNC(CURRENT_DATE) + 1
-		AND NVL(dl.use_yn, 'Y') = 'Y'
-		AND NVL(i.use_yn, 'Y') = 'Y'
-		), 0) AS today_defect_qty,
+					(
+						SELECT TO_CHAR(MAX(et.trouble_date), 'HH24:MI')
+						FROM equipment_trouble et
+						WHERE et.resolve_date IS NULL
+						AND et.trouble_date IS NOT NULL
+						AND et.trouble_content IS NOT NULL
+					) AS trouble_issue_time,
 
-		(
-		SELECT
-		TO_CHAR(MAX(dl.defect_date), 'HH24:MI')
-		FROM defect_list dl
-		JOIN
-		inspection i ON i.insp_id = dl.insp_id
-		JOIN production p ON p.prod_id =
-		i.prod_id
-		WHERE p.prod_date &gt;= TRUNC(CURRENT_DATE)
-		AND p.prod_date
-		&lt; TRUNC(CURRENT_DATE) + 1
-		AND NVL(dl.use_yn, 'Y') = 'Y'
-		AND
-		NVL(i.use_yn, 'Y') = 'Y'
-		) AS defect_issue_time,
+					(
+						SELECT MAX(e.equip_name || ' ' || et.trouble_content)
+						KEEP (DENSE_RANK LAST ORDER BY et.trouble_date)
+						FROM equipment_trouble et
+						JOIN equipment e ON e.equip_id = et.equip_id
+						WHERE et.resolve_date IS NULL
+						AND et.trouble_date IS NOT NULL
+						AND et.trouble_content IS NOT NULL
+					) AS trouble_message,
 
-		NVL((
-		SELECT COUNT(*)
-		FROM equipment_trouble et
-		WHERE et.resolve_date IS NULL
-		AND
-		et.trouble_date IS NOT NULL
-		AND et.trouble_content IS NOT NULL
-		), 0) AS
-		trouble_count,
+					NVL((
+						SELECT COUNT(DISTINCT wo.order_id)
+						FROM work_order wo
+						JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+						LEFT JOIN (
+							SELECT
+								order_id,
+								SUM(NVL(prod_qty, 0)) AS total_prod_qty,
+								MAX(
+									CASE
+										WHEN prod_status IN ('완료', '취소') THEN 1
+										ELSE 0
+									END
+								) AS close_yn
+							FROM production
+							GROUP BY order_id
+						) ps ON ps.order_id = wo.order_id
+						WHERE pp.due_date &lt; TRUNC(CURRENT_DATE)
+						AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
+						AND NVL(ps.close_yn, 0) = 0
+						AND wo.product_lot IS NOT NULL
+					), 0) AS delay_order_count,
 
-		(
-		SELECT TO_CHAR(MAX(et.trouble_date), 'HH24:MI')
-		FROM
-		equipment_trouble et
-		WHERE et.resolve_date IS NULL
-		AND et.trouble_date
-		IS NOT NULL
-		AND et.trouble_content IS NOT NULL
-		) AS trouble_issue_time,
-
-		(
-		SELECT MAX(e.equip_name || ' ' || et.trouble_content)
-		KEEP (DENSE_RANK
-		LAST ORDER BY et.trouble_date)
-		FROM equipment_trouble et
-		JOIN equipment
-		e ON e.equip_id = et.equip_id
-		WHERE et.resolve_date IS NULL
-		AND
-		et.trouble_date IS NOT NULL
-		AND et.trouble_content IS NOT NULL
-		) AS
-		trouble_message,
-
-		NVL((
-		SELECT COUNT(DISTINCT wo.order_id)
-		FROM work_order
-		wo
-		JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
-		LEFT
-		JOIN (
-		SELECT
-		order_id,
-		SUM(NVL(prod_qty, 0)) AS total_prod_qty,
-		MAX(
-		CASE
-		WHEN prod_status IN ('완료', '취소') THEN 1
-		ELSE 0
-		END
-		) AS close_yn
-		FROM
-		production
-		GROUP BY order_id
-		) ps ON ps.order_id = wo.order_id
-		WHERE
-		pp.due_date &lt; TRUNC(CURRENT_DATE)
-		AND NVL(ps.total_prod_qty, 0) &lt;
-		NVL(wo.order_qty, 0)
-		AND NVL(ps.close_yn, 0) = 0
-		AND wo.product_lot IS
-		NOT NULL
-		), 0) AS delay_order_count,
-
-		(
-		SELECT TO_CHAR(MAX(pp.due_date),
-		'MM/DD')
-		FROM work_order wo
-		JOIN production_plan pp ON pp.prod_plan_id =
-		wo.prod_plan_id
-		LEFT JOIN (
-		SELECT
-		order_id,
-		SUM(NVL(prod_qty, 0)) AS
-		total_prod_qty,
-		MAX(
-		CASE
-		WHEN prod_status IN ('완료', '취소') THEN 1
-		ELSE 0
-		END
-		) AS close_yn
-		FROM production
-		GROUP BY order_id
-		) ps ON ps.order_id =
-		wo.order_id
-		WHERE pp.due_date &lt; TRUNC(CURRENT_DATE)
-		AND
-		NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
-		AND
-		NVL(ps.close_yn, 0) = 0
-		AND wo.product_lot IS NOT NULL
-		) AS
-		delay_issue_time
-		FROM dual
+					(
+						SELECT TO_CHAR(MAX(pp.due_date), 'MM/DD')
+						FROM work_order wo
+						JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+						LEFT JOIN (
+							SELECT
+								order_id,
+								SUM(NVL(prod_qty, 0)) AS total_prod_qty,
+								MAX(
+									CASE
+										WHEN prod_status IN ('완료', '취소') THEN 1
+										ELSE 0
+									END
+								) AS close_yn
+							FROM production
+							GROUP BY order_id
+						) ps ON ps.order_id = wo.order_id
+						WHERE pp.due_date &lt; TRUNC(CURRENT_DATE)
+						AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
+						AND NVL(ps.close_yn, 0) = 0
+						AND wo.product_lot IS NOT NULL
+					) AS delay_issue_time
+				FROM dual
+			)
 		)
-		)
-		)
-	</select>
+	)
+</select>
 
 	<!-- 대시보드 KPI 핵심 6대 지표 조회 -->
 	<select id="select_dashboard_kpi_summary" resultType="map">
 		WITH
 		curr_plan AS (
-		SELECT NVL(SUM(NVL(prod_plan_qty, 0)), 0) AS qty
-		FROM
-		production_plan
-		WHERE prod_plan_date &gt;= TRUNC(CURRENT_DATE)
-		AND
-		prod_plan_date &lt; TRUNC(CURRENT_DATE) + 1
+			SELECT NVL(SUM(NVL(prod_plan_qty, 0)), 0) AS qty
+			FROM production_plan
+			WHERE prod_plan_date &gt;= TRUNC(CURRENT_DATE)
+			AND prod_plan_date &lt; TRUNC(CURRENT_DATE) + 1
 		),
 		prev_plan AS (
-		SELECT
-		NVL(SUM(NVL(prod_plan_qty, 0)), 0) AS qty
-		FROM production_plan
-		WHERE
-		prod_plan_date &gt;= TRUNC(CURRENT_DATE) - 1
-		AND prod_plan_date &lt;
-		TRUNC(CURRENT_DATE)
+			SELECT NVL(SUM(NVL(prod_plan_qty, 0)), 0) AS qty
+			FROM production_plan
+			WHERE prod_plan_date &gt;= TRUNC(CURRENT_DATE) - 1
+			AND prod_plan_date &lt; TRUNC(CURRENT_DATE)
 		),
 		curr_prod AS (
-		SELECT NVL(SUM(NVL(prod_qty, 0)),
-		0) AS qty
-		FROM production
-		WHERE prod_date &gt;= TRUNC(CURRENT_DATE)
-		AND
-		prod_date &lt; TRUNC(CURRENT_DATE) + 1
+			SELECT NVL(SUM(NVL(order_qty, 0)), 0) AS qty
+			FROM work_order
+			WHERE order_date &gt;= TRUNC(CURRENT_DATE)
+			AND order_date &lt; TRUNC(CURRENT_DATE) + 1
+			AND product_lot IS NOT NULL
 		),
 		prev_prod AS (
-		SELECT
-		NVL(SUM(NVL(prod_qty, 0)), 0) AS qty
-		FROM production
-		WHERE prod_date
-		&gt;= TRUNC(CURRENT_DATE) - 1
-		AND prod_date &lt; TRUNC(CURRENT_DATE)
+			SELECT NVL(SUM(NVL(order_qty, 0)), 0) AS qty
+			FROM work_order
+			WHERE order_date &gt;= TRUNC(CURRENT_DATE) - 1
+			AND order_date &lt; TRUNC(CURRENT_DATE)
+			AND product_lot IS NOT NULL
 		),
-		curr_defect AS (
-		SELECT NVL(SUM(NVL(dl.defect_qty, 0)), 0) AS qty
-		FROM
-		inspection i
-		JOIN defect_list dl ON dl.insp_id = i.insp_id
-		WHERE
-		i.insp_date &gt;= TRUNC(CURRENT_DATE)
-		AND i.insp_date &lt;
-		TRUNC(CURRENT_DATE) + 1
-		AND NVL(i.use_yn, 'Y') = 'Y'
-		AND NVL(dl.use_yn,
-		'Y') = 'Y'
+				curr_defect AS (
+			SELECT NVL(SUM(NVL(dl.defect_qty, 0)), 0) AS qty
+			FROM inspection i
+			JOIN defect_list dl ON dl.insp_id = i.insp_id
+			WHERE i.insp_date &gt;= TRUNC(CURRENT_DATE)
+			AND i.insp_date &lt; TRUNC(CURRENT_DATE) + 1
+			AND NVL(i.use_yn, 'Y') = 'Y'
+			AND NVL(dl.use_yn, 'Y') = 'Y'
 		),
 		prev_defect AS (
-		SELECT NVL(SUM(NVL(dl.defect_qty, 0)), 0)
-		AS qty
-		FROM inspection i
-		JOIN defect_list dl ON dl.insp_id = i.insp_id
-		WHERE i.insp_date &gt;= TRUNC(CURRENT_DATE) - 1
-		AND i.insp_date &lt;
-		TRUNC(CURRENT_DATE)
-		AND NVL(i.use_yn, 'Y') = 'Y'
-		AND NVL(dl.use_yn, 'Y')
-		= 'Y'
+			SELECT NVL(SUM(NVL(dl.defect_qty, 0)), 0) AS qty
+			FROM inspection i
+			JOIN defect_list dl ON dl.insp_id = i.insp_id
+			WHERE i.insp_date &gt;= TRUNC(CURRENT_DATE) - 1
+			AND i.insp_date &lt; TRUNC(CURRENT_DATE)
+			AND NVL(i.use_yn, 'Y') = 'Y'
+			AND NVL(dl.use_yn, 'Y') = 'Y'
 		),
 		curr_insp AS (
-		SELECT NVL(SUM(NVL(inspection_qty, 0)), 0) AS qty
-		FROM inspection
-		WHERE insp_date &gt;= TRUNC(CURRENT_DATE)
-		AND insp_date
-		&lt; TRUNC(CURRENT_DATE) + 1
-		AND NVL(use_yn, 'Y') = 'Y'
+			SELECT NVL(SUM(NVL(inspection_qty, 0)), 0) AS qty
+			FROM inspection
+			WHERE insp_date &gt;= TRUNC(CURRENT_DATE)
+			AND insp_date &lt; TRUNC(CURRENT_DATE) + 1
+			AND NVL(use_yn, 'Y') = 'Y'
 		),
 		prev_insp AS (
-		SELECT NVL(SUM(NVL(inspection_qty, 0)), 0) AS qty
-		FROM inspection
-		WHERE
-		insp_date &gt;= TRUNC(CURRENT_DATE) - 1
-		AND insp_date &lt;
-		TRUNC(CURRENT_DATE)
-		AND NVL(use_yn, 'Y') = 'Y'
+			SELECT NVL(SUM(NVL(inspection_qty, 0)), 0) AS qty
+			FROM inspection
+			WHERE insp_date &gt;= TRUNC(CURRENT_DATE) - 1
+			AND insp_date &lt; TRUNC(CURRENT_DATE)
+			AND NVL(use_yn, 'Y') = 'Y'
 		),
 		curr_cost AS (
-		SELECT
-		NVL(ROUND(AVG(NVL(unit_cost, 0)), 0), 0) AS cost
-		FROM actual_cost_daily
-		WHERE cost_date &gt;= TRUNC(CURRENT_DATE)
-		AND cost_date &lt;
-		TRUNC(CURRENT_DATE) + 1
+			SELECT NVL(ROUND(AVG(NVL(unit_cost, 0)), 0), 0) AS cost
+			FROM actual_cost_daily
+			WHERE cost_date &gt;= TRUNC(CURRENT_DATE)
+			AND cost_date &lt; TRUNC(CURRENT_DATE) + 1
 		),
 		prev_cost AS (
-		SELECT
-		NVL(ROUND(AVG(NVL(unit_cost, 0)), 0), 0) AS cost
-		FROM actual_cost_daily
-		WHERE cost_date &gt;= TRUNC(CURRENT_DATE) - 1
-		AND cost_date &lt;
-		TRUNC(CURRENT_DATE)
+			SELECT NVL(ROUND(AVG(NVL(unit_cost, 0)), 0), 0) AS cost
+			FROM actual_cost_daily
+			WHERE cost_date &gt;= TRUNC(CURRENT_DATE) - 1
+			AND cost_date &lt; TRUNC(CURRENT_DATE)
 		),
 		target_cost AS (
-		SELECT
-		NVL(ROUND(AVG(NVL(unit_cost, 0)), 0), 0) AS cost
-		FROM standard_cost
-		WHERE NVL(use_yn, 'Y') = 'Y'
+			SELECT NVL(ROUND(AVG(NVL(unit_cost, 0)), 0), 0) AS cost
+			FROM standard_cost
+			WHERE NVL(use_yn, 'Y') = 'Y'
 		),
 		curr_oee AS (
-		SELECT
-		NVL(SUM(NVL(runtime_min, 0)), 0) AS runtime_min,
-		NVL(SUM(NVL(plan_time_min, 0)), 0) AS plan_time_min
-		FROM
-		equipment_history
-		WHERE operation_date &gt;= TRUNC(CURRENT_DATE)
-		AND
-		operation_date &lt; TRUNC(CURRENT_DATE) + 1
+			SELECT
+				NVL(SUM(NVL(runtime_min, 0)), 0) AS runtime_min,
+				NVL(SUM(NVL(plan_time_min, 0)), 0) AS plan_time_min
+			FROM equipment_history
+			WHERE operation_date &gt;= TRUNC(CURRENT_DATE)
+			AND operation_date &lt; TRUNC(CURRENT_DATE) + 1
 		),
 		prev_oee AS (
-		SELECT
-		NVL(SUM(NVL(runtime_min, 0)), 0) AS runtime_min,
-		NVL(SUM(NVL(plan_time_min, 0)), 0) AS plan_time_min
-		FROM
-		equipment_history
-		WHERE operation_date &gt;= TRUNC(CURRENT_DATE) - 1
-		AND operation_date &lt; TRUNC(CURRENT_DATE)
+			SELECT
+				NVL(SUM(NVL(runtime_min, 0)), 0) AS runtime_min,
+				NVL(SUM(NVL(plan_time_min, 0)), 0) AS plan_time_min
+			FROM equipment_history
+			WHERE operation_date &gt;= TRUNC(CURRENT_DATE) - 1
+			AND operation_date &lt; TRUNC(CURRENT_DATE)
 		),
 		prod_sum AS (
-		SELECT
-		order_id,
-		SUM(NVL(prod_qty, 0)) AS total_prod_qty,
-		MAX(
-		CASE
-		WHEN
-		prod_status IN ('완료', '취소') THEN 1
-		ELSE 0
-		END
-		) AS close_yn
-		FROM
-		production
-		GROUP BY order_id
+			SELECT
+				order_id,
+				SUM(NVL(prod_qty, 0)) AS total_prod_qty,
+				MAX(
+					CASE
+						WHEN prod_status IN ('완료', '취소') THEN 1
+						ELSE 0
+					END
+				) AS close_yn
+			FROM production
+			GROUP BY order_id
 		),
 		curr_delay AS (
-		SELECT
-		COUNT(DISTINCT
-		wo.order_id) AS cnt,
-		NVL(SUM(GREATEST(NVL(wo.order_qty, 0) -
-		NVL(ps.total_prod_qty, 0), 0)), 0) AS qty
-		FROM work_order wo
-		JOIN
-		production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
-		LEFT JOIN
-		prod_sum ps ON ps.order_id = wo.order_id
-		WHERE pp.due_date &lt;
-		TRUNC(CURRENT_DATE)
-		AND NVL(ps.total_prod_qty, 0) &lt;
-		NVL(wo.order_qty, 0)
-		AND NVL(ps.close_yn, 0) = 0
-		AND wo.product_lot IS
-		NOT NULL
+			SELECT
+				COUNT(DISTINCT wo.order_id) AS cnt,
+				NVL(SUM(GREATEST(NVL(wo.order_qty, 0) - NVL(ps.total_prod_qty, 0), 0)), 0) AS qty
+			FROM work_order wo
+			JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+			LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
+			WHERE pp.due_date &lt; TRUNC(CURRENT_DATE)
+			AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
+			AND NVL(ps.close_yn, 0) = 0
+			AND wo.product_lot IS NOT NULL
 		),
 		prev_delay AS (
-		SELECT
-		COUNT(DISTINCT wo.order_id) AS cnt
-		FROM
-		work_order wo
-		JOIN production_plan pp ON pp.prod_plan_id =
-		wo.prod_plan_id
-		LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
-		WHERE pp.due_date &lt; TRUNC(CURRENT_DATE) - 1
-		AND
-		NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
-		AND
-		NVL(ps.close_yn, 0) = 0
-		AND wo.product_lot IS NOT NULL
+			SELECT
+				COUNT(DISTINCT wo.order_id) AS cnt
+			FROM work_order wo
+			JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+			LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
+			WHERE pp.due_date &lt; TRUNC(CURRENT_DATE) - 1
+			AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
+			AND NVL(ps.close_yn, 0) = 0
+			AND wo.product_lot IS NOT NULL
 		),
 		rate_data AS (
-		SELECT
-		cp.qty AS curr_plan_qty,
-		pp.qty AS prev_plan_qty,
-		cr.qty AS
-		curr_prod_qty,
-		pr.qty AS prev_prod_qty,
-		cd.qty AS curr_defect_qty,
-		pd.qty AS prev_defect_qty,
-		ci.qty AS curr_insp_qty,
-		pi.qty AS
-		prev_insp_qty,
-		cc.cost AS curr_cost,
-		pc.cost AS prev_cost,
-		tc.cost AS
-		target_cost,
-		co.runtime_min AS curr_runtime_min,
-		co.plan_time_min AS
-		curr_plan_time_min,
-		po.runtime_min AS prev_runtime_min,
-		po.plan_time_min AS prev_plan_time_min,
-		cdy.cnt AS curr_delay_count,
-		cdy.qty AS curr_delay_qty,
-		pdy.cnt AS prev_delay_count,
+			SELECT
+				cp.qty AS curr_plan_qty,
+				pp.qty AS prev_plan_qty,
+				cr.qty AS curr_work_qty,
+				pr.qty AS prev_work_qty,
+				GREATEST(cr.qty - cd.qty, 0) AS curr_prod_qty,
+				GREATEST(pr.qty - pd.qty, 0) AS prev_prod_qty,
+				cd.qty AS curr_defect_qty,
+				pd.qty AS prev_defect_qty,
+				ci.qty AS curr_insp_qty,
+				cc.cost AS curr_cost,
+				pc.cost AS prev_cost,
+				tc.cost AS target_cost,
+				co.runtime_min AS curr_runtime_min,
+				co.plan_time_min AS curr_plan_time_min,
+				po.runtime_min AS prev_runtime_min,
+				po.plan_time_min AS prev_plan_time_min,
+				cdy.cnt AS curr_delay_count,
+				cdy.qty AS curr_delay_qty,
+				pdy.cnt AS prev_delay_count,
 
-		CASE
-		WHEN cp.qty
-		= 0 THEN 0
-		ELSE ROUND(cr.qty / cp.qty * 100, 1)
-		END AS
-		curr_achievement_rate,
+				CASE
+					WHEN cp.qty = 0 THEN 0
+					ELSE ROUND(GREATEST(cr.qty - cd.qty, 0) / cp.qty * 100, 1)
+				END AS curr_achievement_rate,
 
-		CASE
-		WHEN pp.qty = 0 THEN 0
-		ELSE ROUND(pr.qty /
-		pp.qty * 100, 1)
-		END AS prev_achievement_rate,
+				CASE
+					WHEN pp.qty = 0 THEN 0
+					ELSE ROUND(GREATEST(pr.qty - pd.qty, 0) / pp.qty * 100, 1)
+				END AS prev_achievement_rate,
 
-		CASE
-		WHEN ci.qty = 0 THEN
-		0
-		ELSE ROUND(cd.qty / ci.qty * 100, 1)
-		END AS curr_defect_rate,
+				CASE
+					WHEN cr.qty = 0 THEN 0
+					ELSE ROUND(cd.qty / cr.qty * 100, 1)
+				END AS curr_defect_rate,
 
-		CASE
-		WHEN
-		pi.qty = 0 THEN 0
-		ELSE ROUND(pd.qty / pi.qty * 100, 1)
-		END AS
-		prev_defect_rate,
+				CASE
+					WHEN pr.qty = 0 THEN 0
+					ELSE ROUND(pd.qty / pr.qty * 100, 1)
+				END AS prev_defect_rate,
 
-		CASE
-		WHEN co.plan_time_min = 0 THEN 0
-		ELSE
-		ROUND(co.runtime_min / co.plan_time_min * 100, 1)
-		END AS curr_oee_rate,
+				CASE
+					WHEN co.plan_time_min = 0 THEN 0
+					ELSE ROUND(co.runtime_min / co.plan_time_min * 100, 1)
+				END AS curr_oee_rate,
 
-		CASE
-		WHEN po.plan_time_min = 0 THEN 0
-		ELSE ROUND(po.runtime_min /
-		po.plan_time_min * 100, 1)
-		END AS prev_oee_rate
-		FROM curr_plan cp
-		CROSS
-		JOIN prev_plan pp
-		CROSS JOIN curr_prod cr
-		CROSS JOIN prev_prod pr
-		CROSS
-		JOIN curr_defect cd
-		CROSS JOIN prev_defect pd
-		CROSS JOIN curr_insp ci
-		CROSS JOIN prev_insp pi
-		CROSS JOIN curr_cost cc
-		CROSS JOIN prev_cost pc
-		CROSS JOIN target_cost tc
-		CROSS JOIN curr_oee co
-		CROSS JOIN prev_oee po
-		CROSS JOIN curr_delay cdy
-		CROSS JOIN prev_delay pdy
+				CASE
+					WHEN po.plan_time_min = 0 THEN 0
+					ELSE ROUND(po.runtime_min / po.plan_time_min * 100, 1)
+				END AS prev_oee_rate
+			FROM curr_plan cp
+			CROSS JOIN prev_plan pp
+			CROSS JOIN curr_prod cr
+			CROSS JOIN prev_prod pr
+			CROSS JOIN curr_defect cd
+			CROSS JOIN prev_defect pd
+			CROSS JOIN curr_insp ci
+			CROSS JOIN curr_cost cc
+			CROSS JOIN prev_cost pc
+			CROSS JOIN target_cost tc
+			CROSS JOIN curr_oee co
+			CROSS JOIN prev_oee po
+			CROSS JOIN curr_delay cdy
+			CROSS JOIN prev_delay pdy
 		)
-		SELECT
-		curr_plan_qty AS PRODTARGETQTY,
-		prev_plan_qty AS PREVPRODTARGETQTY,
-		curr_prod_qty AS PRODACTUALQTY,
-		curr_achievement_rate AS
-		ACHIEVEMENTRATE,
-		prev_achievement_rate AS PREVACHIEVEMENTRATE,
-		ROUND(curr_achievement_rate - prev_achievement_rate, 1) AS
-		ACHIEVEMENTCOMPAREPOINT,
+				SELECT
+			curr_plan_qty AS PRODTARGETQTY,
+			prev_plan_qty AS PREVPRODTARGETQTY,
+			curr_prod_qty AS PRODACTUALQTY,
+			curr_achievement_rate AS ACHIEVEMENTRATE,
+			prev_achievement_rate AS PREVACHIEVEMENTRATE,
+			ROUND(curr_achievement_rate - prev_achievement_rate, 1) AS ACHIEVEMENTCOMPAREPOINT,
 
-		curr_prod_qty AS TODAYPRODQTY,
-		prev_prod_qty AS
-		PREVPRODQTY,
-		curr_prod_qty - prev_prod_qty AS TODAYPRODCOMPAREQTY,
+			curr_prod_qty AS TODAYPRODQTY,
+			prev_prod_qty AS PREVPRODQTY,
+			curr_work_qty AS TODAYWORKQTY,
+			prev_work_qty AS PREVWORKQTY,
+			curr_prod_qty - prev_prod_qty AS TODAYPRODCOMPAREQTY,
 
-		curr_defect_rate AS DEFECTRATE,
-		prev_defect_rate AS PREVDEFECTRATE,
-		curr_defect_qty AS DEFECTQTY,
-		curr_insp_qty AS INSPECTIONQTY,
-		prev_insp_qty AS PREVINSPECTIONQTY,
-		ROUND(curr_defect_rate -
-		prev_defect_rate, 1) AS DEFECTCOMPAREPOINT,
+			curr_defect_rate AS DEFECTRATE,
+			prev_defect_rate AS PREVDEFECTRATE,
+			curr_defect_qty AS DEFECTQTY,
+			curr_insp_qty AS INSPECTIONQTY,
+			ROUND(curr_defect_rate - prev_defect_rate, 1) AS DEFECTCOMPAREPOINT,
 
-		curr_cost AS COSTACTUAL,
-		prev_cost AS COSTPREV,
-		target_cost AS COSTTARGET,
-		curr_cost - prev_cost
-		AS COSTCOMPAREVALUE,
+			curr_cost AS COSTACTUAL,
+			prev_cost AS COSTPREV,
+			target_cost AS COSTTARGET,
+			curr_cost - prev_cost AS COSTCOMPAREVALUE,
 
-		curr_oee_rate AS OEERATE,
-		prev_oee_rate AS
-		PREVOEERATE,
-		curr_runtime_min AS OEERUNTIME,
-		curr_plan_time_min AS
-		OEEPLANTIME,
-		prev_plan_time_min AS PREVOEEPLANTIME,
-		ROUND(curr_oee_rate
-		- prev_oee_rate, 1) AS OEECOMPAREPOINT,
+			curr_oee_rate AS OEERATE,
+			prev_oee_rate AS PREVOEERATE,
+			curr_runtime_min AS OEERUNTIME,
+			curr_plan_time_min AS OEEPLANTIME,
+			prev_plan_time_min AS PREVOEEPLANTIME,
+			ROUND(curr_oee_rate - prev_oee_rate, 1) AS OEECOMPAREPOINT,
 
-		curr_delay_count AS
-		DELAYORDERCOUNT,
-		prev_delay_count AS PREVDELAYORDERCOUNT,
-		curr_delay_qty AS DELAYQTY,
-		curr_delay_count - prev_delay_count AS
-		DELAYCOMPARECOUNT
+			curr_delay_count AS DELAYORDERCOUNT,
+			prev_delay_count AS PREVDELAYORDERCOUNT,
+			curr_delay_qty AS DELAYQTY,
+			curr_delay_count - prev_delay_count AS DELAYCOMPARECOUNT
 		FROM rate_data
 	</select>
+	
+		<!-- 생산달성률 상세 모달 주차별 조회 -->
+	<select id="select_dashboard_achievement_week" parameterType="map" resultType="map">
+		WITH
+		base_date AS (
+			SELECT TRUNC(TO_DATE(#{baseDate}, 'YYYY-MM-DD'), 'IW') AS week_start
+			FROM dual
+		),
+		days AS (
+			SELECT LEVEL - 1 AS day_no
+			FROM dual
+			CONNECT BY LEVEL &lt;= 7
+		),
+		target_days AS (
+			SELECT
+				'CURRENT' AS period_type,
+				b.week_start + d.day_no AS target_date,
+				b.week_start AS week_start,
+				b.week_start + 6 AS week_end
+			FROM base_date b
+			CROSS JOIN days d
 
-	<!-- KPI 상세 모달 주차별 공통 조회 -->
-	<select id="select_dashboard_kpi_week_detail"
-		parameterType="map" resultType="map">
+			UNION ALL
+
+			SELECT
+				'PREV' AS period_type,
+				b.week_start - 7 + d.day_no AS target_date,
+				b.week_start - 7 AS week_start,
+				b.week_start - 1 AS week_end
+			FROM base_date b
+			CROSS JOIN days d
+		),
+		plan_daily AS (
+			SELECT
+				TRUNC(prod_plan_date) AS target_date,
+				NVL(SUM(NVL(prod_plan_qty, 0)), 0) AS plan_qty
+			FROM production_plan
+			WHERE prod_plan_date &gt;= (
+				SELECT week_start - 7
+				FROM base_date
+			)
+			AND prod_plan_date &lt; (
+				SELECT week_start + 7
+				FROM base_date
+			)
+			GROUP BY TRUNC(prod_plan_date)
+		),
+		prod_daily AS (
+			SELECT
+				TRUNC(prod_date) AS target_date,
+				NVL(SUM(NVL(prod_qty, 0)), 0) AS actual_qty
+			FROM production
+			WHERE prod_date &gt;= (
+				SELECT week_start - 7
+				FROM base_date
+			)
+			AND prod_date &lt; (
+				SELECT week_start + 7
+				FROM base_date
+			)
+			GROUP BY TRUNC(prod_date)
+		)
+		SELECT
+			td.period_type AS PERIOD_TYPE,
+			TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
+			TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
+			TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
+			TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS DAY_NAME,
+			NVL(pd.plan_qty, 0) AS PLAN_QTY,
+			NVL(pr.actual_qty, 0) AS ACTUAL_QTY,
+			CASE
+				WHEN NVL(pd.plan_qty, 0) = 0 THEN 0
+				ELSE ROUND(NVL(pr.actual_qty, 0) / pd.plan_qty * 100, 1)
+			END AS ACHIEVEMENT_RATE
+		FROM target_days td
+		LEFT JOIN plan_daily pd ON pd.target_date = td.target_date
+		LEFT JOIN prod_daily pr ON pr.target_date = td.target_date
+		ORDER BY
+			CASE
+				WHEN td.period_type = 'CURRENT' THEN 1
+				ELSE 2
+			END,
+			td.target_date DESC
+	</select>
+	
+		<!-- KPI 상세 모달 주차별 공통 조회 -->
+	<select id="select_dashboard_kpi_week_detail" parameterType="map" resultType="map">
 		<choose>
 
 			<!-- 생산달성률 상세 -->
 			<when test="kpiType == 'achievement'">
 				WITH
 				base_date AS (
-				SELECT TRUNC(TO_DATE(#{baseDate},
-				'YYYY-MM-DD'), 'IW') AS week_start
-				FROM dual
+					SELECT TRUNC(TO_DATE(#{baseDate}, 'YYYY-MM-DD'), 'IW') AS week_start
+					FROM dual
 				),
 				days AS (
-				SELECT LEVEL -
-				1 AS day_no
-				FROM dual
-				CONNECT BY LEVEL &lt;= 7
+					SELECT LEVEL - 1 AS day_no
+					FROM dual
+					CONNECT BY LEVEL &lt;= 7
 				),
 				target_days AS (
-				SELECT 'CURRENT' AS period_type,
-				b.week_start + d.day_no AS
-				target_date,
-				b.week_start AS week_start,
-				b.week_start + 6 AS week_end
-				FROM base_date b
-				CROSS JOIN days d
-
-				UNION ALL
-
-				SELECT 'PREV' AS
-				period_type,
-				b.week_start - 7 + d.day_no AS target_date,
-				b.week_start
-				- 7 AS week_start,
-				b.week_start - 1 AS week_end
-				FROM base_date b
-				CROSS
-				JOIN days d
+					SELECT 'CURRENT' AS period_type, b.week_start + d.day_no AS target_date,
+						b.week_start AS week_start, b.week_start + 6 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
+					UNION ALL
+					SELECT 'PREV' AS period_type, b.week_start - 7 + d.day_no AS target_date,
+						b.week_start - 7 AS week_start, b.week_start - 1 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
 				),
 				plan_daily AS (
-				SELECT TRUNC(prod_plan_date) AS
-				target_date,
-				NVL(SUM(NVL(prod_plan_qty, 0)), 0) AS plan_qty
-				FROM
-				production_plan
-				WHERE prod_plan_date &gt;= (SELECT week_start - 7
-				FROM base_date)
-				AND prod_plan_date &lt; (SELECT week_start + 7 FROM
-				base_date)
-				GROUP BY TRUNC(prod_plan_date)
+					SELECT TRUNC(prod_plan_date) AS target_date,
+						NVL(SUM(NVL(prod_plan_qty, 0)), 0) AS plan_qty
+					FROM production_plan
+					WHERE prod_plan_date &gt;= (SELECT week_start - 7 FROM base_date)
+					AND prod_plan_date &lt; (SELECT week_start + 7 FROM base_date)
+					GROUP BY TRUNC(prod_plan_date)
 				),
 				prod_daily AS (
-				SELECT
-				TRUNC(prod_date) AS target_date,
-				NVL(SUM(NVL(prod_qty, 0)), 0) AS
-				actual_qty
-				FROM production
-				WHERE prod_date &gt;= (SELECT week_start -
-				7 FROM base_date)
-				AND prod_date &lt; (SELECT week_start + 7 FROM
-				base_date)
-				GROUP BY TRUNC(prod_date)
+					SELECT TRUNC(prod_date) AS target_date,
+						NVL(SUM(NVL(prod_qty, 0)), 0) AS actual_qty
+					FROM production
+					WHERE prod_date &gt;= (SELECT week_start - 7 FROM base_date)
+					AND prod_date &lt; (SELECT week_start + 7 FROM base_date)
+					GROUP BY TRUNC(prod_date)
 				)
 				SELECT
-				td.period_type AS
-				PERIOD_TYPE,
-				TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
-				TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
-				TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
-				TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS
-				DAY_NAME,
-				NVL(pd.plan_qty, 0) AS PLAN_QTY,
-				NVL(pr.actual_qty, 0) AS
-				ACTUAL_QTY,
-				CASE
-				WHEN NVL(pd.plan_qty, 0) = 0 THEN 0
-				ELSE
-				ROUND(NVL(pr.actual_qty, 0) / pd.plan_qty * 100, 1)
-				END AS
-				ACHIEVEMENT_RATE
+					td.period_type AS PERIOD_TYPE,
+					TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
+					TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
+					TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
+					TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS DAY_NAME,
+					NVL(pd.plan_qty, 0) AS PLAN_QTY,
+					NVL(pr.actual_qty, 0) AS ACTUAL_QTY,
+					CASE
+						WHEN NVL(pd.plan_qty, 0) = 0 THEN 0
+						ELSE ROUND(NVL(pr.actual_qty, 0) / pd.plan_qty * 100, 1)
+					END AS ACHIEVEMENT_RATE
 				FROM target_days td
-				LEFT JOIN plan_daily pd ON
-				pd.target_date = td.target_date
-				LEFT JOIN prod_daily pr ON
-				pr.target_date = td.target_date
+				LEFT JOIN plan_daily pd ON pd.target_date = td.target_date
+				LEFT JOIN prod_daily pr ON pr.target_date = td.target_date
 				ORDER BY
-				CASE WHEN td.period_type =
-				'CURRENT' THEN 1 ELSE 2 END,
-				td.target_date DESC
+					CASE WHEN td.period_type = 'CURRENT' THEN 1 ELSE 2 END,
+					td.target_date DESC
 			</when>
 
 			<!-- 금일 생산량 상세 -->
 			<when test="kpiType == 'production'">
 				WITH
 				base_date AS (
-				SELECT TRUNC(TO_DATE(#{baseDate},
-				'YYYY-MM-DD'), 'IW') AS week_start
-				FROM dual
+					SELECT TRUNC(TO_DATE(#{baseDate}, 'YYYY-MM-DD'), 'IW') AS week_start
+					FROM dual
 				),
 				days AS (
-				SELECT LEVEL -
-				1 AS day_no
-				FROM dual
-				CONNECT BY LEVEL &lt;= 7
+					SELECT LEVEL - 1 AS day_no
+					FROM dual
+					CONNECT BY LEVEL &lt;= 7
 				),
 				target_days AS (
-				SELECT 'CURRENT' AS period_type,
-				b.week_start + d.day_no AS
-				target_date,
-				b.week_start AS week_start,
-				b.week_start + 6 AS week_end
-				FROM base_date b
-				CROSS JOIN days d
+					SELECT 'CURRENT' AS period_type,
+						b.week_start + d.day_no AS target_date,
+						b.week_start AS week_start,
+						b.week_start + 6 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
 
-				UNION ALL
+					UNION ALL
 
-				SELECT 'PREV' AS
-				period_type,
-				b.week_start - 7 + d.day_no AS target_date,
-				b.week_start
-				- 7 AS week_start,
-				b.week_start - 1 AS week_end
-				FROM base_date b
-				CROSS
-				JOIN days d
+					SELECT 'PREV' AS period_type,
+						b.week_start - 7 + d.day_no AS target_date,
+						b.week_start - 7 AS week_start,
+						b.week_start - 1 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
 				),
-				prod_daily AS (
-				SELECT TRUNC(prod_date) AS target_date,
-				NVL(SUM(NVL(prod_qty, 0)), 0) AS prod_qty
-				FROM production
-				WHERE
-				prod_date &gt;= (SELECT week_start - 7 FROM base_date)
-				AND prod_date
-				&lt; (SELECT week_start + 7 FROM base_date)
-				GROUP BY TRUNC(prod_date)
+				work_daily AS (
+					SELECT TRUNC(order_date) AS target_date,
+						NVL(SUM(NVL(order_qty, 0)), 0) AS work_qty
+					FROM work_order
+					WHERE order_date &gt;= (SELECT week_start - 7 FROM base_date)
+					AND order_date &lt; (SELECT week_start + 7 FROM base_date)
+					AND product_lot IS NOT NULL
+					GROUP BY TRUNC(order_date)
+				),
+				defect_daily AS (
+					SELECT TRUNC(i.insp_date) AS target_date,
+						NVL(SUM(NVL(dl.defect_qty, 0)), 0) AS defect_qty
+					FROM inspection i
+					JOIN defect_list dl ON dl.insp_id = i.insp_id
+					WHERE i.insp_date &gt;= (SELECT week_start - 7 FROM base_date)
+					AND i.insp_date &lt; (SELECT week_start + 7 FROM base_date)
+					AND NVL(i.use_yn, 'Y') = 'Y'
+					AND NVL(dl.use_yn, 'Y') = 'Y'
+					GROUP BY TRUNC(i.insp_date)
 				)
 				SELECT
-				td.period_type AS PERIOD_TYPE,
-				TO_CHAR(td.week_start,
-				'YYYY-MM-DD') AS WEEK_START,
-				TO_CHAR(td.week_end, 'YYYY-MM-DD') AS
-				WEEK_END,
-				TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
-				TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS
-				DAY_NAME,
-				NVL(pd.prod_qty, 0) AS PROD_QTY
+					td.period_type AS PERIOD_TYPE,
+					TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
+					TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
+					TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
+					TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS DAY_NAME,
+					NVL(wd.work_qty, 0) AS WORK_QTY,
+					NVL(dd.defect_qty, 0) AS DEFECT_QTY,
+					GREATEST(NVL(wd.work_qty, 0) - NVL(dd.defect_qty, 0), 0) AS PROD_QTY
 				FROM target_days td
-				LEFT JOIN
-				prod_daily pd ON
-				pd.target_date = td.target_date
+				LEFT JOIN work_daily wd ON wd.target_date = td.target_date
+				LEFT JOIN defect_daily dd ON dd.target_date = td.target_date
 				ORDER BY
-				CASE WHEN
-				td.period_type = 'CURRENT' THEN 1 ELSE 2 END,
-				td.target_date DESC
+					CASE WHEN td.period_type = 'CURRENT' THEN 1 ELSE 2 END,
+					td.target_date DESC
 			</when>
 
-			<!-- 불량률 상세 -->
+			<!-- 불량률 상세 : 불량수량 / 검사수량 기준 -->
 			<when test="kpiType == 'defect'">
 				WITH
 				base_date AS (
-				SELECT TRUNC(TO_DATE(#{baseDate},
-				'YYYY-MM-DD'), 'IW') AS week_start
-				FROM dual
+					SELECT TRUNC(TO_DATE(#{baseDate}, 'YYYY-MM-DD'), 'IW') AS week_start
+					FROM dual
 				),
 				days AS (
-				SELECT LEVEL -
-				1 AS day_no
-				FROM dual
-				CONNECT BY LEVEL &lt;= 7
+					SELECT LEVEL - 1 AS day_no
+					FROM dual
+					CONNECT BY LEVEL &lt;= 7
 				),
 				target_days AS (
-				SELECT 'CURRENT' AS period_type,
-				b.week_start + d.day_no AS
-				target_date,
-				b.week_start AS week_start,
-				b.week_start + 6 AS week_end
-				FROM base_date b
-				CROSS JOIN days d
-
-				UNION ALL
-
-				SELECT 'PREV' AS
-				period_type,
-				b.week_start - 7 + d.day_no AS target_date,
-				b.week_start
-				- 7 AS week_start,
-				b.week_start - 1 AS week_end
-				FROM base_date b
-				CROSS
-				JOIN days d
+					SELECT 'CURRENT' AS period_type, b.week_start + d.day_no AS target_date,
+						b.week_start AS week_start, b.week_start + 6 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
+					UNION ALL
+					SELECT 'PREV' AS period_type, b.week_start - 7 + d.day_no AS target_date,
+						b.week_start - 7 AS week_start, b.week_start - 1 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
 				),
 				insp_daily AS (
-				SELECT TRUNC(insp_date) AS target_date,
-				NVL(SUM(NVL(inspection_qty, 0)), 0) AS inspection_qty
-				FROM inspection
-				WHERE insp_date &gt;= (SELECT week_start - 7 FROM base_date)
-				AND
-				insp_date &lt; (SELECT week_start + 7 FROM base_date)
-				AND NVL(use_yn,
-				'Y') = 'Y'
-				GROUP BY TRUNC(insp_date)
+					SELECT TRUNC(insp_date) AS target_date,
+						NVL(SUM(NVL(inspection_qty, 0)), 0) AS inspection_qty
+					FROM inspection
+					WHERE insp_date &gt;= (SELECT week_start - 7 FROM base_date)
+					AND insp_date &lt; (SELECT week_start + 7 FROM base_date)
+					AND NVL(use_yn, 'Y') = 'Y'
+					GROUP BY TRUNC(insp_date)
 				),
 				defect_daily AS (
-				SELECT
-				TRUNC(i.insp_date) AS target_date,
-				NVL(SUM(NVL(dl.defect_qty, 0)), 0)
-				AS defect_qty
-				FROM inspection i
-				JOIN defect_list dl ON dl.insp_id =
-				i.insp_id
-				WHERE i.insp_date &gt;= (SELECT week_start - 7 FROM
-				base_date)
-				AND i.insp_date &lt; (SELECT week_start + 7 FROM
-				base_date)
-				AND NVL(i.use_yn, 'Y') = 'Y'
-				AND NVL(dl.use_yn, 'Y') = 'Y'
-				GROUP BY TRUNC(i.insp_date)
+					SELECT TRUNC(i.insp_date) AS target_date,
+						NVL(SUM(NVL(dl.defect_qty, 0)), 0) AS defect_qty
+					FROM inspection i
+					JOIN defect_list dl ON dl.insp_id = i.insp_id
+					WHERE i.insp_date &gt;= (SELECT week_start - 7 FROM base_date)
+					AND i.insp_date &lt; (SELECT week_start + 7 FROM base_date)
+					AND NVL(i.use_yn, 'Y') = 'Y'
+					AND NVL(dl.use_yn, 'Y') = 'Y'
+					GROUP BY TRUNC(i.insp_date)
 				)
 				SELECT
-				td.period_type AS PERIOD_TYPE,
-				TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
-				TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
-				TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
-				TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS
-				DAY_NAME,
-				NVL(id.inspection_qty, 0) AS INSPECTION_QTY,
-				NVL(dd.defect_qty, 0) AS DEFECT_QTY,
-				CASE
-				WHEN NVL(id.inspection_qty,
-				0) = 0 THEN 0
-				ELSE ROUND(NVL(dd.defect_qty, 0) / id.inspection_qty *
-				100, 1)
-				END AS DEFECT_RATE
+					td.period_type AS PERIOD_TYPE,
+					TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
+					TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
+					TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
+					TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS DAY_NAME,
+					NVL(id.inspection_qty, 0) AS INSPECTION_QTY,
+					NVL(dd.defect_qty, 0) AS DEFECT_QTY,
+					CASE
+						WHEN NVL(id.inspection_qty, 0) = 0 THEN 0
+						ELSE ROUND(NVL(dd.defect_qty, 0) / id.inspection_qty * 100, 1)
+					END AS DEFECT_RATE
 				FROM target_days td
-				LEFT JOIN insp_daily id
-				ON
-				id.target_date = td.target_date
-				LEFT JOIN defect_daily dd ON
-				dd.target_date = td.target_date
+				LEFT JOIN insp_daily id ON id.target_date = td.target_date
+				LEFT JOIN defect_daily dd ON dd.target_date = td.target_date
 				ORDER BY
-				CASE WHEN td.period_type =
-				'CURRENT' THEN 1 ELSE 2 END,
-				td.target_date DESC
+					CASE WHEN td.period_type = 'CURRENT' THEN 1 ELSE 2 END,
+					td.target_date DESC
 			</when>
 
 			<!-- 생산원가 상세 -->
 			<when test="kpiType == 'cost'">
 				WITH
 				base_date AS (
-				SELECT TRUNC(TO_DATE(#{baseDate},
-				'YYYY-MM-DD'), 'IW') AS week_start
-				FROM dual
+					SELECT TRUNC(TO_DATE(#{baseDate}, 'YYYY-MM-DD'), 'IW') AS week_start
+					FROM dual
 				),
 				days AS (
-				SELECT LEVEL -
-				1 AS day_no
-				FROM dual
-				CONNECT BY LEVEL &lt;= 7
+					SELECT LEVEL - 1 AS day_no
+					FROM dual
+					CONNECT BY LEVEL &lt;= 7
 				),
 				target_days AS (
-				SELECT 'CURRENT' AS period_type,
-				b.week_start + d.day_no AS
-				target_date,
-				b.week_start AS week_start,
-				b.week_start + 6 AS week_end
-				FROM base_date b
-				CROSS JOIN days d
-
-				UNION ALL
-
-				SELECT 'PREV' AS
-				period_type,
-				b.week_start - 7 + d.day_no AS target_date,
-				b.week_start
-				- 7 AS week_start,
-				b.week_start - 1 AS week_end
-				FROM base_date b
-				CROSS
-				JOIN days d
+					SELECT 'CURRENT' AS period_type, b.week_start + d.day_no AS target_date,
+						b.week_start AS week_start, b.week_start + 6 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
+					UNION ALL
+					SELECT 'PREV' AS period_type, b.week_start - 7 + d.day_no AS target_date,
+						b.week_start - 7 AS week_start, b.week_start - 1 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
 				),
 				actual_daily AS (
-				SELECT TRUNC(cost_date) AS
-				target_date,
-				NVL(ROUND(AVG(NVL(unit_cost, 0)), 0), 0) AS actual_cost
-				FROM actual_cost_daily
-				WHERE cost_date &gt;= (SELECT week_start - 7
-				FROM base_date)
-				AND cost_date &lt; (SELECT week_start + 7 FROM
-				base_date)
-				GROUP BY TRUNC(cost_date)
+					SELECT TRUNC(cost_date) AS target_date,
+						NVL(ROUND(AVG(NVL(unit_cost, 0)), 0), 0) AS actual_cost
+					FROM actual_cost_daily
+					WHERE cost_date &gt;= (SELECT week_start - 7 FROM base_date)
+					AND cost_date &lt; (SELECT week_start + 7 FROM base_date)
+					GROUP BY TRUNC(cost_date)
 				),
 				target_cost AS (
-				SELECT
-				NVL(ROUND(AVG(NVL(unit_cost, 0)), 0), 0) AS target_cost
-				FROM
-				standard_cost
-				WHERE NVL(use_yn, 'Y') = 'Y'
+					SELECT NVL(ROUND(AVG(NVL(unit_cost, 0)), 0), 0) AS target_cost
+					FROM standard_cost
+					WHERE NVL(use_yn, 'Y') = 'Y'
 				)
 				SELECT
-				td.period_type AS
-				PERIOD_TYPE,
-				TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
-				TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
-				TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
-				TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS
-				DAY_NAME,
-				tc.target_cost AS TARGET_COST,
-				NVL(ad.actual_cost, 0) AS
-				ACTUAL_COST,
-				NVL(ad.actual_cost, 0) - tc.target_cost AS COST_GAP
-				FROM
-				target_days td
-				CROSS JOIN
-				target_cost tc
-				LEFT JOIN actual_daily ad ON
-				ad.target_date =
-				td.target_date
+					td.period_type AS PERIOD_TYPE,
+					TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
+					TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
+					TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
+					TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS DAY_NAME,
+					tc.target_cost AS TARGET_COST,
+					NVL(ad.actual_cost, 0) AS ACTUAL_COST,
+					NVL(ad.actual_cost, 0) - tc.target_cost AS COST_GAP
+				FROM target_days td
+				CROSS JOIN target_cost tc
+				LEFT JOIN actual_daily ad ON ad.target_date = td.target_date
 				ORDER BY
-				CASE WHEN td.period_type =
-				'CURRENT' THEN 1 ELSE 2 END,
-				td.target_date DESC
+					CASE WHEN td.period_type = 'CURRENT' THEN 1 ELSE 2 END,
+					td.target_date DESC
 			</when>
 
 			<!-- OEE 상세 -->
 			<when test="kpiType == 'oee'">
 				WITH
 				base_date AS (
-				SELECT TRUNC(TO_DATE(#{baseDate},
-				'YYYY-MM-DD'), 'IW') AS week_start
-				FROM dual
+					SELECT TRUNC(TO_DATE(#{baseDate}, 'YYYY-MM-DD'), 'IW') AS week_start
+					FROM dual
 				),
 				days AS (
-				SELECT LEVEL -
-				1 AS day_no
-				FROM dual
-				CONNECT BY LEVEL &lt;= 7
+					SELECT LEVEL - 1 AS day_no
+					FROM dual
+					CONNECT BY LEVEL &lt;= 7
 				),
 				target_days AS (
-				SELECT 'CURRENT' AS period_type,
-				b.week_start + d.day_no AS
-				target_date,
-				b.week_start AS week_start,
-				b.week_start + 6 AS week_end
-				FROM base_date b
-				CROSS JOIN days d
-
-				UNION ALL
-
-				SELECT 'PREV' AS
-				period_type,
-				b.week_start - 7 + d.day_no AS target_date,
-				b.week_start
-				- 7 AS week_start,
-				b.week_start - 1 AS week_end
-				FROM base_date b
-				CROSS
-				JOIN days d
+					SELECT 'CURRENT' AS period_type, b.week_start + d.day_no AS target_date,
+						b.week_start AS week_start, b.week_start + 6 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
+					UNION ALL
+					SELECT 'PREV' AS period_type, b.week_start - 7 + d.day_no AS target_date,
+						b.week_start - 7 AS week_start, b.week_start - 1 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
 				),
 				oee_daily AS (
-				SELECT TRUNC(operation_date) AS
-				target_date,
-				NVL(SUM(NVL(runtime_min, 0)), 0) AS runtime_min,
-				NVL(SUM(NVL(plan_time_min, 0)), 0) AS plan_time_min
-				FROM
-				equipment_history
-				WHERE operation_date &gt;= (SELECT week_start - 7
-				FROM base_date)
-				AND operation_date &lt; (SELECT week_start + 7 FROM
-				base_date)
-				GROUP BY TRUNC(operation_date)
+					SELECT TRUNC(operation_date) AS target_date,
+						NVL(SUM(NVL(runtime_min, 0)), 0) AS runtime_min,
+						NVL(SUM(NVL(plan_time_min, 0)), 0) AS plan_time_min
+					FROM equipment_history
+					WHERE operation_date &gt;= (SELECT week_start - 7 FROM base_date)
+					AND operation_date &lt; (SELECT week_start + 7 FROM base_date)
+					GROUP BY TRUNC(operation_date)
 				)
 				SELECT
-				td.period_type AS
-				PERIOD_TYPE,
-				TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
-				TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
-				TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
-				TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS
-				DAY_NAME,
-				NVL(od.runtime_min, 0) AS RUNTIME_MIN,
-				NVL(od.plan_time_min, 0) AS PLAN_TIME_MIN,
-				CASE
-				WHEN
-				NVL(od.plan_time_min, 0) = 0 THEN 0
-				ELSE ROUND(NVL(od.runtime_min, 0)
-				/ od.plan_time_min * 100, 1)
-				END AS OEE_RATE
+					td.period_type AS PERIOD_TYPE,
+					TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
+					TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
+					TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
+					TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS DAY_NAME,
+					NVL(od.runtime_min, 0) AS RUNTIME_MIN,
+					NVL(od.plan_time_min, 0) AS PLAN_TIME_MIN,
+					CASE
+						WHEN NVL(od.plan_time_min, 0) = 0 THEN 0
+						ELSE ROUND(NVL(od.runtime_min, 0) / od.plan_time_min * 100, 1)
+					END AS OEE_RATE
 				FROM target_days td
-				LEFT
-				JOIN oee_daily od ON
-				od.target_date = td.target_date
+				LEFT JOIN oee_daily od ON od.target_date = td.target_date
 				ORDER BY
-				CASE WHEN
-				td.period_type = 'CURRENT' THEN 1 ELSE 2 END,
-				td.target_date DESC
+					CASE WHEN td.period_type = 'CURRENT' THEN 1 ELSE 2 END,
+					td.target_date DESC
 			</when>
 
-			<!-- 생산지연 LOT 상세 목록 -->
-			<when test="detailType == 'delayLot'">
-				SELECT *
-				FROM (
+			<!-- 지연 작업지시 상세 -->
+			<when test="kpiType == 'delay'">
+				WITH
+				base_date AS (
+					SELECT TRUNC(TO_DATE(#{baseDate}, 'YYYY-MM-DD'), 'IW') AS week_start
+					FROM dual
+				),
+				days AS (
+					SELECT LEVEL - 1 AS day_no
+					FROM dual
+					CONNECT BY LEVEL &lt;= 7
+				),
+				target_days AS (
+					SELECT 'CURRENT' AS period_type, b.week_start + d.day_no AS target_date,
+						b.week_start AS week_start, b.week_start + 6 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
+					UNION ALL
+					SELECT 'PREV' AS period_type, b.week_start - 7 + d.day_no AS target_date,
+						b.week_start - 7 AS week_start, b.week_start - 1 AS week_end
+					FROM base_date b
+					CROSS JOIN days d
+				),
+				prod_sum AS (
+					SELECT
+						order_id,
+						SUM(NVL(prod_qty, 0)) AS total_prod_qty,
+						MAX(
+							CASE
+								WHEN prod_status IN ('완료', '취소') THEN 1
+								ELSE 0
+							END
+						) AS close_yn
+					FROM production
+					GROUP BY order_id
+				),
+				delay_daily AS (
+					SELECT
+						td.target_date,
+						COUNT(DISTINCT wo.order_id) AS delay_count,
+						NVL(SUM(GREATEST(NVL(wo.order_qty, 0) - NVL(ps.total_prod_qty, 0), 0)), 0) AS delay_qty
+					FROM target_days td
+					JOIN work_order wo ON 1 = 1
+					JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+					LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
+					WHERE pp.due_date &lt; td.target_date + 1
+					AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
+					AND NVL(ps.close_yn, 0) = 0
+					AND wo.product_lot IS NOT NULL
+					GROUP BY td.target_date
+				)
 				SELECT
-				DATA_LIST.*
-				FROM (
-				SELECT
-				wo.order_id AS ORDER_ID,
-				wo.product_lot AS PRODUCT_LOT,
-				it.item_name
-				AS ITEM_NAME,
-				TO_CHAR(wo.order_date, 'YYYY-MM-DD') AS DUE_DATE,
-				NVL(wo.order_qty, 0) AS ORDER_QTY,
-				NVL(ps.total_prod_qty, 0) AS
-				PROD_QTY,
-				GREATEST(NVL(wo.order_qty, 0) - NVL(ps.total_prod_qty, 0),
-				0) AS REMAIN_QTY,
-				CASE
-				WHEN TRUNC(wo.order_date) = TRUNC(CURRENT_DATE)
-				AND NVL(ps.total_prod_qty, 0) = 0
-				THEN '당일 미착수'
-
-				WHEN
-				TRUNC(wo.order_date) = TRUNC(CURRENT_DATE)
-				AND NVL(ps.total_prod_qty,
-				0) &gt; 0
-				THEN '당일 생산중'
-
-				WHEN TRUNC(wo.order_date) &lt;
-				TRUNC(CURRENT_DATE)
-				AND NVL(ps.total_prod_qty, 0) = 0
-				THEN '생산 미착수'
-
-				ELSE '생산 지연'
-				END AS DELAY_STATUS
-				FROM work_order wo
-				JOIN
-				production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
-				JOIN item it
-				ON it.item_id = pp.item_id
-				LEFT JOIN (
-				SELECT
-				order_id,
-				SUM(NVL(prod_qty, 0)) AS total_prod_qty,
-				MAX(
-				CASE
-				WHEN prod_status IN
-				('완료', '취소') THEN 1
-				ELSE 0
-				END
-				) AS close_yn
-				FROM production
-				GROUP BY
-				order_id
-				) ps ON ps.order_id = wo.order_id
-				WHERE wo.order_date &lt;
-				TRUNC(CURRENT_DATE) + 1
-				AND wo.product_lot IS NOT NULL
-				AND
-				NVL(ps.close_yn, 0) = 0
-				AND NVL(ps.total_prod_qty, 0) &lt;
-				NVL(wo.order_qty, 0)
+					td.period_type AS PERIOD_TYPE,
+					TO_CHAR(td.week_start, 'YYYY-MM-DD') AS WEEK_START,
+					TO_CHAR(td.week_end, 'YYYY-MM-DD') AS WEEK_END,
+					TO_CHAR(td.target_date, 'YYYY-MM-DD') AS DISPLAY_DATE,
+					TO_CHAR(td.target_date, 'DY', 'NLS_DATE_LANGUAGE=KOREAN') AS DAY_NAME,
+					NVL(dd.delay_count, 0) AS DELAY_COUNT,
+					NVL(dd.delay_qty, 0) AS DELAY_QTY
+				FROM target_days td
+				LEFT JOIN delay_daily dd ON dd.target_date = td.target_date
 				ORDER BY
-				wo.order_date ASC,
-				CASE
-				WHEN
-				NVL(ps.total_prod_qty, 0) = 0 THEN 1
-				ELSE 2
-				END,
-				wo.order_id DESC
-				)
-				DATA_LIST
-				)
-				WHERE ROWNUM &lt;= 10
+					CASE WHEN td.period_type = 'CURRENT' THEN 1 ELSE 2 END,
+					td.target_date DESC
 			</when>
 
 			<otherwise>
 				SELECT
-				'' AS PERIOD_TYPE,
-				'' AS WEEK_START,
-				'' AS WEEK_END,
-				'' AS DISPLAY_DATE,
-				'' AS DAY_NAME
+					'' AS PERIOD_TYPE,
+					'' AS WEEK_START,
+					'' AS WEEK_END,
+					'' AS DISPLAY_DATE,
+					'' AS DAY_NAME
 				FROM dual
 				WHERE 1 = 0
 			</otherwise>
 
 		</choose>
 	</select>
-
-	<!-- 대시보드 현장 이슈와 LOT 간략 목록 조회 -->
-	<select id="select_dashboard_detail_list" parameterType="map"
-		resultType="map">
-		<choose>
-
-			<!-- 불량 경고 상세 목록 -->
-			<when test="detailType == 'defectIssue'">
-				SELECT *
-				FROM (
-				SELECT
-				DATA_LIST.*
-				FROM (
-				SELECT
-				dl.defect_list_id AS DEFECT_LIST_ID,
-				wo.order_id AS ORDER_ID,
-				wo.product_lot AS PRODUCT_LOT,
-				it.item_name AS ITEM_NAME,
-				d.defect_name AS DEFECT_NAME,
-				NVL(dl.defect_qty, 0) AS DEFECT_QTY,
-				TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS DEFECT_DATE
-				FROM defect_list
-				dl
-				JOIN defect d ON d.defect_id = dl.defect_id
-				JOIN inspection i ON
-				i.insp_id = dl.insp_id
-				JOIN production p ON p.prod_id = i.prod_id
-				JOIN work_order wo ON wo.order_id = p.order_id
-				JOIN production_plan
-				pp ON pp.prod_plan_id = wo.prod_plan_id
-				JOIN item it ON it.item_id =
-				pp.item_id
-				WHERE dl.defect_date &gt;= TRUNC(CURRENT_DATE)
-				AND
-				dl.defect_date &lt; TRUNC(CURRENT_DATE) + 1
-				AND NVL(dl.use_yn, 'Y') =
-				'Y'
-				AND NVL(i.use_yn, 'Y') = 'Y'
-				ORDER BY dl.defect_date DESC,
-				dl.defect_list_id DESC
-				) DATA_LIST
-				)
-				WHERE ROWNUM &lt;= 10
-			</when>
-
-			<!-- 설비 고장 상세 목록 -->
-			<when test="detailType == 'equipmentIssue'">
-				SELECT *
-				FROM (
-				SELECT
-				DATA_LIST.*
-				FROM (
-				SELECT
-				eh.history_id AS HISTORY_ID,
-				et.equip_id AS EQUIP_ID,
-				e.equip_name AS
-				EQUIP_NAME,
-				et.trouble_content AS TROUBLE_CONTENT,
-				TO_CHAR(et.trouble_date, 'YYYY-MM-DD HH24:MI') AS TROUBLE_DATE,
-				'미조치' AS TROUBLE_STATUS
-				FROM equipment_trouble et
-				JOIN equipment e ON
-				e.equip_id = et.equip_id
-				LEFT JOIN equipment_history eh
-				ON eh.equip_id
-				= et.equip_id
-				AND TRUNC(eh.operation_date) = TRUNC(et.trouble_date)
-				WHERE et.resolve_date IS NULL
-				AND et.trouble_date IS NOT NULL
-				AND
-				et.trouble_content IS NOT NULL
-				ORDER BY et.trouble_date DESC,
-				et.trouble_id DESC
-				) DATA_LIST
-				)
-				WHERE ROWNUM &lt;= 10
-			</when>
-
-			<!-- 생산지연 LOT 상세 목록 -->
-			<when test="detailType == 'delayLot'">
-				SELECT *
-				FROM (
-				SELECT
-				DATA_LIST.*
-				FROM (
-				SELECT
-				wo.order_id AS ORDER_ID,
-				wo.product_lot AS PRODUCT_LOT,
-				it.item_name
-				AS ITEM_NAME,
-				TO_CHAR(wo.order_date, 'YYYY-MM-DD') AS DUE_DATE,
-				NVL(wo.order_qty, 0) AS ORDER_QTY,
-				NVL(ps.total_prod_qty, 0) AS
-				PROD_QTY,
-				GREATEST(NVL(wo.order_qty, 0) - NVL(ps.total_prod_qty, 0),
-				0) AS REMAIN_QTY,
-				CASE
-				WHEN TRUNC(wo.order_date) = TRUNC(CURRENT_DATE)
-				AND NVL(ps.total_prod_qty, 0) = 0
-				THEN '당일 미착수'
-
-				WHEN TRUNC(wo.order_date) = TRUNC(CURRENT_DATE)
-				AND NVL(ps.total_prod_qty, 0) &gt; 0
-				THEN '당일 생산중'
-
-				WHEN TRUNC(wo.order_date) &lt; TRUNC(CURRENT_DATE)
-				AND NVL(ps.total_prod_qty, 0) = 0
-				THEN '생산 미착수'
-
-				ELSE '생산 지연'
-				END AS DELAY_STATUS
-				FROM work_order wo
-				JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
-				JOIN item it ON it.item_id = pp.item_id
-				LEFT JOIN (
-				SELECT
-				order_id,
-				SUM(NVL(prod_qty, 0)) AS total_prod_qty,
-				MAX(
-				CASE
-				WHEN prod_status IN ('완료', '취소') THEN 1
-				ELSE 0
-				END
-				) AS close_yn
-				FROM production
-				GROUP BY order_id
-				) ps ON ps.order_id = wo.order_id
-				WHERE wo.order_date &lt; TRUNC(CURRENT_DATE) + 1
-				AND wo.product_lot IS NOT NULL
-				AND NVL(ps.close_yn, 0) = 0
-				AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
-				ORDER BY
-				wo.order_date ASC,
-				CASE
-				WHEN NVL(ps.total_prod_qty, 0) = 0 THEN 1
-				ELSE 2
-				END,
-				wo.order_id DESC
-				) DATA_LIST
-				)
-				WHERE ROWNUM &lt;= 10
-			</when>
-
-			<!-- 검사대기 LOT 상세 목록 -->
-			<when test="detailType == 'inspectionWaitLot'">
-				SELECT *
-				FROM (
-				SELECT
-				DATA_LIST.*
-				FROM (
-				SELECT
-				wo.order_id AS ORDER_ID,
-				wo.product_lot AS PRODUCT_LOT,
-				it.item_name
-				AS ITEM_NAME,
-				i.insp_id AS INSP_ID,
-				i.doc_no AS INSP_DOC_NO,
-				TO_CHAR(i.insp_date, 'YYYY-MM-DD') AS INSP_DATE,
-				i.insp_status AS
-				INSP_STATUS
-				FROM inspection i
-				JOIN production p ON p.prod_id =
-				i.prod_id
-				JOIN work_order wo ON wo.order_id = p.order_id
-				JOIN
-				production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
-				JOIN item it
-				ON it.item_id = pp.item_id
-				WHERE NVL(i.use_yn, 'Y') = 'Y'
-				AND
-				wo.product_lot IS NOT NULL
-				AND (
-				NVL(i.insp_status, '-') IN ('대기', '검사
-				예정')
-				OR NVL(i.result, '-') =
-				'대기'
-				OR NVL(p.inspection_status, '-') IN
-				('대기', '검사 예정')
-				)
-				ORDER BY i.insp_date ASC, i.insp_id DESC
-				) DATA_LIST
-				)
-				WHERE ROWNUM &lt;= 10
-			</when>
-
-			<!-- 완제품 출하대기 LOT 상세 목록 -->
-			<when test="detailType == 'shipmentWaitLot'">
-				SELECT *
-				FROM (
-				SELECT
-				DATA_LIST.*
-				FROM (
-				SELECT
-				wo.order_id AS ORDER_ID,
-				wo.product_lot AS PRODUCT_LOT,
-				it.item_name
-				AS ITEM_NAME,
-				TO_CHAR(pi.inout_date, 'YYYY-MM-DD') AS INOUT_DATE,
-				'출하대기' AS SHIP_STATUS
-				FROM product_inout pi
-				JOIN work_order wo ON
-				wo.order_id = pi.order_id
-				JOIN item it ON it.item_id = pi.item_id
-				JOIN inspection i ON i.insp_id = pi.insp_id
-				WHERE pi.inout_date &gt;=
-				TRUNC(CURRENT_DATE)
-				AND pi.inout_date &lt; TRUNC(CURRENT_DATE) + 1
-				AND NVL(pi.use_yn, 'Y') = 'Y'
-				AND pi.inout_type = 'MI'
-				AND
-				wo.product_lot IS NOT NULL
-				AND NVL(i.use_yn, 'Y') = 'Y'
-				AND
-				i.insp_status IN ('완료', '검사 완료')
-				AND i.result IN ('합격', '조건부합격')
-				AND
-				NOT EXISTS (
-				SELECT 1
-				FROM product_inout po
-				WHERE po.order_id =
-				pi.order_id
-				AND NVL(po.use_yn, 'Y') = 'Y'
-				AND po.inout_type IN ('MO',
-				'OUT', 'SO', '출고', '출하')
-				)
-				ORDER BY pi.inout_date DESC, wo.order_id
-				DESC
-				) DATA_LIST
-				)
-				WHERE ROWNUM &lt;= 10
-			</when>
-
-			<otherwise>
-				SELECT
-				'' AS EMPTY_VALUE
-				FROM dual
-				WHERE 1 = 0
-			</otherwise>
-
-		</choose>
-	</select>
-
+	
 </mapper>

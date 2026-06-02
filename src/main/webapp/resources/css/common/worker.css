@@ -1514,3 +1514,443 @@ button {
 	}
 }
 
+
+/* =====================================================
+	작업자 메인 웹 반응형 최종 보정
+	PC / 태블릿 / 모바일 모두 같은 workerMain.jsp를 사용한다.
+	공통 파일은 수정하지 않고 worker.css 안에서만 화면 크기별로 조정한다.
+
+	적용 내용:
+	1. 작업자 메인 메뉴 4개 카드 반응형 정렬
+	2. 품질관리 카드 검사관리 / 불량관리 버튼 모바일 크기 보정
+	3. QR 영역 모바일에서 잘리지 않도록 축소
+	4. QR 중앙 로고 크기 축소
+	5. 모바일 QR 카메라 스캔 화면 전체화면 유지
+===================================================== */
+
+/* QR 중앙 로고 기본 크기 재조정 */
+.workerQrLogoBox {
+	width: 34px !important;
+	height: 34px !important;
+	border-radius: 9px !important;
+}
+
+.workerQrLogoBox img {
+	width: 21px !important;
+	height: 21px !important;
+}
+
+/* 품질관리 카드 버튼 기본 정렬 */
+.workerQualityQuickBtns {
+	display: flex !important;
+	flex-wrap: wrap !important;
+	gap: 8px !important;
+	margin-top: 12px !important;
+}
+
+.workerQualityQuickBtn {
+	min-width: 78px !important;
+	height: 32px !important;
+	padding: 0 12px !important;
+	border: 1px solid rgba(47, 125, 98, 0.35) !important;
+	border-radius: 999px !important;
+	background: #f7fffb !important;
+	color: var(--mainColor) !important;
+	font-size: 13px !important;
+	font-weight: 800 !important;
+	cursor: pointer !important;
+}
+
+/* =====================================================
+	태블릿 / 작은 PC
+	오른쪽 카드가 4개가 되어도 한 화면에서 자연스럽게 내려가도록 조정한다.
+===================================================== */
+@media screen and (max-width: 1180px) {
+
+	.workerKioskContent {
+		grid-template-columns: 1fr !important;
+	}
+
+	.workerScanPanel {
+		min-height: auto !important;
+	}
+
+	.workerRightPanel {
+		gap: 16px !important;
+	}
+
+	.workerMenuList {
+		gap: 14px !important;
+	}
+
+	.workerMenuCard {
+		min-height: 128px !important;
+		padding: 20px 96px 20px 24px !important;
+	}
+
+	.workerQualityMenuCard {
+		min-height: 138px !important;
+	}
+}
+
+/* =====================================================
+	모바일 최종 반응형
+	핸드폰에서 worker 메인 진입 시 QR / 메뉴 / 오늘 현황이 세로로 안정적으로 보이게 한다.
+===================================================== */
+@media screen and (max-width: 768px) {
+
+	html,
+	body {
+		width: 100% !important;
+		overflow-x: hidden !important;
+	}
+
+	.workerPage {
+		width: 100% !important;
+		min-height: 100vh !important;
+
+		--contentPadding: 12px 10px 18px !important;
+		--contentGap: 14px !important;
+
+		--scanPadding: 22px 12px 18px !important;
+		--scanMinHeight: auto !important;
+		--scanTitle: 27px !important;
+		--qrStageH: 244px !important;
+		--qrBox: 218px !important;
+		--qrImg: 196px !important;
+		--scanBtnW: 100% !important;
+		--scanBtnH: 58px !important;
+		--scanBtnFont: 21px !important;
+
+		--menuCardH: 106px !important;
+		--menuCardPadding: 16px 66px 16px 15px !important;
+		--menuIcon: 58px !important;
+		--menuSvg: 34px !important;
+		--menuTitle: 20px !important;
+		--menuText: 12px !important;
+
+		--todayIcon: 42px !important;
+		--progressIcon: 48px !important;
+	}
+
+	.workerKioskContent {
+		display: grid !important;
+		grid-template-columns: 1fr !important;
+		padding: var(--contentPadding) !important;
+		gap: var(--contentGap) !important;
+	}
+
+	.workerScanPanel {
+		width: 100% !important;
+		min-height: auto !important;
+		padding: var(--scanPadding) !important;
+		border-radius: 18px !important;
+	}
+
+	.workerScanTopGuide {
+		margin-bottom: 16px !important;
+		padding: 8px 13px !important;
+		font-size: 12px !important;
+		line-height: 1.35 !important;
+	}
+
+	.workerScanTitle {
+		margin-bottom: 16px !important;
+		font-size: var(--scanTitle) !important;
+		line-height: 1.22 !important;
+	}
+
+	.workerQrStage {
+		max-width: 100% !important;
+		height: var(--qrStageH) !important;
+		margin-bottom: 14px !important;
+	}
+
+	.workerQrWhiteBox {
+		width: var(--qrBox) !important;
+		height: var(--qrBox) !important;
+		border-radius: 16px !important;
+	}
+
+	.realQrImg {
+		width: var(--qrImg) !important;
+		height: var(--qrImg) !important;
+	}
+
+	.workerQrLogoBox {
+		width: 28px !important;
+		height: 28px !important;
+		border-radius: 8px !important;
+		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14) !important;
+	}
+
+	.workerQrLogoBox img {
+		width: 17px !important;
+		height: 17px !important;
+	}
+
+	.scanLine {
+		left: 16px !important;
+		right: 16px !important;
+		height: 4px !important;
+	}
+
+	.qrCorner {
+		width: 34px !important;
+		height: 34px !important;
+	}
+
+	.workerScanStartBtn {
+		width: 100% !important;
+		max-width: 100% !important;
+		height: var(--scanBtnH) !important;
+		gap: 10px !important;
+		border-radius: 15px !important;
+		font-size: var(--scanBtnFont) !important;
+	}
+
+	.workerScanBtnIcon,
+	.workerScanBtnArrow {
+		width: 25px !important;
+		height: 25px !important;
+		font-size: 25px !important;
+	}
+
+	.workerScanHelpText {
+		font-size: 12px !important;
+		line-height: 1.45 !important;
+	}
+
+	.workerRightPanel,
+	.workerMenuList {
+		width: 100% !important;
+		gap: 12px !important;
+	}
+
+	.workerMenuCard {
+		width: 100% !important;
+		min-height: var(--menuCardH) !important;
+		padding: var(--menuCardPadding) !important;
+		gap: 13px !important;
+		border-radius: 16px !important;
+	}
+
+	.workerMenuIconCircle {
+		width: var(--menuIcon) !important;
+		height: var(--menuIcon) !important;
+	}
+
+	.menuSvgIcon {
+		width: var(--menuSvg) !important;
+		height: var(--menuSvg) !important;
+	}
+
+	.workerMenuTextBox h3 {
+		margin-bottom: 6px !important;
+		font-size: var(--menuTitle) !important;
+		line-height: 1.2 !important;
+	}
+
+	.workerMenuTextBox p {
+		font-size: var(--menuText) !important;
+		line-height: 1.35 !important;
+	}
+
+	.workerMenuNo {
+		top: 8px !important;
+		right: 18px !important;
+		font-size: 23px !important;
+	}
+
+	.workerMenuArrowBtn {
+		right: 16px !important;
+		top: 64% !important;
+		width: 40px !important;
+		height: 40px !important;
+		font-size: 28px !important;
+		line-height: 34px !important;
+	}
+
+	.workerQualityMenuCard {
+		min-height: 132px !important;
+	}
+
+	.workerQualityQuickBtns {
+		margin-top: 8px !important;
+		gap: 6px !important;
+	}
+
+	.workerQualityQuickBtn {
+		min-width: 64px !important;
+		height: 27px !important;
+		padding: 0 8px !important;
+		font-size: 11px !important;
+	}
+
+	.workerTodayBox {
+		width: 100% !important;
+		min-height: auto !important;
+		padding: 16px 10px !important;
+		border-radius: 16px !important;
+	}
+
+	.workerTodayGrid {
+		grid-template-columns: repeat(3, 1fr) !important;
+	}
+
+	.workerTodayItem {
+		padding: 2px 5px !important;
+	}
+
+	.workerTodayIcon,
+	.workerProgressCircle {
+		width: var(--todayIcon) !important;
+		height: var(--todayIcon) !important;
+		margin-bottom: 8px !important;
+	}
+
+	.workerProgressCircle {
+		width: var(--progressIcon) !important;
+		height: var(--progressIcon) !important;
+	}
+
+	.workerProgressCircle span {
+		width: 34px !important;
+		height: 34px !important;
+		font-size: 11px !important;
+	}
+
+	.workerTodayItem p {
+		font-size: 11px !important;
+		line-height: 1.3 !important;
+	}
+
+	.workerTodayItem strong {
+		font-size: 17px !important;
+	}
+
+	.workerQrCameraModal {
+		position: fixed !important;
+		inset: 0 !important;
+		width: 100vw !important;
+		height: 100vh !important;
+		z-index: 99999 !important;
+		background: #000 !important;
+		overflow: hidden !important;
+	}
+
+	.workerQrCameraVideo {
+		position: absolute !important;
+		inset: 0 !important;
+		width: 100% !important;
+		height: 100% !important;
+		object-fit: cover !important;
+	}
+
+	.workerQrCameraTop {
+		padding: 18px 16px 0 !important;
+	}
+
+	.workerQrCameraTitle {
+		font-size: 21px !important;
+	}
+
+	.workerQrCameraSubTitle {
+		font-size: 12px !important;
+		line-height: 1.4 !important;
+	}
+
+	.workerQrCameraCloseBtn {
+		width: 38px !important;
+		height: 38px !important;
+		font-size: 28px !important;
+		line-height: 34px !important;
+	}
+
+	.workerQrCameraFrame {
+		width: min(70vw, 290px) !important;
+		height: min(70vw, 290px) !important;
+	}
+
+	.workerQrCameraCorner {
+		width: 38px !important;
+		height: 38px !important;
+	}
+
+	.workerQrCameraBottom {
+		left: 14px !important;
+		right: 14px !important;
+		bottom: 22px !important;
+	}
+
+	.workerQrCameraStatus {
+		min-height: 34px !important;
+		padding: 8px 14px !important;
+		font-size: 12px !important;
+	}
+
+	.workerQrCameraMessageBox {
+		max-width: calc(100vw - 36px) !important;
+		font-size: 12px !important;
+	}
+}
+
+@media screen and (max-width: 380px) {
+
+	.workerPage {
+		--scanTitle: 24px !important;
+		--qrStageH: 222px !important;
+		--qrBox: 200px !important;
+		--qrImg: 180px !important;
+		--scanBtnFont: 19px !important;
+		--menuTitle: 18px !important;
+		--menuText: 11px !important;
+		--menuIcon: 52px !important;
+		--menuSvg: 30px !important;
+	}
+
+	.workerMenuCard {
+		padding-right: 58px !important;
+	}
+
+	.workerMenuArrowBtn {
+		right: 12px !important;
+		width: 36px !important;
+		height: 36px !important;
+		font-size: 25px !important;
+	}
+
+	.workerQualityQuickBtn {
+		min-width: 58px !important;
+		font-size: 10px !important;
+	}
+
+	.workerTodayItem strong {
+		font-size: 15px !important;
+	}
+}
+
+
+/* =====================================================
+	작업자 전용 생산관리 읽기모드 보정
+	-----------------------------------------------------
+	팀원 원본 JSP는 수정하지 않는다.
+	WorkerController가 작업자 전용 JSP로 이동하게 하고,
+	혹시 기존 버튼 클래스가 남아있어도 작업자 전용 화면에서는 보이지 않도록
+	worker.css에서 한 번 더 안전하게 숨긴다.
+
+	관리자가 /production/workorder 또는 /production/productionresult로 들어가는 경우에는
+	이 CSS 클래스가 붙은 작업자 전용 화면을 타지 않으므로 기존 버튼이 그대로 보인다.
+===================================================== */
+.workerReadonlyPage .workorder_print_btn,
+.workerReadonlyPage .modal_open_btn,
+.workerReadonlyPage button[onclick="deleteCheck()"] {
+	display: none !important;
+}
+
+.workerReadonlyPage .search-btn-right {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}
+

@@ -4,7 +4,10 @@
 <c:set var="canManageQuality"
 	value="${not empty sessionScope.loginUser
 		and (sessionScope.loginUser.role eq 'ADMIN'
-		or sessionScope.loginUser.role eq 'MANAGER')}" />
+		or sessionScope.loginUser.role eq 'MANAGER'
+		or sessionScope.loginUser.role eq 'QC'
+		or (sessionScope.loginUser.role eq 'WORKER'
+			and sessionScope.loginUser.dept eq '품질관리'))}" />
 
 <style>
 .insp_file_area {
