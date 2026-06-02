@@ -99,7 +99,14 @@
 										<td>${eqp.equip_name}</td>
 
 										<th>상태</th>
-										<td><input type="text" name="equip_status" value="${eqp.equip_status}"></td>
+										<td>											
+											<select name="equip_status" class="modal_select id_select">
+											<option value="가동" ${eqp.equip_status == '가동' ? 'selected' : ''}>가동</option>
+											<option value="비가동" ${eqp.equip_status == '비가동' ? 'selected' : ''}>비가동</option>
+											<option value="점검" ${eqp.equip_status == '점검' ? 'selected' : ''}>점검</option>
+											<option value="고장" ${eqp.equip_status == '고장' ? 'selected' : ''}>고장</option>											
+										</select>
+										</td>
 									</tr>
 
 									<tr>

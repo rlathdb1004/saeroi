@@ -123,6 +123,21 @@ a {
     /* 로고와 설명 문구를 가운데 정렬한다. */
 }
 
+.siLogoLink {
+	display: block;
+	text-decoration: none;
+	color: inherit;
+	cursor: pointer;
+}
+
+.siLogoLink:hover .siLogo {
+	transform: scale(1.02);
+}
+
+.siLogo {
+	transition: transform 0.18s ease;
+}
+
 .siLogo {
     /* 실제 로고 이미지이다. */
     width: 132px;

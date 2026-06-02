@@ -76,6 +76,27 @@
 	color: #12362b;
 }
 
+.modal_field_error {
+	display: none;
+	margin-top: 5px;
+	color: #dc2626;
+	font-size: 13px;
+	line-height: 1.35;
+}
+
+/* LOT 상세로 이동하는 목록 링크임 */
+.quality_detail_link {
+	color: #0b7a5a;
+	font-weight: 700;
+	text-decoration: none;
+	border-bottom: 1px dotted #0b7a5a;
+	white-space: nowrap;
+}
+
+.quality_detail_link:hover {
+	color: #075f46;
+}
+
 .insp_file_area {
 	display: flex;
 	align-items: center;
@@ -259,7 +280,17 @@
 							<td class="mobile_show">${inspection.doc_no}</td>
 							<td class="mobile_hidden">${inspection.insp_date}</td>
 							<td class="coTextLeft mobile_show">${inspection.item_name}</td>
-							<td class="mobile_hidden">${inspection.product_lot}</td>
+							<%-- LOT번호 클릭 시 LOT 상세 페이지로 이동함 --%>
+							<td class="mobile_hidden"><c:choose>
+									<c:when test="${inspection.order_id > 0 and not empty inspection.product_lot}">
+										
+											${inspection.product_lot}
+									</c:when>
+									<c:when test="${not empty inspection.product_lot}">
+										${inspection.product_lot}
+									</c:when>
+									<c:otherwise>-</c:otherwise>
+								</c:choose></td>
 							<td class="mobile_hidden">${inspection.ename}</td>
 
 							<td class="mobile_show"><c:choose>
@@ -348,6 +379,7 @@
 							class="modal_required">*</span></label> <input type="number"
 							id="inspectionProdQty" name="inspection_qty"
 							class="modal_input" min="0" readonly required>
+						<div id="inspectionProdQtyError" class="modal_field_error"></div>
 					</div>
 
 					<div class="modal_item">
@@ -355,12 +387,7 @@
 							class="modal_required">*</span></label> <input type="number"
 							id="inspectionGoodQty" name="good_qty"
 							class="modal_input" min="0" required>
-					</div>
-
-					<div class="modal_item modal_item_full">
-						<div id="inspectionQtyError"
-							style="display: none; color: #dc2626; font-size: 13px;">
-							생산 수량을 초과 할 수 없습니다.</div>
+						<div id="inspectionGoodQtyError" class="modal_field_error"></div>
 					</div>
 					
 
@@ -375,6 +402,7 @@
 								name="has_defect" value="Y"> 불량 정보 및 조치 함께 등록
 							</label>
 						</div>
+						<div id="inspectionDefectInfoError" class="modal_field_error"></div>
 
 						<div id="inspectionDefectArea" class="modal_body modal_body_2col"
 							style="display: none; padding: 0;">
@@ -398,6 +426,7 @@
 									class="modal_required">*</span></label> <input type="number"
 									id="inspectionDefectQty" name="defect_qty"
 									class="modal_input defectRequired" min="0">
+								<div id="inspectionDefectQtyError" class="modal_field_error"></div>
 							</div>
 
 							<div class="modal_item">

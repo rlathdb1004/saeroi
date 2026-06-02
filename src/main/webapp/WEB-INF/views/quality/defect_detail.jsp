@@ -74,8 +74,8 @@
 	text-align: left;
 }
 
-.defect_action_table th:first-child,
-.defect_action_table td:first-child {
+.defect_action_table th:first-child, .defect_action_table td:first-child
+	{
 	width: 110px;
 	min-width: 110px;
 	white-space: nowrap;
@@ -85,6 +85,25 @@
 	.defect_detail_bottom {
 		grid-template-columns: 1fr;
 	}
+}
+
+/* 상세 페이지로 이동하는 값 링크임 */
+.lot-link {
+	display: inline-block;
+	color: #0b7a5a;
+	font-weight: 700;
+	text-decoration: none;
+	border-bottom: 1px dotted #0b7a5a;
+	white-space: nowrap;
+}
+
+.lot-link::after {
+	content: " ↗";
+	font-size: 10px;
+}
+
+.lot-link:hover {
+	color: #075f46;
 }
 </style>
 
@@ -140,8 +159,7 @@
 						style="vertical-align: -3px; margin-right: 6px;"
 						aria-hidden="true">
 						<path d="M12 20h9"></path>
-						<path
-							d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
 					</svg>
 
 					수정
@@ -201,24 +219,21 @@
 
 					<tr>
 						<th>불량명</th>
-						<td>
-							<span
-								class="detailText detail_status_badge defect_status_badge">${defect.defect_name}</span>
+						<td><span
+							class="detailText detail_status_badge defect_status_badge">${defect.defect_name}</span>
 							<select name="defect_id" class="detailInput"
-								data-selected="${defect.defect_id}" style="display: none;"
-								required>
+							data-selected="${defect.defect_id}" style="display: none;"
+							required>
 								<option value="${defect.defect_id}" selected>${defect.defect_name}</option>
-							</select>
-						</td>
+						</select></td>
 
 						<th>불량유형</th>
 						<td>${defect.defect_type}</td>
 
 						<th>불량발생일시</th>
-						<td>
-							<span class="detailText">${defect.defect_date}</span>
-							<input type="date" name="defect_date" class="detailInput"
-								value="${defect.defect_date}" style="display: none;" required>
+						<td><span class="detailText">${defect.defect_date}</span> <input
+							type="date" name="defect_date" class="detailInput"
+							value="${defect.defect_date}" style="display: none;" required>
 						</td>
 					</tr>
 
@@ -235,11 +250,9 @@
 
 					<tr>
 						<th>비고</th>
-						<td colspan="5">
-							<span class="detailText">${defect.remark}</span>
+						<td colspan="5"><span class="detailText">${defect.remark}</span>
 							<input type="text" name="remark" class="detailInput"
-								value="${defect.remark}" style="display: none;">
-						</td>
+							value="${defect.remark}" style="display: none;"></td>
 					</tr>
 				</tbody>
 			</table>
@@ -261,18 +274,51 @@
 				<tbody>
 					<tr>
 						<th>검사번호</th>
-						<td>${defect.insp_doc_no}</td>
+						<%-- 검사번호 클릭 시 검사 상세 페이지로 이동함 --%>
+						<td><c:choose>
+								<c:when test="${defect.insp_id > 0 and not empty defect.insp_doc_no}">
+									<a class="lot-link"
+										href="${pageContext.request.contextPath}/quality/inspection_detail?insp_id=${defect.insp_id}">
+										${defect.insp_doc_no}</a>
+								</c:when>
+								<c:when test="${not empty defect.insp_doc_no}">
+									${defect.insp_doc_no}
+								</c:when>
+								<c:otherwise>-</c:otherwise>
+							</c:choose></td>
 
 						<th>검사자</th>
 						<td>${defect.ename}</td>
 
 						<th>LOT번호</th>
-						<td>${defect.product_lot}</td>
+						<%-- LOT번호 클릭 시 LOT 상세 페이지로 이동함 --%>
+						<td><c:choose>
+								<c:when test="${defect.order_id > 0 and not empty defect.product_lot}">
+									<a class="lot-link"
+										href="${pageContext.request.contextPath}/lot/lothistory/detail?orderId=${defect.order_id}">
+										${defect.product_lot} </a>
+								</c:when>
+								<c:when test="${not empty defect.product_lot}">
+									${defect.product_lot}
+								</c:when>
+								<c:otherwise>-</c:otherwise>
+							</c:choose></td>
 					</tr>
 
 					<tr>
 						<th>품목코드</th>
-						<td>${defect.item_code}</td>
+						<%-- 품목코드 클릭 시 품목 상세 페이지로 이동함 --%>
+						<td><c:choose>
+								<c:when test="${defect.item_id > 0 and not empty defect.item_code}">
+									<a class="lot-link"
+										href="${pageContext.request.contextPath}/master/item/detail?itemId=${defect.item_id}">
+										${defect.item_code}</a>
+								</c:when>
+								<c:when test="${not empty defect.item_code}">
+									${defect.item_code}
+								</c:when>
+								<c:otherwise>-</c:otherwise>
+							</c:choose></td>
 
 						<th>품목명</th>
 						<td>${defect.item_name}</td>
@@ -286,7 +332,18 @@
 						<td>${defect.prod_doc_no}</td>
 
 						<th>작업지시번호</th>
-						<td>${defect.work_order_doc_no}</td>
+						<%-- 작업지시번호 클릭 시 작업지시 상세 페이지로 이동함 --%>
+						<td><c:choose>
+								<c:when test="${defect.order_id > 0 and not empty defect.work_order_doc_no}">
+									<a class="lot-link"
+										href="${pageContext.request.contextPath}/production/workorder/detail?orderId=${defect.order_id}">
+										${defect.work_order_doc_no}</a>
+								</c:when>
+								<c:when test="${not empty defect.work_order_doc_no}">
+									${defect.work_order_doc_no}
+								</c:when>
+								<c:otherwise>-</c:otherwise>
+							</c:choose></td>
 
 						<th>생산상태</th>
 						<td>${defect.prod_status}</td>
@@ -316,12 +373,10 @@
 						<td>${defect.good_qty}</td>
 
 						<th>불량수량</th>
-						<td>
-							<span class="detailText">${defect.defect_qty}</span>
-							<input type="number" name="defect_qty" class="detailInput"
-								value="${defect.defect_qty}" style="display: none;" min="0"
-								required>
-						</td>
+						<td><span class="detailText">${defect.defect_qty}</span> <input
+							type="number" name="defect_qty" class="detailInput"
+							value="${defect.defect_qty}" style="display: none;" min="0"
+							required></td>
 
 						<th>손실수량</th>
 						<td>${defect.loss_qty}</td>
@@ -413,21 +468,20 @@
 
 					<div class="modal_item">
 						<label class="modal_label">조치 일시<span
-							class="modal_required">*</span></label>
-						<input type="date" name="action_date"
-							class="modal_input modal_today" required>
+							class="modal_required">*</span></label> <input type="date"
+							name="action_date" class="modal_input modal_today" required>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">조치 부서</label>
-						<input type="text" id="actionDept" class="modal_input"
-							value="${defect.action_dept}" readonly>
+						<label class="modal_label">조치 부서</label> <input type="text"
+							id="actionDept" class="modal_input" value="${defect.action_dept}"
+							readonly>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">조치 담당자<span
-							class="modal_required">*</span></label>
-						<select name="emp_id" id="actionEmpId" class="modal_select"
+							class="modal_required">*</span></label> <select name="emp_id"
+							id="actionEmpId" class="modal_select"
 							data-dept="${defect.action_dept}" required>
 							<option value="">선택</option>
 						</select>

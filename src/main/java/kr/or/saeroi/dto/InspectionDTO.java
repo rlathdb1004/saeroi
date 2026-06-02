@@ -9,6 +9,7 @@ public class InspectionDTO {
 	private String item_name;
 	private String item_code;
 	private String item_unit;
+	private int item_id;
 	private String product_lot;
 	private String ename;
 	private String dept;
@@ -21,6 +22,7 @@ public class InspectionDTO {
 	private String insp_status;
 	private int inspection_qty;
 	private int good_qty;
+	private int defect_qty;
 	private String remark;
 	private String created_date;
 	private String updated_date;
@@ -32,6 +34,7 @@ public class InspectionDTO {
 	private int prod_qty;
 	private int loss_qty;
 	private String prod_status;
+	private int order_id;
 	private String work_order_doc_no;
 	private int order_qty;
 	private String order_date;
@@ -77,6 +80,12 @@ public class InspectionDTO {
 	}
 	public void setItem_unit(String item_unit) {
 		this.item_unit = item_unit;
+	}
+	public int getItem_id() {
+		return item_id;
+	}
+	public void setItem_id(int item_id) {
+		this.item_id = item_id;
 	}
 	public String getProduct_lot() {
 		return product_lot;
@@ -138,6 +147,12 @@ public class InspectionDTO {
 	public void setGood_qty(int good_qty) {
 		this.good_qty = good_qty;
 	}
+	public int getDefect_qty() {
+		return defect_qty;
+	}
+	public void setDefect_qty(int defect_qty) {
+		this.defect_qty = defect_qty;
+	}
 	public String getRemark() {
 		return remark;
 	}
@@ -192,6 +207,12 @@ public class InspectionDTO {
 	public void setProd_status(String prod_status) {
 		this.prod_status = prod_status;
 	}
+	public int getOrder_id() {
+		return order_id;
+	}
+	public void setOrder_id(int order_id) {
+		this.order_id = order_id;
+	}
 	public String getWork_order_doc_no() {
 		return work_order_doc_no;
 	}
@@ -214,13 +235,14 @@ public class InspectionDTO {
 	public String toString() {
 		return "InspectionDTO [insp_id=" + insp_id + ", doc_no=" + doc_no + ", doc_seq=" + doc_seq + ", insp_date="
 				+ insp_date + ", item_name=" + item_name + ", item_code=" + item_code + ", item_unit=" + item_unit
-				+ ", product_lot=" + product_lot + ", ename=" + ename + ", dept=" + dept + ", result=" + result
+				+ ", item_id=" + item_id + ", product_lot=" + product_lot + ", ename=" + ename + ", dept=" + dept + ", result=" + result
 				+ ", prod_id=" + prod_id + ", emp_id=" + emp_id + ", insp_type=" + insp_type + ", insp_status="
-				+ insp_status + ", inspection_qty=" + inspection_qty + ", good_qty=" + good_qty + ", remark=" + remark
-				+ ", created_date=" + created_date + ", updated_date=" + updated_date + ", use_yn=" + use_yn
-				+ ", prod_doc_no=" + prod_doc_no + ", prod_date=" + prod_date + ", prod_qty=" + prod_qty
-				+ ", loss_qty=" + loss_qty + ", prod_status=" + prod_status + ", work_order_doc_no="
-				+ work_order_doc_no + ", order_qty=" + order_qty + ", order_date=" + order_date + "]";
+				+ insp_status + ", inspection_qty=" + inspection_qty + ", good_qty=" + good_qty + ", defect_qty="
+				+ defect_qty + ", remark=" + remark + ", created_date=" + created_date + ", updated_date="
+				+ updated_date + ", use_yn=" + use_yn + ", prod_doc_no=" + prod_doc_no + ", prod_date=" + prod_date
+				+ ", prod_qty=" + prod_qty + ", loss_qty=" + loss_qty + ", prod_status=" + prod_status
+				+ ", order_id=" + order_id + ", work_order_doc_no=" + work_order_doc_no + ", order_qty=" + order_qty + ", order_date="
+				+ order_date + "]";
 	}
 	
 	
