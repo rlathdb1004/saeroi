@@ -10,456 +10,195 @@
 
 <style>
 
-	.coTable {
+	/* =====================================================
+		재고조회관리 전용 테이블 CSS
+		공통 테이블(coTable)을 사용하지 않고 이 JSP 전용 테이블로 새로 구성한다.
+		색상은 기존 공통 스타일과 맞추되, 공통 CSS 파일은 수정하지 않는다.
+	===================================================== */
+
+	.inventoryTableWrap {
 		width: 100%;
-		table-layout: fixed;
+		overflow-x: hidden;
+		border: 1px solid #d8e3df;
+		border-radius: 8px;
+		background: #ffffff;
 	}
 
-	.coTable th,
-	.coTable td {
-		font-size: 13px;
+	.inventoryTable {
+		width: 100%;
+		border-collapse: collapse;
+		table-layout: fixed;
+		background: #ffffff;
+	}
+
+	.inventoryTable th,
+	.inventoryTable td {
+		height: 54px;
+		padding: 10px 8px;
+		border-right: 1px solid #d8e3df;
+		border-bottom: 1px solid #d8e3df;
 		text-align: center;
 		vertical-align: middle;
+		font-size: 13px;
+		color: #001f3f;
 		white-space: nowrap;
-		padding: 12px 5px;
 		word-break: keep-all;
+		box-sizing: border-box;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
+	.inventoryTable th {
+		height: 48px;
+		background: #f2f7f5;
+		font-weight: 800;
+		color: #001f3f;
+	}
+
+	.inventoryTable tr:last-child td {
+		border-bottom: 0;
+	}
+
+	.inventoryTable th:last-child,
+	.inventoryTable td:last-child {
+		border-right: 0;
+	}
+
 	/* =====================================================
-		재고조회관리 목록 컬럼 폭 보정
-		등록 / 선택삭제 / 선택 체크박스 컬럼을 제거했기 때문에
-		남은 7개 컬럼 기준으로 폭을 다시 맞춘다.
-		공통 CSS 파일은 수정하지 않는다.
+		PC 7컬럼 폭
+		생성일까지 포함해서 총 7개 컬럼을 유지한다.
+		가로 스크롤이 생기지 않도록 모든 컬럼 합계를 100%로 맞춘다.
 	===================================================== */
 
 	/* 품목코드 */
-	.coTable th:nth-child(1),
-	.coTable td:nth-child(1) {
-		/* =================================================
-			품목코드 컬럼 폭 확장
-			RM-ADH-FILM-001, FG-GSK-EV6-PU-001 같은 긴 코드가
-			RM-... 형태로 과하게 잘리지 않도록 기존 16%에서 22%로 늘린다.
-			공통 CSS는 수정하지 않고 현재 JSP 안에서만 적용한다.
-		================================================= */
-		width: 22%;
-		font-size: 13px;
-		letter-spacing: -0.45px;
+	.inventoryTable th:nth-child(1),
+	.inventoryTable td:nth-child(1) {
+		width: 16%;
+		font-size: 12px;
+		letter-spacing: -0.7px;
 	}
 
 	/* 품목유형 */
-	.coTable th:nth-child(2),
-	.coTable td:nth-child(2) {
-		/* =================================================
-			품목코드 폭을 늘리기 위해 품목유형 컬럼은 조금 줄인다.
-		================================================= */
+	.inventoryTable th:nth-child(2),
+	.inventoryTable td:nth-child(2) {
 		width: 8%;
-		font-size: 13px;
-		letter-spacing: -0.3px;
 	}
 
 	/* 품목명 */
-	.coTable th:nth-child(3),
-	.coTable td:nth-child(3) {
-		/* =================================================
-			품목코드 폭 확장에 맞춰 품목명 컬럼을 기존 31%에서 27%로 조정한다.
-			품목명은 title 속성이 있어서 잘린 경우 마우스 오버로 전체 확인 가능하다.
-		================================================= */
-		width: 27%;
-		font-size: 13px;
-		letter-spacing: -0.3px;
+	.inventoryTable th:nth-child(3),
+	.inventoryTable td:nth-child(3) {
+		width: 22%;
+		letter-spacing: -0.4px;
 	}
 
 	/* 현재재고/단위 */
-	.coTable th:nth-child(4),
-	.coTable td:nth-child(4) {
-		width: 12%;
-		font-size: 13px;
+	.inventoryTable th:nth-child(4),
+	.inventoryTable td:nth-child(4) {
+		width: 14%;
 	}
 
 	/* 창고위치 */
-	.coTable th:nth-child(5),
-	.coTable td:nth-child(5) {
-		width: 13%;
-		font-size: 13px;
-		letter-spacing: -0.3px;
+	.inventoryTable th:nth-child(5),
+	.inventoryTable td:nth-child(5) {
+		width: 16%;
 	}
 
 	/* 생성일 */
-	.coTable th:nth-child(6),
-	.coTable td:nth-child(6) {
-		width: 12%;
-		font-size: 13px;
+	.inventoryTable th:nth-child(6),
+	.inventoryTable td:nth-child(6) {
+		width: 15%;
 	}
 
 	/* 상세 */
-	.coTable th:nth-child(7),
-	.coTable td:nth-child(7) {
-		width: 6%;
-		font-size: 13px;
+	.inventoryTable th:nth-child(7),
+	.inventoryTable td:nth-child(7) {
+		width: 9%;
 	}
 
+	.inventoryDetailBtn {
+		min-width: 44px;
+		padding: 6px 10px;
+		border: 0;
+		background: transparent;
+		color: #001f3f;
+		font-size: 13px;
+		font-weight: 700;
+		cursor: pointer;
+	}
+
+	.inventoryDetailBtn:hover {
+		color: #0b7a5a;
+		text-decoration: underline;
+	}
 
 	/* =====================================================
-		모바일 테이블 컬럼 보정
-		팀 공통 규칙에 맞게 mobile_show / mobile_hidden 만 사용한다.
-		공통 CSS 파일은 수정하지 않고, 이 JSP 안에서만 모바일 표시를 보정한다.
-
-		선택 컬럼은 팀장님 피드백에 따라 삭제했다.
-		모바일 노출 컬럼:
-		품목코드 / 품목명 / 현재재고/단위 / 창고위치 / 상세
+		모바일 테이블 보정
+		팀 공통 규칙과 동일하게 mobile_show / mobile_hidden 클래스를 사용한다.
 		상세 컬럼은 반드시 mobile_show로 유지한다.
 	===================================================== */
 	@media screen and (max-width: 768px) {
 
-		.coTable th.mobile_hidden,
-		.coTable td.mobile_hidden {
-			display: none !important;
+		.inventoryTableWrap {
+			width: 100%;
+			overflow-x: hidden;
 		}
 
-		.coTable th.mobile_show,
-		.coTable td.mobile_show {
-			display: table-cell !important;
-		}
-
-		.coTable {
+		.inventoryTable {
 			width: 100%;
 			table-layout: fixed;
 		}
 
-		.coTable th,
-		.coTable td {
-			font-size: 11px;
-			padding: 10px 4px;
-			letter-spacing: -0.5px;
-			overflow: hidden;
-			text-overflow: ellipsis;
-			white-space: nowrap;
-		}
-
-		/* 품목코드 */
-		.coTable th:nth-child(1),
-		.coTable td:nth-child(1) {
-			/* =================================================
-				모바일 품목코드 컬럼 확장
-				모바일에서도 품목코드가 RM-... 으로만 보이지 않게 폭을 늘린다.
-			================================================= */
-			width: 30%;
-			font-size: 10.5px;
-			letter-spacing: -0.6px;
-		}
-
-		/* 품목명 */
-		.coTable th:nth-child(3),
-		.coTable td:nth-child(3) {
-			/* =================================================
-				품목코드 컬럼 확장에 맞춰 품목명 컬럼을 조금 줄인다.
-			================================================= */
-			width: 26%;
-		}
-
-		/* 현재재고/단위 */
-		.coTable th:nth-child(4),
-		.coTable td:nth-child(4) {
-			width: 18%;
-		}
-
-		/* 창고위치 */
-		.coTable th:nth-child(5),
-		.coTable td:nth-child(5) {
-			width: 16%;
-		}
-
-		/* 상세 */
-		.coTable th:nth-child(7),
-		.coTable td:nth-child(7) {
-			width: 10%;
-		}
-
-		.coDetailBtn {
-			min-width: 36px;
-			padding: 6px 6px;
-			font-size: 11px;
-		}
-	}
-
-
-
-	/* =====================================================
-		품목코드 컬럼 최종 보정
-		공통 CSS는 건드리지 않고 inventoryManage.jsp 안에서만 적용한다.
-
-		목표:
-		1) 가로 스크롤바 제거
-		2) 품목코드가 RM-... 처럼 너무 짧게 잘리지 않게 보정
-		3) 팀 공통 테이블 구조는 그대로 유지
-	===================================================== */
-	.coTableWrap {
-		width: 100%;
-		overflow-x: hidden !important;
-	}
-
-	.coTable {
-		width: 100% !important;
-		min-width: 0 !important;
-		max-width: 100% !important;
-	table-layout: fixed !important;
-	}
-
-	/* 품목코드 */
-	.coTable th:nth-child(1),
-	.coTable td:nth-child(1) {
-		width: 14% !important;
-		min-width: 0 !important;
-		max-width: none !important;
-		font-size: 11.5px !important;
-		letter-spacing: -1px !important;
-		white-space: nowrap !important;
-		overflow: hidden !important;
-		text-overflow: clip !important;
-		padding-left: 3px !important;
-		padding-right: 3px !important;
-	}
-
-	/* 품목유형 */
-	.coTable th:nth-child(2),
-	.coTable td:nth-child(2) {
-		width: 8% !important;
-		min-width: 0 !important;
-		max-width: none !important;
-	}
-
-	/* 품목명 */
-	.coTable th:nth-child(3),
-	.coTable td:nth-child(3) {
-		width: 23% !important;
-		min-width: 0 !important;
-		max-width: none !important;
-	}
-
-	/* 현재재고/단위 */
-	.coTable th:nth-child(4),
-	.coTable td:nth-child(4) {
-		width: 16% !important;
-		min-width: 0 !important;
-		max-width: none !important;
-	}
-
-	/* 창고위치 */
-	.coTable th:nth-child(5),
-	.coTable td:nth-child(5) {
-		width: 17% !important;
-		min-width: 0 !important;
-		max-width: none !important;
-	}
-
-	/* 생성일 */
-	.coTable th:nth-child(6),
-	.coTable td:nth-child(6) {
-		width: 14% !important;
-		min-width: 0 !important;
-		max-width: none !important;
-	}
-
-	/* 상세 */
-	.coTable th:nth-child(7),
-	.coTable td:nth-child(7) {
-		width: 8% !important;
-		min-width: 0 !important;
-		max-width: none !important;
-	}
-
-	/* =====================================================
-		모바일 보정
-		공통 mobile_show / mobile_hidden 규칙은 그대로 사용하고,
-		가로 스크롤이 생기지 않도록 최소폭을 강제로 제거한다.
-	===================================================== */
-	@media screen and (max-width: 768px) {
-
-		.coTableWrap {
-			overflow-x: hidden !important;
-		}
-
-		.coTable {
-			width: 100% !important;
-			min-width: 0 !important;
-			max-width: 100% !important;
-		}
-
-		.coTable th:nth-child(1),
-		.coTable td:nth-child(1) {
-			width: 22% !important;
-			font-size: 10px !important;
-			letter-spacing: -1px !important;
-		}
-
-		.coTable th:nth-child(3),
-		.coTable td:nth-child(3) {
-			width: 30% !important;
-		}
-
-		.coTable th:nth-child(4),
-		.coTable td:nth-child(4) {
-			width: 20% !important;
-		}
-
-		.coTable th:nth-child(5),
-		.coTable td:nth-child(5) {
-			width: 18% !important;
-		}
-
-		.coTable th:nth-child(7),
-		.coTable td:nth-child(7) {
-			width: 10% !important;
-		}
-	}
-
-
-	/* =====================================================
-		재고조회관리 테이블 최종 폭 보정
-		공통 CSS / 공통 JSP는 수정하지 않고 이 JSP 안에서만 적용한다.
-
-		수정 목적:
-		1. 가로 스크롤바 제거
-		2. 품목코드가 RM-... 처럼 너무 심하게 잘리지 않도록 폭 조정
-		3. 전체 컬럼 합계를 100% 안으로 맞춰 화면 안에 들어오게 처리
-	===================================================== */
-	.coTableWrap {
-		width: 100% !important;
-		overflow-x: hidden !important;
-	}
-
-	.coTable {
-		width: 100% !important;
-		min-width: 0 !important;
-		max-width: 100% !important;
-		table-layout: fixed !important;
-	}
-
-	.coTable th,
-	.coTable td {
-		white-space: nowrap !important;
-		word-break: keep-all !important;
-		overflow: hidden !important;
-		text-overflow: ellipsis !important;
-		box-sizing: border-box !important;
-	}
-
-	/* 품목코드 */
-	.coTable th:nth-child(1),
-	.coTable td:nth-child(1) {
-		width: 14% !important;
-		font-size: 11.5px !important;
-		letter-spacing: -0.9px !important;
-	}
-
-	/* 품목유형 */
-	.coTable th:nth-child(2),
-	.coTable td:nth-child(2) {
-		width: 9% !important;
-		font-size: 12px !important;
-	}
-
-	/* 품목명 */
-	.coTable th:nth-child(3),
-	.coTable td:nth-child(3) {
-		width: 19% !important;
-		font-size: 12px !important;
-		letter-spacing: -0.5px !important;
-	}
-
-	/* 현재재고/단위 */
-	.coTable th:nth-child(4),
-	.coTable td:nth-child(4) {
-		width: 15% !important;
-		font-size: 12px !important;
-	}
-
-	/* 창고위치 */
-	.coTable th:nth-child(5),
-	.coTable td:nth-child(5) {
-		width: 17% !important;
-		font-size: 12px !important;
-	}
-
-	/* 생성일 */
-	.coTable th:nth-child(6),
-	.coTable td:nth-child(6) {
-		width: 16% !important;
-		font-size: 12px !important;
-	}
-
-	/* 상세 */
-	.coTable th:nth-child(7),
-	.coTable td:nth-child(7) {
-		width: 10% !important;
-		font-size: 12px !important;
-	}
-
-	/* =====================================================
-		모바일 전용 보정
-		팀 공통 mobile_show / mobile_hidden 규칙을 유지한다.
-		상세 컬럼은 반드시 mobile_show로 유지한다.
-	===================================================== */
-	@media screen and (max-width: 768px) {
-
-		.coTableWrap {
-			overflow-x: hidden !important;
-		}
-
-		.coTable {
-			width: 100% !important;
-			min-width: 0 !important;
-			table-layout: fixed !important;
-		}
-
-		.coTable th.mobile_hidden,
-		.coTable td.mobile_hidden {
+		.inventoryTable th.mobile_hidden,
+		.inventoryTable td.mobile_hidden {
 			display: none !important;
 		}
 
-		.coTable th.mobile_show,
-		.coTable td.mobile_show {
+		.inventoryTable th.mobile_show,
+		.inventoryTable td.mobile_show {
 			display: table-cell !important;
 		}
 
+		.inventoryTable th,
+		.inventoryTable td {
+			height: 54px;
+			padding: 8px 4px;
+			font-size: 11px;
+			letter-spacing: -0.6px;
+		}
+
 		/* 모바일 노출 컬럼: 품목코드 / 품목명 / 현재재고/단위 / 창고위치 / 상세 */
-		.coTable th:nth-child(1),
-		.coTable td:nth-child(1) {
-			width: 24% !important;
-			font-size: 10.5px !important;
-			letter-spacing: -0.9px !important;
+		.inventoryTable th:nth-child(1),
+		.inventoryTable td:nth-child(1) {
+			width: 24%;
+			font-size: 10.5px;
+			letter-spacing: -0.9px;
 		}
 
-		.coTable th:nth-child(3),
-		.coTable td:nth-child(3) {
-			width: 26% !important;
-			font-size: 11px !important;
+		.inventoryTable th:nth-child(3),
+		.inventoryTable td:nth-child(3) {
+			width: 26%;
 		}
 
-		.coTable th:nth-child(4),
-		.coTable td:nth-child(4) {
-			width: 20% !important;
-			font-size: 11px !important;
+		.inventoryTable th:nth-child(4),
+		.inventoryTable td:nth-child(4) {
+			width: 20%;
 		}
 
-		.coTable th:nth-child(5),
-		.coTable td:nth-child(5) {
-			width: 20% !important;
-			font-size: 10.5px !important;
+		.inventoryTable th:nth-child(5),
+		.inventoryTable td:nth-child(5) {
+			width: 20%;
+			font-size: 10.5px;
 		}
 
-		.coTable th:nth-child(7),
-		.coTable td:nth-child(7) {
-			width: 10% !important;
-			font-size: 11px !important;
+		.inventoryTable th:nth-child(7),
+		.inventoryTable td:nth-child(7) {
+			width: 10%;
 		}
 
-		.coDetailBtn {
-			min-width: 34px !important;
-			padding: 5px 4px !important;
-			font-size: 10.5px !important;
+		.inventoryDetailBtn {
+			min-width: 32px;
+			padding: 5px 4px;
+			font-size: 10.5px;
 		}
 	}
 
@@ -647,7 +386,7 @@
 
 		</div>
 
-		<div class="coTableWrap">
+		<div class="inventoryTableWrap">
 
 			<%-- =====================================================
 				재고조회 관리 목록 테이블 모바일 컬럼 규칙
@@ -664,7 +403,7 @@
 				상세 컬럼은 팀 공통 규칙상 반드시 mobile_show로 유지한다.
 				공통 JSP / 공통 CSS는 수정하지 않는다.
 			===================================================== --%>
-			<table class="coTable">
+			<table class="inventoryTable">
 
 				<thead>
 
@@ -771,7 +510,7 @@
 							<td class="mobile_show">
 
 								<button type="button"
-									class="coDetailBtn"
+									class="inventoryDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/stockList/detail?inventoryId=${inventory.inventoryId}'">
 
 									보기
