@@ -8,23 +8,25 @@
 <head>
 <meta charset="UTF-8">
 <title>Insert title here</title>
-<!-- <link rel="stylesheet" -->
-<%-- 	href="${pageContext.request.contextPath}/resources/css/common/detail.css"> --%>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/common/detail.css">
 <style>
 #chart {
 	max-width: 100%;
 	margin: 40px auto;
 }
+
+.defect-highlight { color: #FF4560; font-weight: bold; }
 /* 대시보드 전체 레이아웃 (가로 배열) */
 .dashboard-container {
 	display: flex;
 	gap: 20px;
-	max-width: 1400px; /* 화면에 맞춰 최대 폭 확장 */
+	max-width: 1400px;
 	margin: 20px auto;
 }
 
 .left-panel {
-	flex: 7; /* 좌측 70% 비율 */
+	flex: 7;
 	background: #fff;
 	padding: 15px;
 	border-radius: 8px;
@@ -32,7 +34,7 @@
 }
 
 .right-panel {
-	flex: 3; /* 우측 30% 비율 */
+	flex: 3;
 	display: flex;
 	flex-direction: column;
 	gap: 20px;
@@ -82,43 +84,29 @@
 }
 
 .dashboard-container {
-	flex-direction: column; /* 가로 배열을 세로 배열로 변경 ✨ */
+	flex-direction: column;
 }
 
 .apexcharts-toolbar {
-	top: 30px !important; /* 🔴 원래 0px 근처인 값을 아래로 내림 (원하는 만큼 수정 가능) */
-	right: 10px !important; /* 우측 여백 조정 */
+	top: 30px !important;
+	right: 10px !important;
 }
 
+/* [기본 PC 화면] 테이블 기본 설정 */
 .detail_info_table {
-	width: 100%; /* ◀ 테이블 전체 너비 (필요시 800px 등 고정값 입력 가능) */
-	table-layout: fixed; /* ◀ 이 속성이 있어야 아래 col 너비가 정확히 먹힙니다. */
+	width: 100% !important;
+	table-layout: fixed !important; /* ◀ 선을 완벽하게 맞추기 위해 fixed로 고정 */
 	border-collapse: collapse;
 	margin-bottom: 20px;
 	background-color: #ffffff;
 }
 
-/* ★ 여기 아래 숫자(px)를 원하시는 크기로 변경하시면 테이블 칸 크기가 바로 바뀝니다! */
-.detail_info_table col:nth-child(1) {
-	width: 170px;
-} /* 1번째 열 (제목 칸) */
-.detail_info_table col:nth-child(2) {
-	width: auto;
-} /* 2번째 열 (내용 입력 칸) */
-.detail_info_table col:nth-child(3) {
-	width: 170px;
-} /* 3번째 열 (제목 칸) */
-.detail_info_table col:nth-child(4) {
-	width: auto;
-} /* 4번째 열 (내용 입력 칸) */
-.detail_info_table col:nth-child(5) {
-	width: 170px;
-} /* 5번째 열 (제목 칸) */
-.detail_info_table col:nth-child(6) {
-	width: auto;
-} /* 6번째 열 (내용 입력 칸) */
+/* PC에서는 6개 열너비를 균등하게 설정 (오타 제거 완료) */
+.detail_info_table col {
+	width: 16.66% !important;
+}
 
-/* 테이블 행 및 셀 내부 기존 디자인 원형 복원 */
+/* 테이블 디자인 */
 .detail_info_table tr {
 	border-bottom: 1px solid #dde5e1;
 }
@@ -128,14 +116,15 @@
 	color: #1f3d34;
 	font-size: 14px;
 	font-weight: 600;
-	padding: 12px 16px;
-	text-align: left;
+	padding: 12px 4px;
+	text-align: center; /* 헤더도 중앙 정렬로 통일 */
 }
 
 .detail_info_table td {
-	padding: 12px 16px;
+	padding: 12px 4px;
 	font-size: 14px;
 	color: #333333;
+	text-align: center; /* 바디도 중앙 정렬 */
 }
 
 .detail_info_table input[type="text"], .detail_info_table input[type="number"],
@@ -150,9 +139,66 @@
 	background-color: #ffffff;
 }
 
-.detail_info_table input:focus, .detail_info_table select:focus {
-	outline: none;
-	border-color: #2f7d62;
+/* [태블릿 및 반응형 화면 영역] 기존 px 고정값 제거하고 유연하게 대처 */
+@media screen and (max-width: 1070px) {
+	.detail_info_table th, .detail_info_table td {
+		font-size: 13px !important;
+		padding: 10px 2px !important;
+	}
+}
+
+/* [모바일 화면 영역] 문제의 미디어 쿼리 완전 정돈 */
+@media screen and (max-width: 769px) {
+	/* display 설정을 테이블 본연의 속성으로 복원하거나 삭제합니다 */
+	.detail_info_table {
+		display: table !important;
+		width: 100% !important;
+	}
+	.detail_info_table thead {
+		display: table-header-group !important;
+	}
+	.detail_info_table tbody {
+		display: table-row-group !important;
+	}
+	.detail_info_table tr {
+		display: table-row !important; /* ◀ table 대신 table-row로 설정하여 열이 어긋나지 않도록 고정 */
+	}
+	.detail_info_table th, .detail_info_table td {
+		display: table-cell !important;
+		padding: 10px 2px !important;
+		font-size: 12px !important;
+		border: 1px solid #dde5e1 !important;
+	}
+
+	/* 모바일에서 숨겨지는 2개의 열(품목명, 불량)을 완전히 제외하고, 
+	   남은 4개의 열 너비를 25%로 균등 지정 */
+	.detail_info_table th:not(.mobile_hidden),
+	.detail_info_table td:not(.mobile_hidden) {
+		width: 25% !important;
+	}
+
+	/* 모바일에서 약속한 열 숨기기 */
+	.mobile_hidden, 
+    th.mobile_hidden, 
+    td.mobile_hidden {
+        display: none !important;
+        visibility: hidden !important;
+        opacity: 0 !important;
+        width: 0px !important;
+        padding: 0px !important;
+    }
+    
+    
+}
+
+/* 감싸는 영역에 가로 스크롤 허용 안전장치 */
+.coTableWrap {
+	width: 100%;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.detail_info_table {
+    table-layout: fixed !important;
 }
 </style>
 </head>
@@ -226,12 +272,12 @@
 				<table class="detail_info_table" id="reportTable">
 
 					<colgroup>
-						<col>
-						<col>
-						<col>
-						<col>
-						<col>
-						<col>
+						<col style="width: 20% !important;">
+						<col style="width: 25% !important;">
+						<col style="width: 14% !important;">
+						<col style="width: 14% !important;">
+						<col style="width: 13% !important;">
+						<col style="width: 14% !important;">
 					</colgroup>
 
 					<thead>
@@ -241,7 +287,7 @@
 							<th>계획량</th>
 							<th>작업량</th>
 							<th class="mobile_hidden">불량</th>
-							<th class="mobile_hidden">달성률</th>
+							<th>달성률</th>
 						</tr>
 					</thead>
 					<tbody id="tableBody">
@@ -459,11 +505,11 @@
 
       		row.innerHTML = ''
       			+ '<td>' + escapeHtml(item.계획일자) + '</td>'
-      			+ '<td class="mobile_hidden">' + escapeHtml(item.품목명) + '</td>'
-      			+ '<td>' + planQty.toLocaleString() + '</td>'
-      			+ '<td>' + orderQty.toLocaleString() + '</td>'
-      			+ '<td class="mobile_hidden" style="color: #FF4560; font-weight: bold;">' + defectQty.toLocaleString() + '</td>'
-      			+ '<td class="mobile_hidden">' + escapeHtml(achievementRate) + '</td>'
+      		    + '<td class="mobile_hidden">' + escapeHtml(item.품목명) + '</td>'
+      		    + '<td>' + planQty.toLocaleString() + '</td>'
+      		    + '<td>' + orderQty.toLocaleString() + '</td>'
+      		    + '<td class="mobile_hidden defect-highlight">' + defectQty.toLocaleString() + '</td>' // 인라인 style 제거
+      		    + '<td>' + escapeHtml(achievementRate) + '</td>';
       		tableBody.appendChild(row);
       		
       		totalPlan += Number(item.생산계획량 || 0);
