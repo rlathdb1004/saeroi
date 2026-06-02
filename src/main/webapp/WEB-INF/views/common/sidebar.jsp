@@ -135,14 +135,29 @@
 					</div>
 				</div>
 
-				<div class="siSubMenu">
+				<div class="siMenuGroup">
+					<%-- 품질관리 큰 메뉴와 하위 메뉴를 묶는 영역이다. --%>
+
+					<button type="button" class="siMenuTitle" data-main-menu="품질관리">
+						<%-- 품질관리 하위 메뉴를 열고 닫는 버튼이다. --%>
+
+						<span class="siMenuName">품질관리</span> <span class="siMenuArrow">
+							<svg class="siMenuArrowSvg" viewBox="0 0 24 24">
+																			<path d="M6 9L12 15L18 9"></path>
+																		</svg>
+						</span>
+
+					</button>
+
+					<div class="siSubMenu">
 						<%-- 품질관리 하위 메뉴 영역이다. --%>
 
 						<a href="${pageContext.request.contextPath}/quality/inspection"
 							class="siSubMenuLink" data-main-menu="품질관리" data-sub-menu="검사관리">
 							<%-- 검사 정보를 등록하고 조회하는 메뉴이다. --%> 검사관리
-						</a>
-				</div>
+						</a> 
+
+					</div>
 
 			</nav>
 
