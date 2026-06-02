@@ -24,7 +24,7 @@ public class LoginDAO {
         LoginDTO login = null;
 
         String sql =
-            "SELECT EMPNO, EMP_PW, ENAME, DEPT, JOB, HIRE_DATE, " +
+            "SELECT EMP_ID, EMPNO, EMP_PW, ENAME, DEPT, JOB, HIRE_DATE, " +
             "EMP_TEL, EMAIL, STATUS, ROLE, CREATED_DATE, UPDATED_DATE, PROFILE_IMG " +
             "FROM EMP WHERE EMPNO = ?";
 
@@ -38,6 +38,7 @@ public class LoginDAO {
                 if (rs.next()) {
 
                     login = new LoginDTO();
+                    login.setEmp_id(rs.getInt("EMP_ID"));
                     login.setEmpno(rs.getString("EMPNO"));
                     login.setEname(rs.getString("ENAME"));
                     login.setEmp_pw(rs.getString("EMP_PW"));

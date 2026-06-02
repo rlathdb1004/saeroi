@@ -428,6 +428,13 @@
 
 									<div class="modal_item">
 										<label class="modal_label">
+											정비 일자<span class="modal_required">*</span>
+										</label>
+										<input type="date" name="equip_main_date" class="modal_input" required>
+									</div>
+
+									<div class="modal_item">
+										<label class="modal_label">
 											작업자<span class="modal_required">*</span>
 										</label>
 										<select name="emp_id" class="modal_select id_select" required>
@@ -438,34 +445,27 @@
 												</option>
 											</c:forEach>
 										</select>
+									</div>									
+
+									<div class="modal_item">
+										<label class="modal_label">
+											정비 타입
+										</label>
+										<input type="text" name="equip_main_type" class="modal_input">
 									</div>
 
 									<div class="modal_item">
 										<label class="modal_label">
-											정비 일자<span class="modal_required">*</span>
+											정비 내용
 										</label>
-										<input type="date" name="equip_main_date" class="modal_input" required>
+										<input type="text" name="equip_main_content" class="modal_input">
 									</div>
 
 									<div class="modal_item">
 										<label class="modal_label">
-											정비 타입<span class="modal_required">*</span>
+											정비 시간
 										</label>
-										<input type="text" name="equip_main_type" class="modal_input" required>
-									</div>
-
-									<div class="modal_item">
-										<label class="modal_label">
-											정비 내용<span class="modal_required">*</span>
-										</label>
-										<input type="text" name="equip_main_content" class="modal_input" required>
-									</div>
-
-									<div class="modal_item">
-										<label class="modal_label">
-											정비 시간<span class="modal_required">*</span>
-										</label>
-										<input type="number" name="equip_main_time" class="modal_input" required>
+										<input type="number" name="equip_main_time" class="modal_input">
 									</div>
 
 									<div class="modal_item">
@@ -517,14 +517,7 @@
 											</label>
 											<input type="datetime-local" name="trouble_date" class="modal_input"
 												required>
-										</div>
-
-										<div class="modal_item">
-											<label class="modal_label">
-												고장 내용<span class="modal_required">*</span>
-											</label>
-											<input type="text" name="trouble_content" class="modal_input" required>
-										</div>
+										</div>									
 
 										<div class="modal_item">
 											<label class="modal_label">
@@ -538,6 +531,13 @@
 													</option>
 												</c:forEach>
 											</select>
+										</div>
+										
+										<div class="modal_item">
+											<label class="modal_label">
+												고장 내용
+											</label>
+											<input type="text" name="trouble_content" class="modal_input">
 										</div>
 
 										<div class="modal_item">
@@ -627,4 +627,24 @@
 					downtime.addEventListener("input", calcRuntime);
 					calcRuntime();
 				}
+				
+				
+				document.addEventListener("click", e => {
+
+				    const btn = e.target.closest(".modal_open_btn[data_modal_target='#eqp_trouble_insert']");
+				    if (btn) {
+				        const now = new Date();
+				        now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+				        const localDateTime = now.toISOString().slice(0, 16);
+				        const input = document.querySelector("#eqp_trouble_insert input[name='trouble_date']");
+				        if (input) input.value = localDateTime;
+				    }
+
+				    const btn2 = e.target.closest(".modal_open_btn[data_modal_target='#eqp_main_insert']");
+				    if (btn2) {
+				        const today = new Date().toISOString().slice(0, 10);
+				        const input2 = document.querySelector("#eqp_main_insert input[name='equip_main_date']");
+				        if (input2) input2.value = today;
+				    }
+				})
 			</script>

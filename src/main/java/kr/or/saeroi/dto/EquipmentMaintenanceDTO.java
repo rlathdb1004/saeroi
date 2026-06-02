@@ -13,7 +13,7 @@ public class EquipmentMaintenanceDTO {
 	private Date equip_main_date;
 	private String equip_main_type;
 	private String equip_main_content;
-	private int equip_main_time;
+	private Integer equip_main_time;
 	private String remark;	
 	private int history_id;
 	private String equip_name;
