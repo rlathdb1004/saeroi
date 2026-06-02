@@ -16,37 +16,6 @@
 	margin-top: 16px;
 }
 
-.inspection_related_table {
-	width: 100%;
-	border-collapse: collapse;
-	border: 1px solid #E1E8E3;
-}
-
-.inspection_related_table th, .inspection_related_table td {
-	border: 1px solid #E1E8E3;
-	padding: 11px 10px;
-	text-align: center;
-	font-size: 14px;
-}
-
-.inspection_related_table th {
-	background: #F4F8F5;
-	font-weight: 700;
-	white-space: nowrap;
-}
-
-.inspection_related_table .coTextLeft {
-	text-align: left;
-}
-
-.inspection_related_row {
-	cursor: pointer;
-}
-
-.inspection_related_row:hover td {
-	background: #F8FCF9;
-}
-
 /* 상세 페이지로 이동하는 값 링크임 */
 .lot-link {
 	display: inline-block;
@@ -355,48 +324,70 @@
 			<div class="detail_card_title">불량 정보</div>
 
 			<table class="detail_info_table">
-				<thead>
-					<tr>
-						<th>불량코드</th>
-						<th>발생일시</th>
-						<th>품목명</th>
-						<th>LOT번호</th>
-						<th>불량명</th>
-						<th>검사자</th>
-					</tr>
-				</thead>
+				<colgroup>
+					<col style="width: 12%;">
+					<col style="width: 21%;">
+					<col style="width: 12%;">
+					<col style="width: 21%;">
+					<col style="width: 12%;">
+					<col style="width: 22%;">
+				</colgroup>
 
 				<tbody>
-					<c:forEach var="defect" items="${inspectionDefectList}">
-						<%-- 불량코드와 LOT번호를 각각 상세 페이지로 연결함 --%>
-						<tr>
-							<td><a class="lot-link"
-								href="${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${defect.defect_list_id}">
-									${defect.defect_code}</a></td>
-							<td>${defect.defect_date}</td>
-							<td class="coTextLeft">${defect.item_name}</td>
-							<td><c:choose>
-									<c:when
-										test="${defect.order_id > 0 and not empty defect.product_lot}">
-										<a class="lot-link"
-											href="${pageContext.request.contextPath}/lot/lothistory/detail?orderId=${defect.order_id}">
-											${defect.product_lot}</a>
-									</c:when>
-									<c:when test="${not empty defect.product_lot}">
-										${defect.product_lot}
-									</c:when>
-									<c:otherwise>-</c:otherwise>
-								</c:choose></td>
-							<td>${defect.defect_name}</td>
-							<td>${defect.ename}</td>
-						</tr>
-					</c:forEach>
+					<c:choose>
+						<c:when test="${empty inspectionDefectList}">
+							<tr>
+								<th>안내</th>
+								<td>등록된 불량 정보가 없습니다.</td>
+							</tr>
+						</c:when>
 
-					<c:if test="${empty inspectionDefectList}">
-						<tr>
-							<td colspan="6">등록된 불량 정보가 없습니다.</td>
-						</tr>
-					</c:if>
+						<c:otherwise>
+							<c:forEach var="defect" items="${inspectionDefectList}"
+								varStatus="status">
+								<%-- 불량 정보를 PC에서는 가로 상세형, 모바일에서는 세로 상세형으로 표시함 --%>
+								<c:if test="${not status.first}">
+									<tr>
+										<th>구분</th>
+										<td colspan="5">${status.count}번째 불량</td>
+									</tr>
+								</c:if>
+								<tr>
+									<th>불량코드</th>
+									<td><a class="lot-link"
+										href="${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${defect.defect_list_id}">
+											${defect.defect_code}</a></td>
+
+									<th>발생일시</th>
+									<td>${defect.defect_date}</td>
+
+									<th>품목명</th>
+									<td>${defect.item_name}</td>
+								</tr>
+								<tr>
+									<th>LOT번호</th>
+									<td><c:choose>
+											<c:when
+												test="${defect.order_id > 0 and not empty defect.product_lot}">
+												<a class="lot-link"
+													href="${pageContext.request.contextPath}/lot/lothistory/detail?orderId=${defect.order_id}">
+													${defect.product_lot}</a>
+											</c:when>
+											<c:when test="${not empty defect.product_lot}">
+												${defect.product_lot}
+											</c:when>
+											<c:otherwise>-</c:otherwise>
+										</c:choose></td>
+
+									<th>불량명</th>
+									<td>${defect.defect_name}</td>
+
+									<th>검사자</th>
+									<td>${defect.ename}</td>
+								</tr>
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
 				</tbody>
 			</table>
 		</div>
@@ -405,33 +396,56 @@
 			<div class="detail_card_title">조치 및 처리내역</div>
 
 			<table class="detail_info_table">
-				<thead>
-					<tr>
-						<th>불량명</th>
-						<th>조치일시</th>
-						<th>조치부서</th>
-						<th>조치담당자</th>
-						<th>조치내용</th>
-					</tr>
-				</thead>
+				<colgroup>
+					<col style="width: 12%;">
+					<col style="width: 21%;">
+					<col style="width: 12%;">
+					<col style="width: 21%;">
+					<col style="width: 12%;">
+					<col style="width: 22%;">
+				</colgroup>
 
 				<tbody>
-					<c:forEach var="action" items="${inspectionActionList}">
-						<tr
-							onclick="location.href='${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${action.defect_list_id}'">
-							<td>${action.defect_name}</td>
-							<td>${action.action_date}</td>
-							<td>${action.dept}</td>
-							<td>${action.action_ename}</td>
-							<td class="coTextLeft">${action.action_content}</td>
-						</tr>
-					</c:forEach>
+					<c:choose>
+						<c:when test="${empty inspectionActionList}">
+							<tr>
+								<th>안내</th>
+								<td>등록된 조치 및 처리내역이 없습니다.</td>
+							</tr>
+						</c:when>
 
-					<c:if test="${empty inspectionActionList}">
-						<tr>
-							<td colspan="5">등록된 조치 및 처리내역이 없습니다.</td>
-						</tr>
-					</c:if>
+						<c:otherwise>
+							<c:forEach var="action" items="${inspectionActionList}"
+								varStatus="status">
+								<%-- 조치 정보를 PC에서는 가로 상세형, 모바일에서는 세로 상세형으로 표시함 --%>
+								<c:if test="${not status.first}">
+									<tr>
+										<th>구분</th>
+										<td colspan="5">${status.count}번째 조치</td>
+									</tr>
+								</c:if>
+								<tr>
+									<th>불량명</th>
+									<td><a class="lot-link"
+										href="${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${action.defect_list_id}">
+											${action.defect_name}</a></td>
+
+									<th>조치일시</th>
+									<td>${action.action_date}</td>
+
+									<th>조치부서</th>
+									<td>${action.dept}</td>
+								</tr>
+								<tr>
+									<th>조치담당자</th>
+									<td>${action.action_ename}</td>
+
+									<th>조치내용</th>
+									<td colspan="3">${action.action_content}</td>
+								</tr>
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
 				</tbody>
 			</table>
 		</div>
