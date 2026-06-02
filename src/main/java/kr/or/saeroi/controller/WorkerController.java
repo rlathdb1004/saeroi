@@ -222,6 +222,17 @@ public class WorkerController {
 			return "redirect:/login";
 		}
 
+		// =============================================================
+		// 작업자 작업지시 관리 화면 버튼 숨김 처리
+		// -------------------------------------------------------------
+		// 팀원 작업지시 JSP는 수정하지 않는다.
+		// 작업자 전용 URL로 들어온 경우에만 세션 role을 WORKER로 바꿔서
+		// 등록 / 선택삭제 / 검색결과 인쇄 버튼이 화면에 보이지 않게 한다.
+		// =============================================================
+		applyWorkerViewRole(
+			session,
+			loginUser);
+
 		String empno = "";
 
 		if (loginUser.getEmpno() != null) {
@@ -359,7 +370,15 @@ public class WorkerController {
 		model.addAttribute("headerTitle", "생산관리");
 		model.addAttribute("headerSubTitle", "작업지시 관리");
 
-		return "production/workorder.tiles";
+		// =============================================================
+		// 작업자 전용 읽기모드 표시
+		// -------------------------------------------------------------
+		// 작업자 전용 JSP에서 등록 / 삭제 / 인쇄 기능을 사용하지 않기 위한 표시값이다.
+		// 팀원 production/workorder.jsp는 수정하지 않는다.
+		// =============================================================
+		model.addAttribute("workerReadonlyMode", "Y");
+
+		return "worker/workerWorkOrder.tiles";
 	}
 
 	// =====================================================
@@ -383,6 +402,17 @@ public class WorkerController {
 
 			return "redirect:/login";
 		}
+
+		// =============================================================
+		// 작업자 생산실적 등록 화면 버튼 숨김 처리
+		// -------------------------------------------------------------
+		// 팀원 생산실적 JSP는 수정하지 않는다.
+		// 작업자 전용 URL로 들어온 경우에만 세션 role을 WORKER로 바꿔서
+		// 등록 / 선택삭제 / 검색결과 인쇄 버튼이 화면에 보이지 않게 한다.
+		// =============================================================
+		applyWorkerViewRole(
+			session,
+			loginUser);
 
 		String empno = "";
 
@@ -462,12 +492,67 @@ public class WorkerController {
 		model.addAttribute("headerTitle", "생산관리");
 		model.addAttribute("headerSubTitle", "생산실적 등록");
 
+		// =============================================================
+		// 작업자 전용 읽기모드 표시
+		// -------------------------------------------------------------
+		// 작업자 전용 JSP에서 등록 / 삭제 / 인쇄 기능을 사용하지 않기 위한 표시값이다.
+		// 팀원 production/productionresult.jsp는 수정하지 않는다.
+		// =============================================================
+		model.addAttribute("workerReadonlyMode", "Y");
+
 		// =================================================
 		// 중요
-		// worker/workerProductionResult 사용 안 함
-		// 기존 팀원 tiles 화면으로 이동해야 CSS가 깨지지 않음
+		// worker/workerProductionResult 사용
+		// 작업자 전용 tiles 화면으로 이동해서 버튼을 숨김
 		// =================================================
-		return "production/productionresult.tiles";
+		return "worker/workerProductionResult.tiles";
+	}
+
+	// =====================================================
+	// 작업자 화면 표시용 권한 보정
+	// -----------------------------------------------------
+	// 팀원 production/workorder.jsp, production/productionresult.jsp는
+	// sessionScope.loginUser.role 값을 기준으로 등록 / 삭제 / 인쇄 버튼을 보여준다.
+	//
+	// 관리자나 매니저가 일반 생산관리 메뉴로 들어갈 때는 기존 권한을 그대로 사용해야 하므로
+	// 팀원 Controller와 JSP는 건드리지 않는다.
+	//
+	// 대신 작업자 전용 URL인
+	// /worker/workorder
+	// /worker/productionresult
+	// 로 들어온 경우에만 현재 세션의 role을 WORKER로 바꿔서
+	// 작업자 화면에서는 등록 / 선택삭제 / 인쇄 버튼이 보이지 않게 한다.
+	// =====================================================
+	private void applyWorkerViewRole(
+			HttpSession session,
+			LoginDTO loginUser) {
+
+		if (session == null
+				|| loginUser == null) {
+
+			return;
+		}
+
+		// =================================================
+		// 원래 권한은 참고용으로만 보관한다.
+		// 추후 필요 시 로그아웃 전까지 확인할 수 있게 세션에 남겨둔다.
+		// =================================================
+		if (session.getAttribute("originWorkerRole") == null) {
+
+			session.setAttribute(
+				"originWorkerRole",
+				loginUser.getRole());
+		}
+
+		// =================================================
+		// Lombok @Data LoginDTO라서 setRole 사용 가능
+		// 작업자 전용 화면에서는 버튼 권한을 WORKER 기준으로 보이게 한다.
+		// =================================================
+		loginUser.setRole("WORKER");
+
+		session.setAttribute(
+			"loginUser",
+			loginUser);
 	}
 
 	// =====================================================

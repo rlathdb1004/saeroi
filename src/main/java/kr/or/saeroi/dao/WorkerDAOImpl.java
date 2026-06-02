@@ -366,6 +366,24 @@ public class WorkerDAOImpl implements WorkerDAO {
 					new ProductionDTO();
 
 				dto.setProdId(rs.getInt("PROD_ID"));
+
+				// =================================================
+				// 작업자 생산실적 실적번호 표시 보정
+				// -------------------------------------------------
+				// 관리자 화면은 팀원 기존 조회 로직을 타기 때문에 실적번호가 보이지만,
+				// 작업자 화면은 WorkerDAOImpl.selectMyProductionResultList()를 타므로
+				// 여기서 화면 표시용 실적번호를 직접 세팅한다.
+				//
+				// 팀원 ProductionController / Service / JSP는 수정하지 않는다.
+				// DTO의 기존 docNo / docSeq 필드만 사용해서 화면에서 실적번호가 비지 않게 한다.
+				// =================================================
+				dto.setDocNo(
+					makeWorkerProdDocNo(
+						rs.getString("PROD_DATE"),
+						rs.getInt("PROD_ID")));
+
+				dto.setDocSeq(rs.getInt("PROD_ID"));
+
 				dto.setOrderId(rs.getInt("ORDER_ID"));
 				dto.setProdDate(rs.getString("PROD_DATE"));
 				dto.setProdQty(rs.getInt("PROD_QTY"));
@@ -401,4 +419,39 @@ public class WorkerDAOImpl implements WorkerDAO {
 
 		return list;
 	}
+	// =====================================================
+	// 작업자 생산실적 화면용 실적번호 생성
+	// -----------------------------------------------------
+	// 팀원 생산실적 등록 / 조회 코드는 건드리지 않는다.
+	// 작업자 전용 DAO에서 조회한 생산실적은 실적번호 표시 값이 비어있을 수 있어서
+	// PROD_DATE + PROD_ID 기준으로 화면 표시용 번호를 만들어 DTO에 넣는다.
+	//
+	// 예)
+	// PROD_DATE : 2026-06-01
+	// PROD_ID   : 1
+	// 화면 표시 : PR-20260601-0001
+	// =====================================================
+	private String makeWorkerProdDocNo(
+			String prodDate,
+			int prodId) {
+
+		String dateText = "";
+
+		if (prodDate != null) {
+
+			dateText =
+				prodDate.replace("-", "").trim();
+		}
+
+		if (dateText.equals("")) {
+
+			dateText = "00000000";
+		}
+
+		return "PR-"
+				+ dateText
+				+ "-"
+				+ String.format("%04d", prodId);
+	}
+
 }

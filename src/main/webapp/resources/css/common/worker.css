@@ -1930,3 +1930,27 @@ button {
 	}
 }
 
+
+/* =====================================================
+	작업자 전용 생산관리 읽기모드 보정
+	-----------------------------------------------------
+	팀원 원본 JSP는 수정하지 않는다.
+	WorkerController가 작업자 전용 JSP로 이동하게 하고,
+	혹시 기존 버튼 클래스가 남아있어도 작업자 전용 화면에서는 보이지 않도록
+	worker.css에서 한 번 더 안전하게 숨긴다.
+
+	관리자가 /production/workorder 또는 /production/productionresult로 들어가는 경우에는
+	이 CSS 클래스가 붙은 작업자 전용 화면을 타지 않으므로 기존 버튼이 그대로 보인다.
+===================================================== */
+.workerReadonlyPage .workorder_print_btn,
+.workerReadonlyPage .modal_open_btn,
+.workerReadonlyPage button[onclick="deleteCheck()"] {
+	display: none !important;
+}
+
+.workerReadonlyPage .search-btn-right {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+}
+
