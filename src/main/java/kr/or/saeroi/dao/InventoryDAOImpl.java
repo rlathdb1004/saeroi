@@ -181,12 +181,11 @@ public class InventoryDAOImpl implements InventoryDAO {
 			}
 
 			// =============================================================
-			// 최신 반영순 정렬
-			// 재고조회관리에서는 새로 등록한 재고뿐 아니라,
-			// 자재입출고 등록으로 기존 재고 수량이 갱신된 품목도 맨 위에 보여야 한다.
-			// 그래서 CREATED_DATE가 아니라 UPDATED_DATE DESC를 우선 정렬 기준으로 사용한다.
+			// 생성일 최신순 정렬
+			// 팀 피드백 반영: 재고조회관리 목록은 UPDATED_DATE가 아니라
+			// CREATED_DATE 기준으로 최신 등록건이 위에 오도록 한다.
 			// =============================================================
-			sql += " ORDER BY NVL(INV.UPDATED_DATE, INV.CREATED_DATE) DESC, INV.INVENTORY_ID DESC ";
+			sql += " ORDER BY INV.CREATED_DATE DESC, INV.INVENTORY_ID DESC ";
 
 			PreparedStatement pstmt =
 				conn.prepareStatement(sql);
@@ -792,16 +791,20 @@ public class InventoryDAOImpl implements InventoryDAO {
 	// =========================================================================
 	// 재고 상세페이지 하단 입출고 내역 조회
 	// -------------------------------------------------------------------------
-	// 팀장님 피드백 반영 내용
-	// 재고번호를 클릭했을 때 단순히 현재재고만 보는 것이 아니라,
-	// 해당 재고의 품목이 언제 입고되었고, 작업지시에서 언제 사용되었고,
-	// 어떤 LOT / 입출고번호로 이력이 남았는지 확인할 수 있어야 한다.
+	// 팀장님 피드백 반영 최종 방향
+	// 기존에는 INVENTORY_ID → ITEM_ID 기준으로 같은 품목의 전체 입출고 이력을
+	// 가져와서 60건 이상이 한꺼번에 보이는 문제가 있었다.
 	//
-	// 기준:
-	// - inventoryId로 INVENTORY를 먼저 찾는다.
-	// - 찾은 ITEM_ID 기준으로 MATERIAL_INOUT 이력을 조회한다.
-	// - 같은 창고위치 기준 이력만 보려고 하면 MATERIAL_INOUT에 창고 컬럼이 없어서
-	//   현재 DB 구조에서는 ITEM_ID 기준으로 전체 입출고 이력을 보여준다.
+	// 변경 기준:
+	// 1. 재고번호로 해당 품목의 최신 자재 LOT번호 1개를 찾는다.
+	// 2. 그 LOT번호와 같은 MATERIAL_INOUT 이력만 가져온다.
+	// 3. 입고/출고를 시간순으로 계산해서 누적잔량을 만든다.
+	// 4. 화면에는 최신순으로 보여주되, 각 행에는 그 시점의 잔량을 표시한다.
+	//
+	// 예:
+	// 입고 1000 → 누적잔량 1000
+	// 출고 100  → 누적잔량 900
+	// 출고 200  → 누적잔량 700
 	// =========================================================================
 	@Override
 	public List<InventoryDTO> selectInventoryInoutHistoryList(
@@ -809,6 +812,10 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 		List<InventoryDTO> list =
 			new ArrayList<InventoryDTO>();
+
+		int totalInQty = 0;
+		int totalOutQty = 0;
+		int remainQty = 0;
 
 		try {
 
@@ -833,13 +840,36 @@ public class InventoryDAOImpl implements InventoryDAO {
 			sql += "     I.ITEM_NAME, ";
 			sql += "     I.ITEM_TYPE, ";
 			sql += "     I.ITEM_UNIT ";
-			sql += " FROM INVENTORY INV ";
-			sql += " JOIN MATERIAL_INOUT MI ";
-			sql += "     ON INV.ITEM_ID = MI.ITEM_ID ";
+			sql += " FROM MATERIAL_INOUT MI ";
 			sql += " JOIN ITEM I ";
 			sql += "     ON MI.ITEM_ID = I.ITEM_ID ";
-			sql += " WHERE INV.INVENTORY_ID = ? ";
-			sql += " ORDER BY MI.INOUT_DATE DESC, MI.INOUT_ID DESC ";
+
+			// =============================================================
+			// LOT 기준 조회
+			// 최신 LOT 하나를 먼저 찾고, 그 LOT의 입고/출고 흐름만 조회한다.
+			// 품목코드 기준 전체 조회가 아니므로 같은 품목의 다른 LOT 이력은 섞이지 않는다.
+			// =============================================================
+			sql += " WHERE MI.MATERIAL_LOT = ( ";
+			sql += "     SELECT MATERIAL_LOT ";
+			sql += "     FROM ( ";
+			sql += "         SELECT M2.MATERIAL_LOT ";
+			sql += "         FROM MATERIAL_INOUT M2 ";
+			sql += "         WHERE M2.ITEM_ID = ( ";
+			sql += "             SELECT ITEM_ID ";
+			sql += "             FROM INVENTORY ";
+			sql += "             WHERE INVENTORY_ID = ? ";
+			sql += "         ) ";
+			sql += "         AND M2.MATERIAL_LOT IS NOT NULL ";
+			sql += "         ORDER BY M2.INOUT_DATE DESC, M2.INOUT_ID DESC ";
+			sql += "     ) ";
+			sql += "     WHERE ROWNUM = 1 ";
+			sql += " ) ";
+
+			// =============================================================
+			// 누적잔량 계산을 위해 SQL에서는 시간순으로 가져온다.
+			// 화면에서는 최신순으로 보여주기 위해 Java에서 list.add(0, dto)를 사용한다.
+			// =============================================================
+			sql += " ORDER BY MI.INOUT_DATE ASC, MI.INOUT_ID ASC ";
 
 			PreparedStatement pstmt =
 				conn.prepareStatement(sql);
@@ -854,33 +884,41 @@ public class InventoryDAOImpl implements InventoryDAO {
 				InventoryDTO dto =
 					new InventoryDTO();
 
+				String inoutType =
+					rs.getString("INOUT_TYPE");
+
+				int qty =
+					rs.getInt("INOUT_QTY");
+
 				dto.setInoutId(rs.getInt("INOUT_ID"));
 				dto.setDocNo(rs.getString("DOC_NO"));
-				dto.setInoutType(rs.getString("INOUT_TYPE"));
+				dto.setInoutType(inoutType);
 				dto.setMaterialLot(rs.getString("MATERIAL_LOT"));
-				dto.setInoutQty(rs.getInt("INOUT_QTY"));
+				dto.setInoutQty(qty);
 
 				// =====================================================
-				// 팀장님 피드백 반영
-				// 재고 상세 하단 내역서에서 "몇 개가 입고됐고,
-				// 몇 개가 출고/사용됐는지" 한눈에 보이도록
-				// 입고수량 / 출고수량을 분리해서 DTO에 담는다.
-				//
-				// MI      : 입고수량
-				// MO      : 출고수량
-				// MO-PROD : 작업지시 자동투입이므로 사용/출고수량
-				// 그 외   : 출고수량으로 처리
+				// 입고/출고 분리 + 누적잔량 계산
+				// MI는 입고로 더하고, 그 외 MO/MO-PROD는 출고 또는 사용으로 뺀다.
 				// =====================================================
-				if ("MI".equals(rs.getString("INOUT_TYPE"))) {
+				if ("MI".equals(inoutType)) {
 
-					dto.setInQty(rs.getInt("INOUT_QTY"));
+					dto.setInQty(qty);
 					dto.setOutQty(0);
+
+					totalInQty += qty;
+					remainQty += qty;
 
 				} else {
 
 					dto.setInQty(0);
-					dto.setOutQty(rs.getInt("INOUT_QTY"));
+					dto.setOutQty(qty);
+
+					totalOutQty += qty;
+					remainQty -= qty;
 				}
+
+				dto.setRemainQty(remainQty);
+
 				dto.setInoutDate(rs.getDate("INOUT_DATE"));
 				dto.setStatus(rs.getString("STATUS"));
 				dto.setHistoryRemark(rs.getString("REMARK"));
@@ -893,7 +931,26 @@ public class InventoryDAOImpl implements InventoryDAO {
 				dto.setItemType(rs.getString("ITEM_TYPE"));
 				dto.setItemUnit(rs.getString("ITEM_UNIT"));
 
-				list.add(dto);
+				// =====================================================
+				// 화면은 최신순이 보기 편하므로 맨 앞에 추가한다.
+				// 단, remainQty는 이미 시간순 기준으로 계산된 값이므로 정확하다.
+				// =====================================================
+				list.add(0, dto);
+			}
+
+			// =============================================================
+			// LOT 요약값 세팅
+			// JSP에서 첫 번째 행을 기준으로 총입고/총출고/현재잔량을 보여줄 수 있게
+			// 모든 DTO에 같은 요약값을 넣는다.
+			// =============================================================
+			for (int i = 0; i < list.size(); i++) {
+
+				InventoryDTO dto =
+					list.get(i);
+
+				dto.setTotalInQty(totalInQty);
+				dto.setTotalOutQty(totalOutQty);
+				dto.setCurrentRemainQty(remainQty);
 			}
 
 			rs.close();
@@ -907,6 +964,7 @@ public class InventoryDAOImpl implements InventoryDAO {
 
 		return list;
 	}
+
 
 	// =========================================================================
 	// 재고 수정

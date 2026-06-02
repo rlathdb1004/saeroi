@@ -54,6 +54,12 @@ public class InoutDTO {
 	private int inventoryStock;      // 현재재고
 
 	// =============================================================
+	// INVENTORY 테이블 JOIN 조회용 컬럼
+	// 상세페이지 품목코드 링크를 재고 상세페이지로 연결하기 위해 사용한다.
+	// =============================================================
+	private int inventoryId;         // 재고 ID
+
+	// =============================================================
 	// 입출고 ID
 	// =============================================================
 	public int getInoutId() {
@@ -306,6 +312,18 @@ public class InoutDTO {
 
 	public void setInventoryStock(int inventoryStock) {
 		this.inventoryStock = inventoryStock;
+	}
+
+	// =============================================================
+	// 재고 ID
+	// 품목코드 클릭 시 재고 상세페이지로 이동하기 위한 값
+	// =============================================================
+	public int getInventoryId() {
+		return inventoryId;
+	}
+
+	public void setInventoryId(int inventoryId) {
+		this.inventoryId = inventoryId;
 	}
 
 	// =============================================================

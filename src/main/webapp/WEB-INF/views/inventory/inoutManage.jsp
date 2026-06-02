@@ -115,6 +115,72 @@
 		width: 55px;
 	}
 
+
+	/* =====================================================
+		모바일 테이블 컬럼 보정
+		팀 공통 규칙에 맞게 mobile_show / mobile_hidden 만 사용한다.
+		공통 CSS 파일은 수정하지 않고, 이 JSP 안에서만 모바일 표시를 보정한다.
+		모바일 노출 컬럼:
+		선택 / 입출고구분 / 품목명 / 일자 / 상세
+		상세 컬럼은 반드시 mobile_show로 유지한다.
+	===================================================== */
+	@media screen and (max-width: 768px) {
+
+		.coTable col.mobile_hidden,
+		.coTable th.mobile_hidden,
+		.coTable td.mobile_hidden {
+			display: none !important;
+		}
+
+		.coTable th.mobile_show,
+		.coTable td.mobile_show {
+			display: table-cell !important;
+		}
+
+		.coTable {
+			width: 100%;
+			table-layout: fixed;
+		}
+
+		.coTable th,
+		.coTable td {
+			font-size: 11px;
+			padding: 10px 4px;
+			letter-spacing: -0.5px;
+		}
+
+		.coTable th:nth-child(1),
+		.coTable td:nth-child(1) {
+			width: 48px;
+		}
+
+		.coTable th:nth-child(3),
+		.coTable td:nth-child(3) {
+			width: 70px;
+		}
+
+		.coTable th:nth-child(4),
+		.coTable td:nth-child(4) {
+			width: auto;
+		}
+
+		.coTable th:nth-child(7),
+		.coTable td:nth-child(7) {
+			width: 92px;
+		}
+
+		.coTable th:nth-child(8),
+		.coTable td:nth-child(8) {
+			width: 58px;
+		}
+
+		.coDetailBtn {
+			min-width: 38px;
+			padding: 6px 8px;
+			font-size: 11px;
+		}
+	}
+
 </style>
 
 <div class="coPageWrap">
@@ -267,6 +333,14 @@
 
 		<div class="coTableWrap">
 
+			<%-- =====================================================
+				자재입출고관리 목록 모바일 컬럼 규칙 최종 반영
+				mobile_show   : 모바일에서도 보여줄 컬럼
+				mobile_hidden : 모바일에서 숨길 컬럼
+				모바일 노출 컬럼은 선택 / 입출고구분 / 품목명 / 일자 / 상세 총 5개이다.
+				상세 컬럼은 팀 공통 규칙상 반드시 mobile_show로 유지한다.
+				공통 JSP / 공통 CSS는 수정하지 않는다.
+			===================================================== --%>
 			<table class="coTable">
 
 				<%-- =====================================================
@@ -274,30 +348,45 @@
 					공통 테이블 리사이즈 기능은 유지하고, 처음 진입 시 기본 폭만 맞춘다.
 				===================================================== --%>
 				<colgroup>
-					<col style="width:48px;">
-					<col style="width:190px;">
-					<col style="width:80px;">
-					<col style="width:200px;">
-					<col style="width:80px;">
-					<col style="width:55px;">
-					<col style="width:110px;">
-					<col style="width:55px;">
+					<%-- 모바일 표시: 선택 --%>
+					<col class="mobile_show" style="width:48px;">
+
+					<%-- 모바일 숨김: 입출고번호 --%>
+					<col class="mobile_hidden" style="width:190px;">
+
+					<%-- 모바일 표시: 입출고구분 --%>
+					<col class="mobile_show" style="width:80px;">
+
+					<%-- 모바일 표시: 품목명 --%>
+					<col class="mobile_show" style="width:200px;">
+
+					<%-- 모바일 숨김: 입출고량 --%>
+					<col class="mobile_hidden" style="width:80px;">
+
+					<%-- 모바일 숨김: 단위 --%>
+					<col class="mobile_hidden" style="width:55px;">
+
+					<%-- 모바일 표시: 일자 --%>
+					<col class="mobile_show" style="width:110px;">
+
+					<%-- 모바일 표시: 상세 --%>
+					<col class="mobile_show" style="width:55px;">
 				</colgroup>
 
 				<thead>
 					<tr>
-						<th>
+						<th class="mobile_show">
 							<label id="checkAllLabel">선택</label>
 							<input type="checkbox" id="checkAll" style="display:none;">
 						</th>
 
-						<th>입출고번호</th>
-						<th>입출고구분</th>
-						<th>품목명</th>
-						<th>입출고량</th>
-						<th>단위</th>
-						<th>일자</th>
-						<th>상세</th>
+						<th class="mobile_hidden">입출고번호</th>
+						<th class="mobile_show">입출고구분</th>
+						<th class="mobile_show">품목명</th>
+						<th class="mobile_hidden">입출고량</th>
+						<th class="mobile_hidden">단위</th>
+						<th class="mobile_show">일자</th>
+						<th class="mobile_show">상세</th>
 					</tr>
 				</thead>
 
@@ -309,7 +398,7 @@
 
 						<tr>
 
-							<td>
+							<td class="mobile_show">
 								<input type="checkbox"
 									name="inoutIds"
 									value="${inout.inoutId}">
@@ -327,11 +416,11 @@
 								2) DOC_NO가 비어 있으면 입출고구분 + 일자 + INOUT_ID로 표시용 번호 생성
 								하도록 처리했기 때문에 여기서는 displayDocNo만 출력한다.
 							===================================================== --%>
-							<td title="${inout.displayDocNo}">
+							<td class="mobile_hidden" title="${inout.displayDocNo}">
 								${inout.displayDocNo}
 							</td>
 
-							<td>
+							<td class="mobile_show">
 								<c:choose>
 									<c:when test="${inout.inoutType eq 'MI'}">입고</c:when>
 									<c:when test="${inout.inoutType eq 'MO-PROD'}">출고</c:when>
@@ -339,23 +428,23 @@
 								</c:choose>
 							</td>
 
-							<td>
+							<td class="mobile_show" title="${inout.itemName}">
 								${inout.itemName}
 							</td>
 
-							<td>
+							<td class="mobile_hidden">
 								${inout.inoutQty}
 							</td>
 
-							<td>
+							<td class="mobile_hidden">
 								${inout.itemUnit}
 							</td>
 
-							<td>
+							<td class="mobile_show">
 								${inout.inoutDate}
 							</td>
 
-							<td>
+							<td class="mobile_show">
 								<button type="button"
 									class="coDetailBtn"
 									onclick="location.href='${pageContext.request.contextPath}/inventory/materialIn/detail?inoutId=${inout.inoutId}'">
@@ -535,7 +624,7 @@
 
 					<%-- =====================================================
 						담당자
-						CLIENT.CLIENT_MAN 값을 자동 표시한다.
+						현재 로그인한 사람 이름을 자동 표시한다. DB 저장은 Controller에서 로그인 세션 EMP_ID로 처리한다.
 					===================================================== --%>
 					<div class="modal_item">
 
@@ -546,6 +635,7 @@
 						<input type="text"
 							id="insertClientManager"
 							class="modal_input"
+							value="${loginEmpName}"
 							readonly>
 
 					</div>
@@ -1044,7 +1134,10 @@
 				}
 
 				if (insertClientManager != null) {
-					insertClientManager.value = "";
+					// =====================================================
+					// 품목을 선택하지 않아도 담당자는 로그인 사용자 이름으로 유지한다.
+					// =====================================================
+					insertClientManager.value = "${loginEmpName}";
 				}
 
 				if (insertInventoryStock != null) {
@@ -1078,8 +1171,13 @@
 
 				if (insertClientManager != null) {
 
+					// =====================================================
+					// 팀 피드백 반영
+					// 품목을 바꿔도 담당자는 거래처 담당자가 아니라
+					// 현재 로그인한 사람 이름만 표시한다.
+					// =====================================================
 					insertClientManager.value =
-						data.clientManager || "";
+						"${loginEmpName}";
 				}
 
 				if (insertInventoryStock != null) {

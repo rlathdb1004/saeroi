@@ -379,7 +379,13 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += "     C.CLIENT_NAME, ";
 			sql += "     C.CLIENT_MAN, ";
 			sql += "     IV.STOCK_LOCATION, ";
-			sql += "     IV.INVENTORY_STOCK ";
+			sql += "     IV.INVENTORY_STOCK, ";
+			// =====================================================
+			// 품목코드 링크용 재고번호
+			// 상세페이지에서 품목코드를 누르면 재고 상세페이지로 이동하게 하기 위해
+			// 해당 품목의 대표 INVENTORY_ID를 같이 조회한다.
+			// =====================================================
+			sql += "     IV.INVENTORY_ID ";
 			sql += " FROM MATERIAL_INOUT MI ";
 			sql += " JOIN ITEM I ";
 			sql += " ON MI.ITEM_ID = I.ITEM_ID ";
@@ -412,6 +418,11 @@ public class InoutDAOImpl implements InoutDAO {
 			sql += " LEFT JOIN ( ";
 			sql += "     SELECT ";
 			sql += "         ITEM_ID, ";
+			// =====================================================
+			// 같은 품목에 재고 행이 여러 개 있을 수 있으므로
+			// 대표 재고번호는 가장 최근 INVENTORY_ID를 사용한다.
+			// =====================================================
+			sql += "         MAX(INVENTORY_ID) AS INVENTORY_ID, ";
 			sql += "         MAX(STOCK_LOCATION) AS STOCK_LOCATION, ";
 			sql += "         SUM(INVENTORY_STOCK) AS INVENTORY_STOCK ";
 			sql += "     FROM INVENTORY ";
@@ -459,6 +470,11 @@ public class InoutDAOImpl implements InoutDAO {
 
 				dto.setStockLocation(rs.getString("STOCK_LOCATION"));
 				dto.setInventoryStock(rs.getInt("INVENTORY_STOCK"));
+
+				// =====================================================
+				// 상세페이지 품목코드 링크용 재고번호
+				// =====================================================
+				dto.setInventoryId(rs.getInt("INVENTORY_ID"));
 			}
 
 			rs.close();
