@@ -28,83 +28,74 @@
 	}
 
 	/* =====================================================
-		선택
+		재고조회관리 목록 컬럼 폭 보정
+		등록 / 선택삭제 / 선택 체크박스 컬럼을 제거했기 때문에
+		남은 7개 컬럼 기준으로 폭을 다시 맞춘다.
+		공통 CSS 파일은 수정하지 않는다.
 	===================================================== */
+
+	/* 품목코드 */
 	.coTable th:nth-child(1),
 	.coTable td:nth-child(1) {
-		width: 4%;
+		/* =================================================
+			품목코드 컬럼 폭 확장
+			RM-ADH-FILM-001, FG-GSK-EV6-PU-001 같은 긴 코드가
+			RM-... 형태로 과하게 잘리지 않도록 기존 16%에서 22%로 늘린다.
+			공통 CSS는 수정하지 않고 현재 JSP 안에서만 적용한다.
+		================================================= */
+		width: 22%;
+		font-size: 13px;
+		letter-spacing: -0.45px;
 	}
 
-	/* =====================================================
-		품목코드
-		품목명이 더 넓게 보이도록 기존보다 살짝 줄임
-	===================================================== */
+	/* 품목유형 */
 	.coTable th:nth-child(2),
 	.coTable td:nth-child(2) {
-		width: 14%;
+		/* =================================================
+			품목코드 폭을 늘리기 위해 품목유형 컬럼은 조금 줄인다.
+		================================================= */
+		width: 8%;
 		font-size: 13px;
 		letter-spacing: -0.3px;
 	}
 
-	/* =====================================================
-		품목유형
-		원자재 / 완제품만 표시되므로 폭을 크게 줄임
-	===================================================== */
+	/* 품목명 */
 	.coTable th:nth-child(3),
 	.coTable td:nth-child(3) {
-		width: 7%;
+		/* =================================================
+			품목코드 폭 확장에 맞춰 품목명 컬럼을 기존 31%에서 27%로 조정한다.
+			품목명은 title 속성이 있어서 잘린 경우 마우스 오버로 전체 확인 가능하다.
+		================================================= */
+		width: 27%;
 		font-size: 13px;
 		letter-spacing: -0.3px;
 	}
 
-	/* =====================================================
-		품목명
-		가장 많이 보여야 하는 컬럼이므로 폭을 크게 늘림
-	===================================================== */
+	/* 현재재고/단위 */
 	.coTable th:nth-child(4),
 	.coTable td:nth-child(4) {
-		width: 31%;
+		width: 12%;
 		font-size: 13px;
-		letter-spacing: -0.3px;
 	}
 
-	/* =====================================================
-		현재재고/단위
-		숫자 + 단위만 표시되므로 폭을 줄임
-	===================================================== */
+	/* 창고위치 */
 	.coTable th:nth-child(5),
 	.coTable td:nth-child(5) {
-		width: 10%;
-		font-size: 13px;
-	}
-
-	/* =====================================================
-		창고위치
-		품목명 공간 확보를 위해 기존보다 줄임
-	===================================================== */
-	.coTable th:nth-child(6),
-	.coTable td:nth-child(6) {
-		width: 11%;
+		width: 13%;
 		font-size: 13px;
 		letter-spacing: -0.3px;
 	}
 
-	/* =====================================================
-		생성일
-		날짜만 표시되므로 기존보다 줄임
-	===================================================== */
-	.coTable th:nth-child(7),
-	.coTable td:nth-child(7) {
-		width: 13%;
+	/* 생성일 */
+	.coTable th:nth-child(6),
+	.coTable td:nth-child(6) {
+		width: 12%;
 		font-size: 13px;
 	}
 
-	/* =====================================================
-		상세
-		보기 버튼만 있으므로 최소 폭으로 줄임
-	===================================================== */
-	.coTable th:nth-child(8),
-	.coTable td:nth-child(8) {
+	/* 상세 */
+	.coTable th:nth-child(7),
+	.coTable td:nth-child(7) {
 		width: 6%;
 		font-size: 13px;
 	}
@@ -114,8 +105,10 @@
 		모바일 테이블 컬럼 보정
 		팀 공통 규칙에 맞게 mobile_show / mobile_hidden 만 사용한다.
 		공통 CSS 파일은 수정하지 않고, 이 JSP 안에서만 모바일 표시를 보정한다.
+
+		선택 컬럼은 팀장님 피드백에 따라 삭제했다.
 		모바일 노출 컬럼:
-		선택 / 품목명 / 현재재고/단위 / 창고위치 / 상세
+		품목코드 / 품목명 / 현재재고/단위 / 창고위치 / 상세
 		상세 컬럼은 반드시 mobile_show로 유지한다.
 	===================================================== */
 	@media screen and (max-width: 768px) {
@@ -140,49 +133,333 @@
 			font-size: 11px;
 			padding: 10px 4px;
 			letter-spacing: -0.5px;
-		}
-
-		.coTable th:nth-child(1),
-		.coTable td:nth-child(1) {
-			width: 46px;
-		}
-
-		/* =================================================
-			모바일 컬럼 폭 최종 보정
-			팀 공통 mobile_show/mobile_hidden 규칙은 그대로 사용하고,
-			품목명이 너무 넓어서 상세 컬럼이 잘리지 않도록 폭만 조정한다.
-		================================================= */
-		.coTable th:nth-child(4),
-		.coTable td:nth-child(4) {
-			width: 38%;
-		}
-
-		.coTable th:nth-child(5),
-		.coTable td:nth-child(5) {
-			width: 18%;
-		}
-
-		.coTable th:nth-child(6),
-		.coTable td:nth-child(6) {
-			width: 22%;
-		}
-
-		.coTable th:nth-child(8),
-		.coTable td:nth-child(8) {
-			width: 52px;
-		}
-
-		.coTable th,
-		.coTable td {
 			overflow: hidden;
 			text-overflow: ellipsis;
 			white-space: nowrap;
+		}
+
+		/* 품목코드 */
+		.coTable th:nth-child(1),
+		.coTable td:nth-child(1) {
+			/* =================================================
+				모바일 품목코드 컬럼 확장
+				모바일에서도 품목코드가 RM-... 으로만 보이지 않게 폭을 늘린다.
+			================================================= */
+			width: 30%;
+			font-size: 10.5px;
+			letter-spacing: -0.6px;
+		}
+
+		/* 품목명 */
+		.coTable th:nth-child(3),
+		.coTable td:nth-child(3) {
+			/* =================================================
+				품목코드 컬럼 확장에 맞춰 품목명 컬럼을 조금 줄인다.
+			================================================= */
+			width: 26%;
+		}
+
+		/* 현재재고/단위 */
+		.coTable th:nth-child(4),
+		.coTable td:nth-child(4) {
+			width: 18%;
+		}
+
+		/* 창고위치 */
+		.coTable th:nth-child(5),
+		.coTable td:nth-child(5) {
+			width: 16%;
+		}
+
+		/* 상세 */
+		.coTable th:nth-child(7),
+		.coTable td:nth-child(7) {
+			width: 10%;
 		}
 
 		.coDetailBtn {
 			min-width: 36px;
 			padding: 6px 6px;
 			font-size: 11px;
+		}
+	}
+
+
+
+	/* =====================================================
+		품목코드 컬럼 최종 보정
+		공통 CSS는 건드리지 않고 inventoryManage.jsp 안에서만 적용한다.
+
+		목표:
+		1) 가로 스크롤바 제거
+		2) 품목코드가 RM-... 처럼 너무 짧게 잘리지 않게 보정
+		3) 팀 공통 테이블 구조는 그대로 유지
+	===================================================== */
+	.coTableWrap {
+		width: 100%;
+		overflow-x: hidden !important;
+	}
+
+	.coTable {
+		width: 100% !important;
+		min-width: 0 !important;
+		max-width: 100% !important;
+	table-layout: fixed !important;
+	}
+
+	/* 품목코드 */
+	.coTable th:nth-child(1),
+	.coTable td:nth-child(1) {
+		width: 14% !important;
+		min-width: 0 !important;
+		max-width: none !important;
+		font-size: 11.5px !important;
+		letter-spacing: -1px !important;
+		white-space: nowrap !important;
+		overflow: hidden !important;
+		text-overflow: clip !important;
+		padding-left: 3px !important;
+		padding-right: 3px !important;
+	}
+
+	/* 품목유형 */
+	.coTable th:nth-child(2),
+	.coTable td:nth-child(2) {
+		width: 8% !important;
+		min-width: 0 !important;
+		max-width: none !important;
+	}
+
+	/* 품목명 */
+	.coTable th:nth-child(3),
+	.coTable td:nth-child(3) {
+		width: 23% !important;
+		min-width: 0 !important;
+		max-width: none !important;
+	}
+
+	/* 현재재고/단위 */
+	.coTable th:nth-child(4),
+	.coTable td:nth-child(4) {
+		width: 16% !important;
+		min-width: 0 !important;
+		max-width: none !important;
+	}
+
+	/* 창고위치 */
+	.coTable th:nth-child(5),
+	.coTable td:nth-child(5) {
+		width: 17% !important;
+		min-width: 0 !important;
+		max-width: none !important;
+	}
+
+	/* 생성일 */
+	.coTable th:nth-child(6),
+	.coTable td:nth-child(6) {
+		width: 14% !important;
+		min-width: 0 !important;
+		max-width: none !important;
+	}
+
+	/* 상세 */
+	.coTable th:nth-child(7),
+	.coTable td:nth-child(7) {
+		width: 8% !important;
+		min-width: 0 !important;
+		max-width: none !important;
+	}
+
+	/* =====================================================
+		모바일 보정
+		공통 mobile_show / mobile_hidden 규칙은 그대로 사용하고,
+		가로 스크롤이 생기지 않도록 최소폭을 강제로 제거한다.
+	===================================================== */
+	@media screen and (max-width: 768px) {
+
+		.coTableWrap {
+			overflow-x: hidden !important;
+		}
+
+		.coTable {
+			width: 100% !important;
+			min-width: 0 !important;
+			max-width: 100% !important;
+		}
+
+		.coTable th:nth-child(1),
+		.coTable td:nth-child(1) {
+			width: 22% !important;
+			font-size: 10px !important;
+			letter-spacing: -1px !important;
+		}
+
+		.coTable th:nth-child(3),
+		.coTable td:nth-child(3) {
+			width: 30% !important;
+		}
+
+		.coTable th:nth-child(4),
+		.coTable td:nth-child(4) {
+			width: 20% !important;
+		}
+
+		.coTable th:nth-child(5),
+		.coTable td:nth-child(5) {
+			width: 18% !important;
+		}
+
+		.coTable th:nth-child(7),
+		.coTable td:nth-child(7) {
+			width: 10% !important;
+		}
+	}
+
+
+	/* =====================================================
+		재고조회관리 테이블 최종 폭 보정
+		공통 CSS / 공통 JSP는 수정하지 않고 이 JSP 안에서만 적용한다.
+
+		수정 목적:
+		1. 가로 스크롤바 제거
+		2. 품목코드가 RM-... 처럼 너무 심하게 잘리지 않도록 폭 조정
+		3. 전체 컬럼 합계를 100% 안으로 맞춰 화면 안에 들어오게 처리
+	===================================================== */
+	.coTableWrap {
+		width: 100% !important;
+		overflow-x: hidden !important;
+	}
+
+	.coTable {
+		width: 100% !important;
+		min-width: 0 !important;
+		max-width: 100% !important;
+		table-layout: fixed !important;
+	}
+
+	.coTable th,
+	.coTable td {
+		white-space: nowrap !important;
+		word-break: keep-all !important;
+		overflow: hidden !important;
+		text-overflow: ellipsis !important;
+		box-sizing: border-box !important;
+	}
+
+	/* 품목코드 */
+	.coTable th:nth-child(1),
+	.coTable td:nth-child(1) {
+		width: 14% !important;
+		font-size: 11.5px !important;
+		letter-spacing: -0.9px !important;
+	}
+
+	/* 품목유형 */
+	.coTable th:nth-child(2),
+	.coTable td:nth-child(2) {
+		width: 9% !important;
+		font-size: 12px !important;
+	}
+
+	/* 품목명 */
+	.coTable th:nth-child(3),
+	.coTable td:nth-child(3) {
+		width: 19% !important;
+		font-size: 12px !important;
+		letter-spacing: -0.5px !important;
+	}
+
+	/* 현재재고/단위 */
+	.coTable th:nth-child(4),
+	.coTable td:nth-child(4) {
+		width: 15% !important;
+		font-size: 12px !important;
+	}
+
+	/* 창고위치 */
+	.coTable th:nth-child(5),
+	.coTable td:nth-child(5) {
+		width: 17% !important;
+		font-size: 12px !important;
+	}
+
+	/* 생성일 */
+	.coTable th:nth-child(6),
+	.coTable td:nth-child(6) {
+		width: 16% !important;
+		font-size: 12px !important;
+	}
+
+	/* 상세 */
+	.coTable th:nth-child(7),
+	.coTable td:nth-child(7) {
+		width: 10% !important;
+		font-size: 12px !important;
+	}
+
+	/* =====================================================
+		모바일 전용 보정
+		팀 공통 mobile_show / mobile_hidden 규칙을 유지한다.
+		상세 컬럼은 반드시 mobile_show로 유지한다.
+	===================================================== */
+	@media screen and (max-width: 768px) {
+
+		.coTableWrap {
+			overflow-x: hidden !important;
+		}
+
+		.coTable {
+			width: 100% !important;
+			min-width: 0 !important;
+			table-layout: fixed !important;
+		}
+
+		.coTable th.mobile_hidden,
+		.coTable td.mobile_hidden {
+			display: none !important;
+		}
+
+		.coTable th.mobile_show,
+		.coTable td.mobile_show {
+			display: table-cell !important;
+		}
+
+		/* 모바일 노출 컬럼: 품목코드 / 품목명 / 현재재고/단위 / 창고위치 / 상세 */
+		.coTable th:nth-child(1),
+		.coTable td:nth-child(1) {
+			width: 24% !important;
+			font-size: 10.5px !important;
+			letter-spacing: -0.9px !important;
+		}
+
+		.coTable th:nth-child(3),
+		.coTable td:nth-child(3) {
+			width: 26% !important;
+			font-size: 11px !important;
+		}
+
+		.coTable th:nth-child(4),
+		.coTable td:nth-child(4) {
+			width: 20% !important;
+			font-size: 11px !important;
+		}
+
+		.coTable th:nth-child(5),
+		.coTable td:nth-child(5) {
+			width: 20% !important;
+			font-size: 10.5px !important;
+		}
+
+		.coTable th:nth-child(7),
+		.coTable td:nth-child(7) {
+			width: 10% !important;
+			font-size: 11px !important;
+		}
+
+		.coDetailBtn {
+			min-width: 34px !important;
+			padding: 5px 4px !important;
+			font-size: 10.5px !important;
 		}
 	}
 
@@ -362,90 +639,11 @@
 			</p>
 
 			<%-- =====================================================
-				관리자 / 매니저만 등록 삭제 가능
+				팀장님 피드백 반영
+				재고조회관리 화면에서는 등록 버튼과 선택 삭제 버튼을 제거한다.
+				기존 공통 버튼 / 공통 CSS 파일은 수정하지 않고,
+				현재 JSP에서 버튼 영역만 출력하지 않는다.
 			===================================================== --%>
-			<c:if test="${sessionScope.loginUser.role eq 'ADMIN'
-				or sessionScope.loginUser.role eq 'MANAGER'}">
-
-				<div class="search-btn-right">
-
-					<%-- =================================================
-						등록 버튼 + SVG 추가
-					================================================= --%>
-					<button type="button"
-						class="search-btn search-btn-main modal_open_btn"
-						data_modal_target="#modal_insert">
-
-						<svg viewBox="0 0 24 24"
-							fill="none">
-
-							<path d="M12 5V19"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
-							<path d="M5 12H19"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
-						</svg>
-
-						등록
-
-					</button>
-
-					<%-- =================================================
-						선택 삭제 버튼 + SVG 추가
-					================================================= --%>
-					<button type="button"
-						class="search-btn search-btn-sub"
-						onclick="deleteCheck()">
-
-						<svg viewBox="0 0 24 24"
-							fill="none">
-
-							<path d="M4 7H20"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
-							<path d="M10 11V17"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
-							<path d="M14 11V17"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round">
-							</path>
-
-							<path d="M6 7L7 21H17L18 7"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linejoin="round">
-							</path>
-
-							<path d="M9 7V4H15V7"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linejoin="round">
-							</path>
-
-						</svg>
-
-						선택 삭제
-
-					</button>
-
-				</div>
-
-			</c:if>
 
 		</div>
 
@@ -472,28 +670,17 @@
 
 					<tr>
 
-						<th class="mobile_show">
-
-							<label id="checkAllLabel">
-								선택
-							</label>
-
-							<input type="checkbox"
-								id="checkAll"
-								style="display:none;">
-
-						</th>
-
-						<th class="mobile_hidden">품목코드</th>
+						<%-- =====================================================
+							팀장님 피드백 반영
+							선택 체크박스 컬럼은 삭제한다.
+							모바일 노출 컬럼은 품목코드 / 품목명 / 현재재고/단위 / 창고위치 / 상세이다.
+							상세 컬럼은 팀 공통 규칙상 반드시 mobile_show로 유지한다.
+						===================================================== --%>
+						<th class="mobile_show">품목코드</th>
 						<th class="mobile_hidden">품목유형</th>
 						<th class="mobile_show">품목명</th>
 						<th class="mobile_show">현재재고/단위</th>
 						<th class="mobile_show">창고위치</th>
-						<%-- =====================================================
-							모바일 컬럼 규칙
-							생성일은 PC에서는 보이지만 모바일에서는 5개 컬럼 제한 때문에 숨긴다.
-							모바일 노출 컬럼: 선택 / 품목명 / 현재재고/단위 / 창고위치 / 상세
-						===================================================== --%>
 						<th class="mobile_hidden">생성일</th>
 						<th class="mobile_show">상세</th>
 
@@ -508,15 +695,11 @@
 
 						<tr>
 
-							<td class="mobile_show">
-
-								<input type="checkbox"
-									name="inventoryIds"
-									value="${inventory.inventoryId}">
-
-							</td>
-
-							<td class="mobile_hidden"
+							<%-- =====================================================
+								팀장님 피드백 반영
+								선택 체크박스는 삭제하고 품목코드를 첫 번째 컬럼으로 보여준다.
+							===================================================== --%>
+							<td class="mobile_show"
 								title="${inventory.itemCode}">
 
 								${inventory.itemCode}
@@ -919,50 +1102,61 @@
 
 	// =========================================================
 	// 전체 선택
+	// ---------------------------------------------------------
+	// 팀장님 피드백으로 재고조회관리의 선택 체크박스 컬럼을 삭제했다.
+	// 기존 스크립트가 checkAllLabel / checkAll을 바로 찾으면 null 오류가 나므로
+	// 현재 JSP 안에서만 방어코딩한다.
+	// 공통 JS / 공통 JSP는 수정하지 않는다.
 	// =========================================================
-	document.getElementById("checkAllLabel").onclick =
-		function() {
+	var checkAllLabel =
+		document.getElementById("checkAllLabel");
 
-		var checkAll =
-			document.getElementById("checkAll");
+	var checkAll =
+		document.getElementById("checkAll");
 
-		var checks =
-			document.getElementsByName("inventoryIds");
-
-		checkAll.checked =
-			!checkAll.checked;
-
-		for (var i = 0; i < checks.length; i++) {
-
-			checks[i].checked =
-				checkAll.checked;
-		}
-	};
-
-	// =========================================================
-	// 체크박스 상태 동기화
-	// =========================================================
 	var checks =
 		document.getElementsByName("inventoryIds");
 
-	for (var i = 0; i < checks.length; i++) {
+	if (checkAllLabel != null
+			&& checkAll != null
+			&& checks != null
+			&& checks.length > 0) {
 
-		checks[i].onclick = function() {
+		checkAllLabel.onclick =
+			function() {
 
-			var allChecked = true;
+			checkAll.checked =
+				!checkAll.checked;
 
-			for (var j = 0; j < checks.length; j++) {
+			for (var i = 0; i < checks.length; i++) {
 
-				if (!checks[j].checked) {
-
-					allChecked = false;
-					break;
-				}
+				checks[i].checked =
+					checkAll.checked;
 			}
-
-			document.getElementById("checkAll").checked =
-				allChecked;
 		};
+
+		// =====================================================
+		// 체크박스 상태 동기화
+		// =====================================================
+		for (var i = 0; i < checks.length; i++) {
+
+			checks[i].onclick = function() {
+
+				var allChecked = true;
+
+				for (var j = 0; j < checks.length; j++) {
+
+					if (!checks[j].checked) {
+
+						allChecked = false;
+						break;
+					}
+				}
+
+				checkAll.checked =
+					allChecked;
+			};
+		}
 	}
 
 	// =========================================================
