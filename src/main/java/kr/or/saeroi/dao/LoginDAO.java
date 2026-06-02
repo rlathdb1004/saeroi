@@ -25,7 +25,7 @@ public class LoginDAO {
 
         String sql =
             "SELECT EMPNO, EMP_PW, ENAME, DEPT, JOB, HIRE_DATE, " +
-            "EMP_TEL, EMAIL, STATUS, ROLE, CREATED_DATE, UPDATED_DATE " +
+            "EMP_TEL, EMAIL, STATUS, ROLE, CREATED_DATE, UPDATED_DATE, PROFILE_IMG " +
             "FROM EMP WHERE EMPNO = ?";
 
         try (Connection conn = dataSource.getConnection();
@@ -50,6 +50,7 @@ public class LoginDAO {
                     login.setHire_date(rs.getTimestamp("HIRE_DATE"));
                     login.setCreated_date(rs.getTimestamp("CREATED_DATE"));
                     login.setUpdated_date(rs.getTimestamp("UPDATED_DATE"));
+                    login.setProfile_img(rs.getString("PROFILE_IMG"));
                 }
             }
 
@@ -186,6 +187,8 @@ public class LoginDAO {
 	    int result = 0;
 
 	    String sql;
+	    System.out.println("empno = " + dto.getEmpno());
+	    System.out.println("profile_img = " + dto.getProfile_img());	    
 
 	    if(dto.getEmp_pw() != null && !dto.getEmp_pw().isEmpty()) {
 
@@ -193,6 +196,7 @@ public class LoginDAO {
 	            "UPDATE EMP " +
 	            "SET EMAIL = ?, " +
 	            "    EMP_TEL = ?, " +
+	            "    PROFILE_IMG = ?, " +
 	            "    EMP_PW = ?, " +
 	            "    UPDATED_DATE = SYSTIMESTAMP " +
 	            "WHERE EMPNO = ?";
@@ -203,6 +207,7 @@ public class LoginDAO {
 	            "UPDATE EMP " +
 	            "SET EMAIL = ?, " +
 	            "    EMP_TEL = ?, " +
+	            "    PROFILE_IMG = ?, " +
 	            "    UPDATED_DATE = SYSTIMESTAMP " +
 	            "WHERE EMPNO = ?";
 	    }
@@ -214,14 +219,16 @@ public class LoginDAO {
 
 	            ps.setString(1, dto.getEmail());
 	            ps.setString(2, dto.getEmp_tel());
-	            ps.setString(3, dto.getEmp_pw());
-	            ps.setString(4, dto.getEmpno());
+	            ps.setString(3, dto.getProfile_img());
+	            ps.setString(4, dto.getEmp_pw());
+	            ps.setString(5, dto.getEmpno());
 
 	        } else {
 
 	            ps.setString(1, dto.getEmail());
 	            ps.setString(2, dto.getEmp_tel());
-	            ps.setString(3, dto.getEmpno());
+	            ps.setString(3, dto.getProfile_img());
+	            ps.setString(4, dto.getEmpno());
 	        }
 
 	        result = ps.executeUpdate();

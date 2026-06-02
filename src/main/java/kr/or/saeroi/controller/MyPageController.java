@@ -1,6 +1,8 @@
 package kr.or.saeroi.controller;
 
+import java.io.File;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.servlet.http.HttpSession;
 
@@ -11,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import kr.or.saeroi.dto.LoginDTO;
@@ -41,6 +44,8 @@ public class MyPageController {
 	public String updateMyPage(
 	        @RequestParam("email") String email,
 	        @RequestParam("emp_tel") String emp_tel,
+	        @RequestParam(value = "profile_img", required = false)
+	        MultipartFile profile_img,
 	        @RequestParam("emp_pw") String emp_pw,
 	        @RequestParam("emp_pw_new") String emp_pw_new,
 	        @RequestParam("emp_pw_confirm") String emp_pw_confirm,
@@ -59,8 +64,68 @@ public class MyPageController {
 	    dto.setEmpno(loginUser.getEmpno());
 	    dto.setEmail(email);
 	    dto.setEmp_tel(emp_tel);
-
 	    
+	    if (profile_img != null && !profile_img.isEmpty()) {
+	    	
+	    	String contentType = profile_img.getContentType();
+
+	        if (contentType == null ||
+	            !contentType.startsWith("image/")) {
+	            redirectAttributes.addFlashAttribute(
+	                    "errorMsg", "이미지 파일만 업로드 가능합니다.");
+	            return "redirect:/mypage";
+	        }
+
+	        try {
+	            String originalName = profile_img.getOriginalFilename();
+	            String ext = originalName.substring(originalName.lastIndexOf("."));
+	            String saveFileName = UUID.randomUUID().toString() + ext;
+	            String uploadPath =
+	            	    session.getServletContext()
+	            	           .getRealPath("/resources/upload/profile/");
+	            File dir = new File(uploadPath);
+
+	            if (!dir.exists()) {
+	                dir.mkdirs();
+	            }
+
+	            File saveFile = new File(uploadPath, saveFileName);
+	            
+	            if (loginUser.getProfile_img() != null) {
+
+	                File oldFile = new File(
+	                        uploadPath, loginUser.getProfile_img());
+
+	                if (oldFile.exists()) {
+	                    oldFile.delete();
+	                }
+	            }
+	            
+	            System.out.println("uploadPath : " + uploadPath);
+	            System.out.println("saveFile : " + saveFile.getAbsolutePath());
+	            System.out.println("exists dir : " + dir.exists());
+	            
+	            profile_img.transferTo(saveFile);	            
+	            dto.setProfile_img(saveFileName);  
+	            
+	           
+	            
+	            System.out.println("saved : " + saveFile.exists());
+
+	        } catch (Exception e) {
+
+	            e.printStackTrace();
+	            redirectAttributes.addFlashAttribute(
+	                    "errorMsg", "프로필 사진 업로드 실패"
+	            );
+	            return "redirect:/mypage";
+	        }
+
+	    } else {	       
+	        dto.setProfile_img(loginUser.getProfile_img());
+	    }
+
+	    	    
 	    if (emp_pw_new != null && !emp_pw_new.trim().isEmpty()) {	
 	    	
 	        if (emp_pw == null || emp_pw.trim().isEmpty()) {

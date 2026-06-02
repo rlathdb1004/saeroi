@@ -10,7 +10,7 @@
 <c:set var="currentUri" value="${pageContext.request.requestURI}" />
 
 <c:choose>
-	<c:when test="${fn:contains(currentUri, '/worker/')}">
+	<c:when test="${Worker or fn:contains(currentUri, '/worker/')}">
 		<c:url var="logoHomeUrl" value="/worker/main" />
 	</c:when>
 	<c:otherwise>
@@ -40,8 +40,12 @@
 				<a href="${pageContext.request.contextPath}/mypage">
 					<div class="siUserProfileIcon">
 
-						<img src="${pageContext.request.contextPath}/resources/kim.png"
-							alt="사용자 프로필 사진">
+						<img
+							src="${empty sessionScope.loginUser.profile_img
+        ? pageContext.request.contextPath.concat('/resources/upload/profile/default_profile.png')
+        : pageContext.request.contextPath.concat('/resources/upload/profile/')
+            .concat(sessionScope.loginUser.profile_img)}"
+							alt="프로필 이미지" class="mypage_profile_image" id="profilePreview">
 					</div>
 				</a>
 
@@ -129,7 +133,15 @@
 						</a>
 
 					</div>
+				</div>
 
+				<div class="siSubMenu">
+						<%-- 품질관리 하위 메뉴 영역이다. --%>
+
+						<a href="${pageContext.request.contextPath}/quality/inspection"
+							class="siSubMenuLink" data-main-menu="품질관리" data-sub-menu="검사관리">
+							<%-- 검사 정보를 등록하고 조회하는 메뉴이다. --%> 검사관리
+						</a>
 				</div>
 
 			</nav>
@@ -171,10 +183,12 @@
 						<%-- 사용자 프로필 사진이 들어가는 영역이다. --%>
 						<%-- 현재는 테스트 이미지이고, 나중에는 DB에서 가져온 사용자 프로필 이미지 경로로 변경한다. --%>
 
-						<img src="${pageContext.request.contextPath}/resources/kim.png"
-							alt="사용자 프로필 사진">
-						<%-- 현재 테스트용 프로필 이미지이다. 실제 프로젝트에서는 로그인한 사용자의 DB 이미지 경로를 받아서 src에 넣어야
-														한다. 예: ${loginUser.profileImg} --%>
+						<img
+							src="${empty sessionScope.loginUser.profile_img
+        ? pageContext.request.contextPath.concat('/resources/upload/profile/default_profile.png')
+        : pageContext.request.contextPath.concat('/resources/upload/profile/')
+            .concat(sessionScope.loginUser.profile_img)}"
+							alt="프로필 이미지" class="mypage_profile_image" id="profilePreview">
 					</div>
 				</a>
 
