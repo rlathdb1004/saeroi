@@ -46,11 +46,24 @@
 .inspection_related_row:hover td {
 	background: #F8FCF9;
 }
-/* .coStatusReady { */
-/*     background-color: #F5F5F5; */
-/*     color: #757575; */
-/*     border: 1px solid #E0E0E0; */
-/* } */
+
+.lot-link {
+	display: inline-block;
+	color: #0b7a5a;
+	font-weight: 700;
+	text-decoration: none;
+	border-bottom: 1px dotted #0b7a5a;
+	white-space: nowrap;
+}
+
+.lot-link::after {
+	content: " ↗";
+	font-size: 10px;
+}
+
+.lot-link:hover {
+	color: #075f46;
+}
 </style>
 
 <div class="detail_page">
@@ -266,7 +279,14 @@
 
 				<tr>
 					<th>LOT번호</th>
-					<td>${inspection.product_lot}</td>
+					<td><c:choose>
+							<c:when test="${not empty inspection.product_lot}">
+								<a class="lot-link"
+									href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${inspection.product_lot}">
+									${inspection.product_lot} </a>
+							</c:when>
+							<c:otherwise>-</c:otherwise>
+						</c:choose></td>
 
 					<th>생산문서번호</th>
 					<td>${inspection.prod_doc_no}</td>

@@ -14,8 +14,38 @@
 }
 .coTable th:first-child, .coTable td:first-child {
 	width: 90px;
-	min-width: 30px;
+	min-width: 90px;
 	max-width: 90px;
+}
+
+@media screen and (max-width: 768px) {
+
+	.coTable {
+		table-layout: fixed;		
+	}
+	
+	.coTable th:last-child,
+	.coTable td:last-child {
+		width: 72px;
+		min-width: 72px;
+		max-width: 72px;
+		padding: 0 4px;
+	}
+	
+	.coTable th:first-child,
+	.coTable td:first-child {
+		width: 72px;
+		min-width: 72px;
+		max-width: 72px;
+	}	
+	.coTable th,
+	.coTable td {
+		padding: 0 6px;		
+	}	
+	.coDetailBtn {
+		min-width: auto;
+		font-size: 12px;
+	}
 }
 </style>
 
