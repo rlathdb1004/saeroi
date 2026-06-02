@@ -75,14 +75,14 @@
 		<table class="coTable" id="reportTable">
 			<thead>
 				<tr>
-					<th onclick="toggleAllCheckByTitle();" title="전체 선택/해제">선택</th>
+					<th  class="mobile_hidden" onclick="toggleAllCheckByTitle();" title="전체 선택/해제">선택</th>
 					<th>일자/기간</th>
 					<th class="mobile_hidden">품목명</th>
 					<th>계획량</th>
 					<th>작업량</th>
-					<th class="mobile_hidden">불량</th>
-					<th class="mobile_hidden">달성률</th>
-					<th>상세</th>
+					<th>불량</th>
+					<th>달성률</th>
+					<th class="mobile_hidden">상세</th>
 				</tr>
 			</thead>
 			<tbody id="tableBody">
@@ -366,14 +366,14 @@ function getLocalDateFromWeek(weekStr, isEnd) {
       					 
 
       		row.innerHTML = ''
-      			+ '<td><input type="checkbox" name="orderIds" class="check_btn" value="' + escapeHtml(item.계획일자) + '"></td>'
+      			+ '<td class="mobile_hidden"><input type="checkbox" name="orderIds" class="check_btn" value="' + escapeHtml(item.계획일자) + '"></td>'
       			+ '<td>' + escapeHtml(item.계획일자) + '</td>'
       			+ '<td class="mobile_hidden">' + escapeHtml(item.품목명) + '</td>'
       			+ '<td>' + planQty.toLocaleString() + '</td>'
       			+ '<td>' + orderQty.toLocaleString() + '</td>'
-      			+ '<td class="mobile_hidden" style="color: #FF4560; font-weight: bold;">' + defectQty.toLocaleString() + '</td>'
-      			+ '<td class="mobile_hidden">' + escapeHtml(achievementRate) + '</td>'
-      			+ '<td><a href="' + escapeHtml(detailUrl) + '" class="coDetailBtn">보기</a></td>';
+      			+ '<td  style="color: #FF4560; font-weight: bold;">' + defectQty.toLocaleString() + '</td>'
+      			+ '<td>' + escapeHtml(achievementRate) + '</td>'
+      			+ '<td class="mobile_hidden"><a href="' + escapeHtml(detailUrl) + '" class="coDetailBtn">보기</a></td>';
       		tableBody.appendChild(row);
       		
       		totalPlan += Number(item.생산계획량 || 0);

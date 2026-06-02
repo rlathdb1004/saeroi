@@ -750,7 +750,7 @@
 	<div class="detail_card">
 
 		<div class="detail_card_title">
-			선택 LOT 입출고 흐름
+			입출고내역서
 		</div>
 
 		<c:if test="${not empty inoutHistory}">
