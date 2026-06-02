@@ -75,6 +75,7 @@ public class RoleInterceptor extends HandlerInterceptorAdapter {
                 || uri.contains("/worker/workorder")
                 || uri.contains("/notice/list")
                 || uri.contains("/mypage")                
+                || uri.contains("/quality/inspection")                
                 || uri.contains("/weather/current")
                 || uri.contains("/weather/today")) {
 

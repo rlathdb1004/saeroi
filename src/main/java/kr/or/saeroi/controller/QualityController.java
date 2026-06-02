@@ -38,7 +38,17 @@ public class QualityController {
 	private static final String RESULT_WAIT = "대기";
 
 	private boolean canManageQuality(LoginDTO loginUser) {
-		return loginUser != null && ("ADMIN".equals(loginUser.getRole()) || "MANAGER".equals(loginUser.getRole()));
+		if (loginUser == null) {
+			return false;
+		}
+
+		String role = loginUser.getRole();
+		String dept = loginUser.getDept();
+
+		return "ADMIN".equalsIgnoreCase(role)
+			|| "MANAGER".equalsIgnoreCase(role)
+			|| "QC".equalsIgnoreCase(role)
+			|| ("WORKER".equalsIgnoreCase(role) && "품질관리".equals(dept));
 	}
 
 	@RequestMapping("/inspection")

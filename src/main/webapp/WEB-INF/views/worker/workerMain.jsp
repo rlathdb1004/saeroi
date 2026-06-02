@@ -1354,6 +1354,22 @@
 		}
 
 		// =================================================
+		// 모바일 카메라는 HTTPS / localhost 같은 보안 환경에서만 동작한다.
+		// http://IP주소 로 접속하면 브라우저 정책상 getUserMedia가 막힌다.
+		// =================================================
+		if (window.isSecureContext === false
+				&& location.hostname !== "localhost"
+				&& location.hostname !== "127.0.0.1") {
+
+			showWorkerQrMessage(
+				"보안 연결이 아닙니다.",
+				"모바일 카메라는 HTTPS 주소에서만 실행됩니다. 현재 주소가 http:// 로 시작하면 https:// 주소로 접속해주세요."
+			);
+
+			return;
+		}
+
+		// =================================================
 		// 카메라 API 지원 여부 확인
 		// =================================================
 		if (navigator.mediaDevices == null
@@ -1361,7 +1377,7 @@
 
 			showWorkerQrMessage(
 				"카메라를 사용할 수 없습니다.",
-				"브라우저에서 카메라 기능을 지원하지 않거나 보안 연결이 아닙니다. HTTPS 또는 localhost 환경에서 실행해주세요."
+				"브라우저에서 카메라 기능을 지원하지 않거나 보안 연결이 아닙니다. Chrome 또는 Safari에서 HTTPS 주소로 접속해주세요."
 			);
 
 			return;
@@ -1370,42 +1386,103 @@
 		try {
 
 			// =================================================
-			// QR 인식 라이브러리 확인
-			// 브라우저 기본 BarcodeDetector 대신 jsQR을 사용한다.
-			// CDN이 차단되면 카메라는 켜져도 QR 분석을 할 수 없으므로
-			// 안내 메시지를 보여준다.
+			// 기존 코드 문제:
+			// jsQR CDN 확인을 카메라 실행보다 먼저 해서,
+			// 모바일에서 CDN이 늦게 로드되거나 차단되면 카메라가 아예 안 켜졌다.
+			//
+			// 수정:
+			// 1. 카메라를 먼저 실행한다.
+			// 2. 지원되면 BarcodeDetector를 사용한다.
+			// 3. 아니면 jsQR을 사용한다.
+			// 4. 둘 다 없으면 카메라는 켜진 상태에서 안내 메시지를 보여준다.
 			// =================================================
-			if (typeof jsQR === "undefined") {
 
-				showWorkerQrMessage(
-					"QR 인식 스크립트를 불러오지 못했습니다.",
-					"인터넷 연결 또는 jsQR 스크립트 로드 상태를 확인해주세요."
-				);
+			try {
 
-				return;
+				workerQrStream =
+					await navigator.mediaDevices.getUserMedia({
+						video: {
+							facingMode: {
+								exact: "environment"
+							}
+						},
+						audio: false
+					});
+
+			} catch (environmentError) {
+
+				// =================================================
+				// 일부 기기는 exact environment를 지원하지 않는다.
+				// 이 경우 ideal environment로 다시 시도한다.
+				// =================================================
+				try {
+
+					workerQrStream =
+						await navigator.mediaDevices.getUserMedia({
+							video: {
+								facingMode: {
+									ideal: "environment"
+								}
+							},
+							audio: false
+						});
+
+				} catch (idealError) {
+
+					// =================================================
+					// 그래도 실패하면 기본 카메라로 마지막 시도한다.
+					// =================================================
+					workerQrStream =
+						await navigator.mediaDevices.getUserMedia({
+							video: true,
+							audio: false
+						});
+				}
 			}
-
-			workerQrStream =
-				await navigator.mediaDevices.getUserMedia({
-					video: {
-						facingMode: {
-							ideal: "environment"
-						}
-					},
-					audio: false
-				});
 
 			video.srcObject =
 				workerQrStream;
 
 			await video.play();
 
+			// =================================================
+			// BarcodeDetector 지원 브라우저면 우선 사용한다.
+			// Android Chrome에서는 이 방식이 CDN 의존이 없어 더 안정적이다.
+			// =================================================
+			workerQrDetector = null;
+
+			if ("BarcodeDetector" in window) {
+
+				try {
+
+					workerQrDetector =
+						new BarcodeDetector({
+							formats: ["qr_code"]
+						});
+
+				} catch (detectorError) {
+
+					workerQrDetector = null;
+				}
+			}
+
 			workerQrScanning =
 				true;
 
 			if (status != null) {
 
-				status.innerText = "QR 코드를 스캔 영역 안에 맞춰주세요.";
+				if (workerQrDetector != null) {
+
+					status.innerText = "QR 코드를 스캔 영역 안에 맞춰주세요.";
+
+				} else if (typeof jsQR !== "undefined") {
+
+					status.innerText = "QR 코드를 스캔 영역 안에 맞춰주세요.";
+
+				} else {
+
+					status.innerText = "카메라는 켜졌지만 QR 인식 스크립트를 확인 중입니다.";
+				}
 			}
 
 			scanWorkerQrCode();
@@ -1414,13 +1491,35 @@
 
 			console.error(error);
 
+			var errorText =
+				"카메라 권한을 허용했는지 확인해주세요. 모바일에서는 HTTPS 주소에서 접속해야 카메라가 동작합니다.";
+
+			if (error != null
+					&& error.name != null) {
+
+				if (error.name == "NotAllowedError") {
+
+					errorText =
+						"카메라 권한이 거부되었습니다. 브라우저 주소창의 권한 설정에서 카메라를 허용해주세요.";
+
+				} else if (error.name == "NotFoundError") {
+
+					errorText =
+						"사용 가능한 카메라를 찾지 못했습니다. 다른 브라우저 또는 기기 카메라 권한을 확인해주세요.";
+
+				} else if (error.name == "NotReadableError") {
+
+					errorText =
+						"다른 앱이 카메라를 사용 중일 수 있습니다. 카메라 앱을 종료한 뒤 다시 시도해주세요.";
+				}
+			}
+
 			showWorkerQrMessage(
 				"카메라 실행에 실패했습니다.",
-				"카메라 권한을 허용했는지 확인해주세요. 모바일에서는 HTTPS 또는 localhost 환경에서 카메라가 동작합니다."
+				errorText
 			);
 		}
 	}
-
 	// =====================================================
 	// QR 반복 인식
 	// -----------------------------------------------------
@@ -1428,7 +1527,7 @@
 	// video 화면을 canvas에 그린 뒤 jsQR로 QR 코드를 분석한다.
 	// 이렇게 하면 Chrome / Edge / Safari 계열에서 더 안정적으로 동작한다.
 	// =====================================================
-	function scanWorkerQrCode() {
+	async function scanWorkerQrCode() {
 
 		if (!workerQrScanning) {
 
@@ -1441,9 +1540,7 @@
 		var status =
 			document.getElementById("workerQrCameraStatus");
 
-		if (video == null
-				|| typeof jsQR === "undefined"
-				|| workerQrCanvasContext == null) {
+		if (video == null) {
 
 			workerQrScanTimer =
 				setTimeout(scanWorkerQrCode, 350);
@@ -1453,56 +1550,108 @@
 
 		try {
 
-			// =================================================
-			// video.readyState 2 이상이면 현재 프레임을 canvas로 복사할 수 있다.
-			// =================================================
 			if (video.readyState >= 2
 					&& video.videoWidth > 0
 					&& video.videoHeight > 0) {
 
-				workerQrCanvas.width =
-					video.videoWidth;
+				// =================================================
+				// 1순위: 브라우저 기본 BarcodeDetector
+				// CDN 없이 동작하므로 모바일에서 더 안정적이다.
+				// =================================================
+				if (workerQrDetector != null) {
 
-				workerQrCanvas.height =
-					video.videoHeight;
+					var barcodes =
+						await workerQrDetector.detect(video);
 
-				workerQrCanvasContext.drawImage(
-					video,
-					0,
-					0,
-					workerQrCanvas.width,
-					workerQrCanvas.height);
+					if (barcodes != null
+							&& barcodes.length > 0
+							&& barcodes[0].rawValue != null
+							&& barcodes[0].rawValue.trim() != "") {
 
-				var imageData =
-					workerQrCanvasContext.getImageData(
+						workerQrScanning =
+							false;
+
+						if (status != null) {
+
+							status.innerText = "QR 인식 완료. 화면을 이동합니다.";
+						}
+
+						moveWorkerQrResult(
+							barcodes[0].rawValue.trim());
+
+						return;
+					}
+				}
+
+				// =================================================
+				// 2순위: jsQR
+				// BarcodeDetector 미지원 브라우저에서는 canvas + jsQR로 인식한다.
+				// =================================================
+				if (typeof jsQR !== "undefined"
+						&& workerQrCanvasContext != null) {
+
+					workerQrCanvas.width =
+						video.videoWidth;
+
+					workerQrCanvas.height =
+						video.videoHeight;
+
+					workerQrCanvasContext.drawImage(
+						video,
 						0,
 						0,
 						workerQrCanvas.width,
 						workerQrCanvas.height);
 
-				var qrCode =
-					jsQR(
-						imageData.data,
-						imageData.width,
-						imageData.height,
-						{
-							inversionAttempts: "attemptBoth"
-						});
+					var imageData =
+						workerQrCanvasContext.getImageData(
+							0,
+							0,
+							workerQrCanvas.width,
+							workerQrCanvas.height);
 
-				if (qrCode != null
-						&& qrCode.data != null
-						&& qrCode.data.trim() != "") {
+					var qrCode =
+						jsQR(
+							imageData.data,
+							imageData.width,
+							imageData.height,
+							{
+								inversionAttempts: "attemptBoth"
+							});
+
+					if (qrCode != null
+							&& qrCode.data != null
+							&& qrCode.data.trim() != "") {
+
+						workerQrScanning =
+							false;
+
+						if (status != null) {
+
+							status.innerText = "QR 인식 완료. 화면을 이동합니다.";
+						}
+
+						moveWorkerQrResult(
+							qrCode.data.trim());
+
+						return;
+					}
+				}
+
+				// =================================================
+				// 둘 다 없으면 카메라는 켜져 있지만 QR 분석을 못 하는 상태다.
+				// 이 경우 계속 무한 반복하지 않고 안내한다.
+				// =================================================
+				if (workerQrDetector == null
+						&& typeof jsQR === "undefined") {
 
 					workerQrScanning =
 						false;
 
-					if (status != null) {
-
-						status.innerText = "QR 인식 완료. 화면을 이동합니다.";
-					}
-
-					moveWorkerQrResult(
-						qrCode.data.trim());
+					showWorkerQrMessage(
+						"QR 인식 스크립트를 불러오지 못했습니다.",
+						"카메라는 켜졌지만 QR 분석 기능을 사용할 수 없습니다. 인터넷 연결 또는 jsQR 스크립트 로드 상태를 확인해주세요."
+					);
 
 					return;
 				}

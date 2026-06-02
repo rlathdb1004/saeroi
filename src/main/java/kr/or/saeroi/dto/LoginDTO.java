@@ -18,5 +18,6 @@ public class LoginDTO {
 	private String role;	
 	private Timestamp created_date;
 	private Timestamp updated_date;	
+	private String profile_img;
 }
 
