@@ -87,17 +87,17 @@
 					취소
 				</button>
 
-				<button type="submit"
-					class="detail_btn_line user-auth-reset-pw-btn"
-					form="resetPwForm"
-					onclick="return confirmResetPassword();">
-					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
-						<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.78 7.78 5.5 5.5 0 0 1 7.78-7.78z"></path>
-						<path d="M15 7l3 3"></path>
-						<path d="M9 15h.01"></path>
-					</svg>
-					임시비밀번호 발급
-				</button>
+<!-- 				<button type="submit" -->
+<!-- 					class="detail_btn_line user-auth-reset-pw-btn" -->
+<!-- 					form="resetPwForm" -->
+<!-- 					onclick="return confirmResetPassword();"> -->
+<!-- 					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true"> -->
+<!-- 						<path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.78 7.78 5.5 5.5 0 0 1 7.78-7.78z"></path> -->
+<!-- 						<path d="M15 7l3 3"></path> -->
+<!-- 						<path d="M9 15h.01"></path> -->
+<!-- 					</svg> -->
+<!-- 					임시비밀번호 발급 -->
+<!-- 				</button> -->
 
 			</c:if>
 

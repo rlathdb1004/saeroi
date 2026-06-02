@@ -11,13 +11,40 @@
 	기준:
 	- URL: /production/productionresult
 	- Controller return: production/productionresult.tiles
-	- 작업지시 QR 스캔 시 GET 방식으로 진입
-	  예: /production/productionresult?orderId=1015&productLot=FGLOT-20260608-0001&openModal=Y
-	- QR 진입 시 등록 모달 자동 오픈
-	- QR 대상 작업지시 자동 선택
-	- LOT / 작업지시번호 / 품목 / 지시수량 / 담당자 자동 입력
-	- 작업자는 수량 확인 후 등록 버튼 클릭
-	- LOSS_QTY는 불량수량이 아니라 LOSS량 / 손실수량
+	- 생산실적은 작업지시 기준으로 등록
+	- 등록 가능한 작업지시는 잔량이 남은 작업지시만 표시
+	- 기본 조회 기준은 Mapper에서 잔량 20EA 이상만 표시
+	- [소량 잔량 포함] 체크 시 잔량 1EA 이상 작업지시도 표시
+	- QR 스캔 진입은 orderId 기준 별도 조회이므로 소량 잔량 필터 제한을 받지 않음
+	- 생산수량 + LOSS량은 작업지시 잔량보다 클 수 없음
+	- 생산상태는 Mapper에서 누적수량 기준으로 자동 계산
+	  정상 등록 → 진행중 또는 완료
+	  보류 선택 → 보류
+	- 품질검사 상태는 등록 시 기본값 "검사 예정"
+	- 생산실적 담당자는 productionResultEmpList 사용
+	- QR 스캔 진입 시 작업지시/LOT 자동입력 및 모달 자동 오픈
+	- 검색어 input placeholder는 생산관리 공통 기준 "검색 키워드"로 통일
+	- 전체검색은 Mapper에서 상세페이지 주요 항목까지 대소문자 구분 없이 일부 포함 검색
+	- 진행중은 완료와 같은 정상 스타일로 표시한다
+	- 모바일 select 깨짐 방지를 위해 작업지시 option 문구는 짧게 표시하고 상세 정보는 선택 후 아래에 표시한다
+
+	목록 컬럼 기준:
+	- PC: 체크박스 포함 8개
+	  1 선택
+	  2 실적번호
+	  3 작업지시번호
+	  4 LOT번호
+	  5 생산수량
+	  6 생산일자
+	  7 생산상태
+	  8 상세
+
+	- 모바일: 체크박스 포함 5개
+	  1 선택
+	  2 LOT번호
+	  3 생산수량
+	  4 생산상태
+	  5 상세
 --%>
 
 <c:set var="contextPath" value="${pageContext.request.contextPath}" />
@@ -31,9 +58,6 @@
 	</c:if>
 
 
-	<%-- =========================================================
-	     1. 검색 영역
-	     ========================================================= --%>
 	<form class="search-form" method="get"
 		action="${contextPath}/production/productionresult">
 
@@ -43,18 +67,21 @@
 
 				<div class="search-item">
 					<label class="search-label">시작일</label>
+
 					<input type="date" name="startDate" class="search-date"
 						value="${startDate}">
 				</div>
 
 				<div class="search-item">
 					<label class="search-label">종료일</label>
+
 					<input type="date" name="endDate" class="search-date"
 						value="${endDate}">
 				</div>
 
 				<div class="search-item">
 					<label class="search-label">상태</label>
+
 					<select name="prodStatus" class="search-select">
 						<option value="">전체</option>
 
@@ -69,19 +96,25 @@
 
 				<div class="search-item">
 					<label class="search-label">검색어</label>
+
 					<input type="text" name="keyword" class="search-input"
-						placeholder="실적번호 / LOT / 품목코드 / 품명" value="${keyword}">
+						placeholder="검색 키워드"
+						value="${keyword}">
 				</div>
+
+				<input type="hidden" name="includeSmallRemain"
+					id="searchIncludeSmallRemain"
+					value="${includeSmallRemain}">
 
 				<div class="search-btn-wrap">
 
 					<button type="submit" class="search-btn search-btn-main">
 						<svg viewBox="0 0 24 24" fill="none">
-							<circle cx="10.5" cy="10.5" r="7.5" stroke="currentColor"
-								stroke-width="2">
+							<circle cx="10.5" cy="10.5" r="7.5"
+								stroke="currentColor" stroke-width="2">
 							</circle>
-							<path d="M16 16L21 21" stroke="currentColor" stroke-width="2"
-								stroke-linecap="round">
+							<path d="M16 16L21 21" stroke="currentColor"
+								stroke-width="2" stroke-linecap="round">
 							</path>
 						</svg>
 						검색
@@ -111,9 +144,6 @@
 	</form>
 
 
-	<%-- =========================================================
-	     2. 목록 상단 버튼
-	     ========================================================= --%>
 	<form method="post" id="deleteForm"
 		action="${contextPath}/production/productionresult/delete">
 
@@ -138,7 +168,7 @@
 				</button>
 
 				<button type="button" class="search-btn search-btn-sub"
-					onclick="deleteCheck()">
+					onclick="deleteCheck();">
 					<svg viewBox="0 0 24 24" fill="none">
 						<path d="M4 7H20" stroke="currentColor" stroke-width="2"
 							stroke-linecap="round">
@@ -164,12 +194,9 @@
 		</div>
 
 
-		<%-- =========================================================
-		     3. 목록
-		     ========================================================= --%>
 		<div class="coTableWrap">
 
-			<table class="coTable">
+			<table class="coTable production-result-table">
 
 				<thead>
 					<tr>
@@ -180,88 +207,96 @@
 						</th>
 
 						<th class="mobile_hidden">실적번호</th>
+						<th class="mobile_hidden">작업지시번호</th>
 						<th class="mobile_show">LOT번호</th>
-						<th class="mobile_hidden">품목명</th>
 						<th class="mobile_show">생산수량</th>
-						<th class="mobile_hidden">LOSS량</th>
-						<th class="mobile_hidden">생산일</th>
-						<th class="mobile_show">상태</th>
+						<th class="mobile_hidden">생산일자</th>
+						<th class="mobile_show">생산상태</th>
 						<th class="mobile_show">상세</th>
 					</tr>
 				</thead>
 
 				<tbody>
 
-					<c:forEach var="result" items="${list}">
+					<c:choose>
 
-						<tr>
-							<td class="mobile_show">
-								<input type="checkbox" name="prodIds"
-									value="${result.prodId}">
-							</td>
+						<c:when test="${not empty list}">
 
-							<td class="mobile_hidden" title="${result.docNo}">
-								${result.docNo}
-							</td>
+							<c:forEach var="result" items="${list}">
 
-							<td class="mobile_show" title="${result.productLot}">
-								${result.productLot}
-							</td>
+								<tr>
+									<td class="mobile_show">
+										<input type="checkbox" name="prodIds"
+											value="${result.prodId}">
+									</td>
 
-							<td class="coTextLeft mobile_hidden"
-								title="${result.itemName}">
-								${result.itemName}
-							</td>
+									<td class="mobile_hidden" title="${result.docNo}">
+										${result.docNo}
+									</td>
 
-							<td class="mobile_show">
-								<fmt:formatNumber value="${result.prodQty}" pattern="#,##0" />
-								${result.itemUnit}
-							</td>
+									<td class="mobile_hidden" title="${result.workOrderDocNo}">
+										${result.workOrderDocNo}
+									</td>
 
-							<td class="mobile_hidden">
-								<fmt:formatNumber value="${result.lossQty}" pattern="#,##0" />
-								${result.itemUnit}
-							</td>
+									<td class="mobile_show" title="${result.productLot}">
+										${result.productLot}
+									</td>
 
-							<td class="mobile_hidden">${result.prodDate}</td>
+									<td class="mobile_show">
+										<fmt:formatNumber value="${result.prodQty}"
+											pattern="#,##0" />
+										${result.itemUnit}
+									</td>
 
-							<td class="mobile_show">
-								<c:choose>
-									<c:when test="${result.prodStatus eq '완료'}">
-										<span class="coStatus coStatusUse">
-											${result.prodStatus}
-										</span>
-									</c:when>
+									<td class="mobile_hidden">
+										${result.prodDate}
+									</td>
 
-									<c:when test="${result.prodStatus eq '보류' or result.prodStatus eq '취소'}">
-										<span class="coStatus coStatusStop">
-											${result.prodStatus}
-										</span>
-									</c:when>
+									<td class="mobile_show">
+										<c:choose>
 
-									<c:otherwise>
-										<span class="coStatus">
-											${result.prodStatus}
-										</span>
-									</c:otherwise>
-								</c:choose>
-							</td>
+											<c:when
+												test="${result.prodStatus eq '완료' or result.prodStatus eq '진행중'}">
+												<span class="coStatus coStatusUse">
+													${result.prodStatus}
+												</span>
+											</c:when>
 
-							<td class="mobile_show">
-								<button type="button" class="coDetailBtn"
-									onclick="location.href='${contextPath}/production/productionresult/detail?prodId=${result.prodId}'">
-									보기
-								</button>
-							</td>
-						</tr>
+											<c:when
+												test="${result.prodStatus eq '취소' or result.prodStatus eq '보류'}">
+												<span class="coStatus coStatusStop">
+													${result.prodStatus}
+												</span>
+											</c:when>
 
-					</c:forEach>
+											<c:otherwise>
+												<span class="coStatus">
+													${result.prodStatus}
+												</span>
+											</c:otherwise>
 
-					<c:if test="${empty list}">
-						<tr>
-							<td colspan="9">조회된 생산실적이 없습니다.</td>
-						</tr>
-					</c:if>
+										</c:choose>
+									</td>
+
+									<td class="mobile_show">
+										<button type="button" class="coDetailBtn"
+											onclick="location.href='${contextPath}/production/productionresult/detail?prodId=${result.prodId}'">
+											보기
+										</button>
+									</td>
+								</tr>
+
+							</c:forEach>
+
+						</c:when>
+
+						<c:otherwise>
+							<tr>
+								<td colspan="8">조회된 생산실적이 없습니다.</td>
+							</tr>
+						</c:otherwise>
+
+					</c:choose>
 
 				</tbody>
 
@@ -272,12 +307,10 @@
 	</form>
 
 
-	<%-- =========================================================
-	     4. 생산실적 등록 모달
-	     ========================================================= --%>
 	<div id="modal_insert" class="modal_wrap" aria-hidden="true">
 
-		<div class="modal_box" role="dialog" aria-modal="true">
+		<div class="modal_box production-result-modal-box" role="dialog"
+			aria-modal="true">
 
 			<div class="modal_header">
 				<h3 class="modal_title">생산실적 등록</h3>
@@ -287,129 +320,135 @@
 				action="${contextPath}/production/productionresult/insert"
 				onsubmit="return checkProductionResultInsert();">
 
-				<div class="modal_body modal_body_2col">
+				<input type="hidden" name="orderQty" id="insertOrderQty">
 
-					<c:if test="${openModal eq 'Y'}">
-						<div class="modal_item modal_item_full">
-							<div class="qr_entry_notice">
-								QR 스캔으로 진입했습니다. 작업지시 정보와 담당자가 자동 입력됩니다.
-							</div>
-						</div>
-					</c:if>
+				<div class="modal_body modal_body_2col production-result-modal-body">
 
 					<div class="modal_item modal_item_full">
-						<label class="modal_label">
-							작업지시 선택 <span class="modal_required">*</span>
-						</label>
+
+						<div class="production-result-order-option-row">
+
+							<label class="modal_label">
+								작업지시 선택 <span class="modal_required">*</span>
+							</label>
+
+							<label class="production-result-small-remain-label">
+								<input type="checkbox" id="includeSmallRemainCheck"
+									value="Y"
+									<c:if test="${includeSmallRemain eq 'Y'}">checked</c:if>
+									onchange="changeIncludeSmallRemain(this);">
+								<span>소량 잔량 포함</span>
+							</label>
+
+						</div>
 
 						<select name="orderId" id="insertOrderId"
-							class="modal_select"
-							onchange="setProductionResultOrderInfo();" required>
+							class="modal_select production-result-order-select"
+							onchange="setProductionResultOrderInfo();"
+							required>
 
 							<option value="">선택</option>
 
 							<c:if test="${not empty qrOrder}">
 								<option value="${qrOrder.orderId}"
-									data-prod-plan-doc-no="${qrOrder.prodPlanDocNo}"
 									data-work-order-doc-no="${qrOrder.workOrderDocNo}"
 									data-product-lot="${qrOrder.productLot}"
-									data-order-qty="${qrOrder.orderQty}"
-									data-emp-id="${qrOrder.empId}"
 									data-item-code="${qrOrder.itemCode}"
 									data-item-name="${qrOrder.itemName}"
 									data-item-unit="${qrOrder.itemUnit}"
+									data-order-qty="${qrOrder.orderQty}"
+									data-total-prod-qty="${qrOrder.totalProdQty}"
+									data-total-loss-qty="${qrOrder.totalLossQty}"
+									data-remain-qty="${qrOrder.remainQty}"
 									data-order-date="${qrOrder.orderDate}"
-									data-prod-plan-qty="${qrOrder.prodPlanQty}"
 									selected>
-									[QR] ${qrOrder.workOrderDocNo} / ${qrOrder.productLot} /
-									${qrOrder.itemCode} / ${qrOrder.itemName}
+									${qrOrder.workOrderDocNo} / ${qrOrder.productLot} / 잔량
+									<fmt:formatNumber value="${qrOrder.remainQty}" pattern="#,##0" />${qrOrder.itemUnit}
 								</option>
 							</c:if>
 
 							<c:forEach var="order" items="${productionResultOrderList}">
-
-								<option value="${order.orderId}"
-									data-prod-plan-doc-no="${order.prodPlanDocNo}"
-									data-work-order-doc-no="${order.workOrderDocNo}"
-									data-product-lot="${order.productLot}"
-									data-order-qty="${order.orderQty}"
-									data-emp-id="${order.empId}"
-									data-item-code="${order.itemCode}"
-									data-item-name="${order.itemName}"
-									data-item-unit="${order.itemUnit}"
-									data-order-date="${order.orderDate}"
-									data-prod-plan-qty="${order.prodPlanQty}">
-									${order.workOrderDocNo} / ${order.productLot} /
-									${order.itemCode} / ${order.itemName} /
-									지시수량
-									<fmt:formatNumber value="${order.orderQty}" pattern="#,##0" />${order.itemUnit}
-								</option>
-
+								<c:if test="${empty qrOrder or qrOrder.orderId ne order.orderId}">
+									<option value="${order.orderId}"
+										data-work-order-doc-no="${order.workOrderDocNo}"
+										data-product-lot="${order.productLot}"
+										data-item-code="${order.itemCode}"
+										data-item-name="${order.itemName}"
+										data-item-unit="${order.itemUnit}"
+										data-order-qty="${order.orderQty}"
+										data-total-prod-qty="${order.totalProdQty}"
+										data-total-loss-qty="${order.totalLossQty}"
+										data-remain-qty="${order.remainQty}"
+										data-order-date="${order.orderDate}">
+										${order.workOrderDocNo} / ${order.productLot} / 잔량
+										<fmt:formatNumber value="${order.remainQty}" pattern="#,##0" />${order.itemUnit}
+									</option>
+								</c:if>
 							</c:forEach>
 
 						</select>
 
 						<div class="modal_help_text">
-							QR로 진입한 경우 해당 작업지시가 자동 선택되고, LOT·수량·담당자가 자동 입력됩니다.
+							기본값은 잔량 20EA 이상인 최근 작업지시만 표시합니다.
+							소량 잔량 작업지시가 필요하면 “소량 잔량 포함”을 체크하세요.
 						</div>
+
+						<div class="modal_help_text">
+							모바일 화면에서는 작업지시 선택 목록을 짧게 표시하고, 상세 정보는 선택 후 아래에 표시됩니다.
+						</div>
+
 					</div>
 
-
-					<div class="modal_item">
-						<label class="modal_label">생산계획번호</label>
-						<input type="text" id="insertProdPlanDocNo"
-							class="modal_input" readonly>
-					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">작업지시번호</label>
+
 						<input type="text" id="insertWorkOrderDocNo"
-							class="modal_input" readonly>
+							class="modal_input"
+							placeholder="작업지시 선택 시 자동 표시" readonly>
 					</div>
 
 					<div class="modal_item">
-						<label class="modal_label">완제품 LOT</label>
+						<label class="modal_label">LOT번호</label>
+
 						<input type="text" id="insertProductLot"
-							class="modal_input" readonly>
+							class="modal_input"
+							placeholder="작업지시 선택 시 자동 표시" readonly>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">품목코드</label>
+
 						<input type="text" id="insertItemCode"
-							class="modal_input" readonly>
+							class="modal_input"
+							placeholder="작업지시 선택 시 자동 표시" readonly>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">품목명</label>
+
 						<input type="text" id="insertItemName"
-							class="modal_input" readonly>
+							class="modal_input"
+							placeholder="작업지시 선택 시 자동 표시" readonly>
 					</div>
 
-					<div class="modal_item">
-						<label class="modal_label">작업지시수량</label>
+					<div class="modal_item modal_item_full">
+						<label class="modal_label">작업지시 수량 / 누계 / 잔량</label>
+
 						<input type="text" id="insertOrderQtyText"
-							class="modal_input" readonly>
-						<input type="hidden" name="orderQty" id="insertOrderQty">
+							class="modal_input"
+							placeholder="작업지시 선택 시 자동 표시" readonly>
+
+						<div id="remainQtyHelpText" class="modal_help_text">
+							생산수량과 LOSS량의 합은 잔량을 초과할 수 없습니다.
+						</div>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">
-							생산수량 <span class="modal_required">*</span>
+							생산일자 <span class="modal_required">*</span>
 						</label>
-						<input type="number" name="prodQty" id="insertProdQty"
-							class="modal_input" min="1" required>
-					</div>
 
-					<div class="modal_item">
-						<label class="modal_label">LOSS량</label>
-						<input type="number" name="lossQty" id="insertLossQty"
-							class="modal_input" min="0" value="0">
-					</div>
-
-					<div class="modal_item">
-						<label class="modal_label">
-							생산일 <span class="modal_required">*</span>
-						</label>
 						<input type="date" name="prodDate" id="insertProdDate"
 							class="modal_input modal_today" required>
 					</div>
@@ -418,43 +457,84 @@
 						<label class="modal_label">
 							담당자 <span class="modal_required">*</span>
 						</label>
+
 						<select name="empId" id="insertEmpId"
 							class="modal_select" required>
 
 							<option value="">선택</option>
 
-							<c:forEach var="emp" items="${empList}">
+							<c:forEach var="emp" items="${productionResultEmpList}">
 								<option value="${emp.empId}">
 									${emp.ename} / ${emp.dept}
 								</option>
 							</c:forEach>
 
 						</select>
+
+						<div class="modal_help_text">
+							생산실적 담당자는 작업자 / 작업자 / WORKER 기준으로 표시됩니다.
+						</div>
 					</div>
 
 					<div class="modal_item">
 						<label class="modal_label">
-							상태 <span class="modal_required">*</span>
+							생산수량 <span class="modal_required">*</span>
 						</label>
+
+						<input type="number" name="prodQty" id="insertProdQty"
+							class="modal_input" min="1" required
+							oninput="checkResultQtyPreview();">
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">
+							LOSS량 <span class="modal_required">*</span>
+						</label>
+
+						<input type="number" name="lossQty" id="insertLossQty"
+							class="modal_input" min="0" value="0" required
+							oninput="checkResultQtyPreview();">
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">
+							등록구분 <span class="modal_required">*</span>
+						</label>
+
 						<select name="prodStatus" id="insertProdStatus"
 							class="modal_select" required>
-							<option value="완료">완료</option>
-							<option value="진행중">진행중</option>
+							<option value="진행중">정상등록</option>
 							<option value="보류">보류</option>
 						</select>
+
+						<div class="modal_help_text">
+							정상등록은 누적수량 기준으로 진행중/완료가 자동 계산됩니다.
+						</div>
+					</div>
+
+					<div class="modal_item">
+						<label class="modal_label">품질검사 상태</label>
+
+						<input type="text" id="insertInspectionStatusText"
+							class="modal_input" value="검사 예정" readonly>
+
+						<div class="modal_help_text">
+							생산실적 등록 후 품질검사 등록 시 검사 완료로 변경됩니다.
+						</div>
+					</div>
+
+					<div class="modal_item modal_item_full">
+						<label class="modal_label">수량검증</label>
+
+						<input type="text" id="insertQtyCheckText"
+							class="modal_input" value="작업지시 선택 후 수량을 입력하세요." readonly>
 					</div>
 
 					<div class="modal_item modal_item_full">
 						<label class="modal_label">비고</label>
+
 						<textarea name="remark" class="modal_textarea"
 							placeholder="생산실적 관련 메모를 입력하세요."></textarea>
-					</div>
-
-					<div class="modal_item modal_item_full">
-						<div class="modal_help_text production_result_help">
-							생산수량은 작업지시수량을 기본값으로 자동 입력합니다.
-							LOSS량은 불량수량이 아니라 생산 중 손실수량입니다.
-						</div>
 					</div>
 
 				</div>
@@ -462,8 +542,7 @@
 				<div class="modal_footer">
 
 					<button type="button"
-						class="modal_btn modal_btn_cancel modal_close_btn"
-						onclick="closeProductionResultInsertModal();">
+						class="modal_btn modal_btn_cancel modal_close_btn">
 						취소
 					</button>
 
@@ -491,58 +570,106 @@
 	font-size: 13px;
 	color: #666;
 	line-height: 1.5;
+	word-break: keep-all;
+	overflow-wrap: anywhere;
 }
 
-.production_result_help {
-	padding: 10px 12px;
-	border-radius: 8px;
-	background: #f7f9fb;
-	border: 1px solid #e5e8eb;
-	color: #444;
+.production-result-modal-box {
+	width: min(900px, calc(100vw - 32px));
+	max-height: calc(100vh - 40px);
+	display: flex;
+	flex-direction: column;
 }
 
-.qr_entry_notice {
-	padding: 10px 12px;
-	border-radius: 8px;
-	background: #e8f3ee;
-	border: 1px solid #c7dfd5;
-	color: #174c3c;
-	font-size: 13px;
-	font-weight: 700;
-	line-height: 1.5;
+.production-result-modal-body {
+	overflow-y: auto;
+	max-height: calc(100vh - 180px);
+	padding-right: 4px;
 }
 
-/* QR 진입 시 공통 모달 방식과 무관하게 모달 표시 보정 */
-#modal_insert.force_open {
-	display: flex !important;
+.production-result-modal-body .modal_textarea {
+	min-height: 74px;
+}
+
+.production-result-order-option-row {
+	display: flex;
 	align-items: center;
-	justify-content: center;
-	opacity: 1 !important;
-	visibility: visible !important;
-	pointer-events: auto !important;
-	z-index: 9999 !important;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 6px;
 }
 
-#modal_insert.force_open .modal_box {
-	display: block;
-	opacity: 1;
-	visibility: visible;
+.production-result-small-remain-label {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	color: #333;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.production-result-small-remain-label input {
+	margin: 0;
+}
+
+.production-result-order-select {
+	width: 100%;
+	max-width: 100%;
+	box-sizing: border-box;
+}
+
+.production-result-order-select option {
+	max-width: 100%;
+}
+
+@media (max-width: 768px) {
+	.production-result-modal-box {
+		width: calc(100vw - 24px);
+		max-height: calc(100vh - 24px);
+	}
+
+	.production-result-modal-body {
+		max-height: calc(100vh - 164px);
+		padding-right: 0;
+	}
+
+	.production-result-order-option-row {
+		align-items: flex-start;
+		flex-direction: column;
+		gap: 6px;
+	}
+
+	.production-result-small-remain-label {
+		font-size: 13px;
+	}
+
+	.production-result-order-select {
+		font-size: 13px;
+		min-width: 0;
+	}
+
+	.modal_help_text {
+		font-size: 12px;
+	}
 }
 </style>
 
 
 <script>
-	// 선택 글씨 클릭 시 전체 선택 / 전체 해제
-	var productionResultCheckAllLabel = document
-			.getElementById("productionResultCheckAllLabel");
+	var productionResultCheckAllLabel =
+		document.getElementById("productionResultCheckAllLabel");
 
 	if (productionResultCheckAllLabel != null) {
 
 		productionResultCheckAllLabel.onclick = function() {
 
 			var checkAll = document.getElementById("productionResultCheckAll");
-
 			var checks = document.getElementsByName("prodIds");
+
+			if (checkAll == null || checks == null) {
+				return;
+			}
 
 			checkAll.checked = !checkAll.checked;
 
@@ -552,38 +679,42 @@
 		};
 	}
 
-	// 개별 체크박스 상태에 따라 전체 선택 상태를 맞춘다.
-	var checks = document.getElementsByName("prodIds");
 
-	for (var i = 0; i < checks.length; i++) {
+	var productionResultChecks = document.getElementsByName("prodIds");
 
-		checks[i].onclick = function() {
+	for (var i = 0; i < productionResultChecks.length; i++) {
+
+		productionResultChecks[i].onclick = function() {
 
 			var allChecked = true;
 
-			for (var j = 0; j < checks.length; j++) {
+			for (var j = 0; j < productionResultChecks.length; j++) {
 
-				if (!checks[j].checked) {
+				if (!productionResultChecks[j].checked) {
 					allChecked = false;
 					break;
 				}
 			}
 
-			document.getElementById("productionResultCheckAll").checked = allChecked;
+			var checkAll = document.getElementById("productionResultCheckAll");
+
+			if (checkAll != null) {
+				checkAll.checked = allChecked;
+			}
 		};
 	}
 
-	// 선택 삭제 방어코딩이다.
+
 	function deleteCheck() {
 
 		var checks = document.getElementsByName("prodIds");
-
 		var checked = false;
 
 		for (var i = 0; i < checks.length; i++) {
 
 			if (checks[i].checked) {
 				checked = true;
+				break;
 			}
 		}
 
@@ -592,86 +723,192 @@
 			return;
 		}
 
-		alert("생산실적은 검사/불량/재고 이력과 연결되므로 삭제 기능은 다음 단계에서 별도 검토합니다.");
+		alert("생산실적은 품질검사, 재고반영, LOT 이력과 연결되므로 삭제 기능은 지원하지 않습니다.\n수정이 필요한 경우 상세 화면에서 보류 또는 취소 상태로 관리하세요.");
 	}
 
-	// 작업지시 선택 시 생산실적 등록 정보 자동입력
-	function setProductionResultOrderInfo() {
+
+	function changeIncludeSmallRemain(checkBox) {
+
+		var url = new URL(window.location.href);
+
+		if (checkBox.checked) {
+			url.searchParams.set("includeSmallRemain", "Y");
+		} else {
+			url.searchParams.delete("includeSmallRemain");
+		}
+
+		url.searchParams.set("openInsertModal", "Y");
+		url.searchParams.delete("page");
+
+		window.location.href = url.toString();
+	}
+
+
+	document.addEventListener("DOMContentLoaded", function() {
+
+		var openModal = "${openModal}";
+		var openInsertModal = "${param.openInsertModal}";
+
+		if (openModal === "Y" || openInsertModal === "Y") {
+
+			var modal = document.getElementById("modal_insert");
+
+			if (modal != null) {
+				modal.classList.add("modal_is_open");
+				modal.setAttribute("aria-hidden", "false");
+				document.body.classList.add("modal_body_lock");
+			}
+		}
+
+		setModalTodayDate();
 
 		var orderSelect = document.getElementById("insertOrderId");
 
-		if (orderSelect == null) {
+		if (orderSelect != null && orderSelect.value !== "") {
+			setProductionResultOrderInfo();
+		}
+	});
+
+
+	function setModalTodayDate() {
+
+		var prodDateInput = document.getElementById("insertProdDate");
+
+		if (prodDateInput == null || prodDateInput.value !== "") {
 			return;
 		}
 
+		var today = new Date();
+		var year = today.getFullYear();
+		var month = String(today.getMonth() + 1).padStart(2, "0");
+		var date = String(today.getDate()).padStart(2, "0");
+
+		prodDateInput.value = year + "-" + month + "-" + date;
+	}
+
+
+	function setProductionResultOrderInfo() {
+
+		var orderSelect = document.getElementById("insertOrderId");
 		var selectedOption = orderSelect.options[orderSelect.selectedIndex];
 
 		if (selectedOption == null || selectedOption.value === "") {
-			clearProductionResultOrderInfo();
+
+			document.getElementById("insertWorkOrderDocNo").value = "";
+			document.getElementById("insertProductLot").value = "";
+			document.getElementById("insertItemCode").value = "";
+			document.getElementById("insertItemName").value = "";
+			document.getElementById("insertOrderQtyText").value = "";
+			document.getElementById("insertOrderQty").value = "";
+			document.getElementById("remainQtyHelpText").innerHTML =
+				"생산수량과 LOSS량의 합은 잔량을 초과할 수 없습니다.";
+
+			checkResultQtyPreview();
 			return;
 		}
 
-		var prodPlanDocNo = selectedOption.getAttribute("data-prod-plan-doc-no");
-		var workOrderDocNo = selectedOption.getAttribute("data-work-order-doc-no");
-		var productLot = selectedOption.getAttribute("data-product-lot");
-		var orderQty = selectedOption.getAttribute("data-order-qty");
-		var empId = selectedOption.getAttribute("data-emp-id");
-		var itemCode = selectedOption.getAttribute("data-item-code");
-		var itemName = selectedOption.getAttribute("data-item-name");
-		var itemUnit = selectedOption.getAttribute("data-item-unit");
+		var workOrderDocNo =
+			selectedOption.getAttribute("data-work-order-doc-no");
+		var productLot =
+			selectedOption.getAttribute("data-product-lot");
+		var itemCode =
+			selectedOption.getAttribute("data-item-code");
+		var itemName =
+			selectedOption.getAttribute("data-item-name");
+		var itemUnit =
+			selectedOption.getAttribute("data-item-unit");
+		var orderQty =
+			selectedOption.getAttribute("data-order-qty");
+		var totalProdQty =
+			selectedOption.getAttribute("data-total-prod-qty");
+		var totalLossQty =
+			selectedOption.getAttribute("data-total-loss-qty");
+		var remainQty =
+			selectedOption.getAttribute("data-remain-qty");
 
-		document.getElementById("insertProdPlanDocNo").value = prodPlanDocNo || "";
-		document.getElementById("insertWorkOrderDocNo").value = workOrderDocNo || "";
-		document.getElementById("insertProductLot").value = productLot || "";
-		document.getElementById("insertItemCode").value = itemCode || "";
-		document.getElementById("insertItemName").value = itemName || "";
+		document.getElementById("insertWorkOrderDocNo").value =
+			workOrderDocNo || "";
+		document.getElementById("insertProductLot").value =
+			productLot || "";
+		document.getElementById("insertItemCode").value =
+			itemCode || "";
+		document.getElementById("insertItemName").value =
+			itemName || "";
+		document.getElementById("insertOrderQty").value =
+			orderQty || "";
 
-		if (empId != null && empId !== "") {
-			document.getElementById("insertEmpId").value = empId;
-		} else {
-			document.getElementById("insertEmpId").value = "";
-		}
+		document.getElementById("insertOrderQtyText").value =
+			"지시 " + formatNumber(orderQty || 0) + " " + (itemUnit || "")
+			+ " / 생산누계 " + formatNumber(totalProdQty || 0) + " " + (itemUnit || "")
+			+ " / LOSS누계 " + formatNumber(totalLossQty || 0) + " " + (itemUnit || "")
+			+ " / 잔량 " + formatNumber(remainQty || 0) + " " + (itemUnit || "");
 
-		document.getElementById("insertOrderQty").value = orderQty || "";
+		document.getElementById("remainQtyHelpText").innerHTML =
+			"현재 등록 가능 잔량은 " + formatNumber(remainQty || 0)
+			+ " " + (itemUnit || "") + " 입니다.";
 
-		if (orderQty != null && orderQty !== "") {
-			document.getElementById("insertOrderQtyText").value =
-				formatNumber(orderQty) + " " + (itemUnit || "");
-
-			document.getElementById("insertProdQty").value = orderQty;
-		} else {
-			document.getElementById("insertOrderQtyText").value = "";
-			document.getElementById("insertProdQty").value = "";
-		}
-
-		document.getElementById("insertLossQty").value = "0";
+		checkResultQtyPreview();
 	}
 
-	// 작업지시 자동입력 정보 초기화
-	function clearProductionResultOrderInfo() {
 
-		document.getElementById("insertProdPlanDocNo").value = "";
-		document.getElementById("insertWorkOrderDocNo").value = "";
-		document.getElementById("insertProductLot").value = "";
-		document.getElementById("insertItemCode").value = "";
-		document.getElementById("insertItemName").value = "";
-		document.getElementById("insertOrderQtyText").value = "";
-		document.getElementById("insertOrderQty").value = "";
-		document.getElementById("insertProdQty").value = "";
-		document.getElementById("insertLossQty").value = "0";
-		document.getElementById("insertEmpId").value = "";
+	function checkResultQtyPreview() {
+
+		var orderSelect = document.getElementById("insertOrderId");
+		var selectedOption = orderSelect.options[orderSelect.selectedIndex];
+
+		var prodQty = Number(document.getElementById("insertProdQty").value || 0);
+		var lossQty = Number(document.getElementById("insertLossQty").value || 0);
+
+		if (selectedOption == null || selectedOption.value === "") {
+			document.getElementById("insertQtyCheckText").value =
+				"작업지시를 먼저 선택하세요.";
+			return;
+		}
+
+		var remainQty = Number(selectedOption.getAttribute("data-remain-qty") || 0);
+		var itemUnit = selectedOption.getAttribute("data-item-unit") || "";
+		var requestQty = prodQty + lossQty;
+
+		if (prodQty <= 0) {
+			document.getElementById("insertQtyCheckText").value =
+				"생산수량을 1 이상 입력하세요.";
+			return;
+		}
+
+		if (lossQty < 0) {
+			document.getElementById("insertQtyCheckText").value =
+				"LOSS량은 0 이상 입력하세요.";
+			return;
+		}
+
+		if (lossQty > prodQty) {
+			document.getElementById("insertQtyCheckText").value =
+				"LOSS량은 생산수량보다 클 수 없습니다.";
+			return;
+		}
+
+		if (requestQty > remainQty) {
+			document.getElementById("insertQtyCheckText").value =
+				"초과: 생산수량 + LOSS량 = "
+				+ formatNumber(requestQty) + " " + itemUnit
+				+ " / 잔량 " + formatNumber(remainQty) + " " + itemUnit;
+			return;
+		}
+
+		document.getElementById("insertQtyCheckText").value =
+			"정상: 생산수량 + LOSS량 = "
+			+ formatNumber(requestQty) + " " + itemUnit
+			+ " / 잔량 " + formatNumber(remainQty) + " " + itemUnit;
 	}
 
-	// 생산실적 등록 방어코딩
+
 	function checkProductionResultInsert() {
 
 		var orderId = document.getElementById("insertOrderId").value;
-		var orderQty = document.getElementById("insertOrderQty").value;
-		var prodQty = document.getElementById("insertProdQty").value;
-		var lossQty = document.getElementById("insertLossQty").value;
-		var prodDate = document.getElementById("insertProdDate").value;
 		var empId = document.getElementById("insertEmpId").value;
-		var prodStatus = document.getElementById("insertProdStatus").value;
+		var prodDate = document.getElementById("insertProdDate").value;
+		var prodQty = Number(document.getElementById("insertProdQty").value || 0);
+		var lossQty = Number(document.getElementById("insertLossQty").value || 0);
 
 		if (orderId === "") {
 			alert("작업지시를 선택해주세요.");
@@ -679,33 +916,8 @@
 			return false;
 		}
 
-		if (prodQty === "" || Number(prodQty) <= 0) {
-			alert("생산수량은 1 이상 입력해주세요.");
-			document.getElementById("insertProdQty").focus();
-			return false;
-		}
-
-		if (lossQty === "" || Number(lossQty) < 0) {
-			alert("LOSS량은 0 이상 입력해주세요.");
-			document.getElementById("insertLossQty").focus();
-			return false;
-		}
-
-		if (orderQty !== "" && Number(prodQty) > Number(orderQty)) {
-			if (!confirm("생산수량이 작업지시수량보다 큽니다.\n그래도 등록하시겠습니까?")) {
-				document.getElementById("insertProdQty").focus();
-				return false;
-			}
-		}
-
-		if (Number(lossQty) > Number(prodQty)) {
-			alert("LOSS량은 생산수량보다 클 수 없습니다.");
-			document.getElementById("insertLossQty").focus();
-			return false;
-		}
-
 		if (prodDate === "") {
-			alert("생산일을 선택해주세요.");
+			alert("생산일자를 선택해주세요.");
 			document.getElementById("insertProdDate").focus();
 			return false;
 		}
@@ -716,20 +928,46 @@
 			return false;
 		}
 
-		if (prodStatus === "") {
-			alert("상태를 선택해주세요.");
-			document.getElementById("insertProdStatus").focus();
+		if (prodQty <= 0) {
+			alert("생산수량은 1 이상 입력해주세요.");
+			document.getElementById("insertProdQty").focus();
 			return false;
 		}
 
-		if (!confirm("생산실적을 등록하시겠습니까?")) {
+		if (lossQty < 0) {
+			alert("LOSS량은 0 이상 입력해주세요.");
+			document.getElementById("insertLossQty").focus();
+			return false;
+		}
+
+		if (lossQty > prodQty) {
+			alert("LOSS량은 생산수량보다 클 수 없습니다.");
+			document.getElementById("insertLossQty").focus();
+			return false;
+		}
+
+		var orderSelect = document.getElementById("insertOrderId");
+		var selectedOption = orderSelect.options[orderSelect.selectedIndex];
+		var remainQty = Number(selectedOption.getAttribute("data-remain-qty") || 0);
+		var requestQty = prodQty + lossQty;
+
+		if (requestQty > remainQty) {
+			alert("생산수량과 LOSS량의 합은 작업지시 잔량보다 클 수 없습니다.\n잔량: "
+				+ formatNumber(remainQty)
+				+ "\n입력합계: "
+				+ formatNumber(requestQty));
+			document.getElementById("insertProdQty").focus();
+			return false;
+		}
+
+		if (!confirm("생산실적을 등록하시겠습니까?\n등록 후 품질검사 상태는 검사 예정으로 처리됩니다.")) {
 			return false;
 		}
 
 		return true;
 	}
 
-	// 숫자 천단위 구분 표시
+
 	function formatNumber(value) {
 
 		if (value == null || value === "") {
@@ -744,138 +982,4 @@
 
 		return numberValue.toLocaleString();
 	}
-
-	// 오늘 날짜를 yyyy-MM-dd 형식으로 반환
-	function getTodayText() {
-
-		var today = new Date();
-
-		var year = today.getFullYear();
-		var month = String(today.getMonth() + 1).padStart(2, "0");
-		var day = String(today.getDate()).padStart(2, "0");
-
-		return year + "-" + month + "-" + day;
-	}
-
-	// 생산일 기본값 보정
-	function setDefaultProdDate() {
-
-		var prodDateInput = document.getElementById("insertProdDate");
-
-		if (prodDateInput != null && prodDateInput.value === "") {
-			prodDateInput.value = getTodayText();
-		}
-	}
-
-	// QR 진입 시 넘어온 작업지시를 select에서 강제로 선택한다.
-	function selectQrOrderOption() {
-
-		var qrOrderId = "${qrOrderId}";
-
-		if (qrOrderId == null || qrOrderId === "") {
-			return;
-		}
-
-		var orderSelect = document.getElementById("insertOrderId");
-
-		if (orderSelect == null) {
-			return;
-		}
-
-		for (var i = 0; i < orderSelect.options.length; i++) {
-
-			if (orderSelect.options[i].value === qrOrderId) {
-				orderSelect.selectedIndex = i;
-				return;
-			}
-		}
-	}
-
-	// 생산실적 등록 모달 강제 오픈
-	function openProductionResultInsertModal() {
-
-		var modal = document.getElementById("modal_insert");
-
-		if (modal == null) {
-			return;
-		}
-
-		modal.classList.add("active");
-		modal.classList.add("on");
-		modal.classList.add("show");
-		modal.classList.add("open");
-		modal.classList.add("force_open");
-
-		modal.setAttribute("aria-hidden", "false");
-
-		modal.style.display = "flex";
-		modal.style.alignItems = "center";
-		modal.style.justifyContent = "center";
-		modal.style.opacity = "1";
-		modal.style.visibility = "visible";
-		modal.style.pointerEvents = "auto";
-		modal.style.zIndex = "9999";
-
-		document.body.classList.add("modal_open");
-		document.body.classList.add("modal-open");
-	}
-
-	// 생산실적 등록 모달 닫기
-	function closeProductionResultInsertModal() {
-
-		var modal = document.getElementById("modal_insert");
-
-		if (modal == null) {
-			return;
-		}
-
-		modal.classList.remove("active");
-		modal.classList.remove("on");
-		modal.classList.remove("show");
-		modal.classList.remove("open");
-		modal.classList.remove("force_open");
-
-		modal.setAttribute("aria-hidden", "true");
-
-		modal.style.display = "";
-		modal.style.alignItems = "";
-		modal.style.justifyContent = "";
-		modal.style.opacity = "";
-		modal.style.visibility = "";
-		modal.style.pointerEvents = "";
-		modal.style.zIndex = "";
-
-		document.body.classList.remove("modal_open");
-		document.body.classList.remove("modal-open");
-	}
-
-	// 공통 닫기 버튼과 강제 오픈 모달의 충돌 방지
-	function bindProductionResultModalClose() {
-
-		var closeButtons = document.querySelectorAll("#modal_insert .modal_close_btn");
-
-		for (var i = 0; i < closeButtons.length; i++) {
-			closeButtons[i].onclick = function() {
-				closeProductionResultInsertModal();
-			};
-		}
-	}
-
-	// QR 진입 시 등록 모달 자동 오픈 + 작업지시 정보 자동입력
-	document.addEventListener("DOMContentLoaded", function() {
-
-		setDefaultProdDate();
-		bindProductionResultModalClose();
-
-		var openModal = "${openModal}";
-
-		if (openModal === "Y") {
-
-			selectQrOrderOption();
-
-			setProductionResultOrderInfo();
-
-			openProductionResultInsertModal();
-		}
-	});
 </script>
