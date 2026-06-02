@@ -109,6 +109,83 @@
 		font-size: 13px;
 	}
 
+
+	/* =====================================================
+		모바일 테이블 컬럼 보정
+		팀 공통 규칙에 맞게 mobile_show / mobile_hidden 만 사용한다.
+		공통 CSS 파일은 수정하지 않고, 이 JSP 안에서만 모바일 표시를 보정한다.
+		모바일 노출 컬럼:
+		선택 / 품목명 / 현재재고/단위 / 창고위치 / 상세
+		상세 컬럼은 반드시 mobile_show로 유지한다.
+	===================================================== */
+	@media screen and (max-width: 768px) {
+
+		.coTable th.mobile_hidden,
+		.coTable td.mobile_hidden {
+			display: none !important;
+		}
+
+		.coTable th.mobile_show,
+		.coTable td.mobile_show {
+			display: table-cell !important;
+		}
+
+		.coTable {
+			width: 100%;
+			table-layout: fixed;
+		}
+
+		.coTable th,
+		.coTable td {
+			font-size: 11px;
+			padding: 10px 4px;
+			letter-spacing: -0.5px;
+		}
+
+		.coTable th:nth-child(1),
+		.coTable td:nth-child(1) {
+			width: 46px;
+		}
+
+		/* =================================================
+			모바일 컬럼 폭 최종 보정
+			팀 공통 mobile_show/mobile_hidden 규칙은 그대로 사용하고,
+			품목명이 너무 넓어서 상세 컬럼이 잘리지 않도록 폭만 조정한다.
+		================================================= */
+		.coTable th:nth-child(4),
+		.coTable td:nth-child(4) {
+			width: 38%;
+		}
+
+		.coTable th:nth-child(5),
+		.coTable td:nth-child(5) {
+			width: 18%;
+		}
+
+		.coTable th:nth-child(6),
+		.coTable td:nth-child(6) {
+			width: 22%;
+		}
+
+		.coTable th:nth-child(8),
+		.coTable td:nth-child(8) {
+			width: 52px;
+		}
+
+		.coTable th,
+		.coTable td {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.coDetailBtn {
+			min-width: 36px;
+			padding: 6px 6px;
+			font-size: 11px;
+		}
+	}
+
 </style>
 
 <div class="coPageWrap">
@@ -374,6 +451,21 @@
 
 		<div class="coTableWrap">
 
+			<%-- =====================================================
+				재고조회 관리 목록 테이블 모바일 컬럼 규칙
+				mobile_show   : 모바일에서도 보여줄 컬럼
+				mobile_hidden : 모바일에서 숨길 컬럼
+				모바일에서는 선택 / 품목명 / 현재재고/단위 / 창고위치 / 상세 총 5개만 노출한다.
+				공통 CSS / 공통 JSP는 절대 수정하지 않는다.
+			===================================================== --%>
+			<%-- =====================================================
+				재고조회관리 목록 모바일 컬럼 규칙 최종 반영
+				mobile_show   : 모바일에서도 보여줄 컬럼
+				mobile_hidden : 모바일에서 숨길 컬럼
+				모바일 노출 컬럼은 선택 / 품목명 / 현재재고/단위 / 창고위치 / 상세 총 5개이다.
+				상세 컬럼은 팀 공통 규칙상 반드시 mobile_show로 유지한다.
+				공통 JSP / 공통 CSS는 수정하지 않는다.
+			===================================================== --%>
 			<table class="coTable">
 
 				<thead>
@@ -397,7 +489,12 @@
 						<th class="mobile_show">품목명</th>
 						<th class="mobile_show">현재재고/단위</th>
 						<th class="mobile_show">창고위치</th>
-						<th class="mobile_show">생성일</th>
+						<%-- =====================================================
+							모바일 컬럼 규칙
+							생성일은 PC에서는 보이지만 모바일에서는 5개 컬럼 제한 때문에 숨긴다.
+							모바일 노출 컬럼: 선택 / 품목명 / 현재재고/단위 / 창고위치 / 상세
+						===================================================== --%>
+						<th class="mobile_hidden">생성일</th>
 						<th class="mobile_show">상세</th>
 
 					</tr>
@@ -477,7 +574,12 @@
 
 							</td>
 
-							<td class="mobile_show">
+							<%-- =====================================================
+								모바일 컬럼 규칙
+								생성일 값도 header와 동일하게 mobile_hidden 처리한다.
+								공통 CSS는 수정하지 않고 JSP 컬럼 class만 맞춘다.
+							===================================================== --%>
+							<td class="mobile_hidden">
 
 								${inventory.createdDate}
 

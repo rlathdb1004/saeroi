@@ -206,6 +206,16 @@ public class InventoryController {
 			"loginEmpNo",
 			getLoginEmpNo(session));
 
+		// =============================================================
+		// 화면 표시용 로그인 사용자 이름
+		// 자재입출고 등록 모달의 담당자 칸은 품목 거래처 담당자가 아니라
+		// 현재 로그인한 작업자/관리자 이름이 보이도록 한다.
+		// DB 저장은 기존처럼 getLoginEmpId(session)로 EMP_ID를 저장한다.
+		// =============================================================
+		model.addAttribute(
+			"loginEmpName",
+			getLoginEmpName(session));
+
 		return "inventory/inoutManage.tiles";
 	}
 
@@ -508,9 +518,11 @@ public class InventoryController {
 				endDate);
 
 		// =============================================================
-		// 재고조회 목록 최신 반영순 정렬
-		// DAO에서도 정렬하지만, 등록/수정 직후 화면 첫 줄 보장을 위해
-		// Controller에서 한 번 더 UPDATED_DATE DESC, INVENTORY_ID DESC 기준으로 정렬한다.
+		// 재고조회 목록 생성일 최신순 정렬
+		// 팀 피드백 반영: 재고조회관리 화면은 수정일이 아니라
+		// 생성일 기준 최신 등록건이 위로 보이게 한다.
+		// DAO에서도 CREATED_DATE DESC로 정렬하지만,
+		// 공통 파일을 건드리지 않고 Controller에서 한 번 더 보정한다.
 		// =============================================================
 		Collections.sort(
 			list,
@@ -520,13 +532,6 @@ public class InventoryController {
 				public int compare(
 						InventoryDTO a,
 						InventoryDTO b) {
-
-					if (a.getUpdatedDate() != null
-							&& b.getUpdatedDate() != null
-							&& !a.getUpdatedDate().equals(b.getUpdatedDate())) {
-
-						return b.getUpdatedDate().compareTo(a.getUpdatedDate());
-					}
 
 					if (a.getCreatedDate() != null
 							&& b.getCreatedDate() != null
@@ -732,32 +737,23 @@ public class InventoryController {
 			inventoryService.getInventoryInoutHistoryList(
 				inventoryId);
 
+		// =============================================================
+		// 재고 상세 입출고 내역서는 LOT 기준 흐름만 보여준다.
+		// 품목코드/ITEM_ID 기준 전체 이력을 가져오면 60건 이상이 한꺼번에 보여
+		// 관리가 복잡해지므로, DAO에서 최신 LOT 기준으로 입고/출고 흐름과
+		// 누적잔량을 계산해서 가져온다.
+		// 공통 paging.jsp는 inventoryDetail.jsp에서 사용하지 않는다.
+		// =============================================================
 		int totalCount =
 			historyList.size();
 
-		int startIndex =
-			(page - 1) * size;
-
-		int endIndex =
-			startIndex + size;
-
-		if (startIndex > totalCount) {
-			startIndex = totalCount;
-		}
-
-		if (endIndex > totalCount) {
-			endIndex = totalCount;
-		}
-
 		List<InventoryDTO> pageHistoryList =
-			historyList.subList(
-				startIndex,
-				endIndex);
+			historyList;
 
 		PageDTO pageInfo =
 			new PageDTO(
-				page,
-				size,
+				1,
+				totalCount == 0 ? 1 : totalCount,
 				totalCount);
 
 		model.addAttribute(
@@ -921,6 +917,47 @@ public class InventoryController {
 		}
 
 		return empno;
+	}
+
+	// =========================================================================
+	// 로그인 사용자 이름 조회
+	// 화면 표시용
+	// 자재입출고 등록 모달 담당자 칸에 현재 로그인한 사람 이름을 보여준다.
+	// 로그인 DTO는 팀원 파일이므로 수정하지 않고 getter만 사용한다.
+	// =========================================================================
+	private String getLoginEmpName(
+			HttpSession session) {
+
+		if (session == null) {
+
+			return "";
+		}
+
+		Object loginUser =
+			session.getAttribute("loginUser");
+
+		if (loginUser == null) {
+
+			loginUser =
+				session.getAttribute("member");
+		}
+
+		if (loginUser == null) {
+
+			return "";
+		}
+
+		String ename =
+			callStringGetter(
+				loginUser,
+				"getEname");
+
+		if (ename == null) {
+
+			return "";
+		}
+
+		return ename;
 	}
 
 	// =========================================================================

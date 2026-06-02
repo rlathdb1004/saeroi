@@ -27,6 +27,17 @@ public class InventoryDTO {
 	private int outQty;            // 일반 출고량 합계
 
 	// =========================================================================
+	// LOT 기준 재고 흐름 표시용
+	// 입고 1000개, 출고 100개, 출고 200개일 때
+	// 현재 잔여수량 700개처럼 한눈에 보이도록 계산해서 담는 값이다.
+	// INVENTORY 테이블 컬럼이 아니라 재고 상세 입출고 내역서 화면 전용 값이다.
+	// =========================================================================
+	private int remainQty;         // 해당 입출고 이후 누적잔량
+	private int totalInQty;        // 선택 LOT 총입고량
+	private int totalOutQty;       // 선택 LOT 총출고량
+	private int currentRemainQty;  // 선택 LOT 현재잔량
+
+	// =========================================================================
 	// 재고 상세페이지 하단 입출고 내역 리스트 출력용
 	// 특정 재고번호를 따라갔을 때 해당 품목의 입출고 흐름을 보여주기 위한 값이다.
 	// =========================================================================
@@ -153,6 +164,51 @@ public class InventoryDTO {
 
 	public void setOutQty(int outQty) {
 		this.outQty = outQty;
+	}
+
+
+	// =========================================================================
+	// 해당 입출고 이후 누적잔량
+	// =========================================================================
+	public int getRemainQty() {
+		return remainQty;
+	}
+
+	public void setRemainQty(int remainQty) {
+		this.remainQty = remainQty;
+	}
+
+	// =========================================================================
+	// 선택 LOT 총입고량
+	// =========================================================================
+	public int getTotalInQty() {
+		return totalInQty;
+	}
+
+	public void setTotalInQty(int totalInQty) {
+		this.totalInQty = totalInQty;
+	}
+
+	// =========================================================================
+	// 선택 LOT 총출고량
+	// =========================================================================
+	public int getTotalOutQty() {
+		return totalOutQty;
+	}
+
+	public void setTotalOutQty(int totalOutQty) {
+		this.totalOutQty = totalOutQty;
+	}
+
+	// =========================================================================
+	// 선택 LOT 현재잔량
+	// =========================================================================
+	public int getCurrentRemainQty() {
+		return currentRemainQty;
+	}
+
+	public void setCurrentRemainQty(int currentRemainQty) {
+		this.currentRemainQty = currentRemainQty;
 	}
 
 	public int getInoutId() {
