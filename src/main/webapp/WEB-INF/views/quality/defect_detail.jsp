@@ -87,6 +87,7 @@
 	}
 }
 
+/* 상세 페이지로 이동하는 값 링크임 */
 .lot-link {
 	display: inline-block;
 	color: #0b7a5a;
@@ -273,17 +274,32 @@
 				<tbody>
 					<tr>
 						<th>검사번호</th>
-						<td>${defect.insp_doc_no}</td>
+						<%-- 검사번호 클릭 시 검사 상세 페이지로 이동함 --%>
+						<td><c:choose>
+								<c:when test="${defect.insp_id > 0 and not empty defect.insp_doc_no}">
+									<a class="lot-link"
+										href="${pageContext.request.contextPath}/quality/inspection_detail?insp_id=${defect.insp_id}">
+										${defect.insp_doc_no}</a>
+								</c:when>
+								<c:when test="${not empty defect.insp_doc_no}">
+									${defect.insp_doc_no}
+								</c:when>
+								<c:otherwise>-</c:otherwise>
+							</c:choose></td>
 
 						<th>검사자</th>
 						<td>${defect.ename}</td>
 
 						<th>LOT번호</th>
+						<%-- LOT번호 클릭 시 LOT 상세 페이지로 이동함 --%>
 						<td><c:choose>
-								<c:when test="${not empty defect.product_lot}">
+								<c:when test="${defect.order_id > 0 and not empty defect.product_lot}">
 									<a class="lot-link"
-										href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${defect.product_lot}">
+										href="${pageContext.request.contextPath}/lot/lothistory/detail?orderId=${defect.order_id}">
 										${defect.product_lot} </a>
+								</c:when>
+								<c:when test="${not empty defect.product_lot}">
+									${defect.product_lot}
 								</c:when>
 								<c:otherwise>-</c:otherwise>
 							</c:choose></td>
@@ -291,7 +307,18 @@
 
 					<tr>
 						<th>품목코드</th>
-						<td>${defect.item_code}</td>
+						<%-- 품목코드 클릭 시 품목 상세 페이지로 이동함 --%>
+						<td><c:choose>
+								<c:when test="${defect.item_id > 0 and not empty defect.item_code}">
+									<a class="lot-link"
+										href="${pageContext.request.contextPath}/master/item/detail?itemId=${defect.item_id}">
+										${defect.item_code}</a>
+								</c:when>
+								<c:when test="${not empty defect.item_code}">
+									${defect.item_code}
+								</c:when>
+								<c:otherwise>-</c:otherwise>
+							</c:choose></td>
 
 						<th>품목명</th>
 						<td>${defect.item_name}</td>
@@ -305,7 +332,18 @@
 						<td>${defect.prod_doc_no}</td>
 
 						<th>작업지시번호</th>
-						<td>${defect.work_order_doc_no}</td>
+						<%-- 작업지시번호 클릭 시 작업지시 상세 페이지로 이동함 --%>
+						<td><c:choose>
+								<c:when test="${defect.order_id > 0 and not empty defect.work_order_doc_no}">
+									<a class="lot-link"
+										href="${pageContext.request.contextPath}/production/workorder/detail?orderId=${defect.order_id}">
+										${defect.work_order_doc_no}</a>
+								</c:when>
+								<c:when test="${not empty defect.work_order_doc_no}">
+									${defect.work_order_doc_no}
+								</c:when>
+								<c:otherwise>-</c:otherwise>
+							</c:choose></td>
 
 						<th>생산상태</th>
 						<td>${defect.prod_status}</td>

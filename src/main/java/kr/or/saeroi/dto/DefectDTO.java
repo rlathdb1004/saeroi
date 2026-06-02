@@ -16,6 +16,7 @@ public class DefectDTO {
 	private String item_code;
 	private String item_name;
 	private String item_unit;
+	private int item_id;
 	private String product_lot;
 	private String defect_name;
 	private String defect_photo;
@@ -32,6 +33,7 @@ public class DefectDTO {
 	private int prod_qty;
 	private int loss_qty;
 	private String prod_status;
+	private int order_id;
 	private String work_order_doc_no;
 	private int order_qty;
 	private String order_date;
@@ -158,6 +160,14 @@ public class DefectDTO {
 		this.item_unit = item_unit;
 	}
 
+	public int getItem_id() {
+		return item_id;
+	}
+
+	public void setItem_id(int item_id) {
+		this.item_id = item_id;
+	}
+
 	public String getProduct_lot() {
 		return product_lot;
 	}
@@ -278,6 +288,14 @@ public class DefectDTO {
 		this.prod_status = prod_status;
 	}
 
+	public int getOrder_id() {
+		return order_id;
+	}
+
+	public void setOrder_id(int order_id) {
+		this.order_id = order_id;
+	}
+
 	public String getWork_order_doc_no() {
 		return work_order_doc_no;
 	}
@@ -380,12 +398,12 @@ public class DefectDTO {
 				+ ", doc_no=" + doc_no + ", doc_seq=" + doc_seq + ", insp_doc_no=" + insp_doc_no + ", defect_code="
 				+ defect_code + ", inspection_qty=" + inspection_qty + ", good_qty=" + good_qty + ", defect_type="
 				+ defect_type + ", defect_date=" + defect_date + ", item_code=" + item_code + ", item_name="
-				+ item_name + ", item_unit=" + item_unit + ", product_lot=" + product_lot + ", defect_name="
+				+ item_name + ", item_unit=" + item_unit + ", item_id=" + item_id + ", product_lot=" + product_lot + ", defect_name="
 				+ defect_name + ", defect_photo=" + defect_photo + ", ename=" + ename + ", action_dept="
 				+ action_dept + ", defect_qty=" + defect_qty + ", remark=" + remark + ", created_date="
 				+ created_date + ", updated_date=" + updated_date + ", use_yn=" + use_yn + ", prod_doc_no="
 				+ prod_doc_no + ", prod_date=" + prod_date + ", prod_qty=" + prod_qty + ", loss_qty=" + loss_qty
-				+ ", prod_status=" + prod_status + ", work_order_doc_no=" + work_order_doc_no + ", order_qty="
+				+ ", prod_status=" + prod_status + ", order_id=" + order_id + ", work_order_doc_no=" + work_order_doc_no + ", order_qty="
 				+ order_qty + ", order_date=" + order_date + ", defect_action_id=" + defect_action_id
 				+ ", action_type=" + action_type + ", sort_no=" + sort_no + ", action_date=" + action_date
 				+ ", dept=" + dept + ", action_emp_id=" + action_emp_id + ", action_ename=" + action_ename

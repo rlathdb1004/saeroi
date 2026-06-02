@@ -152,30 +152,30 @@
 
 
 	<!-- LOT 이력 검색 조건이다. -->
-	<sql id="lotHistorySearchCondition">
+<sql id="lotHistorySearchCondition">
 
-		<where>
+	<where>
 
-			<!-- 시작일 검색 조건이다. 작업지시일 기준이다. -->
-			<if test="startDate != null and startDate != ''">
-				AND WO.ORDER_DATE <![CDATA[>=]]>
-				TO_DATE(#{startDate}, 'YYYY-MM-DD')
-			</if>
+		<!-- 검색어가 있으면 날짜 조건보다 LOT/문서번호 검색을 우선한다. -->
+		<choose>
 
-			<!-- 종료일 검색 조건이다. 종료일 당일까지 포함한다. -->
-			<if test="endDate != null and endDate != ''">
-				AND WO.ORDER_DATE <![CDATA[<]]>
-				TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
-			</if>
-
-			<!-- 검색키워드 조건이다. -->
-			<if test="keyword != null and keyword != ''">
+			<when test="keyword != null and keyword != ''">
 
 				<choose>
 
-					<!-- 구분이 LOT번호일 때 LOT번호만 검색한다. -->
+					<!-- 구분이 LOT번호일 때 완제품 LOT와 자재 LOT를 함께 검색한다. -->
 					<when test="searchType == 'lotNo'">
-						AND WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
+						AND (
+							WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
+
+							OR EXISTS (
+								SELECT 1
+								FROM MATERIAL_INOUT MI
+								WHERE MI.ORDER_ID = WO.ORDER_ID
+								AND NVL(MI.USE_YN, 'Y') = 'Y'
+								AND MI.MATERIAL_LOT LIKE '%' || TRIM(#{keyword}) || '%'
+							)
+						)
 					</when>
 
 					<!-- 구분이 작업지시번호일 때 작업지시번호만 검색한다. -->
@@ -183,12 +183,24 @@
 						AND WO.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
 					</when>
 
-					<!-- 구분이 품목명일 때 품목명만 검색한다. -->
+					<!-- 구분이 품목명일 때 완제품 품목명과 투입 자재 품목명을 함께 검색한다. -->
 					<when test="searchType == 'itemName'">
-						AND I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+						AND (
+							I.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+
+							OR EXISTS (
+								SELECT 1
+								FROM MATERIAL_INOUT MI
+								JOIN ITEM MAT
+								ON MI.ITEM_ID = MAT.ITEM_ID
+								WHERE MI.ORDER_ID = WO.ORDER_ID
+								AND NVL(MI.USE_YN, 'Y') = 'Y'
+								AND MAT.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+							)
+						)
 					</when>
 
-					<!-- 구분이 전체이거나 비어 있을 때는 화면에 보이는 주요 값들을 전체 검색한다. -->
+					<!-- 전체 검색일 때 LOT와 연결된 모든 주요 번호를 검색한다. -->
 					<otherwise>
 						AND (
 							WO.PRODUCT_LOT LIKE '%' || TRIM(#{keyword}) || '%'
@@ -208,16 +220,91 @@
 									0
 								)
 							) LIKE '%' || TRIM(#{keyword}) || '%'
+
+							OR EXISTS (
+								SELECT 1
+								FROM MATERIAL_INOUT MI
+								JOIN ITEM MAT
+								ON MI.ITEM_ID = MAT.ITEM_ID
+								WHERE MI.ORDER_ID = WO.ORDER_ID
+								AND NVL(MI.USE_YN, 'Y') = 'Y'
+								AND (
+									MI.MATERIAL_LOT LIKE '%' || TRIM(#{keyword}) || '%'
+									OR MI.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+									OR MAT.ITEM_CODE LIKE '%' || TRIM(#{keyword}) || '%'
+									OR MAT.ITEM_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+								)
+							)
+
+							OR EXISTS (
+								SELECT 1
+								FROM PRODUCTION P
+								WHERE P.ORDER_ID = WO.ORDER_ID
+								AND P.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+							)
+
+							OR EXISTS (
+								SELECT 1
+								FROM INSPECTION INS
+								JOIN PRODUCTION P
+								ON INS.PROD_ID = P.PROD_ID
+								WHERE P.ORDER_ID = WO.ORDER_ID
+								AND NVL(INS.USE_YN, 'Y') = 'Y'
+								AND INS.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+							)
+
+							OR EXISTS (
+								SELECT 1
+								FROM DEFECT_LIST DL
+								JOIN INSPECTION INS
+								ON DL.INSP_ID = INS.INSP_ID
+								JOIN PRODUCTION P
+								ON INS.PROD_ID = P.PROD_ID
+								JOIN DEFECT D
+								ON DL.DEFECT_ID = D.DEFECT_ID
+								WHERE P.ORDER_ID = WO.ORDER_ID
+								AND NVL(DL.USE_YN, 'Y') = 'Y'
+								AND (
+									DL.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+									OR D.DEFECT_CODE LIKE '%' || TRIM(#{keyword}) || '%'
+									OR D.DEFECT_NAME LIKE '%' || TRIM(#{keyword}) || '%'
+								)
+							)
+
+							OR EXISTS (
+								SELECT 1
+								FROM PRODUCT_INOUT PIO
+								WHERE PIO.ORDER_ID = WO.ORDER_ID
+								AND NVL(PIO.USE_YN, 'Y') = 'Y'
+								AND PIO.DOC_NO LIKE '%' || TRIM(#{keyword}) || '%'
+							)
 						)
 					</otherwise>
 
 				</choose>
 
-			</if>
+			</when>
 
-		</where>
+			<!-- 검색어가 없을 때만 날짜 조건을 적용한다. -->
+			<otherwise>
 
-	</sql>
+				<if test="startDate != null and startDate != ''">
+					AND WO.ORDER_DATE <![CDATA[>=]]>
+					TO_DATE(#{startDate}, 'YYYY-MM-DD')
+				</if>
+
+				<if test="endDate != null and endDate != ''">
+					AND WO.ORDER_DATE <![CDATA[<]]>
+					TO_DATE(#{endDate}, 'YYYY-MM-DD') + 1
+				</if>
+
+			</otherwise>
+
+		</choose>
+
+	</where>
+
+</sql>
 
 
 	<!-- LOT 이력 목록 총 건수를 조회한다. -->

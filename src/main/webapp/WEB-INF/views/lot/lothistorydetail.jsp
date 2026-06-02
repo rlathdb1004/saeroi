@@ -461,7 +461,7 @@
 			</div>
 
 			<div class="lot_flow_step">
-				<strong>4. 생산실적</strong> <span>${empty lot.prodQty ? 0 : lot.prodQty} EA 생산</span>
+				<strong>4. 생산실적</strong> <span>${empty lot.prodQty ? 0 : lot.prodQty}${empty lot.itemUnit ? '' : lot.itemUnit} 생산</span>
 			</div>
 
 			<div class="lot_flow_step">
@@ -484,21 +484,11 @@
 					<div class="lot_history_doc_area">
 						<span class="lot_history_doc_label">완제품 LOT</span>
 
-						<c:choose>
-							<c:when test="${not empty lot.productLot and not empty lot.orderId}">
-								<a href="${pageContext.request.contextPath}/lot/lothistory/detail?orderId=${lot.orderId}"
-									class="lot_detail_link">
-									<span class="lot_code_text">${lot.productLot}</span>
-								</a>
-							</c:when>
-							<c:otherwise>
-								<span class="lot_code_text">${empty lot.productLot ? '-' : lot.productLot}</span>
-							</c:otherwise>
-						</c:choose>
+						<span class="lot_code_text">${empty lot.productLot ? '-' : lot.productLot}</span>
 					</div>
 
 					<span class="lot_status_badge lot_status_green">
-						잔량 ${empty lot.productRemainQty ? 0 : lot.productRemainQty}
+						잔량 ${empty lot.productRemainQty ? 0 : lot.productRemainQty}${empty lot.itemUnit ? '' : lot.itemUnit}
 					</span>
 				</div>
 
@@ -529,43 +519,38 @@
 					</div>
 
 					<div class="lot_history_item">
-						<span class="lot_history_label">단위</span>
-						<span class="lot_history_value">${empty lot.itemUnit ? '-' : lot.itemUnit}</span>
-					</div>
-
-					<div class="lot_history_item">
 						<span class="lot_history_label">안전재고</span>
-						<span class="lot_history_value">${empty lot.safetyStock ? 0 : lot.safetyStock}</span>
+						<span class="lot_history_value">${empty lot.safetyStock ? 0 : lot.safetyStock}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
 						<span class="lot_history_label">생산계획수량</span>
-						<span class="lot_history_value">${empty lot.prodPlanQty ? 0 : lot.prodPlanQty}</span>
+						<span class="lot_history_value">${empty lot.prodPlanQty ? 0 : lot.prodPlanQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
 						<span class="lot_history_label">작업지시수량</span>
-						<span class="lot_history_value">${empty lot.orderQty ? 0 : lot.orderQty}</span>
+						<span class="lot_history_value">${empty lot.orderQty ? 0 : lot.orderQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
 						<span class="lot_history_label">생산수량</span>
-						<span class="lot_history_value">${empty lot.prodQty ? 0 : lot.prodQty}</span>
+						<span class="lot_history_value">${empty lot.prodQty ? 0 : lot.prodQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
 						<span class="lot_history_label">양품수량</span>
-						<span class="lot_history_value">${empty lot.goodQty ? 0 : lot.goodQty}</span>
+						<span class="lot_history_value">${empty lot.goodQty ? 0 : lot.goodQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
 						<span class="lot_history_label">불량수량</span>
-						<span class="lot_history_value">${empty lot.lossQty ? 0 : lot.lossQty}</span>
+						<span class="lot_history_value">${empty lot.lossQty ? 0 : lot.lossQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
 						<span class="lot_history_label">검사수량</span>
-						<span class="lot_history_value">${empty lot.inspectionQty ? 0 : lot.inspectionQty}</span>
+						<span class="lot_history_value">${empty lot.inspectionQty ? 0 : lot.inspectionQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
@@ -575,22 +560,22 @@
 
 					<div class="lot_history_item">
 						<span class="lot_history_label">입고누계</span>
-						<span class="lot_history_value">${empty lot.productInQtyTotal ? 0 : lot.productInQtyTotal}</span>
+						<span class="lot_history_value">${empty lot.productInQtyTotal ? 0 : lot.productInQtyTotal}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
 						<span class="lot_history_label">출고누계</span>
-						<span class="lot_history_value">${empty lot.productOutQtyTotal ? 0 : lot.productOutQtyTotal}</span>
+						<span class="lot_history_value">${empty lot.productOutQtyTotal ? 0 : lot.productOutQtyTotal}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
 						<span class="lot_history_label">LOT 잔량</span>
-						<span class="lot_history_value">${empty lot.productRemainQty ? 0 : lot.productRemainQty}</span>
+						<span class="lot_history_value">${empty lot.productRemainQty ? 0 : lot.productRemainQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
 						<span class="lot_history_label">품목 현재재고</span>
-						<span class="lot_history_value">${empty lot.inventoryStock ? 0 : lot.inventoryStock}</span>
+						<span class="lot_history_value">${empty lot.inventoryStock ? 0 : lot.inventoryStock}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 					</div>
 
 					<div class="lot_history_item">
@@ -781,17 +766,17 @@
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">생산수량</span>
-									<span class="lot_history_value">${empty prod.prodQty ? 0 : prod.prodQty}</span>
+									<span class="lot_history_value">${empty prod.prodQty ? 0 : prod.prodQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">양품수량</span>
-									<span class="lot_history_value">${empty prod.goodQty ? 0 : prod.goodQty}</span>
+									<span class="lot_history_value">${empty prod.goodQty ? 0 : prod.goodQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">불량수량</span>
-									<span class="lot_history_value">${empty prod.lossQty ? 0 : prod.lossQty}</span>
+									<span class="lot_history_value">${empty prod.lossQty ? 0 : prod.lossQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
@@ -874,17 +859,17 @@
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">검사수량</span>
-									<span class="lot_history_value">${empty insp.inspectionQty ? 0 : insp.inspectionQty}</span>
+									<span class="lot_history_value">${empty insp.inspectionQty ? 0 : insp.inspectionQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">양품수량</span>
-									<span class="lot_history_value">${empty insp.inspectionGoodQty ? 0 : insp.inspectionGoodQty}</span>
+									<span class="lot_history_value">${empty insp.inspectionGoodQty ? 0 : insp.inspectionGoodQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">불량수량</span>
-									<span class="lot_history_value">${empty insp.inspectionBadQty ? 0 : insp.inspectionBadQty}</span>
+									<span class="lot_history_value">${empty insp.inspectionBadQty ? 0 : insp.inspectionBadQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
@@ -954,7 +939,7 @@
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">불량수량</span>
-									<span class="lot_history_value">${empty def.defectQty ? 0 : def.defectQty}</span>
+									<span class="lot_history_value">${empty def.defectQty ? 0 : def.defectQty}${empty lot.itemUnit ? '' : lot.itemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
@@ -1041,15 +1026,7 @@
 								<div class="lot_history_item">
 									<span class="lot_history_label">완제품 LOT</span>
 									<span class="lot_history_value">
-										<c:choose>
-											<c:when test="${not empty pio.productInoutProductLot and not empty pio.orderId}">
-												<a href="${pageContext.request.contextPath}/lot/lothistory/detail?orderId=${pio.orderId}"
-													class="lot_detail_link">
-													<span class="lot_code_text">${pio.productInoutProductLot}</span>
-												</a>
-											</c:when>
-											<c:otherwise>-</c:otherwise>
-										</c:choose>
+										${empty pio.productInoutProductLot ? '-' : pio.productInoutProductLot}
 									</span>
 								</div>
 
@@ -1080,17 +1057,12 @@
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">수량</span>
-									<span class="lot_history_value">${empty pio.productInoutQty ? 0 : pio.productInoutQty}</span>
-								</div>
-
-								<div class="lot_history_item">
-									<span class="lot_history_label">단위</span>
-									<span class="lot_history_value">${empty pio.productInoutItemUnit ? '-' : pio.productInoutItemUnit}</span>
+									<span class="lot_history_value">${empty pio.productInoutQty ? 0 : pio.productInoutQty}${empty pio.productInoutItemUnit ? '' : pio.productInoutItemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">안전재고</span>
-									<span class="lot_history_value">${empty pio.productInoutSafetyStock ? 0 : pio.productInoutSafetyStock}</span>
+									<span class="lot_history_value">${empty pio.productInoutSafetyStock ? 0 : pio.productInoutSafetyStock}${empty pio.productInoutItemUnit ? '' : pio.productInoutItemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
@@ -1160,22 +1132,22 @@
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">품목 현재재고</span>
-									<span class="lot_history_value">${empty pio.productInoutInventoryStock ? 0 : pio.productInoutInventoryStock}</span>
+									<span class="lot_history_value">${empty pio.productInoutInventoryStock ? 0 : pio.productInoutInventoryStock}${empty pio.productInoutItemUnit ? '' : pio.productInoutItemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">LOT 입고누계</span>
-									<span class="lot_history_value">${empty pio.productInoutLotInQty ? 0 : pio.productInoutLotInQty}</span>
+									<span class="lot_history_value">${empty pio.productInoutLotInQty ? 0 : pio.productInoutLotInQty}${empty pio.productInoutItemUnit ? '' : pio.productInoutItemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">LOT 출고누계</span>
-									<span class="lot_history_value">${empty pio.productInoutLotOutQty ? 0 : pio.productInoutLotOutQty}</span>
+									<span class="lot_history_value">${empty pio.productInoutLotOutQty ? 0 : pio.productInoutLotOutQty}${empty pio.productInoutItemUnit ? '' : pio.productInoutItemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
 									<span class="lot_history_label">LOT 잔량</span>
-									<span class="lot_history_value">${empty pio.productInoutLotRemainQty ? 0 : pio.productInoutLotRemainQty}</span>
+									<span class="lot_history_value">${empty pio.productInoutLotRemainQty ? 0 : pio.productInoutLotRemainQty}${empty pio.productInoutItemUnit ? '' : pio.productInoutItemUnit}</span>
 								</div>
 
 								<div class="lot_history_item">
