@@ -1484,14 +1484,14 @@ button {
 	}
 
 	.workerQrLogoBox {
-		width: 46px;
-		height: 46px;
-		border-radius: 12px;
+		width: 34px;
+		height: 34px;
+		
 	}
 
 	.workerQrLogoBox img {
-		width: 33px;
-		height: 33px;
+		width: 20px;
+		height: 20px;
 	}
 
 	.workerQrCameraTop {
