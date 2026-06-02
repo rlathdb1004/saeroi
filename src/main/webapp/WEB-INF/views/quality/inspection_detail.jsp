@@ -16,37 +16,7 @@
 	margin-top: 16px;
 }
 
-.inspection_related_table {
-	width: 100%;
-	border-collapse: collapse;
-	border: 1px solid #E1E8E3;
-}
-
-.inspection_related_table th, .inspection_related_table td {
-	border: 1px solid #E1E8E3;
-	padding: 11px 10px;
-	text-align: center;
-	font-size: 14px;
-}
-
-.inspection_related_table th {
-	background: #F4F8F5;
-	font-weight: 700;
-	white-space: nowrap;
-}
-
-.inspection_related_table .coTextLeft {
-	text-align: left;
-}
-
-.inspection_related_row {
-	cursor: pointer;
-}
-
-.inspection_related_row:hover td {
-	background: #F8FCF9;
-}
-
+/* 상세 페이지로 이동하는 값 링크임 */
 .lot-link {
 	display: inline-block;
 	color: #0b7a5a;
@@ -243,12 +213,16 @@
 							value="${inspection.good_qty}" min="0" style="display: none;"
 							required></td>
 
+						<th>불량수량</th>
+						<td><span class="viewMode">${inspection.defect_qty}${inspection.item_unit}</span></td>
+					</tr>
+
+					<tr>
 						<th>비고</th>
-						<td><span class="viewMode">${inspection.remark}</span> <input
-							type="text" name="remark" class="detailInput editMode"
+						<td colspan="5"><span class="viewMode">${inspection.remark}</span>
+							<input type="text" name="remark" class="detailInput editMode"
 							value="${inspection.remark}" style="display: none;"></td>
 					</tr>
-					<tr>
 				</tbody>
 			</table>
 
@@ -279,11 +253,16 @@
 
 				<tr>
 					<th>LOT번호</th>
+					<%-- LOT번호 클릭 시 LOT 상세 페이지로 이동함 --%>
 					<td><c:choose>
-							<c:when test="${not empty inspection.product_lot}">
+							<c:when
+								test="${inspection.order_id > 0 and not empty inspection.product_lot}">
 								<a class="lot-link"
-									href="${pageContext.request.contextPath}/lot/lothistory?searchType=lotNo&keyword=${inspection.product_lot}">
+									href="${pageContext.request.contextPath}/lot/lothistory/detail?orderId=${inspection.order_id}">
 									${inspection.product_lot} </a>
+							</c:when>
+							<c:when test="${not empty inspection.product_lot}">
+								${inspection.product_lot}
 							</c:when>
 							<c:otherwise>-</c:otherwise>
 						</c:choose></td>
@@ -292,7 +271,19 @@
 					<td>${inspection.prod_doc_no}</td>
 
 					<th>작업지시번호</th>
-					<td>${inspection.work_order_doc_no}</td>
+					<%-- 작업지시번호 클릭 시 작업지시 상세 페이지로 이동함 --%>
+					<td><c:choose>
+							<c:when
+								test="${inspection.order_id > 0 and not empty inspection.work_order_doc_no}">
+								<a class="lot-link"
+									href="${pageContext.request.contextPath}/production/workorder/detail?orderId=${inspection.order_id}">
+									${inspection.work_order_doc_no}</a>
+							</c:when>
+							<c:when test="${not empty inspection.work_order_doc_no}">
+								${inspection.work_order_doc_no}
+							</c:when>
+							<c:otherwise>-</c:otherwise>
+						</c:choose></td>
 				</tr>
 
 				<tr>
@@ -332,36 +323,71 @@
 		<div class="detail_card">
 			<div class="detail_card_title">불량 정보</div>
 
-			<table class="inspection_related_table">
-				<thead>
-					<tr>
-						<th>불량코드</th>
-						<th>발생일시</th>
-						<th>품목명</th>
-						<th>LOT번호</th>
-						<th>불량명</th>
-						<th>검사자</th>
-					</tr>
-				</thead>
+			<table class="detail_info_table">
+				<colgroup>
+					<col style="width: 12%;">
+					<col style="width: 21%;">
+					<col style="width: 12%;">
+					<col style="width: 21%;">
+					<col style="width: 12%;">
+					<col style="width: 22%;">
+				</colgroup>
 
 				<tbody>
-					<c:forEach var="defect" items="${inspectionDefectList}">
-						<tr class="inspection_related_row"
-							onclick="location.href='${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${defect.defect_list_id}'">
-							<td>${defect.defect_code}</td>
-							<td>${defect.defect_date}</td>
-							<td class="coTextLeft">${defect.item_name}</td>
-							<td>${defect.product_lot}</td>
-							<td>${defect.defect_name}</td>
-							<td>${defect.ename}</td>
-						</tr>
-					</c:forEach>
+					<c:choose>
+						<c:when test="${empty inspectionDefectList}">
+							<tr>
+								<th>안내</th>
+								<td>등록된 불량 정보가 없습니다.</td>
+							</tr>
+						</c:when>
 
-					<c:if test="${empty inspectionDefectList}">
-						<tr>
-							<td colspan="6">등록된 불량 정보가 없습니다.</td>
-						</tr>
-					</c:if>
+						<c:otherwise>
+							<c:forEach var="defect" items="${inspectionDefectList}"
+								varStatus="status">
+								<%-- 불량 정보를 PC에서는 가로 상세형, 모바일에서는 세로 상세형으로 표시함 --%>
+								<c:if test="${not status.first}">
+									<tr>
+										<th>구분</th>
+										<td colspan="5">${status.count}번째 불량</td>
+									</tr>
+								</c:if>
+								<tr>
+									<th>불량코드</th>
+									<td><a class="lot-link"
+										href="${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${defect.defect_list_id}">
+											${defect.defect_code}</a></td>
+
+									<th>발생일시</th>
+									<td>${defect.defect_date}</td>
+
+									<th>품목명</th>
+									<td>${defect.item_name}</td>
+								</tr>
+								<tr>
+									<th>LOT번호</th>
+									<td><c:choose>
+											<c:when
+												test="${defect.order_id > 0 and not empty defect.product_lot}">
+												<a class="lot-link"
+													href="${pageContext.request.contextPath}/lot/lothistory/detail?orderId=${defect.order_id}">
+													${defect.product_lot}</a>
+											</c:when>
+											<c:when test="${not empty defect.product_lot}">
+												${defect.product_lot}
+											</c:when>
+											<c:otherwise>-</c:otherwise>
+										</c:choose></td>
+
+									<th>불량명</th>
+									<td>${defect.defect_name}</td>
+
+									<th>검사자</th>
+									<td>${defect.ename}</td>
+								</tr>
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
 				</tbody>
 			</table>
 		</div>
@@ -369,34 +395,57 @@
 		<div class="detail_card">
 			<div class="detail_card_title">조치 및 처리내역</div>
 
-			<table class="inspection_related_table">
-				<thead>
-					<tr>
-						<th>불량명</th>
-						<th>조치일시</th>
-						<th>조치부서</th>
-						<th>조치담당자</th>
-						<th>조치내용</th>
-					</tr>
-				</thead>
+			<table class="detail_info_table">
+				<colgroup>
+					<col style="width: 12%;">
+					<col style="width: 21%;">
+					<col style="width: 12%;">
+					<col style="width: 21%;">
+					<col style="width: 12%;">
+					<col style="width: 22%;">
+				</colgroup>
 
 				<tbody>
-					<c:forEach var="action" items="${inspectionActionList}">
-						<tr class="inspection_related_row"
-							onclick="location.href='${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${action.defect_list_id}'">
-							<td>${action.defect_name}</td>
-							<td>${action.action_date}</td>
-							<td>${action.dept}</td>
-							<td>${action.action_ename}</td>
-							<td class="coTextLeft">${action.action_content}</td>
-						</tr>
-					</c:forEach>
+					<c:choose>
+						<c:when test="${empty inspectionActionList}">
+							<tr>
+								<th>안내</th>
+								<td>등록된 조치 및 처리내역이 없습니다.</td>
+							</tr>
+						</c:when>
 
-					<c:if test="${empty inspectionActionList}">
-						<tr>
-							<td colspan="5">등록된 조치 및 처리내역이 없습니다.</td>
-						</tr>
-					</c:if>
+						<c:otherwise>
+							<c:forEach var="action" items="${inspectionActionList}"
+								varStatus="status">
+								<%-- 조치 정보를 PC에서는 가로 상세형, 모바일에서는 세로 상세형으로 표시함 --%>
+								<c:if test="${not status.first}">
+									<tr>
+										<th>구분</th>
+										<td colspan="5">${status.count}번째 조치</td>
+									</tr>
+								</c:if>
+								<tr>
+									<th>불량명</th>
+									<td><a class="lot-link"
+										href="${pageContext.request.contextPath}/quality/defect_detail?defect_list_id=${action.defect_list_id}">
+											${action.defect_name}</a></td>
+
+									<th>조치일시</th>
+									<td>${action.action_date}</td>
+
+									<th>조치부서</th>
+									<td>${action.dept}</td>
+								</tr>
+								<tr>
+									<th>조치담당자</th>
+									<td>${action.action_ename}</td>
+
+									<th>조치내용</th>
+									<td colspan="3">${action.action_content}</td>
+								</tr>
+							</c:forEach>
+						</c:otherwise>
+					</c:choose>
 				</tbody>
 			</table>
 		</div>

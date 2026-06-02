@@ -616,6 +616,20 @@
 
 					</c:choose>
 
+
+					<%-- =====================================================
+						QR 중앙 로고
+						별도 QR 이미지 파일을 만들지 않고,
+						팀원이 만든 실제 QR 이미지 위에 기존 SAEROI 로고를 겹쳐서 표시한다.
+						공통 파일은 수정하지 않고 worker.css에서만 위치를 잡는다.
+					===================================================== --%>
+					<c:if test="${workerQrOrderId gt 0}">
+						<div class="workerQrLogoBox">
+							<img src="${pageContext.request.contextPath}/resources/saeroi_logo.png"
+								alt="SAEROI 로고">
+						</div>
+					</c:if>
+
 					<%-- =====================================================
 						현재 화면 QR 테스트 / QR 이미지 클릭 이동용 URL
 						- 실제 QR URL이 있으면 해당 URL로 이동
@@ -748,6 +762,76 @@
 
 				</div>
 
+
+				<%-- =====================================================
+					품질관리 카드 추가
+					팀원 품질관리 Controller는 수정하지 않고 URL만 연결한다.
+
+					검사관리: /quality/inspection
+					불량관리: /quality/defect
+				===================================================== --%>
+				<div class="workerMenuCard workerQualityMenuCard"
+					onclick="location.href='${pageContext.request.contextPath}/quality/inspection'">
+
+					<div class="workerMenuIconCircle">
+
+						<svg viewBox="0 0 24 24"
+							class="menuSvgIcon">
+
+							<path
+								d="M9 11L11 13L15 8.5L16.5 10L11.1 16L7.5 12.4L9 11ZM5 3H19C20.1 3 21 3.9 21 5V19C21 20.1 20.1 21 19 21H5C3.9 21 3 20.1 3 19V5C3 3.9 3.9 3 5 3ZM5 5V19H19V5H5Z"
+								fill="currentColor" />
+
+						</svg>
+
+					</div>
+
+					<div class="workerMenuTextBox">
+
+						<h3>
+							품질관리
+						</h3>
+
+						<p>
+							검사관리와 불량관리 현황을 확인합니다.
+						</p>
+
+						<div class="workerQualityQuickBtns">
+
+							<button type="button"
+								class="workerQualityQuickBtn"
+								onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/quality/inspection'">
+
+								검사관리
+
+							</button>
+
+							<button type="button"
+								class="workerQualityQuickBtn"
+								onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/quality/defect'">
+
+								불량관리
+
+							</button>
+
+						</div>
+
+					</div>
+
+					<div class="workerMenuNo">
+						03
+					</div>
+
+					<button type="button"
+						class="workerMenuArrowBtn"
+						onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/quality/inspection'">
+
+						›
+
+					</button>
+
+				</div>
+
 				<div class="workerMenuCard"
 					onclick="location.href='${pageContext.request.contextPath}/notice/list'">
 
@@ -777,7 +861,7 @@
 					</div>
 
 					<div class="workerMenuNo">
-						03
+						04
 					</div>
 
 					<button type="button"

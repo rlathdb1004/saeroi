@@ -181,6 +181,10 @@ function loadDefectOptions(selectTag) {
         });
 
         selectTag.dataset.loaded = 'Y';
+
+        if (selectTag === inspectionDefectId) {
+            updateInspectionActionDept();
+        }
     };
 
     if (defectOptions) {
@@ -307,8 +311,12 @@ const inspectionInsertForm = document.querySelector('#modal_insert form');
 const inspectionProdQty = document.getElementById('inspectionProdQty');
 const inspectionGoodQty = document.getElementById('inspectionGoodQty');
 const inspectionDefectQty = document.getElementById('inspectionDefectQty');
-const inspectionQtyError = document.getElementById('inspectionQtyError');
+const inspectionProdQtyError = document.getElementById('inspectionProdQtyError');
+const inspectionGoodQtyError = document.getElementById('inspectionGoodQtyError');
+const inspectionDefectQtyError = document.getElementById('inspectionDefectQtyError');
+const inspectionDefectInfoError = document.getElementById('inspectionDefectInfoError');
 const inspectionSubmitBtn = document.querySelector('#modal_insert .modal_btn_submit');
+let inspectionErrorFocusTarget = null;
 
 function toNumber(input) {
     if (!input || !hasText(input.value)) {
@@ -342,20 +350,36 @@ function isWaitResult() {
     return inspectionResult && inspectionResult.value === RESULT_WAIT;
 }
 
-function setInspectionQtyError(message) {
-    if (!inspectionQtyError) {
+// 수량 오류를 입력칸별로 표시함
+function setFieldError(errorEl, message) {
+    if (!errorEl) {
         return;
     }
 
     if (message) {
-        inspectionQtyError.textContent = message;
-        inspectionQtyError.style.display = '';
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
         return;
     }
 
-    inspectionQtyError.style.display = 'none';
+    errorEl.textContent = '';
+    errorEl.style.display = 'none';
 }
 
+function clearInspectionQuantityErrors() {
+    setFieldError(inspectionProdQtyError, '');
+    setFieldError(inspectionGoodQtyError, '');
+    setFieldError(inspectionDefectQtyError, '');
+    setFieldError(inspectionDefectInfoError, '');
+    inspectionErrorFocusTarget = null;
+}
+
+function setInspectionQuantityError(errorEl, message, focusTarget) {
+    setFieldError(errorEl, message);
+    inspectionErrorFocusTarget = focusTarget || null;
+}
+
+// 검사 등록 모달 수량 규칙 검증함
 function validateInspectionQuantity() {
     if (!inspectionProdQty || !inspectionGoodQty) {
         return true;
@@ -364,33 +388,43 @@ function validateInspectionQuantity() {
     const prodQty = toNumber(inspectionProdQty);
     const goodQty = toNumber(inspectionGoodQty);
     const defectQty = hasDefect && hasDefect.checked && !hasDefect.disabled ? toNumber(inspectionDefectQty) : 0;
-    let errorMessage = '';
+    let hasError = false;
 
-        if (isWaitResult()) {
+    clearInspectionQuantityErrors();
+
+    if (isWaitResult()) {
         // 대기는 수량 검증 없음
     } else if (prodQty > 0 && goodQty + defectQty > prodQty) {
-        errorMessage = '생산 수량을 초과 할 수 없습니다.';
+        hasError = true;
+        if (hasDefect && hasDefect.checked && !hasDefect.disabled) {
+            setInspectionQuantityError(inspectionDefectQtyError, '양품수량과 불량수량의 합계가 생산수량을 초과할 수 없습니다.', inspectionDefectQty);
+        } else {
+            setInspectionQuantityError(inspectionGoodQtyError, '양품수량은 생산수량을 초과할 수 없습니다.', inspectionGoodQty);
+        }
     } else if (isPassResult() && prodQty > 0 && goodQty !== prodQty) {
-        errorMessage = '합격은 생산수량 전체가 양품수량이어야 합니다.';
+        hasError = true;
+        setInspectionQuantityError(inspectionGoodQtyError, '합격은 생산수량 전체가 양품수량이어야 합니다.', inspectionGoodQty);
     } else if (isConditionalResult()) {
         if (!hasDefect || !hasDefect.checked) {
-            errorMessage = '조건부는 불량 정보 및 조치를 함께 등록해야 합니다.';
+            hasError = true;
+            setInspectionQuantityError(inspectionDefectInfoError, '조건부는 불량 정보 및 조치를 함께 등록해야 합니다.', hasDefect);
         } else if (defectQty <= 0) {
-            errorMessage = '조건부는 불량수량을 1개 이상 입력해야 합니다.';
+            hasError = true;
+            setInspectionQuantityError(inspectionDefectQtyError, '조건부는 불량수량을 1개 이상 입력해야 합니다.', inspectionDefectQty);
         } else if (prodQty > 0 && goodQty + defectQty !== prodQty) {
-            errorMessage = '조건부는 양품수량과 불량수량의 합계가 생산수량과 같아야 합니다.';
+            hasError = true;
+            setInspectionQuantityError(inspectionDefectQtyError, '조건부는 양품수량과 불량수량의 합계가 생산수량과 같아야 합니다.', inspectionDefectQty);
         }
     }
 
-    setInspectionQtyError(errorMessage);
-
     if (inspectionSubmitBtn) {
-        inspectionSubmitBtn.disabled = !!errorMessage;
+        inspectionSubmitBtn.disabled = hasError;
     }
 
-    return !errorMessage;
+    return !hasError;
 }
 
+// 검사 결과에 맞춰 불량 입력 영역을 자동 조절함
 function updateDefectCheckboxByResult() {
     if (!hasDefect) {
         return;
@@ -399,9 +433,15 @@ function updateDefectCheckboxByResult() {
       if (isPassResult()) {
         hasDefect.checked = false;
         hasDefect.disabled = true;
+        if (inspectionGoodQty) {
+            inspectionGoodQty.readOnly = false;
+        }
     } else if (isConditionalResult()) {
         hasDefect.checked = true;
         hasDefect.disabled = false;
+        if (inspectionGoodQty) {
+            inspectionGoodQty.readOnly = false;
+        }
     } else if (isWaitResult()) {
         hasDefect.checked = false;
         hasDefect.disabled = true;
@@ -443,6 +483,7 @@ function toggleInspectionDefectArea() {
     validateInspectionQuantity();
 }
 
+// 불량명 기준으로 조치부서와 담당자 목록 불러옴
 function updateInspectionActionDept() {
     if (!inspectionDefectId) {
         return;
@@ -484,12 +525,8 @@ if (inspectionInsertForm) {
         if (!validateInspectionQuantity()) {
             event.preventDefault();
 
-            if (inspectionQtyError) {
-                inspectionQtyError.style.display = '';
-            }
-
-            if (inspectionGoodQty) {
-                inspectionGoodQty.focus();
+            if (inspectionErrorFocusTarget && typeof inspectionErrorFocusTarget.focus === 'function') {
+                inspectionErrorFocusTarget.focus();
             }
         }
     });

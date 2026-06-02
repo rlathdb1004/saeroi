@@ -822,6 +822,18 @@ public class InventoryDAOImpl implements InventoryDAO {
 			Connection conn =
 				getConnection();
 
+			// =============================================================
+			// 재고 상세 기본정보의 현재재고 수량
+			// 화면 하단 입출고 흐름에서 이 수량과 일치하는 행을
+			// 첫 번째로 올리기 위해 먼저 조회한다.
+			// 예) 기본정보 현재재고가 6,325M이면
+			//     +6,325M / 누적잔량 6,325M 행을 맨 위에 보여준다.
+			// =============================================================
+			int currentInventoryStock =
+				selectInventoryStockByInventoryId(
+					conn,
+					inventoryId);
+
 			String sql = "";
 
 			sql += " SELECT ";
@@ -939,6 +951,38 @@ public class InventoryDAOImpl implements InventoryDAO {
 			}
 
 			// =============================================================
+			// 기본정보 현재재고와 일치하는 행 우선 표시
+			// -----------------------------------------------------------------
+			// 기존에는 최신 입출고 행이 맨 위에 보여서,
+			// 입고 +6,325M / 누적잔량 6,325M 같은 기준 행이
+			// 맨 아래로 내려가는 문제가 있었다.
+			//
+			// 팀 피드백 반영:
+			// 어떤 품목 상세페이지에 들어갔을 때 기본정보의 현재재고 수량과
+			// 일치하는 입출고 흐름 행을 첫 번째로 보여준다.
+			//
+			// 우선순위:
+			// 1. 누적잔량이 현재재고와 같은 행
+			// 2. 입고수량이 현재재고와 같은 행
+			// =============================================================
+			if (currentInventoryStock > 0) {
+
+				for (int i = 0; i < list.size(); i++) {
+
+					InventoryDTO dto =
+						list.get(i);
+
+					if (dto.getRemainQty() == currentInventoryStock
+							|| dto.getInQty() == currentInventoryStock) {
+
+						list.remove(i);
+						list.add(0, dto);
+						break;
+					}
+				}
+			}
+
+			// =============================================================
 			// LOT 요약값 세팅
 			// JSP에서 첫 번째 행을 기준으로 총입고/총출고/현재잔량을 보여줄 수 있게
 			// 모든 DTO에 같은 요약값을 넣는다.
@@ -963,6 +1007,49 @@ public class InventoryDAOImpl implements InventoryDAO {
 		}
 
 		return list;
+	}
+
+
+	// =========================================================================
+	// 재고 상세 현재재고 조회
+	// -------------------------------------------------------------------------
+	// selectInventoryInoutHistoryList() 안에서 같은 Connection을 사용한다.
+	// 기본정보의 현재재고 수량과 입출고 흐름 행을 비교하기 위한 보조 메서드이다.
+	// 공통 파일 / Controller / JSP는 건드리지 않고 DAO 안에서만 처리한다.
+	// =========================================================================
+	private int selectInventoryStockByInventoryId(
+			Connection conn,
+			int inventoryId) throws Exception {
+
+		int inventoryStock = 0;
+
+		String sql = "";
+
+		sql += " SELECT ";
+		sql += "     NVL(INVENTORY_STOCK, 0) AS INVENTORY_STOCK ";
+		sql += " FROM INVENTORY ";
+		sql += " WHERE INVENTORY_ID = ? ";
+
+		PreparedStatement pstmt =
+			conn.prepareStatement(sql);
+
+		pstmt.setInt(
+			1,
+			inventoryId);
+
+		ResultSet rs =
+			pstmt.executeQuery();
+
+		if (rs.next()) {
+
+			inventoryStock =
+				rs.getInt("INVENTORY_STOCK");
+		}
+
+		rs.close();
+		pstmt.close();
+
+		return inventoryStock;
 	}
 
 

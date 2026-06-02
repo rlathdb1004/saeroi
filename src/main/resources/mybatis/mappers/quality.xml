@@ -15,7 +15,9 @@
 		it.item_code,
 		it.item_name,
 		it.item_unit,
+		it.item_id,
 		w.product_lot,
+		w.order_id,
 		e.ename,
 		e.dept,
 		i.result,
@@ -523,7 +525,9 @@
 		it.item_code,
 		it.item_name,
 		it.item_unit,
+		it.item_id,
 		w.product_lot,
+		w.order_id,
 		e.ename,
 		e.dept,
 		i.result,
@@ -534,6 +538,12 @@
 		NVL(i.inspection_qty, 0)
 		AS inspection_qty,
 		NVL(i.good_qty, 0) AS good_qty,
+		NVL((
+		SELECT SUM(NVL(dl.defect_qty, 0))
+		FROM defect_list dl
+		WHERE dl.insp_id = i.insp_id
+		AND NVL(dl.use_yn, 'Y') = 'Y'
+		), 0) AS defect_qty,
 		i.remark,
 		TO_CHAR(i.created_date, 'YYYY-MM-DD HH24:MI') AS created_date,
 		TO_CHAR(i.updated_date, 'YYYY-MM-DD HH24:MI') AS updated_date,
@@ -631,6 +641,7 @@
 		it.item_code,
 		it.item_name,
 		it.item_unit,
+		it.item_id,
 		CASE
 		WHEN
 		REGEXP_LIKE(w.product_lot, '[0-9]{8}')
@@ -639,6 +650,7 @@
 		'YYYYMMDD'), 1, 1)
 		ELSE w.product_lot
 		END AS product_lot,
+		w.order_id,
 		d.defect_name,
 		d.action_dept,
 		d.action_dept AS dept,
@@ -754,6 +766,7 @@
 		it.item_code,
 		it.item_name,
 		it.item_unit,
+		it.item_id,
 		CASE
 		WHEN REGEXP_LIKE(w.product_lot,
 		'[0-9]{8}')
@@ -763,6 +776,7 @@
 		ELSE w.product_lot
 		END AS
 		product_lot,
+		w.order_id,
 		d.defect_name,
 		d.action_dept,
 		d.action_dept AS dept,
@@ -898,6 +912,7 @@
 		it.item_code,
 		it.item_name,
 		it.item_unit,
+		it.item_id,
 		dl.defect_photo,
 		CASE
 		WHEN REGEXP_LIKE(w.product_lot, '[0-9]{8}')
@@ -906,6 +921,7 @@
 		'YYYYMMDD'), 1, 1)
 		ELSE w.product_lot
 		END AS product_lot,
+		w.order_id,
 		d.defect_name,
 		d.action_dept,
 		d.action_dept AS dept,
@@ -1139,11 +1155,18 @@
 		e.ename AS action_ename,
 		e.dept
 		FROM emp e
-		WHERE e.dept = #{dept}
-		AND e.status = '재직'
+		WHERE e.status = '재직'
 		AND e.ename
 		IS NOT
 		NULL
+		AND (
+		e.dept = #{dept}
+		OR e.dept LIKE #{dept} || '%'
+		OR (#{dept} = '품질' AND e.role = 'QC')
+		OR (#{dept} = '생산' AND e.role = 'MANAGER')
+		OR (#{dept} = '설비' AND e.role = 'MAINT')
+		OR (#{dept} = '물류' AND (e.dept = '물류관리' OR e.role = 'WORKER'))
+		)
 		ORDER BY
 		CASE
 		WHEN e.role = 'MANAGER' THEN 1
