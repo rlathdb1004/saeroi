@@ -202,6 +202,25 @@
 		}
 	}
 
+	/* =====================================================
+		재고조회 행 전체 클릭
+		자재입출고관리처럼 테이블 행 아무 곳이나 클릭하면 상세페이지로 이동한다.
+		글씨 hover 색상 변경은 사용하지 않고, 행 배경만 살짝 바뀌게 한다.
+		공통 CSS 파일은 수정하지 않는다.
+	===================================================== */
+	.inventoryTable tbody tr.inventory-click-row {
+		cursor: pointer;
+	}
+
+	.inventoryTable tbody tr.inventory-click-row:hover {
+		background: #f7fffb;
+	}
+
+	.inventoryTable tbody tr.inventory-click-row td {
+		color: inherit;
+		text-decoration: none;
+	}
+
 </style>
 
 <div class="coPageWrap">
@@ -432,11 +451,28 @@
 					<c:forEach var="inventory"
 						items="${list}">
 
-						<tr>
+						<%-- =====================================================
+							재고 상세 이동 URL
+							공통 파일은 건드리지 않고 현재 JSP에서만 사용한다.
+							테이블 안의 품목코드 / 품목유형 / 품목명 / 현재재고 / 창고위치 / 생성일
+							어떤 글씨를 눌러도 같은 상세페이지로 이동한다.
+						===================================================== --%>
+						<c:url var="inventoryDetailUrl"
+							value="/inventory/stockList/detail">
+							<c:param name="inventoryId"
+								value="${inventory.inventoryId}" />
+						</c:url>
+
+						<%-- =====================================================
+							행 전체 클릭으로 재고 상세페이지 이동
+							글씨 링크가 아니라 행 전체를 클릭하는 방식이다.
+							data-detail-url 값은 아래 JavaScript에서 읽어서 이동한다.
+						===================================================== --%>
+						<tr class="inventory-click-row"
+							data-detail-url="${inventoryDetailUrl}">
 
 							<%-- =====================================================
-								팀장님 피드백 반영
-								선택 체크박스는 삭제하고 품목코드를 첫 번째 컬럼으로 보여준다.
+								품목코드 클릭 시 재고 상세페이지 이동
 							===================================================== --%>
 							<td class="mobile_show"
 								title="${inventory.itemCode}">
@@ -445,34 +481,40 @@
 
 							</td>
 
+							<%-- =====================================================
+								품목유형 클릭 시 재고 상세페이지 이동
+							===================================================== --%>
 							<td class="mobile_hidden">
 
 								<c:choose>
 
-									<c:when test="${inventory.itemType eq 'FG'}">
-										완제품
-									</c:when>
+										<c:when test="${inventory.itemType eq 'FG'}">
+											완제품
+										</c:when>
 
-									<c:when test="${inventory.itemType eq 'RM'}">
-										원자재
-									</c:when>
+										<c:when test="${inventory.itemType eq 'RM'}">
+											원자재
+										</c:when>
 
-									<%-- =====================================================
-										우리 프로젝트 기준
-										SM은 화면에서 부자재가 아니라 완제품으로 표시한다.
-									===================================================== --%>
-									<c:when test="${inventory.itemType eq 'SM'}">
-										완제품
-									</c:when>
+										<%-- =====================================================
+											우리 프로젝트 기준
+											SM은 화면에서 부자재가 아니라 완제품으로 표시한다.
+										===================================================== --%>
+										<c:when test="${inventory.itemType eq 'SM'}">
+											완제품
+										</c:when>
 
-									<c:otherwise>
-										${inventory.itemType}
-									</c:otherwise>
+										<c:otherwise>
+											${inventory.itemType}
+										</c:otherwise>
 
-								</c:choose>
+									</c:choose>
 
 							</td>
 
+							<%-- =====================================================
+								품목명 클릭 시 재고 상세페이지 이동
+							===================================================== --%>
 							<td class="mobile_show"
 								title="${inventory.itemName}">
 
@@ -480,16 +522,18 @@
 
 							</td>
 
+							<%-- =====================================================
+								현재재고/단위 클릭 시 재고 상세페이지 이동
+							===================================================== --%>
 							<td class="mobile_show">
 
-								<%-- =====================================================
-									팀장님 피드백 반영
-									현재재고와 단위를 따로 보여주지 않고 한 칸에 합쳐서 표시한다.
-								===================================================== --%>
 								<fmt:formatNumber value="${inventory.inventoryStock}" pattern="#,###" /> ${inventory.itemUnit}
 
 							</td>
 
+							<%-- =====================================================
+								창고위치 클릭 시 재고 상세페이지 이동
+							===================================================== --%>
 							<td class="mobile_show">
 
 								${inventory.stockLocation}
@@ -497,9 +541,8 @@
 							</td>
 
 							<%-- =====================================================
-								모바일 컬럼 규칙
-								생성일 값도 header와 동일하게 mobile_hidden 처리한다.
-								공통 CSS는 수정하지 않고 JSP 컬럼 class만 맞춘다.
+								생성일 클릭 시 재고 상세페이지 이동
+								모바일에서는 기존 규칙대로 숨긴다.
 							===================================================== --%>
 							<td class="mobile_hidden">
 
@@ -507,11 +550,14 @@
 
 							</td>
 
+							<%-- =====================================================
+								상세 버튼은 기존처럼 유지
+							===================================================== --%>
 							<td class="mobile_show">
 
 								<button type="button"
 									class="inventoryDetailBtn"
-									onclick="location.href='${pageContext.request.contextPath}/inventory/stockList/detail?inventoryId=${inventory.inventoryId}'">
+									onclick="event.stopPropagation(); location.href='${inventoryDetailUrl}'">
 
 									보기
 
@@ -1243,3 +1289,51 @@ function submitInventoryInsertDirect() {
 	HTMLFormElement.prototype.submit.call(form);
 }
 </script>
+
+
+<%-- =========================================================
+	재고조회 목록 행 클릭 이벤트
+	공통 JS 파일은 수정하지 않고 이 JSP 안에서만 처리한다.
+	행 안의 아무 곳이나 클릭하면 data-detail-url 값으로 상세페이지 이동한다.
+========================================================= --%>
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+
+		var rows =
+			document.querySelectorAll(".inventory-click-row");
+
+		for (var i = 0; i < rows.length; i++) {
+
+			rows[i].addEventListener("click", function(event) {
+
+				var targetTag =
+					event.target.tagName.toLowerCase();
+
+				// =====================================================
+				// 버튼, input, select, textarea를 누른 경우에는
+				// 행 이동을 실행하지 않는다.
+				// 상세 버튼은 기존 버튼 onclick으로 이동한다.
+				// =====================================================
+				if (targetTag == "button"
+						|| targetTag == "input"
+						|| targetTag == "select"
+						|| targetTag == "textarea"
+						|| event.target.closest("button") != null) {
+
+					return;
+				}
+
+				var detailUrl =
+					this.getAttribute("data-detail-url");
+
+				if (detailUrl != null
+						&& detailUrl != "") {
+
+					location.href =
+						detailUrl;
+				}
+			});
+		}
+	});
+</script>
+

@@ -1954,3 +1954,54 @@ button {
 	gap: 8px;
 }
 
+
+/* =====================================================
+	작업자 메인 최종 보정
+	-----------------------------------------------------
+	1. 품질관리 카드는 검사관리 화면으로 바로 이동한다.
+	2. 검사관리 / 불량관리 작은 버튼은 사용하지 않는다.
+	3. QR은 작업지시가 없어도 항상 보이므로 QR 중앙 로고를 항상 안정적으로 표시한다.
+	공통 CSS / 공통 JSP는 수정하지 않는다.
+===================================================== */
+
+/* 품질관리 카드 안 작은 바로가기 버튼 숨김 */
+.workerQualityQuickBtns,
+.workerQualityQuickBtn {
+	display: none !important;
+}
+
+/* 버튼 제거 후 품질관리 카드 높이와 여백을 일반 카드와 맞춘다. */
+.workerQualityMenuCard {
+	min-height: var(--menuCardH) !important;
+}
+
+/* QR 중앙 로고는 기본 QR에서도 너무 커 보이지 않게 작은 크기로 고정한다. */
+.workerQrLogoBox {
+	width: 34px !important;
+	height: 34px !important;
+	border-radius: 9px !important;
+}
+
+.workerQrLogoBox img {
+	width: 21px !important;
+	height: 21px !important;
+}
+
+@media screen and (max-width: 768px) {
+
+	.workerQualityMenuCard {
+		min-height: var(--menuCardH) !important;
+	}
+
+	.workerQrLogoBox {
+		width: 28px !important;
+		height: 28px !important;
+		border-radius: 8px !important;
+	}
+
+	.workerQrLogoBox img {
+		width: 17px !important;
+		height: 17px !important;
+	}
+}
+

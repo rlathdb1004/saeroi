@@ -50,6 +50,18 @@
 	.inout-lot-link:hover {
 		color: #075f46;
 	}
+
+	/* =====================================================
+		자재 LOT번호 readonly 표시
+		공통 CSS는 건드리지 않고 inoutDetail.jsp 안에서만 적용한다.
+		LOT번호는 수정할 수 없지만 저장 시 값은 그대로 전송된다.
+	===================================================== */
+	.inout-lot-readonly {
+		background: #f4f7f6 !important;
+		color: #4b5f58 !important;
+		cursor: not-allowed !important;
+	}
+
 </style>
 
 <div class="detail_page">
@@ -222,7 +234,8 @@
 
 			<form id="updateForm"
 				method="post"
-				action="${pageContext.request.contextPath}/inventory/materialIn/update">
+				action="${pageContext.request.contextPath}/inventory/materialIn/update"
+				onsubmit="return confirmInoutUpdate();">
 
 				<input type="hidden"
 					name="inoutId"
@@ -255,6 +268,16 @@
 				<input type="hidden"
 					name="status"
 					value="${inout.status}">
+
+				<%-- =====================================================
+					재고 반영용 창고위치
+					수정 저장 시 INVENTORY 현재재고를 어느 창고 기준으로 조정할지
+					DAO에서 사용할 수 있도록 hidden으로 같이 넘긴다.
+					화면에는 기존처럼 창고위치를 읽기 전용으로 보여준다.
+				===================================================== --%>
+				<input type="hidden"
+					name="stockLocation"
+					value="${inout.stockLocation}">
 
 				<div class="detail_card">
 
@@ -293,10 +316,20 @@
 
 								<td>
 
+									<%-- =====================================================
+										자재 LOT번호 수정 불가
+										LOT번호는 입출고 등록 시 생성/선택된 기준값이므로
+										상세 수정모드에서도 변경하지 못하게 readonly 처리한다.
+
+										주의:
+										disabled를 사용하면 form 전송 시 materialLot 값이 넘어가지 않으므로
+										저장 로직 유지를 위해 readonly를 사용한다.
+									===================================================== --%>
 									<input type="text"
 										name="materialLot"
-										class="search-input"
-										value="${inout.materialLot}">
+										class="search-input inout-lot-readonly"
+										value="${inout.materialLot}"
+										readonly>
 
 								</td>
 
@@ -614,3 +647,18 @@
 	</c:choose>
 
 </div>
+
+
+<%-- =========================================================
+	자재 입출고 수정 저장 확인
+	수정모드에서 저장 버튼을 누르면 바로 저장하지 않고
+	사용자에게 한 번 더 확인한다.
+	공통 JS / 공통 JSP는 수정하지 않고 현재 상세 JSP 안에서만 처리한다.
+========================================================= --%>
+<script>
+	function confirmInoutUpdate() {
+
+		return confirm("저장하시겠습니까?");
+	}
+</script>
+
