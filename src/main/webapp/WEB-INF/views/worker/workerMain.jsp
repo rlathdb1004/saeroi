@@ -793,30 +793,17 @@
 						</h3>
 
 						<p>
-							검사관리와 불량관리 현황을 확인합니다.
+							검사관리 현황을 확인합니다.
 						</p>
 
-						<div class="workerQualityQuickBtns">
+						
+        <%-- =====================================================
+            작업자 화면에서는 품질관리 클릭 시 검사관리로 바로 이동한다.
+            검사관리 / 불량관리 빠른 버튼은 표시하지 않는다.
+        ===================================================== --%>
 
-							<button type="button"
-								class="workerQualityQuickBtn"
-								onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/quality/inspection'">
+    </div>
 
-								검사관리
-
-							</button>
-
-							<button type="button"
-								class="workerQualityQuickBtn"
-								onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/quality/defect'">
-
-								불량관리
-
-							</button>
-
-						</div>
-
-					</div>
 
 					<div class="workerMenuNo">
 						03

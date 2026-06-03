@@ -800,6 +800,8 @@ public class InventoryDAOImpl implements InventoryDAO {
 	// 2. 그 LOT번호와 같은 MATERIAL_INOUT 이력만 가져온다.
 	// 3. 입고/출고를 시간순으로 계산해서 누적잔량을 만든다.
 	// 4. 화면에는 최신순으로 보여주되, 각 행에는 그 시점의 잔량을 표시한다.
+	// 5. 입출고 등록/수정 후에는 MATERIAL_INOUT을 다시 조회해서
+	//    총입고량 / 총출고량 / 현재잔량을 매번 새로 계산한다.
 	//
 	// 예:
 	// 입고 1000 → 누적잔량 1000
