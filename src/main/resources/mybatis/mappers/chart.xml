@@ -654,6 +654,135 @@
 		FROM base_data
 	</select>
 
+	<!-- 대시보드 납기 준수율 추이 최근 7일 조회 -->
+	<select id="select_dashboard_delivery_trend" resultType="map">
+		WITH
+		base_date AS (
+			SELECT TRUNC(CURRENT_DATE) - 6 + LEVEL - 1 AS base_date
+			FROM dual
+			CONNECT BY LEVEL &lt;= 7
+		),
+		prod_sum AS (
+			SELECT
+				order_id,
+				SUM(NVL(prod_qty, 0)) AS total_prod_qty,
+				MAX(TRUNC(prod_date)) AS complete_date
+			FROM production
+			GROUP BY order_id
+		),
+		order_data AS (
+			SELECT
+				TRUNC(pp.due_date) AS base_date,
+				COUNT(DISTINCT wo.order_id) AS total_order_count,
+				COUNT(DISTINCT CASE
+					WHEN NVL(ps.total_prod_qty, 0) &gt;= NVL(wo.order_qty, 0)
+					AND ps.complete_date &lt;= TRUNC(pp.due_date)
+					THEN wo.order_id
+				END) AS ontime_order_count
+			FROM work_order wo
+			JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+			LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
+			WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE) - 6
+			AND pp.due_date &lt; TRUNC(CURRENT_DATE) + 1
+			AND wo.product_lot IS NOT NULL
+			GROUP BY TRUNC(pp.due_date)
+		)
+		SELECT
+			TO_CHAR(b.base_date, 'MM/DD') AS LABEL,
+			CASE
+				WHEN NVL(od.total_order_count, 0) = 0 THEN 0
+				ELSE ROUND(NVL(od.ontime_order_count, 0) / od.total_order_count * 100, 1)
+			END AS DELIVERYRATE,
+			95 AS TARGETRATE,
+			NVL(od.total_order_count, 0) AS TOTALORDERCOUNT,
+			NVL(od.ontime_order_count, 0) AS ONTIMEORDERCOUNT,
+			NVL(od.total_order_count, 0) - NVL(od.ontime_order_count, 0) AS DELAYORDERCOUNT
+		FROM base_date b
+		LEFT JOIN order_data od ON od.base_date = b.base_date
+		ORDER BY b.base_date
+	</select>
+
+	<!-- 대시보드 납기 준수율 이번주 요약 조회 -->
+	<select id="select_dashboard_delivery_summary" resultType="map">
+		WITH
+		prod_sum AS (
+			SELECT
+				order_id,
+				SUM(NVL(prod_qty, 0)) AS total_prod_qty,
+				MAX(TRUNC(prod_date)) AS complete_date
+			FROM production
+			GROUP BY order_id
+		),
+		curr_data AS (
+			SELECT
+				COUNT(DISTINCT wo.order_id) AS total_order_count,
+				COUNT(DISTINCT CASE
+					WHEN NVL(ps.total_prod_qty, 0) &gt;= NVL(wo.order_qty, 0)
+					AND ps.complete_date &lt;= TRUNC(pp.due_date)
+					THEN wo.order_id
+				END) AS ontime_order_count
+			FROM work_order wo
+			JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+			LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
+			WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE, 'IW')
+			AND pp.due_date &lt; TRUNC(CURRENT_DATE, 'IW') + 7
+			AND wo.product_lot IS NOT NULL
+		),
+		prev_data AS (
+			SELECT
+				COUNT(DISTINCT wo.order_id) AS total_order_count,
+				COUNT(DISTINCT CASE
+					WHEN NVL(ps.total_prod_qty, 0) &gt;= NVL(wo.order_qty, 0)
+					AND ps.complete_date &lt;= TRUNC(pp.due_date)
+					THEN wo.order_id
+				END) AS ontime_order_count
+			FROM work_order wo
+			JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+			LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
+			WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE, 'IW') - 7
+			AND pp.due_date &lt; TRUNC(CURRENT_DATE, 'IW')
+			AND wo.product_lot IS NOT NULL
+		),
+		rate_data AS (
+			SELECT
+				NVL(cd.total_order_count, 0) AS curr_total_order_count,
+				NVL(cd.ontime_order_count, 0) AS curr_ontime_order_count,
+				NVL(pd.total_order_count, 0) AS prev_total_order_count,
+				NVL(pd.ontime_order_count, 0) AS prev_ontime_order_count,
+				95 AS target_rate,
+				CASE
+					WHEN NVL(cd.total_order_count, 0) = 0 THEN 0
+					ELSE ROUND(NVL(cd.ontime_order_count, 0) / cd.total_order_count * 100, 1)
+				END AS curr_delivery_rate,
+				CASE
+					WHEN NVL(pd.total_order_count, 0) = 0 THEN 0
+					ELSE ROUND(NVL(pd.ontime_order_count, 0) / pd.total_order_count * 100, 1)
+				END AS prev_delivery_rate
+			FROM curr_data cd
+			CROSS JOIN prev_data pd
+		)
+		SELECT
+			curr_delivery_rate AS CURRDELIVERYRATE,
+			prev_delivery_rate AS PREVDELIVERYRATE,
+			target_rate AS TARGETRATE,
+			curr_total_order_count AS CURRTOTALORDERCOUNT,
+			curr_ontime_order_count AS CURRONTIMEORDERCOUNT,
+			curr_total_order_count - curr_ontime_order_count AS CURRDELAYORDERCOUNT,
+			ROUND(curr_delivery_rate - target_rate, 1) AS TARGETCOMPARERATE,
+			ROUND(curr_delivery_rate - prev_delivery_rate, 1) AS WEEKCOMPARERATE,
+			CASE
+				WHEN curr_delivery_rate - target_rate &gt;= 0 THEN 'good'
+				WHEN curr_delivery_rate - target_rate &lt; 0 THEN 'bad'
+				ELSE 'same'
+			END AS TARGETCOMPARETYPE,
+			CASE
+				WHEN curr_delivery_rate - prev_delivery_rate &gt; 0 THEN 'good'
+				WHEN curr_delivery_rate - prev_delivery_rate &lt; 0 THEN 'bad'
+				ELSE 'same'
+			END AS WEEKCOMPARETYPE
+		FROM rate_data
+	</select>
+
 	<!-- 대시보드 설비 가동 현황 조회 -->
 	<select id="select_dashboard_facility_status" resultType="map">
 		WITH
