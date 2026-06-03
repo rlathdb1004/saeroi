@@ -229,6 +229,7 @@ public class EquipmentStatusDAO {
 	    	        start_date_time.plusMinutes(dto.getPlan_time_min());
 	    	Timestamp time_start = Timestamp.valueOf(start_date_time);
 	    	Timestamp time_end = Timestamp.valueOf(end_date_time);
+	    	    	
 	    	
 	    	ps.setInt(1, dto.getEquip_id());
 	    	ps.setDate(2, dto.getOperation_date());
@@ -500,7 +501,11 @@ public class EquipmentStatusDAO {
 	    	ps.setDate(3, dto.getEquip_main_date());
 	    	ps.setString(4, dto.getEquip_main_type());
 	    	ps.setString(5, dto.getEquip_main_content());
-	    	ps.setInt(6, dto.getEquip_main_time());
+	    	if (dto.getEquip_main_time() == null) {
+	    	    ps.setInt(6, 0);
+	    	} else {
+	    	    ps.setInt(6, dto.getEquip_main_time());
+	    	}
 	    	ps.setString(7, dto.getRemark());
 
 	    	result = ps.executeUpdate();

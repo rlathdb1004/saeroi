@@ -592,29 +592,39 @@
 						팀원 코드 수정 없음:
 						/production/workorder/qr?orderId=...
 					===================================================== --%>
-					<c:choose>
+					<%-- =====================================================
+						작업지시 유무와 상관없이 실제 QR 이미지 출력
+						-----------------------------------------------------
+						Controller에서 오늘 작업지시가 없을 경우에도
+						로그인한 작업자의 기존 작업지시 중 1건을 QR 표시용으로 내려준다.
+						따라서 여기서는 SVG 기본 이미지를 사용하지 않고,
+						팀원이 만든 QR 생성 URL을 그대로 사용한다.
 
-						<c:when test="${workerQrOrderId gt 0}">
+						QR 이미지 URL:
+						/production/workorder/qr?orderId=작업지시번호
+					===================================================== --%>
+					<c:if test="${workerQrOrderId gt 0}">
 
-							<img class="realQrImg"
-								src="${pageContext.request.contextPath}/production/workorder/qr?orderId=${workerQrOrderId}"
-								alt="오늘 작업지시 QR 코드">
+						<img class="realQrImg"
+							src="${pageContext.request.contextPath}/production/workorder/qr?orderId=${workerQrOrderId}"
+							alt="작업지시 QR 코드">
 
-						</c:when>
+					</c:if>
 
-						<c:otherwise>
+					<%-- =====================================================
+						정말로 작업지시 데이터가 1건도 없는 경우 안내문 표시
+						-----------------------------------------------------
+						실제 QR은 ORDER_ID가 있어야 생성되므로,
+						DB에 작업지시가 단 한 건도 없으면 QR 생성 자체가 불가능하다.
+						이 경우에만 안내 문구를 보여준다.
+					===================================================== --%>
+					<c:if test="${workerQrOrderId le 0}">
 
-							<div class="realQrImg"
-								style="display:flex; align-items:center; justify-content:center; background:#ffffff; color:#2f6f5e; font-size:13px; font-weight:900; text-align:center; line-height:1.5; padding:12px; box-sizing:border-box;">
+						<div class="workerQrNoOrderText">
+							QR을 표시할 작업지시가 없습니다.
+						</div>
 
-								오늘 작업지시가<br>
-								없습니다
-
-							</div>
-
-						</c:otherwise>
-
-					</c:choose>
+					</c:if>
 
 
 					<%-- =====================================================
@@ -623,21 +633,34 @@
 						팀원이 만든 실제 QR 이미지 위에 기존 SAEROI 로고를 겹쳐서 표시한다.
 						공통 파일은 수정하지 않고 worker.css에서만 위치를 잡는다.
 					===================================================== --%>
-					<c:if test="${workerQrOrderId gt 0}">
-						<div class="workerQrLogoBox">
-							<img src="${pageContext.request.contextPath}/resources/saeroi_logo.png"
-								alt="SAEROI 로고">
-						</div>
-					</c:if>
+					<%-- =====================================================
+						QR 중앙 SAEROI 로고
+						-----------------------------------------------------
+						작업지시가 있을 때뿐만 아니라 작업지시가 없을 때도
+						항상 QR 중앙에 로고가 보이도록 조건문을 제거했다.
+					===================================================== --%>
+					<div class="workerQrLogoBox">
+						<img src="${pageContext.request.contextPath}/resources/saeroi_logo.png"
+							alt="SAEROI 로고">
+					</div>
 
 					<%-- =====================================================
 						현재 화면 QR 테스트 / QR 이미지 클릭 이동용 URL
 						- 실제 QR URL이 있으면 해당 URL로 이동
 						- QR URL이 없으면 오늘 작업지시 조회 화면으로 이동
 					===================================================== --%>
+					<%-- =====================================================
+						QR 클릭 / 테스트 실행 이동 URL
+						-----------------------------------------------------
+						작업지시가 있으면 Controller에서 내려준 workerQrMoveUrl로 이동한다.
+						작업지시가 없으면 빈 값이 들어올 수 있으므로 작업지시 조회 화면을 기본값으로 사용한다.
+					===================================================== --%>
+					<c:set var="workerCurrentQrMoveUrl"
+						value="${empty workerQrMoveUrl ? '/worker/workorder?todayOnly=Y' : workerQrMoveUrl}" />
+
 					<input type="hidden"
 						id="workerCurrentQrMoveUrl"
-						value="<c:choose><c:when test="${workerQrMoveUrl.indexOf('http://') == 0 || workerQrMoveUrl.indexOf('https://') == 0}">${workerQrMoveUrl}</c:when><c:otherwise>${pageContext.request.contextPath}${workerQrMoveUrl}</c:otherwise></c:choose>">
+						value="<c:choose><c:when test="${workerCurrentQrMoveUrl.indexOf('http://') == 0 || workerCurrentQrMoveUrl.indexOf('https://') == 0}">${workerCurrentQrMoveUrl}</c:when><c:otherwise>${pageContext.request.contextPath}${workerCurrentQrMoveUrl}</c:otherwise></c:choose>">
 
 				</div>
 
@@ -793,30 +816,17 @@
 						</h3>
 
 						<p>
-							검사관리와 불량관리 현황을 확인합니다.
+							검사관리 현황을 확인합니다.
 						</p>
 
-						<div class="workerQualityQuickBtns">
+						
+        <%-- =====================================================
+            작업자 화면에서는 품질관리 클릭 시 검사관리로 바로 이동한다.
+            검사관리 / 불량관리 빠른 버튼은 표시하지 않는다.
+        ===================================================== --%>
 
-							<button type="button"
-								class="workerQualityQuickBtn"
-								onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/quality/inspection'">
+    </div>
 
-								검사관리
-
-							</button>
-
-							<button type="button"
-								class="workerQualityQuickBtn"
-								onclick="event.stopPropagation(); location.href='${pageContext.request.contextPath}/quality/defect'">
-
-								불량관리
-
-							</button>
-
-						</div>
-
-					</div>
 
 					<div class="workerMenuNo">
 						03

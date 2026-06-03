@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,7 +17,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import kr.or.saeroi.common.PageDTO;
 import kr.or.saeroi.dao.EquipmentDAO;
+import kr.or.saeroi.dao.EquipmentStatusDAO;
 import kr.or.saeroi.dto.EquipmentDTO;
+import kr.or.saeroi.dto.EquipmentMaintenanceDTO;
+import kr.or.saeroi.dto.EquipmentTroubleDTO;
+import kr.or.saeroi.dto.LoginDTO;
 import kr.or.saeroi.service.EquipmentService;
 
 @Controller
@@ -26,6 +31,8 @@ public class EquipmentController {
     private EquipmentService equipmentService;
     @Autowired
 	private EquipmentDAO equipmentDAO;
+    @Autowired
+	private EquipmentStatusDAO equipmentstatusDAO;
 
     @RequestMapping(value = "/equipment/equipment", method = RequestMethod.GET)
     public String eqp(
@@ -124,10 +131,12 @@ public class EquipmentController {
     
     
     @PostMapping("/equipment/update")
-    public String updateEquipment(EquipmentDTO dto) {
-    	
-        equipmentService.update_equipment(dto);
+    public String updateEquipment(@ModelAttribute EquipmentDTO dto,
+                                   HttpSession session) {        
 
+        int emp_id = ((LoginDTO) session.getAttribute("loginUser")).getEmp_id();        
+        equipmentService.update_equip_status(dto, emp_id);  
+        
         return "redirect:/equipment/equipment/detail?equip_id=" + dto.getEquip_id();
     }
    

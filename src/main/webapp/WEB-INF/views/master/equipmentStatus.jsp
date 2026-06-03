@@ -221,9 +221,9 @@
 
 								<div class="modal_item">
 									<label class="modal_label">
-										설비 비 가동 시간<span class="modal_required">*</span>
+										설비 비 가동 시간<span class="modal_required">
 									</label>
-									<input type="number" name="downtime_min" class="modal_input" required>
+									<input type="number" name="downtime_min" class="modal_input" >
 								</div>
 
 								<div class="modal_item">

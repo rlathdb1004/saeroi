@@ -489,6 +489,255 @@ public class InoutDAOImpl implements InoutDAO {
 		return dto;
 	}
 
+	// =============================================================
+	// 재고 반영용 수정 전 입출고 조회
+	// -------------------------------------------------------------
+	// 입출고 수정 시 기존 수량/구분이 재고에 이미 반영되어 있으므로
+	// 수정 전 데이터를 먼저 조회해서 기존 반영분을 되돌리기 위해 사용한다.
+	// =============================================================
+	private InoutDTO selectInoutForInventoryAdjust(
+			Connection conn,
+			int inoutId) throws Exception {
+
+		InoutDTO dto =
+			null;
+
+		String sql = "";
+
+		sql += " SELECT ";
+		sql += "     INOUT_ID, ";
+		sql += "     ITEM_ID, ";
+		sql += "     INOUT_TYPE, ";
+		sql += "     MATERIAL_LOT, ";
+		sql += "     INOUT_QTY ";
+		sql += " FROM MATERIAL_INOUT ";
+		sql += " WHERE INOUT_ID = ? ";
+
+		PreparedStatement pstmt =
+			conn.prepareStatement(sql);
+
+		pstmt.setInt(
+			1,
+			inoutId);
+
+		ResultSet rs =
+			pstmt.executeQuery();
+
+		if (rs.next()) {
+
+			dto =
+				new InoutDTO();
+
+			dto.setInoutId(
+				rs.getInt("INOUT_ID"));
+
+			dto.setItemId(
+				rs.getInt("ITEM_ID"));
+
+			dto.setInoutType(
+				rs.getString("INOUT_TYPE"));
+
+			dto.setMaterialLot(
+				rs.getString("MATERIAL_LOT"));
+
+			dto.setInoutQty(
+				rs.getInt("INOUT_QTY"));
+		}
+
+		rs.close();
+		pstmt.close();
+
+		return dto;
+	}
+
+	// =============================================================
+	// 입출고 유형별 재고 영향값 계산
+	// -------------------------------------------------------------
+	// 입고(MI)는 재고를 더하고,
+	// 출고(MO-PROD)는 재고를 뺀다.
+	// =============================================================
+	private int getInventoryEffectQty(
+			InoutDTO dto) {
+
+		if (dto == null) {
+
+			return 0;
+		}
+
+		int qty =
+			dto.getInoutQty();
+
+		if ("MO-PROD".equals(dto.getInoutType())) {
+
+			qty =
+				qty * -1;
+		}
+
+		return qty;
+	}
+
+	// =============================================================
+	// 입출고 수정 시 INVENTORY 현재재고 보정
+	// -------------------------------------------------------------
+	// 기존 반영값을 되돌리고 새 반영값을 다시 적용한다.
+	// 기존 품목과 수정 후 품목이 달라져도 각각의 품목 재고에 올바르게 반영된다.
+	// =============================================================
+	private void updateInventoryStockByInoutChange(
+			Connection conn,
+			InoutDTO beforeDto,
+			InoutDTO afterDto) throws Exception {
+
+		int beforeEffectQty =
+			getInventoryEffectQty(beforeDto);
+
+		int afterEffectQty =
+			getInventoryEffectQty(afterDto);
+
+		// 기존 반영분 제거
+		applyInventoryStockChange(
+			conn,
+			beforeDto,
+			beforeEffectQty * -1,
+			"자재 입출고 수정 기존값 되돌림");
+
+		// 수정 반영분 적용
+		applyInventoryStockChange(
+			conn,
+			afterDto,
+			afterEffectQty,
+			"자재 입출고 수정 신규값 반영");
+	}
+
+	// =============================================================
+	// INVENTORY 현재재고 증감 공통 처리
+	// -------------------------------------------------------------
+	// MATERIAL_INOUT에는 창고위치 컬럼이 없으므로,
+	// DTO의 stockLocation이 비어 있으면 해당 품목의 대표 창고위치를 찾아서 반영한다.
+	// =============================================================
+	private void applyInventoryStockChange(
+			Connection conn,
+			InoutDTO dto,
+			int changeQty,
+			String remark) throws Exception {
+
+		if (dto == null
+				|| changeQty == 0) {
+
+			return;
+		}
+
+		String stockLocation =
+			dto.getStockLocation();
+
+		if (stockLocation == null
+				|| stockLocation.trim().equals("")) {
+
+			stockLocation =
+				selectDefaultStockLocation(
+					conn,
+					dto.getItemId());
+
+			dto.setStockLocation(stockLocation);
+		}
+
+		if (stockLocation == null
+				|| stockLocation.trim().equals("")) {
+
+			System.out.println(
+				"재고 수정 반영 실패 : 창고위치가 비어 있습니다. ITEM_ID="
+				+ dto.getItemId());
+
+			return;
+		}
+
+		stockLocation =
+			stockLocation.trim();
+
+		String sql = "";
+
+		sql += " UPDATE INVENTORY ";
+		sql += " SET ";
+		sql += "     INVENTORY_STOCK = INVENTORY_STOCK + ?, ";
+		sql += "     UPDATED_DATE = SYSDATE ";
+		sql += " WHERE ITEM_ID = ? ";
+		sql += " AND STOCK_LOCATION = ? ";
+
+		PreparedStatement pstmt =
+			conn.prepareStatement(sql);
+
+		pstmt.setInt(
+			1,
+			changeQty);
+
+		pstmt.setInt(
+			2,
+			dto.getItemId());
+
+		pstmt.setString(
+			3,
+			stockLocation);
+
+		int updateCount =
+			pstmt.executeUpdate();
+
+		pstmt.close();
+
+		// =====================================================
+		// 재고 행이 없는데 증가 반영이 필요한 경우 새 INVENTORY 행 생성
+		// =====================================================
+		if (updateCount == 0
+				&& changeQty > 0) {
+
+			String insertSql = "";
+
+			insertSql += " INSERT INTO INVENTORY ( ";
+			insertSql += "     INVENTORY_ID, ";
+			insertSql += "     INVENTORY_STOCK, ";
+			insertSql += "     REMARK, ";
+			insertSql += "     STOCK_LOCATION, ";
+			insertSql += "     CREATED_DATE, ";
+			insertSql += "     UPDATED_DATE, ";
+			insertSql += "     ITEM_ID ";
+			insertSql += " ) VALUES ( ";
+			insertSql += "     ?, ";
+			insertSql += "     ?, ";
+			insertSql += "     ?, ";
+			insertSql += "     ?, ";
+			insertSql += "     SYSDATE, ";
+			insertSql += "     SYSDATE, ";
+			insertSql += "     ? ";
+			insertSql += " ) ";
+
+			PreparedStatement insertPstmt =
+				conn.prepareStatement(insertSql);
+
+			insertPstmt.setInt(
+				1,
+				selectNextInventoryId(conn));
+
+			insertPstmt.setInt(
+				2,
+				changeQty);
+
+			insertPstmt.setString(
+				3,
+				remark);
+
+			insertPstmt.setString(
+				4,
+				stockLocation);
+
+			insertPstmt.setInt(
+				5,
+				dto.getItemId());
+
+			insertPstmt.executeUpdate();
+
+			insertPstmt.close();
+		}
+	}
+
+
 	@Override
 	public int updateInout(InoutDTO dto) {
 
@@ -498,6 +747,18 @@ public class InoutDAOImpl implements InoutDAO {
 
 			Connection conn =
 					getConnection();
+
+			// =====================================================
+			// 수정 전 입출고 데이터 조회
+			// -----------------------------------------------------
+			// 기존 입출고가 INVENTORY 현재재고에 반영되어 있으므로
+			// 수정 저장 시에는 기존 영향값을 먼저 되돌리고,
+			// 수정된 영향값을 다시 반영해야 한다.
+			// =====================================================
+			InoutDTO beforeDto =
+				selectInoutForInventoryAdjust(
+					conn,
+					dto.getInoutId());
 
 			String sql = "";
 
@@ -530,25 +791,9 @@ public class InoutDAOImpl implements InoutDAO {
 			pstmt.setInt(idx++, dto.getInoutQty());
 			pstmt.setDate(idx++, dto.getInoutDate());
 			pstmt.setString(idx++, dto.getRemark());
-			// =====================================================
-			// 화면에서 사용여부 입력란은 제거했기 때문에 기본값 Y로 저장한다.
-			// 상태도 비어있으면 완료로 저장해서 목록/상세가 비지 않게 한다.
-			// =====================================================
-			if (dto.getUseYn() == null
-					|| dto.getUseYn().trim().equals("")) {
-
-				dto.setUseYn("Y");
-			}
-
-			if (dto.getStatus() == null
-					|| dto.getStatus().trim().equals("")) {
-
-				dto.setStatus("완료");
-			}
 
 			// =====================================================
-			// 화면에서 사용여부 입력란은 제거했기 때문에 기본값 Y로 저장한다.
-			// 상태도 비어있으면 완료로 저장한다.
+			// 사용여부 / 상태 기본값 방어코딩
 			// =====================================================
 			if (dto.getUseYn() == null
 					|| dto.getUseYn().trim().equals("")) {
@@ -586,6 +831,24 @@ public class InoutDAOImpl implements InoutDAO {
 					pstmt.executeUpdate();
 
 			pstmt.close();
+
+			// =====================================================
+			// 입출고 수정 후 재고 현재수량 보정
+			// -----------------------------------------------------
+			// 예)
+			// 기존 입고 100 → 수정 입고 150 = 재고 +50
+			// 기존 출고 100 → 수정 출고 150 = 재고 -50
+			// 기존 입고 100 → 수정 출고 100 = 재고 -200
+			// =====================================================
+			if (result > 0
+					&& beforeDto != null) {
+
+				updateInventoryStockByInoutChange(
+					conn,
+					beforeDto,
+					dto);
+			}
+
 			conn.close();
 
 		} catch (Exception e) {
@@ -595,6 +858,7 @@ public class InoutDAOImpl implements InoutDAO {
 
 		return result;
 	}
+
 
 	@Override
 	public List<InoutDTO> selectItemList() {

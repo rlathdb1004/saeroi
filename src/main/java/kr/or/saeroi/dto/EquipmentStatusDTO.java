@@ -1,7 +1,6 @@
 package kr.or.saeroi.dto;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 
 import lombok.Data;
 
@@ -15,9 +14,9 @@ public class EquipmentStatusDTO {
 	private String equip_code;
 	private String equip_name;
 	private Date operation_date;
-	private int plan_time_min;
-	private int runtime_min;
-	private int downtime_min;
+	private Integer plan_time_min;
+	private Integer runtime_min;
+	private Integer downtime_min;
 	private String down_reason;
 	private String remark;
 	private String doc_no;

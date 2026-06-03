@@ -37,7 +37,8 @@ public class aiChatController {
 			empno = loginUser.getEmpno();
 			ename = loginUser.getEname();
 		}
-
+		
+		System.out.println("loginUser"+loginUser);
 		List<aiChatContents> history = new ArrayList<aiChatContents>();
 		
 		for(Map<String, Object> msg : params) {
