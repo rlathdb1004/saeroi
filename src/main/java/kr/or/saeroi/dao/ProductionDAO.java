@@ -79,24 +79,21 @@ public class ProductionDAO {
 				NAMESPACE + "insertProductionPlan",
 				productionDTO);
 	}
-	
+
 	// 생산계획 삭제 전 연결된 작업지시 건수를 확인한다.
 	public int selectWorkOrderCountByProdPlanId(Integer prodPlanId) {
 
 		return sqlSession.selectOne(
 				NAMESPACE + "selectWorkOrderCountByProdPlanId",
-				prodPlanId
-		);
+				prodPlanId);
 	}
-
 
 	// 작업지시가 연결되지 않은 생산계획을 삭제한다.
 	public int deleteProductionPlan(Integer prodPlanId) {
 
 		return sqlSession.delete(
 				NAMESPACE + "deleteProductionPlan",
-				prodPlanId
-		);
+				prodPlanId);
 	}
 
 
@@ -114,7 +111,7 @@ public class ProductionDAO {
 
 	// 작업지시 목록을 조회한다.
 	public List<ProductionDTO> selectWorkOrderList(ProductionDTO productionDTO) {
-		
+
 		return sqlSession.selectList(
 				NAMESPACE + "selectWorkOrderList",
 				productionDTO);
@@ -127,24 +124,21 @@ public class ProductionDAO {
 				NAMESPACE + "selectWorkOrderPrintList",
 				productionDTO);
 	}
-	
+
 	// 작업지시서 인쇄용 BOM / 자재 LOT 확인 목록을 조회한다.
 	public List<ProductionDTO> selectWorkOrderPrintMaterialList(Integer orderId) {
 
 		return sqlSession.selectList(
 				NAMESPACE + "selectWorkOrderPrintMaterialList",
-				orderId
-		);
+				orderId);
 	}
-
 
 	// 작업지시서 인쇄용 라인 / 설비 확인 목록을 조회한다.
 	public List<ProductionDTO> selectWorkOrderPrintEquipmentList(Integer orderId) {
 
 		return sqlSession.selectList(
 				NAMESPACE + "selectWorkOrderPrintEquipmentList",
-				orderId
-		);
+				orderId);
 	}
 
 	// 작업지시 검색 select box에 사용할 작업상태 목록을 조회한다.
@@ -181,15 +175,22 @@ public class ProductionDAO {
 				NAMESPACE + "selectLineList");
 	}
 
-	// 작업지시 등록 모달에서 사용할 담당자 목록을 조회한다.
-	// 기존 Controller/Service 메서드명을 유지한다.
+	// 작업지시 등록/수정에서 사용할 생산관리 담당자 목록을 조회한다.
 	public List<ProductionDTO> selectWorkOrderEmpList() {
 
 		return sqlSession.selectList(
-				NAMESPACE + "selectEmpList");
+				NAMESPACE + "selectWorkOrderEmpList");
 	}
 
-	// 작업지시 등록 모달에서 사용할 담당자 목록을 조회한다.
+	// 생산실적 등록/수정에서 사용할 작업자 담당자 목록을 조회한다.
+	public List<ProductionDTO> selectProductionResultEmpList() {
+
+		return sqlSession.selectList(
+				NAMESPACE + "selectProductionResultEmpList");
+	}
+
+	// 기존 호출 호환용 전체 재직자 목록이다.
+	// 특정 화면에서는 selectWorkOrderEmpList 또는 selectProductionResultEmpList 사용을 우선한다.
 	public List<ProductionDTO> selectEmpList() {
 
 		return sqlSession.selectList(
@@ -199,7 +200,7 @@ public class ProductionDAO {
 	// 작업지시를 등록한다.
 	// Mapper의 selectKey에서 orderId가 DTO에 세팅되어야 한다.
 	public int insertWorkOrder(ProductionDTO productionDTO) {
-		
+
 		return sqlSession.insert(
 				NAMESPACE + "insertWorkOrder",
 				productionDTO);
@@ -281,6 +282,7 @@ public class ProductionDAO {
 		int count = 0;
 
 		for (ProductionDTO material : materialList) {
+
 			if (material != null && material.getInoutId() != null) {
 				count++;
 			}
@@ -380,10 +382,32 @@ public class ProductionDAO {
 	}
 
 	// 생산실적 등록 모달에서 사용할 작업지시 목록을 조회한다.
+	// 기존 Service/Controller 호환용 기본 메서드이다.
+	// 기본값은 소량 잔량 미포함이며 Mapper 기준 잔량 20EA 이상만 조회한다.
 	public List<ProductionDTO> selectProductionResultOrderList() {
 
+		ProductionDTO productionDTO = new ProductionDTO();
+		productionDTO.setIncludeSmallRemain("N");
+
+		return selectProductionResultOrderList(productionDTO);
+	}
+
+	// 생산실적 등록 모달에서 사용할 작업지시 목록을 조회한다.
+	// includeSmallRemain 값에 따라 소량 잔량 포함 여부를 제어한다.
+	public List<ProductionDTO> selectProductionResultOrderList(ProductionDTO productionDTO) {
+
+		if (productionDTO == null) {
+			productionDTO = new ProductionDTO();
+		}
+
+		if (productionDTO.getIncludeSmallRemain() == null
+				|| productionDTO.getIncludeSmallRemain().trim().length() == 0) {
+			productionDTO.setIncludeSmallRemain("N");
+		}
+
 		return sqlSession.selectList(
-				NAMESPACE + "selectProductionResultOrderList");
+				NAMESPACE + "selectProductionResultOrderList",
+				productionDTO);
 	}
 
 	// QR 스캔 진입 시 자동입력할 작업지시 정보를 조회한다.

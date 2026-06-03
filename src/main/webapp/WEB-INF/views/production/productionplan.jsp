@@ -18,6 +18,8 @@
 	- 생산계획은 작업지시의 상위 데이터이므로 작업지시가 생성된 생산계획은 삭제 불가
 	- 삭제 불가 사유는 Service에서 검사 후 msg로 안내
 	- 검색 조건: 품목구분 itemType, 검색어 keyword, 시작일 startDate, 종료일 endDate
+	- 검색어 input placeholder는 생산관리 공통 기준 "검색 키워드"로 통일
+	- 전체검색은 Mapper에서 상세페이지 주요 항목까지 대소문자 구분 없이 일부 포함 검색
 	- 등록 모달 품목 select는 품목코드 / 품명 / 단위 표시
 	- 계획수량은 천단위 + 단위 표시
 	- 등록 시 계획수량 1 이상, 납기일 >= 계획일자 검증
@@ -98,7 +100,7 @@
 					<label class="search-label">검색어</label>
 
 					<input type="text" name="keyword" class="search-input"
-						placeholder="생산계획번호 / 품목코드 / 품명"
+						placeholder="검색 키워드"
 						value="${keyword}">
 				</div>
 
