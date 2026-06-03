@@ -164,6 +164,35 @@ public class WorkerController {
 				empno,
 				ename);
 
+		// =============================================================
+		// 작업지시가 없는 날에도 QR 이미지는 계속 보여야 한다.
+		// -------------------------------------------------------------
+		// 기존 구조는 오늘 작업지시가 없으면 workerQrOrderId가 0이 되어
+		// workerMain.jsp에서 기본 SVG QR로 빠지거나 QR 이미지가 깨질 수 있었다.
+		//
+		// 그래서 오늘 작업지시가 없을 때는
+		// 로그인한 작업자의 전체 작업지시 목록 중 실제 ORDER_ID가 있는 첫 번째 건을
+		// 화면 표시용 QR로 사용한다.
+		//
+		// 주의: 새 DAO / 팀원 작업지시 Controller는 건드리지 않는다.
+		// 이미 위에서 조회한 myWorkOrderList만 재사용한다.
+		// =============================================================
+		if (workerQrWorkOrder == null
+				|| workerQrWorkOrder.getOrderId() == null) {
+
+			for (ProductionDTO workOrder : myWorkOrderList) {
+
+				if (workOrder != null
+						&& workOrder.getOrderId() != null) {
+
+					workerQrWorkOrder =
+						workOrder;
+
+					break;
+				}
+			}
+		}
+
 		int workerQrOrderId = 0;
 		String workerQrMoveUrl =
 			"/worker/workorder?todayOnly=Y";
