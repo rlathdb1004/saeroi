@@ -3348,3 +3348,14 @@
 		max-width: none;
 	}
 }
+/* 모달 배경은 대시보드 본문 폭 제한을 받지 않게 한다. */
+.dashboard-page > .dash-dashboard-detail-modal-backdrop,
+.dashboard-page > .dash-kpi-modal-backdrop {
+	width: auto;
+	max-width: none;
+}
+
+/* 현장 이슈와 LOT 모달이 다른 플로팅 요소보다 위에 오게 한다. */
+.dashboard-page .dash-dashboard-detail-modal-backdrop {
+	z-index: 9999;
+}
