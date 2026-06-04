@@ -63,8 +63,7 @@
 
 					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M12 20h9"></path>
-						<path
-							d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z">
+						<path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z">
 						</path>
 					</svg>
 
@@ -73,8 +72,7 @@
 
 
 				<button type="submit" id="saveBtn" class="detail_btn_green"
-					form="workOrderDetailForm"
-					style="display: none;">
+					form="workOrderDetailForm" style="display: none;">
 
 					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
 						<path
@@ -89,8 +87,7 @@
 
 
 				<button type="button" id="cancelBtn" class="detail_btn_line"
-					onclick="changeWorkOrderEditMode(false);"
-					style="display: none;">
+					onclick="changeWorkOrderEditMode(false);" style="display: none;">
 
 					<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M18 6L6 18"></path>
@@ -101,6 +98,19 @@
 				</button>
 
 			</c:if>
+
+			<button type="button" class="detail_btn_line detail_print_btn"
+				onclick="window.open('${contextPath}/production/workorder/print?orderId=${workOrder.orderId}', '_blank');">
+
+				<svg class="detail_btn_icon" viewBox="0 0 24 24" aria-hidden="true">
+		<path d="M7 8V4H17V8"></path>
+		<path
+						d="M7 17H5C3.9 17 3 16.1 3 15V10C3 8.9 3.9 8 5 8H19C20.1 8 21 8.9 21 10V15C21 16.1 20.1 17 19 17H17"></path>
+		<path d="M7 14H17V21H7V14Z"></path>
+	</svg>
+
+				인쇄
+			</button>
 
 
 			<button type="button" class="detail_btn_line"
@@ -132,7 +142,8 @@
 				onsubmit="return checkWorkOrderUpdate();">
 
 				<input type="hidden" name="orderId" value="${workOrder.orderId}">
-				<input type="hidden" name="prodPlanId" value="${workOrder.prodPlanId}">
+				<input type="hidden" name="prodPlanId"
+					value="${workOrder.prodPlanId}">
 
 
 				<div class="detail_card">
@@ -152,43 +163,37 @@
 						<tbody>
 							<tr>
 								<th>작업지시 ID</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.orderId}">
 											${workOrder.orderId}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>작업지시번호</th>
-								<td title="${workOrder.docNo}">
-									<c:choose>
+								<td title="${workOrder.docNo}"><c:choose>
 										<c:when test="${not empty workOrder.docNo}">
 											${workOrder.docNo}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>작업상태</th>
-								<td>
-									<c:choose>
-										<c:when test="${workOrder.prodStatus eq '완료' or workOrder.prodStatus eq '진행중'}">
+								<td><c:choose>
+										<c:when
+											test="${workOrder.prodStatus eq '완료' or workOrder.prodStatus eq '진행중'}">
 											<span class="detail_status_badge detail_status_pass">
-												${workOrder.prodStatus}
-											</span>
+												${workOrder.prodStatus} </span>
 										</c:when>
 
-										<c:when test="${workOrder.prodStatus eq '취소' or workOrder.prodStatus eq '보류'}">
+										<c:when
+											test="${workOrder.prodStatus eq '취소' or workOrder.prodStatus eq '보류'}">
 											<span class="detail_status_badge detail_status_fail">
-												${workOrder.prodStatus}
-											</span>
+												${workOrder.prodStatus} </span>
 										</c:when>
 
 										<c:otherwise>
-											<span class="detail_status_badge">
-												<c:choose>
+											<span class="detail_status_badge"> <c:choose>
 													<c:when test="${not empty workOrder.prodStatus}">
 														${workOrder.prodStatus}
 													</c:when>
@@ -196,37 +201,30 @@
 												</c:choose>
 											</span>
 										</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 
 							<tr>
 								<th>완제품 LOT</th>
-								<td colspan="3" title="${workOrder.productLot}">
-									<c:choose>
+								<td colspan="3" title="${workOrder.productLot}"><c:choose>
 										<c:when test="${not empty workOrder.productLot}">
 											${workOrder.productLot}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>문서순번</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.docSeq}">
 											${workOrder.docSeq}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 
 							<tr>
 								<th>지시수량 <span class="modal_required">*</span></th>
-								<td>
-									<span class="viewMode">
-										<c:choose>
+								<td><span class="viewMode"> <c:choose>
 											<c:when test="${not empty workOrder.orderQty}">
 												<fmt:formatNumber value="${workOrder.orderQty}"
 													pattern="#,##0" />
@@ -234,71 +232,48 @@
 											</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose>
-									</span>
+								</span>
 
 									<div class="editMode workorder_input_wrap"
 										style="display: none;">
-										<input type="number" name="orderQty"
-											id="orderQty"
-											class="detailInput"
-											value="${workOrder.orderQty}"
-											min="1"
-											oninput="setOrderQtyPreview();"
-											disabled required>
-
-										<span class="workorder_unit_text">
-											${workOrder.itemUnit}
+										<input type="number" name="orderQty" id="orderQty"
+											class="detailInput" value="${workOrder.orderQty}" min="1"
+											oninput="setOrderQtyPreview();" disabled required> <span
+											class="workorder_unit_text"> ${workOrder.itemUnit} </span> <span
+											id="orderQtyPreviewText" class="detail_help_text"> 현재
+											수량: <fmt:formatNumber value="${workOrder.orderQty}"
+												pattern="#,##0" /> ${workOrder.itemUnit}
 										</span>
-
-										<span id="orderQtyPreviewText" class="detail_help_text">
-											현재 수량:
-											<fmt:formatNumber value="${workOrder.orderQty}"
-												pattern="#,##0" />
-											${workOrder.itemUnit}
-										</span>
-									</div>
-								</td>
+									</div></td>
 
 								<th>작업지시일 <span class="modal_required">*</span></th>
-								<td>
-									<span class="viewMode">
-										<c:choose>
+								<td><span class="viewMode"> <c:choose>
 											<c:when test="${not empty workOrder.orderDate}">
 												${workOrder.orderDate}
 											</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose>
-									</span>
-
-									<input type="date" name="orderDate"
-										id="orderDate"
-										class="detailInput editMode"
-										value="${workOrder.orderDate}"
-										style="display: none;"
-										disabled required>
-								</td>
+								</span> <input type="date" name="orderDate" id="orderDate"
+									class="detailInput editMode" value="${workOrder.orderDate}"
+									style="display: none;" disabled required></td>
 
 								<th>등록일</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.createdDate}">
 											${workOrder.createdDate}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 
 							<tr>
 								<th>수정일</th>
-								<td colspan="5">
-									<c:choose>
+								<td colspan="5"><c:choose>
 										<c:when test="${not empty workOrder.updatedDate}">
 											${workOrder.updatedDate}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 						</tbody>
 					</table>
@@ -321,33 +296,28 @@
 						<div class="workorder_qr_info">
 
 							<div class="workorder_qr_info_row">
-								<span class="workorder_qr_label">QR 용도</span>
-								<span class="workorder_qr_value">
-									생산실적 등록 이동
-								</span>
+								<span class="workorder_qr_label">QR 용도</span> <span
+									class="workorder_qr_value"> 생산실적 등록 이동 </span>
 							</div>
 
 							<div class="workorder_qr_info_row">
-								<span class="workorder_qr_label">스캔 동작</span>
-								<span class="workorder_qr_value">
-									QR을 스캔하면 생산실적 등록 화면으로 이동하고 작업지시/LOT 정보가 자동 입력됩니다.
-								</span>
+								<span class="workorder_qr_label">스캔 동작</span> <span
+									class="workorder_qr_value"> QR을 스캔하면 생산실적 등록 화면으로 이동하고
+									작업지시/LOT 정보가 자동 입력됩니다. </span>
 							</div>
 
 							<div class="workorder_qr_info_row">
-								<span class="workorder_qr_label">이동 URL</span>
-								<span class="workorder_qr_value workorder_qr_url">
-									/production/workorder/qr?orderId=${workOrder.orderId}
-								</span>
+								<span class="workorder_qr_label">이동 URL</span> <span
+									class="workorder_qr_value workorder_qr_url">
+									/production/workorder/qr?orderId=${workOrder.orderId} </span>
 							</div>
 
 						</div>
 
 					</div>
 
-					<div class="detail_help_text">
-						현장 작업자는 이 QR을 리더기로 스캔하여 생산실적 등록 화면으로 바로 이동합니다.
-					</div>
+					<div class="detail_help_text">현장 작업자는 이 QR을 리더기로 스캔하여 생산실적 등록
+						화면으로 바로 이동합니다.</div>
 
 				</div>
 
@@ -369,112 +339,92 @@
 						<tbody>
 							<tr>
 								<th>생산계획 ID</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.prodPlanId}">
 											${workOrder.prodPlanId}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>생산계획번호</th>
-								<td title="${workOrder.prodPlanDocNo}">
-									<c:choose>
+								<td title="${workOrder.prodPlanDocNo}"><c:choose>
 										<c:when test="${not empty workOrder.prodPlanDocNo}">
 											${workOrder.prodPlanDocNo}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>계획수량</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.prodPlanQty}">
 											<fmt:formatNumber value="${workOrder.prodPlanQty}"
 												pattern="#,##0" />
 											${workOrder.itemUnit}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 
 							<tr>
 								<th>계획일자</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.prodPlanDate}">
 											${workOrder.prodPlanDate}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>납기일</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.dueDate}">
 											${workOrder.dueDate}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>품목 ID</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.itemId}">
 											${workOrder.itemId}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 
 							<tr>
 								<th>품목코드</th>
-								<td title="${workOrder.itemCode}">
-									<c:choose>
+								<td title="${workOrder.itemCode}"><c:choose>
 										<c:when test="${not empty workOrder.itemCode}">
 											${workOrder.itemCode}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>품목명</th>
-								<td title="${workOrder.itemName}">
-									<c:choose>
+								<td title="${workOrder.itemName}"><c:choose>
 										<c:when test="${not empty workOrder.itemName}">
 											${workOrder.itemName}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>품목구분</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.itemType}">
 											${workOrder.itemType}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 
 							<tr>
 								<th>단위</th>
-								<td colspan="5">
-									<c:choose>
+								<td colspan="5"><c:choose>
 										<c:when test="${not empty workOrder.itemUnit}">
 											${workOrder.itemUnit}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 						</tbody>
 					</table>
@@ -499,142 +449,110 @@
 						<tbody>
 							<tr>
 								<th>라인 ID</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.lineId}">
 											${workOrder.lineId}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>라인 <span class="modal_required">*</span></th>
-								<td>
-									<span class="viewMode">
-										<c:choose>
+								<td><span class="viewMode"> <c:choose>
 											<c:when test="${not empty workOrder.lineName}">
 												${workOrder.lineName}
 											</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose>
-									</span>
-
-									<select name="lineId" id="lineId"
-										class="detailInput editMode"
-										style="display: none;"
-										disabled required>
+								</span> <select name="lineId" id="lineId" class="detailInput editMode"
+									style="display: none;" disabled required>
 										<option value="">선택</option>
 
 										<c:forEach var="line" items="${lineList}">
 											<option value="${line.lineId}"
 												<c:if test="${workOrder.lineId eq line.lineId}">selected</c:if>>
-												${line.lineName}
-											</option>
+												${line.lineName}</option>
 										</c:forEach>
-									</select>
-								</td>
+								</select></td>
 
 								<th>라인코드</th>
-								<td title="${workOrder.lineCode}">
-									<c:choose>
+								<td title="${workOrder.lineCode}"><c:choose>
 										<c:when test="${not empty workOrder.lineCode}">
 											${workOrder.lineCode}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 
 							<tr>
 								<th>라인상태</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.lineStatus}">
 											${workOrder.lineStatus}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>담당자 ID</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.empId}">
 											${workOrder.empId}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>담당자 <span class="modal_required">*</span></th>
-								<td>
-									<span class="viewMode">
-										<c:choose>
+								<td><span class="viewMode"> <c:choose>
 											<c:when test="${not empty workOrder.ename}">
 												${workOrder.ename}
 											</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose>
-									</span>
-
-									<select name="empId" id="empId"
-										class="detailInput editMode"
-										style="display: none;"
-										disabled required>
+								</span> <select name="empId" id="empId" class="detailInput editMode"
+									style="display: none;" disabled required>
 										<option value="">선택</option>
 
 										<c:forEach var="emp" items="${workOrderEmpList}">
 											<option value="${emp.empId}"
 												<c:if test="${workOrder.empId eq emp.empId}">selected</c:if>>
-												${emp.ename} / ${emp.dept}
-											</option>
+												${emp.ename} / ${emp.dept}</option>
 										</c:forEach>
-									</select>
-								</td>
+								</select></td>
 							</tr>
 
 							<tr>
 								<th>사원번호</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.empno}">
 											${workOrder.empno}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>부서</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.dept}">
 											${workOrder.dept}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>직무</th>
-								<td>
-									<c:choose>
+								<td><c:choose>
 										<c:when test="${not empty workOrder.job}">
 											${workOrder.job}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 
 							<tr>
 								<th>권한</th>
-								<td colspan="5">
-									<c:choose>
+								<td colspan="5"><c:choose>
 										<c:when test="${not empty workOrder.role}">
 											${workOrder.role}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 						</tbody>
 					</table>
@@ -659,53 +577,48 @@
 						<tbody>
 							<tr>
 								<th>BOM ID</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty appliedBom and not empty appliedBom.bomId}">
+								<td><c:choose>
+										<c:when
+											test="${not empty appliedBom and not empty appliedBom.bomId}">
 											${appliedBom.bomId}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>BOM 코드</th>
-								<td title="${appliedBom.bomCode}">
-									<c:choose>
-										<c:when test="${not empty appliedBom and not empty appliedBom.bomCode}">
+								<td title="${appliedBom.bomCode}"><c:choose>
+										<c:when
+											test="${not empty appliedBom and not empty appliedBom.bomCode}">
 											${appliedBom.bomCode}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 
 								<th>BOM 버전</th>
-								<td>
-									<c:choose>
-										<c:when test="${not empty appliedBom and not empty appliedBom.bomVersion}">
+								<td><c:choose>
+										<c:when
+											test="${not empty appliedBom and not empty appliedBom.bomVersion}">
 											v${appliedBom.bomVersion}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 
 							<tr>
 								<th>BOM 사용여부</th>
-								<td colspan="5">
-									<c:choose>
-										<c:when test="${not empty appliedBom and not empty appliedBom.bomUseYn}">
+								<td colspan="5"><c:choose>
+										<c:when
+											test="${not empty appliedBom and not empty appliedBom.bomUseYn}">
 											${appliedBom.bomUseYn}
 										</c:when>
 										<c:otherwise>-</c:otherwise>
-									</c:choose>
-								</td>
+									</c:choose></td>
 							</tr>
 						</tbody>
 					</table>
 
-					<div class="detail_help_text">
-						작업지시 등록 시 생산계획의 완제품 기준으로 사용중 BOM이 자동 적용됩니다.
-					</div>
+					<div class="detail_help_text">작업지시 등록 시 생산계획의 완제품 기준으로 사용중
+						BOM이 자동 적용됩니다.</div>
 
 				</div>
 
@@ -734,84 +647,68 @@
 									<c:when test="${not empty bomMaterialList}">
 										<c:forEach var="material" items="${bomMaterialList}">
 											<tr>
-												<td title="${material.materialItemCode}">
-													<c:choose>
+												<td title="${material.materialItemCode}"><c:choose>
 														<c:when test="${not empty material.materialItemCode}">
 															${material.materialItemCode}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
-													</c:choose>
-												</td>
+													</c:choose></td>
 
 												<td class="workorder_material_name"
-													title="${material.materialItemName}">
-													<c:choose>
+													title="${material.materialItemName}"><c:choose>
 														<c:when test="${not empty material.materialItemName}">
 															${material.materialItemName}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
-													</c:choose>
-												</td>
+													</c:choose></td>
 
-												<td>
-													<c:choose>
+												<td><c:choose>
 														<c:when test="${not empty material.bomQty}">
 															<fmt:formatNumber value="${material.bomQty}"
 																pattern="#,##0.####" />
 															${material.materialItemUnit}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
-													</c:choose>
-												</td>
+													</c:choose></td>
 
-												<td>
-													<c:choose>
+												<td><c:choose>
 														<c:when test="${not empty material.requiredQty}">
 															<fmt:formatNumber value="${material.requiredQty}"
 																pattern="#,##0.####" />
 															${material.materialItemUnit}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
-													</c:choose>
-												</td>
+													</c:choose></td>
 
-												<td title="${material.materialLot}">
-													<c:choose>
+												<td title="${material.materialLot}"><c:choose>
 														<c:when test="${not empty material.materialLot}">
 															${material.materialLot}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
-													</c:choose>
-												</td>
+													</c:choose></td>
 
-												<td>
-													<c:choose>
+												<td><c:choose>
 														<c:when test="${not empty material.inoutQty}">
 															<fmt:formatNumber value="${material.inoutQty}"
 																pattern="#,##0.####" />
 															${material.materialItemUnit}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
-													</c:choose>
-												</td>
+													</c:choose></td>
 
-												<td>
-													<c:choose>
+												<td><c:choose>
 														<c:when test="${not empty material.inoutDate}">
 															${material.inoutDate}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
-													</c:choose>
-												</td>
+													</c:choose></td>
 
-												<td>
-													<c:choose>
+												<td><c:choose>
 														<c:when test="${not empty material.inoutStatus}">
 															${material.inoutStatus}
 														</c:when>
 														<c:otherwise>-</c:otherwise>
-													</c:choose>
-												</td>
+													</c:choose></td>
 											</tr>
 										</c:forEach>
 									</c:when>
@@ -832,28 +729,22 @@
 								<c:forEach var="material" items="${bomMaterialList}">
 									<div class="workorder_material_mobile_card">
 										<div class="workorder_material_mobile_row">
-											<span>자재코드</span>
-											<strong>${material.materialItemCode}</strong>
+											<span>자재코드</span> <strong>${material.materialItemCode}</strong>
 										</div>
 
 										<div class="workorder_material_mobile_row">
-											<span>자재명</span>
-											<strong>${material.materialItemName}</strong>
+											<span>자재명</span> <strong>${material.materialItemName}</strong>
 										</div>
 
 										<div class="workorder_material_mobile_row">
-											<span>필요수량</span>
-											<strong>
-												<fmt:formatNumber value="${material.requiredQty}"
-													pattern="#,##0.####" />
+											<span>필요수량</span> <strong> <fmt:formatNumber
+													value="${material.requiredQty}" pattern="#,##0.####" />
 												${material.materialItemUnit}
 											</strong>
 										</div>
 
 										<div class="workorder_material_mobile_row">
-											<span>자재 LOT</span>
-											<strong>
-												<c:choose>
+											<span>자재 LOT</span> <strong> <c:choose>
 													<c:when test="${not empty material.materialLot}">
 														${material.materialLot}
 													</c:when>
@@ -863,9 +754,7 @@
 										</div>
 
 										<div class="workorder_material_mobile_row">
-											<span>투입수량</span>
-											<strong>
-												<c:choose>
+											<span>투입수량</span> <strong> <c:choose>
 													<c:when test="${not empty material.inoutQty}">
 														<fmt:formatNumber value="${material.inoutQty}"
 															pattern="#,##0.####" />
@@ -877,9 +766,7 @@
 										</div>
 
 										<div class="workorder_material_mobile_row">
-											<span>투입상태</span>
-											<strong>
-												<c:choose>
+											<span>투입상태</span> <strong> <c:choose>
 													<c:when test="${not empty material.inoutStatus}">
 														${material.inoutStatus}
 													</c:when>
@@ -892,9 +779,8 @@
 							</c:when>
 
 							<c:otherwise>
-								<div class="workorder_material_mobile_empty">
-									조회된 BOM 자재 정보가 없습니다.
-								</div>
+								<div class="workorder_material_mobile_empty">조회된 BOM 자재
+									정보가 없습니다.</div>
 							</c:otherwise>
 						</c:choose>
 					</div>
@@ -915,32 +801,22 @@
 						<tbody>
 							<tr>
 								<th>비고</th>
-								<td>
-									<span class="viewMode">
-										<c:choose>
+								<td><span class="viewMode"> <c:choose>
 											<c:when test="${not empty workOrder.remark}">
 												${workOrder.remark}
 											</c:when>
 											<c:otherwise>-</c:otherwise>
 										</c:choose>
-									</span>
-
-									<textarea name="remark"
-										id="remark"
-										class="detailInput editMode workorder_remark"
-										maxlength="500"
-										placeholder="작업지시 관련 메모를 입력하세요."
-										style="display: none;"
-										disabled>${workOrder.remark}</textarea>
-								</td>
+								</span> <textarea name="remark" id="remark"
+										class="detailInput editMode workorder_remark" maxlength="500"
+										placeholder="작업지시 관련 메모를 입력하세요." style="display: none;"
+										disabled>${workOrder.remark}</textarea></td>
 							</tr>
 						</tbody>
 					</table>
 
-					<div class="detail_help_text">
-						지시수량 또는 작업지시일을 수정해도 이미 생성된 자재투입 이력은 자동 재계산되지 않습니다.
-						필요 시 자재투입 이력은 별도 기준에 따라 확인해야 합니다.
-					</div>
+					<div class="detail_help_text">지시수량 또는 작업지시일을 수정해도 이미 생성된 자재투입
+						이력은 자동 재계산되지 않습니다. 필요 시 자재투입 이력은 별도 기준에 따라 확인해야 합니다.</div>
 
 				</div>
 
@@ -951,9 +827,7 @@
 
 		<c:otherwise>
 			<div class="detail_card">
-				<div class="detail_empty_box">
-					조회된 작업지시 정보가 없습니다.
-				</div>
+				<div class="detail_empty_box">조회된 작업지시 정보가 없습니다.</div>
 			</div>
 		</c:otherwise>
 
@@ -992,7 +866,6 @@
 .workorder_remark {
 	min-height: 90px;
 }
-
 
 /* QR 정보 영역 */
 .workorder_qr_card {
@@ -1075,7 +948,6 @@
 	word-break: break-all;
 }
 
-
 /* BOM 자재 정보 */
 .workorder_material_table_wrap {
 	width: 100%;
@@ -1086,8 +958,7 @@
 	min-width: 920px;
 }
 
-.workorder_material_table th,
-.workorder_material_table td {
+.workorder_material_table th, .workorder_material_table td {
 	white-space: nowrap;
 	text-align: center;
 }
@@ -1152,40 +1023,31 @@
 		flex-direction: column;
 		gap: 6px;
 	}
-
 	.workorder_input_wrap .detailInput {
 		width: 100% !important;
 		flex-basis: auto;
 	}
-
 	.workorder_input_wrap .detail_help_text {
 		margin-top: 4px !important;
 	}
-
 	.workorder_qr_content {
 		flex-direction: column;
 		gap: 12px;
 	}
-
 	.workorder_qr_image_box {
 		flex-basis: auto;
 		width: 100%;
 	}
-
 	.workorder_qr_info_row {
 		grid-template-columns: 92px minmax(0, 1fr);
 	}
-
-	.workorder_qr_label,
-	.workorder_qr_value {
+	.workorder_qr_label, .workorder_qr_value {
 		font-size: 13px;
 		padding: 8px 9px;
 	}
-
 	.workorder_material_table_wrap {
 		display: none;
 	}
-
 	.workorder_material_mobile_wrap {
 		display: block;
 	}
@@ -1198,7 +1060,8 @@
 
 		const viewModes = document.querySelectorAll(".viewMode");
 		const editModes = document.querySelectorAll(".editMode");
-		const editControls = document.querySelectorAll(".editMode input, .editMode select, .editMode textarea, input.editMode, select.editMode, textarea.editMode");
+		const editControls = document
+				.querySelectorAll(".editMode input, .editMode select, .editMode textarea, input.editMode, select.editMode, textarea.editMode");
 
 		const editBtn = document.getElementById("editBtn");
 		const saveBtn = document.getElementById("saveBtn");
@@ -1238,7 +1101,6 @@
 		}
 	}
 
-
 	function setOrderQtyPreview() {
 
 		const qtyElement = document.getElementById("orderQty");
@@ -1261,10 +1123,9 @@
 			return;
 		}
 
-		previewElement.innerHTML =
-			"입력수량: " + formatNumber(qty) + " " + (unit || "");
+		previewElement.innerHTML = "입력수량: " + formatNumber(qty) + " "
+				+ (unit || "");
 	}
-
 
 	function checkWorkOrderUpdate() {
 
@@ -1304,7 +1165,6 @@
 		return true;
 	}
 
-
 	function formatNumber(value) {
 
 		if (value == null || value === "") {
@@ -1320,8 +1180,7 @@
 		return numberValue.toLocaleString();
 	}
 
-
 	<c:if test="${mode eq 'edit'}">
-		changeWorkOrderEditMode(true);
+	changeWorkOrderEditMode(true);
 	</c:if>
 </script>
