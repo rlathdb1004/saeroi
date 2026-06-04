@@ -317,6 +317,7 @@ const inspectionDefectQtyError = document.getElementById('inspectionDefectQtyErr
 const inspectionDefectInfoError = document.getElementById('inspectionDefectInfoError');
 const inspectionSubmitBtn = document.querySelector('#modal_insert .modal_btn_submit');
 let inspectionErrorFocusTarget = null;
+let inspectionSubmitting = false;
 
 function toNumber(input) {
     if (!input || !hasText(input.value)) {
@@ -522,12 +523,25 @@ if (inspectionDefectQty) {
 
 if (inspectionInsertForm) {
     inspectionInsertForm.addEventListener('submit', function (event) {
+        if (inspectionSubmitting) {
+            event.preventDefault();
+            return;
+        }
+
         if (!validateInspectionQuantity()) {
             event.preventDefault();
 
             if (inspectionErrorFocusTarget && typeof inspectionErrorFocusTarget.focus === 'function') {
                 inspectionErrorFocusTarget.focus();
             }
+
+            return;
+        }
+
+        inspectionSubmitting = true;
+
+        if (inspectionSubmitBtn) {
+            inspectionSubmitBtn.disabled = true;
         }
     });
 }

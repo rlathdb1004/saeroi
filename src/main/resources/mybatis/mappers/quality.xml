@@ -437,27 +437,38 @@
 		updated_date,
 		use_yn
 		)
+		WITH target_date AS (
+		SELECT
+		TO_DATE(#{insp_date}, 'YYYY-MM-DD') AS insp_date,
+		TO_CHAR(TO_DATE(#{insp_date}, 'YYYY-MM-DD'), 'YYYYMMDD') AS date_text
+		FROM dual
+		),
+		seq_source AS (
+		SELECT NVL(i.doc_seq, 0) AS seq_no
+		FROM inspection i, target_date td
+		WHERE TRUNC(i.insp_date) = TRUNC(td.insp_date)
+		UNION ALL
+		SELECT TO_NUMBER(SUBSTR(i.doc_no, -4)) AS seq_no
+		FROM inspection i, target_date td
+		WHERE REGEXP_LIKE(i.doc_no, '^INSP-' || td.date_text || '-[0-9]{4}$')
+		),
+		next_doc AS (
+		SELECT
+		td.insp_date,
+		td.date_text,
+		NVL(MAX(ss.seq_no), 0) + 1 AS next_seq
+		FROM target_date td
+		LEFT JOIN seq_source ss ON 1 = 1
+		GROUP BY td.insp_date, td.date_text
+		)
 		SELECT
 		#{insp_id},
-		'INSP-' ||
-		TO_CHAR(TO_DATE(#{insp_date}, 'YYYY-MM-DD'), 'YYYYMMDD') || '-' ||
-		LPAD(
-		(SELECT NVL(MAX(doc_seq), 0) + 1
-		FROM inspection
-		WHERE
-		TRUNC(insp_date) = TRUNC(TO_DATE(#{insp_date}, 'YYYY-MM-DD'))),
-		4,
-		'0'
-		),
-		(SELECT NVL(MAX(doc_seq), 0) + 1
-		FROM inspection
-		WHERE
-		TRUNC(insp_date) = TRUNC(TO_DATE(#{insp_date}, 'YYYY-MM-DD'))),
+		'INSP-' || nd.date_text || '-' || LPAD(nd.next_seq, 4, '0'),
+		nd.next_seq,
 		(SELECT e.emp_id FROM emp e WHERE e.empno = #{emp_id}),
 		TO_NUMBER(#{prod_id}),
 		#{insp_type},
-		TO_DATE(#{insp_date},
-		'YYYY-MM-DD'),
+		nd.insp_date,
 		CASE WHEN #{result} = '대기' THEN '검사 예정' ELSE '검사 완료'
 		END,
 		#{result},
@@ -467,7 +478,7 @@
 		SYSDATE,
 		SYSDATE,
 		'Y'
-		FROM dual
+		FROM next_doc nd
 	</insert>
 
 	<update id="_delete_Inspection" parameterType="map">
