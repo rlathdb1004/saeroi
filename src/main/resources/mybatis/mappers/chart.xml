@@ -654,135 +654,6 @@
 		FROM base_data
 	</select>
 
-	<!-- 대시보드 납기 준수율 추이 최근 7일 조회 -->
-	<select id="select_dashboard_delivery_trend" resultType="map">
-		WITH
-		base_date AS (
-			SELECT TRUNC(CURRENT_DATE) - 6 + LEVEL - 1 AS base_date
-			FROM dual
-			CONNECT BY LEVEL &lt;= 7
-		),
-		prod_sum AS (
-			SELECT
-				order_id,
-				SUM(NVL(prod_qty, 0)) AS total_prod_qty,
-				MAX(TRUNC(prod_date)) AS complete_date
-			FROM production
-			GROUP BY order_id
-		),
-		order_data AS (
-			SELECT
-				TRUNC(pp.due_date) AS base_date,
-				COUNT(DISTINCT wo.order_id) AS total_order_count,
-				COUNT(DISTINCT CASE
-					WHEN NVL(ps.total_prod_qty, 0) &gt;= NVL(wo.order_qty, 0)
-					AND ps.complete_date &lt;= TRUNC(pp.due_date)
-					THEN wo.order_id
-				END) AS ontime_order_count
-			FROM work_order wo
-			JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
-			LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
-			WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE) - 6
-			AND pp.due_date &lt; TRUNC(CURRENT_DATE) + 1
-			AND wo.product_lot IS NOT NULL
-			GROUP BY TRUNC(pp.due_date)
-		)
-		SELECT
-			TO_CHAR(b.base_date, 'MM/DD') AS LABEL,
-			CASE
-				WHEN NVL(od.total_order_count, 0) = 0 THEN 0
-				ELSE ROUND(NVL(od.ontime_order_count, 0) / od.total_order_count * 100, 1)
-			END AS DELIVERYRATE,
-			95 AS TARGETRATE,
-			NVL(od.total_order_count, 0) AS TOTALORDERCOUNT,
-			NVL(od.ontime_order_count, 0) AS ONTIMEORDERCOUNT,
-			NVL(od.total_order_count, 0) - NVL(od.ontime_order_count, 0) AS DELAYORDERCOUNT
-		FROM base_date b
-		LEFT JOIN order_data od ON od.base_date = b.base_date
-		ORDER BY b.base_date
-	</select>
-
-	<!-- 대시보드 납기 준수율 이번주 요약 조회 -->
-	<select id="select_dashboard_delivery_summary" resultType="map">
-		WITH
-		prod_sum AS (
-			SELECT
-				order_id,
-				SUM(NVL(prod_qty, 0)) AS total_prod_qty,
-				MAX(TRUNC(prod_date)) AS complete_date
-			FROM production
-			GROUP BY order_id
-		),
-		curr_data AS (
-			SELECT
-				COUNT(DISTINCT wo.order_id) AS total_order_count,
-				COUNT(DISTINCT CASE
-					WHEN NVL(ps.total_prod_qty, 0) &gt;= NVL(wo.order_qty, 0)
-					AND ps.complete_date &lt;= TRUNC(pp.due_date)
-					THEN wo.order_id
-				END) AS ontime_order_count
-			FROM work_order wo
-			JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
-			LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
-			WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE, 'IW')
-			AND pp.due_date &lt; TRUNC(CURRENT_DATE, 'IW') + 7
-			AND wo.product_lot IS NOT NULL
-		),
-		prev_data AS (
-			SELECT
-				COUNT(DISTINCT wo.order_id) AS total_order_count,
-				COUNT(DISTINCT CASE
-					WHEN NVL(ps.total_prod_qty, 0) &gt;= NVL(wo.order_qty, 0)
-					AND ps.complete_date &lt;= TRUNC(pp.due_date)
-					THEN wo.order_id
-				END) AS ontime_order_count
-			FROM work_order wo
-			JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
-			LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
-			WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE, 'IW') - 7
-			AND pp.due_date &lt; TRUNC(CURRENT_DATE, 'IW')
-			AND wo.product_lot IS NOT NULL
-		),
-		rate_data AS (
-			SELECT
-				NVL(cd.total_order_count, 0) AS curr_total_order_count,
-				NVL(cd.ontime_order_count, 0) AS curr_ontime_order_count,
-				NVL(pd.total_order_count, 0) AS prev_total_order_count,
-				NVL(pd.ontime_order_count, 0) AS prev_ontime_order_count,
-				95 AS target_rate,
-				CASE
-					WHEN NVL(cd.total_order_count, 0) = 0 THEN 0
-					ELSE ROUND(NVL(cd.ontime_order_count, 0) / cd.total_order_count * 100, 1)
-				END AS curr_delivery_rate,
-				CASE
-					WHEN NVL(pd.total_order_count, 0) = 0 THEN 0
-					ELSE ROUND(NVL(pd.ontime_order_count, 0) / pd.total_order_count * 100, 1)
-				END AS prev_delivery_rate
-			FROM curr_data cd
-			CROSS JOIN prev_data pd
-		)
-		SELECT
-			curr_delivery_rate AS CURRDELIVERYRATE,
-			prev_delivery_rate AS PREVDELIVERYRATE,
-			target_rate AS TARGETRATE,
-			curr_total_order_count AS CURRTOTALORDERCOUNT,
-			curr_ontime_order_count AS CURRONTIMEORDERCOUNT,
-			curr_total_order_count - curr_ontime_order_count AS CURRDELAYORDERCOUNT,
-			ROUND(curr_delivery_rate - target_rate, 1) AS TARGETCOMPARERATE,
-			ROUND(curr_delivery_rate - prev_delivery_rate, 1) AS WEEKCOMPARERATE,
-			CASE
-				WHEN curr_delivery_rate - target_rate &gt;= 0 THEN 'good'
-				WHEN curr_delivery_rate - target_rate &lt; 0 THEN 'bad'
-				ELSE 'same'
-			END AS TARGETCOMPARETYPE,
-			CASE
-				WHEN curr_delivery_rate - prev_delivery_rate &gt; 0 THEN 'good'
-				WHEN curr_delivery_rate - prev_delivery_rate &lt; 0 THEN 'bad'
-				ELSE 'same'
-			END AS WEEKCOMPARETYPE
-		FROM rate_data
-	</select>
-
 	<!-- 대시보드 설비 가동 현황 조회 -->
 	<select id="select_dashboard_facility_status" resultType="map">
 		WITH
@@ -928,7 +799,8 @@
 		GROUP BY order_id
 		) ps ON ps.order_id = wo.order_id
 		WHERE
-		pp.due_date &lt; TRUNC(CURRENT_DATE)
+		pp.due_date &gt;= TRUNC(CURRENT_DATE)
+		AND pp.due_date &lt; TRUNC(CURRENT_DATE) + 1
 		AND NVL(ps.total_prod_qty, 0) &lt;
 		NVL(wo.order_qty, 0)
 		AND NVL(ps.close_yn, 0) = 0
@@ -1140,7 +1012,8 @@
 							FROM production
 							GROUP BY order_id
 						) ps ON ps.order_id = wo.order_id
-						WHERE pp.due_date &lt; TRUNC(CURRENT_DATE)
+						WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE)
+						AND pp.due_date &lt; TRUNC(CURRENT_DATE) + 1
 						AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
 						AND NVL(ps.close_yn, 0) = 0
 						AND wo.product_lot IS NOT NULL
@@ -1163,7 +1036,8 @@
 							FROM production
 							GROUP BY order_id
 						) ps ON ps.order_id = wo.order_id
-						WHERE pp.due_date &lt; TRUNC(CURRENT_DATE)
+						WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE)
+						AND pp.due_date &lt; TRUNC(CURRENT_DATE) + 1
 						AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
 						AND NVL(ps.close_yn, 0) = 0
 						AND wo.product_lot IS NOT NULL
@@ -1288,7 +1162,8 @@
 			FROM work_order wo
 			JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
 			LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
-			WHERE pp.due_date &lt; TRUNC(CURRENT_DATE)
+			WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE)
+			AND pp.due_date &lt; TRUNC(CURRENT_DATE) + 1
 			AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
 			AND NVL(ps.close_yn, 0) = 0
 			AND wo.product_lot IS NOT NULL
@@ -1299,7 +1174,8 @@
 			FROM work_order wo
 			JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
 			LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
-			WHERE pp.due_date &lt; TRUNC(CURRENT_DATE) - 1
+			WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE) - 1
+			AND pp.due_date &lt; TRUNC(CURRENT_DATE)
 			AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
 			AND NVL(ps.close_yn, 0) = 0
 			AND wo.product_lot IS NOT NULL
@@ -1869,4 +1745,168 @@
 		</choose>
 	</select>
 	
+
+	<!-- 대시보드 현장 이슈와 LOT 상세 목록 조회 -->
+	<select id="select_dashboard_detail_list" parameterType="map" resultType="map">
+		<choose>
+			<when test="detailType == 'defectIssue'">
+				SELECT *
+				FROM (
+					SELECT
+						dl.defect_list_id AS DEFECT_LIST_ID,
+						wo.order_id AS ORDER_ID,
+						wo.product_lot AS PRODUCT_LOT,
+						it.item_name AS ITEM_NAME,
+						NVL(d.defect_name, '미등록') AS DEFECT_NAME,
+						NVL(dl.defect_qty, 0) AS DEFECT_QTY,
+						TO_CHAR(dl.defect_date, 'YYYY-MM-DD') AS DEFECT_DATE
+					FROM defect_list dl
+					JOIN inspection i ON i.insp_id = dl.insp_id
+					JOIN production p ON p.prod_id = i.prod_id
+					JOIN work_order wo ON wo.order_id = p.order_id
+					JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+					JOIN item it ON it.item_id = pp.item_id
+					LEFT JOIN defect d ON d.defect_id = dl.defect_id
+					WHERE p.prod_date &gt;= TRUNC(CURRENT_DATE)
+					AND p.prod_date &lt; TRUNC(CURRENT_DATE) + 1
+					AND NVL(dl.use_yn, 'Y') = 'Y'
+					AND NVL(i.use_yn, 'Y') = 'Y'
+					ORDER BY dl.defect_date DESC
+				)
+				WHERE ROWNUM &lt;= 10
+			</when>
+
+			<when test="detailType == 'equipmentIssue'">
+				SELECT *
+				FROM (
+					SELECT
+						'' AS HISTORY_ID,
+						e.equip_name AS EQUIP_NAME,
+						et.trouble_content AS TROUBLE_CONTENT,
+						TO_CHAR(et.trouble_date, 'YYYY-MM-DD HH24:MI') AS TROUBLE_DATE,
+						CASE
+							WHEN et.resolve_date IS NULL THEN '미조치'
+							ELSE '조치완료'
+						END AS TROUBLE_STATUS
+					FROM equipment_trouble et
+					JOIN equipment e ON e.equip_id = et.equip_id
+					WHERE et.resolve_date IS NULL
+					AND et.trouble_date IS NOT NULL
+					AND et.trouble_content IS NOT NULL
+					ORDER BY et.trouble_date DESC
+				)
+				WHERE ROWNUM &lt;= 10
+			</when>
+
+			<when test="detailType == 'delayLot'">
+				WITH prod_sum AS (
+					SELECT
+						order_id,
+						SUM(NVL(prod_qty, 0)) AS total_prod_qty,
+						MAX(
+							CASE
+								WHEN prod_status IN ('완료', '취소') THEN 1
+								ELSE 0
+							END
+						) AS close_yn
+					FROM production
+					GROUP BY order_id
+				)
+				SELECT *
+				FROM (
+					SELECT
+						wo.order_id AS ORDER_ID,
+						wo.product_lot AS PRODUCT_LOT,
+						it.item_name AS ITEM_NAME,
+						TO_CHAR(pp.due_date, 'YYYY-MM-DD') AS DUE_DATE,
+						GREATEST(NVL(wo.order_qty, 0) - NVL(ps.total_prod_qty, 0), 0) AS REMAIN_QTY,
+						CASE
+							WHEN pp.due_date &lt; TRUNC(CURRENT_DATE) THEN '납기지연'
+							WHEN pp.due_date &gt;= TRUNC(CURRENT_DATE)
+							AND pp.due_date &lt; TRUNC(CURRENT_DATE) + 1 THEN '금일납기'
+							ELSE '진행중'
+						END AS DELAY_STATUS
+					FROM work_order wo
+					JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+					JOIN item it ON it.item_id = pp.item_id
+					LEFT JOIN prod_sum ps ON ps.order_id = wo.order_id
+					WHERE pp.due_date &gt;= TRUNC(CURRENT_DATE)
+					AND pp.due_date &lt; TRUNC(CURRENT_DATE) + 1
+					AND NVL(ps.total_prod_qty, 0) &lt; NVL(wo.order_qty, 0)
+					AND NVL(ps.close_yn, 0) = 0
+					AND wo.product_lot IS NOT NULL
+					ORDER BY pp.due_date ASC, wo.order_id DESC
+				)
+				WHERE ROWNUM &lt;= 10
+			</when>
+
+			<when test="detailType == 'inspectionWaitLot'">
+				SELECT *
+				FROM (
+					SELECT
+						wo.order_id AS ORDER_ID,
+						wo.product_lot AS PRODUCT_LOT,
+						it.item_name AS ITEM_NAME,
+						TO_CHAR(i.insp_id) AS INSP_DOC_NO,
+						TO_CHAR(i.insp_date, 'YYYY-MM-DD') AS INSP_DATE,
+						i.insp_status AS INSP_STATUS
+					FROM inspection i
+					JOIN production p ON p.prod_id = i.prod_id
+					JOIN work_order wo ON wo.order_id = p.order_id
+					JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+					JOIN item it ON it.item_id = pp.item_id
+					WHERE i.insp_date &lt; TRUNC(CURRENT_DATE) + 1
+					AND NVL(i.use_yn, 'Y') = 'Y'
+					AND i.insp_status = '대기'
+					ORDER BY i.insp_date DESC
+				)
+				WHERE ROWNUM &lt;= 10
+			</when>
+
+			<when test="detailType == 'shipmentWaitLot'">
+				SELECT *
+				FROM (
+					SELECT
+						wo.order_id AS ORDER_ID,
+						wo.product_lot AS PRODUCT_LOT,
+						it.item_name AS ITEM_NAME,
+						TO_CHAR(pi.inout_date, 'YYYY-MM-DD') AS INOUT_DATE,
+						'출하대기' AS SHIP_STATUS
+					FROM product_inout pi
+					JOIN work_order wo ON wo.order_id = pi.order_id
+					JOIN production_plan pp ON pp.prod_plan_id = wo.prod_plan_id
+					JOIN item it ON it.item_id = pp.item_id
+					WHERE pi.inout_date &lt; TRUNC(CURRENT_DATE) + 1
+					AND NVL(pi.use_yn, 'Y') = 'Y'
+					AND pi.inout_type = 'MI'
+					AND EXISTS (
+						SELECT 1
+						FROM production p
+						JOIN inspection i ON i.prod_id = p.prod_id
+						WHERE p.order_id = wo.order_id
+						AND NVL(i.use_yn, 'Y') = 'Y'
+						AND i.insp_status = '완료'
+					)
+					AND NOT EXISTS (
+						SELECT 1
+						FROM product_inout po
+						WHERE po.order_id = pi.order_id
+						AND NVL(po.use_yn, 'Y') = 'Y'
+						AND po.inout_type IN ('MO', 'OUT', 'SO', '출고', '출하')
+					)
+					ORDER BY pi.inout_date DESC
+				)
+				WHERE ROWNUM &lt;= 10
+			</when>
+
+			<otherwise>
+				SELECT
+					'' AS ORDER_ID
+				FROM dual
+				WHERE 1 = 0
+			</otherwise>
+		</choose>
+	</select>
+
 </mapper>
+
