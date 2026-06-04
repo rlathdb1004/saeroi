@@ -70,9 +70,9 @@ public class QualityDAOImpl implements QualityDAO {
 		param.put("good_qty", good_qty);
 		param.put("remark", remark);
 
-		int insert_list = sqlSession.insert("mapper.quality._insert_Inspection", param);
+		sqlSession.insert("mapper.quality._insert_Inspection", param);
 
-		return insert_list;
+		return (Integer) param.get("insp_id");
 	}
 
 	// 삭제에 필요한 구성
