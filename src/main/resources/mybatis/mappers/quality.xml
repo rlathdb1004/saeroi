@@ -634,6 +634,24 @@
 		)
 	</update>
 
+	<update id="_update_DefectQty_ByInspection" parameterType="map">
+		UPDATE defect_list
+		SET defect_qty = TO_NUMBER(#{defect_qty}),
+		use_yn = 'Y',
+		updated_date = SYSDATE
+		WHERE defect_list_id = (
+		SELECT defect_list_id
+		FROM (
+		SELECT defect_list_id
+		FROM defect_list
+		WHERE insp_id = TO_NUMBER(#{insp_id})
+		AND NVL(use_yn, 'Y') = 'Y'
+		ORDER BY defect_list_id DESC
+		)
+		WHERE ROWNUM = 1
+		)
+	</update>
+
 	<select id="_select_Defect"
 		resultType="kr.or.saeroi.dto.DefectDTO">
 		SELECT

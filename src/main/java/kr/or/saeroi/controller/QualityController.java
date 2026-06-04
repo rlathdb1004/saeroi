@@ -127,6 +127,15 @@ public class QualityController {
 		    return "redirect:/quality/inspection";
 		}
 
+		if (isConditionalResult) {
+			has_defect = "Y";
+
+			if (!hasText(defect_qty) && inspectionQtyValue > goodQtyValue) {
+				defectQtyValue = inspectionQtyValue - goodQtyValue;
+				defect_qty = formatQuantity(defectQtyValue);
+			}
+		}
+
 		if (isWaitResult) {
 		    // 대기는 양품수량 강제 0, 불량 없음
 		    good_qty = "0";
@@ -162,7 +171,7 @@ public class QualityController {
 		int inspId = qualityService._ser_insert_Inspection(insp_date, prod_id, emp_id, insp_type, result, inspection_qty,
 				good_qty, remark);
 
-		if ("Y".equals(has_defect) && hasText(defect_date) && hasText(defect_id) && hasText(defect_qty)) {
+		if (isConditionalResult && hasText(defect_date) && hasText(defect_id) && hasText(defect_qty)) {
 			String defectPhotoPath = saveDefectPhoto(defect_photo_file, request);
 			qualityService._ser_add_defect_with_action(defect_date, String.valueOf(inspId), defect_id, defect_qty,
 					defectPhotoPath, defect_remark, action_date, action_emp_id, action_content);
@@ -220,11 +229,31 @@ public class QualityController {
 	public String inspection_update(Model model, HttpSession session, @RequestParam(required = false) String insp_id,
 			@RequestParam(required = false) String insp_date, @RequestParam(required = false) String insp_type,
 			@RequestParam(required = false) String result, @RequestParam(required = false) String inspection_qty,
-			@RequestParam(required = false) String good_qty, @RequestParam(required = false) String remark) {
+			@RequestParam(required = false) String good_qty, @RequestParam(required = false) String defect_qty,
+			@RequestParam(required = false) String remark) {
 
 		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
 
 		if (!canManageQuality(loginUser)) {
+			return "redirect:/quality/inspection_detail?insp_id=" + insp_id;
+		}
+
+		double inspectionQtyValue = toNumber(inspection_qty);
+		double goodQtyValue = toNumber(good_qty);
+		double defectQtyValue = toNumber(defect_qty);
+
+		if (RESULT_CONDITIONAL.equals(result)) {
+			if (!hasText(defect_qty) && inspectionQtyValue > goodQtyValue) {
+				defectQtyValue = inspectionQtyValue - goodQtyValue;
+				defect_qty = formatQuantity(defectQtyValue);
+			}
+
+			if (defectQtyValue <= 0 || !isSameQuantity(goodQtyValue + defectQtyValue, inspectionQtyValue)) {
+				return "redirect:/quality/inspection_detail?insp_id=" + insp_id;
+			}
+		}
+
+		if (RESULT_PASS.equals(result) && !isSameQuantity(goodQtyValue, inspectionQtyValue)) {
 			return "redirect:/quality/inspection_detail?insp_id=" + insp_id;
 		}
 
@@ -233,6 +262,10 @@ public class QualityController {
 		System.out.println("inspection update_result: " + updateResult);
 		// 결과 변경 시 defect_list / defect_action use_yn 동기화
 		qualityService._ser_update_Defect_UseYn_ByInspection(insp_id, result);
+
+		if (RESULT_CONDITIONAL.equals(result)) {
+			qualityService._ser_update_DefectQty_ByInspection(insp_id, defect_qty);
+		}
 
 		return "redirect:/quality/inspection_detail?insp_id=" + insp_id;
 	}
@@ -447,5 +480,13 @@ public class QualityController {
 
 	private boolean isSameQuantity(double left, double right) {
 		return Math.abs(left - right) < 0.000001;
+	}
+
+	private String formatQuantity(double value) {
+		if (value == Math.rint(value)) {
+			return String.valueOf((long) value);
+		}
+
+		return String.valueOf(value);
 	}
 }

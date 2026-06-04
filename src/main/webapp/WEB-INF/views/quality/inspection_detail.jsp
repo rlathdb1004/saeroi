@@ -124,6 +124,7 @@
 		<div class="detail_card_title">기본 정보</div>
 
 		<form id="inspectionDetailForm" method="post" accept-charset="UTF-8"
+			onsubmit="return validateInspectionDetailForm();"
 			action="${pageContext.request.contextPath}/quality/inspection/update">
 
 			<input type="hidden" name="insp_id" value="${inspection.insp_id}">
@@ -218,7 +219,9 @@
 							required></td>
 
 						<th>불량수량</th>
-						<td><span class="viewMode">${inspection.defect_qty}${inspection.item_unit}</span></td>
+						<td><span class="viewMode">${inspection.defect_qty}${inspection.item_unit}</span>
+							<input type="number" name="defect_qty" class="detailInput editMode"
+							value="${inspection.defect_qty}" min="0" style="display: none;"></td>
 					</tr>
 
 					<tr>
@@ -490,5 +493,49 @@
 		if (!isEdit && form) {
 			form.reset();
 		}
+	}
+
+	function validateInspectionDetailForm() {
+		const form = document.getElementById('inspectionDetailForm');
+
+		if (!form) {
+			return true;
+		}
+
+		const result = form.querySelector('[name="result"]');
+		const inspectionQty = Number(form.querySelector('[name="inspection_qty"]').value || 0);
+		const goodQty = Number(form.querySelector('[name="good_qty"]').value || 0);
+		const defectQtyInput = form.querySelector('[name="defect_qty"]');
+		const defectQty = Number(defectQtyInput ? defectQtyInput.value || 0 : 0);
+
+		if (result && result.value === '조건부') {
+			if (defectQty <= 0) {
+				alert('조건부는 불량수량을 1개 이상 입력해야 합니다.');
+
+				if (defectQtyInput) {
+					defectQtyInput.focus();
+				}
+
+				return false;
+			}
+
+			if (inspectionQty !== goodQty + defectQty) {
+				alert('조건부는 검사수량이 양품수량과 불량수량의 합계와 같아야 합니다.');
+
+				if (defectQtyInput) {
+					defectQtyInput.focus();
+				}
+
+				return false;
+			}
+		}
+
+		if (result && result.value === '합격' && inspectionQty !== goodQty) {
+			alert('합격은 검사수량과 양품수량이 같아야 합니다.');
+			form.querySelector('[name="good_qty"]').focus();
+			return false;
+		}
+
+		return true;
 	}
 </script>

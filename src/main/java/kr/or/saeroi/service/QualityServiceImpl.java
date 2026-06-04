@@ -142,6 +142,12 @@ public class QualityServiceImpl implements QualityService {
 	    qualityDAO._dao_update_DefectAction_UseYn_ByInspection(insp_id, result);
 	    qualityDAO._dao_update_Defect_UseYn_ByInspection(insp_id, result);
 	}
+
+	@Override
+	public int _ser_update_DefectQty_ByInspection(String insp_id, String defect_qty) {
+		return qualityDAO._dao_update_DefectQty_ByInspection(insp_id, defect_qty);
+	}
+
 	// 대시보드 최근 7일 불량유형별 수량 TOP5를 조회한다.
 	@Override
 	public List<DefectDTO> _ser_select_Dashboard_DefectTop5() {
