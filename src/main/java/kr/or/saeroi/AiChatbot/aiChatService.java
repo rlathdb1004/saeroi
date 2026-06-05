@@ -40,6 +40,7 @@ public class aiChatService {
 		MesAssistant assistant = assistantCache.get(empno);
 		if(assistant == null) {
 			ChatMemory userChatMemory = MessageWindowChatMemory.withMaxMessages(10);
+				//Langchin4j가 만든 규격 (내가만든 파일의 @Been요소)
 			assistant = AiServices.builder(MesAssistant.class)
 	                .chatLanguageModel(geminiModel)
 	                .chatMemory(userChatMemory)

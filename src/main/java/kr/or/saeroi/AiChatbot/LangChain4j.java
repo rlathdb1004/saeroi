@@ -54,21 +54,25 @@ public class LangChain4j {
 	public EmbeddingStore<TextSegment> embeddingStore(){
 		return new InMemoryEmbeddingStore<TextSegment>();
 	}
-
 	@Bean
 	public ContentRetriever contenRetriever(EmbeddingModel embeddingModel,  
 			EmbeddingStore<TextSegment> embeddingStore) {
 		
 		try {
 			PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+				
 			Resource[] resources = resolver.getResources("classpath:/RAG/*.txt");
 			
 			DocumentParser parser = new ApacheTikaDocumentParser();
 			for (Resource resource : resources) {
+				// 위 경로의 .txt파일을 Document로 변환
 				Document document = FileSystemDocumentLoader.loadDocument(Paths.get(resource.getURI()), parser);
+				// 스플릿으로 쪼갤준비
 				DocumentSplitter splitter = DocumentSplitters.recursive(500,50);
 				
+				//스플릿으로 쪼개기
 				java.util.List<TextSegment> segments = splitter.split(document);
+				//쪼갠문자를 임배딩해서 스토어에 담기
 				java.util.List<dev.langchain4j.data.embedding.Embedding> embeddings = embeddingModel.embedAll(segments).content();
 				embeddingStore.addAll(embeddings, segments);
 				
