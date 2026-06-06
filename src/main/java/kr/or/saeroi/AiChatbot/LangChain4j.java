@@ -55,7 +55,7 @@ public class LangChain4j {
 	public EmbeddingStore<TextSegment> embeddingStore(){
 		return new InMemoryEmbeddingStore<TextSegment>();
 	}
-	@Bean
+	@Bean // 오라클버전이 안맞아서 벡터를 사용할수없음
 	public ContentRetriever contenRetriever(EmbeddingModel embeddingModel,  
 			EmbeddingStore<TextSegment> embeddingStore) {
 		

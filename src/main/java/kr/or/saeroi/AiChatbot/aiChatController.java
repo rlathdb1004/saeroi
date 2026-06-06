@@ -31,6 +31,7 @@ public class aiChatController {
 	@ResponseBody
 	public String gemini(@RequestBody List<Map<String, Object>> params, HttpSession session) {
 		LoginDTO loginUser = (LoginDTO) session.getAttribute("loginUser");
+		//오류방지
 		String empno = "GUEST"; 
 		String ename = "게스트";
 		if(loginUser != null) {
