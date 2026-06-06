@@ -9,7 +9,7 @@ LangChain4j와 Gemini API를 활용하여 제조 실행 시스템(MES) 데이터
 - AI & Libraries: LangChain4j, Gemini API, Kakao Map API, ApexCharts
 
 팀원 및 역할 분담 (Contributors)
-- PARKMINHO-KK (본인)
+- PARKMINHO-KK (김민권)
   - 백엔드 아키텍처 설계 및 프론트엔드-데이터베이스 간 End-to-End 데이터 흐름 구현
   - LangChain4j 및 Gemini API 기반 AI 챗봇('새로이봇') 고도화
   - MessageWindowChatMemory 적용을 통한 멀티턴 대화 토큰 절약 및 응답속도 개선
