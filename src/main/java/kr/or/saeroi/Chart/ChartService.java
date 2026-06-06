@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface ChartService {
 
-	public List<Map<String, Object>> chartday(String searchType,String searchItem);
+	public List<Map<String, Object>> chartday(String searchType, String startDate, String endDate, String searchItem);
 	public List<Map<String, Object>> itemList();
 	
 	// 대시보드 KPI 핵심 6대 지표를 조회한다.

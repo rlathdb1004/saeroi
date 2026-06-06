@@ -21,10 +21,16 @@ public class ChartController {
 
 	
 	@RequestMapping({"", "/", "/productionreport"})
-	public String productionreport(Model model) {
+	public String productionreport(
+			@RequestParam(value="startDate", required=false) String startDate,
+	        @RequestParam(value="endDate", required=false) String endDate,
+			Model model) {
 		
 		List<Map<String,Object>> item = chartService.itemList();
 		model.addAttribute("item", item);
+
+		model.addAttribute("startDate", startDate);
+		model.addAttribute("endDate", endDate);
 		return "report/productionreport.tiles";
 	}
 
@@ -58,11 +64,13 @@ public class ChartController {
 	@ResponseBody
 	public Map<String, Object> chartday(
 			@RequestParam(value="searchType", defaultValue="month")String searchType,
-			@RequestParam(value="searchItem", defaultValue="all")String searchItem
+			@RequestParam(value="searchItem", defaultValue="all")String searchItem,
+			@RequestParam(value="startDate", required=false) String startDate,
+	        @RequestParam(value="endDate", required=false) String endDate
 			) {
 		Map<String, Object> chartData = new HashMap<>();
 		System.out.println("컨트롤"+searchItem);
-		List<Map<String, Object>> list = chartService.chartday(searchType,searchItem);
+		List<Map<String, Object>> list = chartService.chartday(searchType, startDate, endDate, searchItem);
 		chartData.put("chartList", list);
 		System.out.println("list"+list);
 		return chartData;

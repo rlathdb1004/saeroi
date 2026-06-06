@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface ChartDAO {
-	public List<Map<String, Object>> chartday(String searchType, String searchItem);
+	public List<Map<String, Object>> chartday(String searchType, String searchItem, String startDate, String endDate);
 	public List<Map<String, Object>> itemList();
 	
 	// 대시보드 KPI 핵심 6대 지표를 조회한다.

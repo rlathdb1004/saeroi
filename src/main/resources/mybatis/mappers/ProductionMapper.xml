@@ -433,6 +433,10 @@
 
 		<where>
 
+			<if test="ename != null and ename != ''">
+				AND E.ENAME = #{ename}
+			</if>
+
 			<!-- 시작일 검색 조건이다. -->
 			<if test="startDate != null and startDate != ''">
 				AND WO.ORDER_DATE <![CDATA[>=]]>

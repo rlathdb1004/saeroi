@@ -343,7 +343,9 @@
 	document.addEventListener('DOMContentLoaded', function(){
 		let initialType = document.querySelector('#select_type').value || 'month';
 		let initialItem = document.querySelector('#select_item').value || 'all';
-		
+		let initialStartDate = "${startDate}";
+	    let initialEndDate = "${endDate}";
+	    
 		loadChartData(initialType,initialItem);
 		
 		document.querySelector('#startDate').addEventListener('change', function(){

@@ -199,32 +199,35 @@ public class DbTool {
 		}
 	}
 
-	@Tool("특정 작업지시서의 상세 정보를 조회합니다."
-			+ "1.만약 사용자가 날짜를 조회했다면 startDate와 endDate에 YYYY-MM-DD 형식을 지켜서 넘겨주고, 언급하지 않았다면 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
-			+ "2.사용자가 특정 품목 구분이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기', '완료', '보류', 등으로 지정할 수 있습니다."
-			+ "3.사용자가 '1번 작업지시서', '작업지시 ID 5'와 같이 요청하면 문맥에서 순수한 숫자 ID만 추출해야 합니다. "
-		    + "4.절대 '1번', 'ID 5'와 같이 텍스트를 포함해서 넘기지 말고 오직 정수 숫자만 추출하세요.")
-	public String getWorkOrderDetail(Integer orderId, String ename, String empno) {
-		try {
-			
-			ProductionDTO list = productionDAO.selectWorkOrderDetail(orderId);
-			System.out.println("ai" + list);
-			if(list == null) {
-				return "해당 조건으로 조회된 생산계획 관리 조회 결과가 없습니다.";
-			}
-			return  list.toString();
-		} catch (Exception e) {
-			return "생산계획관리조회 중 오류: " + e.getMessage();
-		}
-	}
+//	@Tool("특정 작업지시서의 상세 정보를 조회합니다."
+//			+ "1.만약 사용자가 날짜를 조회했다면 startDate와 endDate에 YYYY-MM-DD 형식을 지켜서 넘겨주고, 언급하지 않았다면 반드시 빈 문자열(\"\")로 넘겨주어야 합니다. "
+//			+ "2.사용자가 특정 품목 구분이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기', '완료', '보류', 등으로 지정할 수 있습니다."
+//			+ "3.사용자가 '1번 작업지시서', '작업지시 ID 5'와 같이 요청하면 문맥에서 순수한 숫자 ID만 추출해야 합니다. "
+//		    + "4.절대 '1번', 'ID 5'와 같이 텍스트를 포함해서 넘기지 말고 오직 정수 숫자만 추출하세요.")
+//	public String getWorkOrderDetail(Integer orderId, String ename, String empno) {
+//		try {
+//			
+//			ProductionDTO list = productionDAO.selectWorkOrderDetail(orderId);
+//			System.out.println("ai" + list);
+//			if(list == null) {
+//				return "해당 조건으로 조회된 생산계획 관리 조회 결과가 없습니다.";
+//			}
+//			return  list.toString();
+//		} catch (Exception e) {
+//			return "생산계획관리조회 중 오류: " + e.getMessage();
+//		}
+//	}
 	
-	@Tool("작업지시 목록을 조회하거나 특정 담당자(사원)의 작업지시서를 검색합니다. "
+	@Tool("작업지시 목록을 모두 조회하거나 특정 담당자(사원)의 작업지시서를 검색합니다. "
 			+ "1. 사용자가 '박민호 관리자', '내가 맡은' 등 특정 사원 이름이나 대상자를 언급하면 ename 매개변수에 해당 이름을 넣어주세요. "
 			+ "2. 이번 주, 오늘 등 기간 조건이 파악되면 startDate와 endDate에 YYYY-MM-DD 형식을 채우고, 언급이 없으면 빈 문자열(\"\")로 넘겨줍니다. "
-			+ "3. 사용자가 특정 품목이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기' 등으로 지정할 수 있습니다.")
+			+ "3. 사용자가 특정 품목이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기' 등으로 지정할 수 있습니다."
+			+ "4. 조건과 일치하는 데이터가 없다면 데이터를 임의로 조작하지 말고 반드시 '해당 조건으로 조회된 결과가 없습니다'를 반환하세요."
+			+ "5. 검색어에 이름과 품목명이 같이 있다면 이름을 우선하세요" 
+			)
 	public String getworkorder(String ename, String startDate, String endDate, String itemType, String keyword) {
 		try {
-			
+			System.out.println("ai작업지시실행");
 			ProductionDTO productionDTO = new ProductionDTO();
 			
 			ename = cleanParam(ename);
@@ -234,7 +237,7 @@ public class DbTool {
             keyword = cleanParam(keyword);
             
             // 💡 정제된 값이 빈 문자열("")이 아닐 때만 DTO에 안전하게 세팅합니다.
-            if (!ename.isEmpty()) productionDTO.setStartDate(ename);
+            if (!ename.isEmpty()) productionDTO.setEname(ename);
             if (!startDate.isEmpty()) productionDTO.setStartDate(startDate);
             if (!endDate.isEmpty()) productionDTO.setEndDate(endDate);
             if (!itemType.isEmpty()) productionDTO.setItemType(itemType);
@@ -249,6 +252,13 @@ public class DbTool {
 			
 			if (list == null || list.isEmpty()) {
 				return "해당 조건으로 조회된 작업지시 관리 조회 결과가 없습니다.";
+			}
+			
+			if (!startDate.isEmpty()) {
+			    final String targetDate = startDate; // YYYY-MM-DD 형식
+			    list = list.stream()
+			               .filter(dto -> dto.getOrderDate() != null && dto.getOrderDate().equals(targetDate))
+			               .collect(java.util.stream.Collectors.toList());
 			}
 			
 			// 💡 데이터 주소값 깨짐 방지 및 AI 인지율 상승을 위해 JSON 오브젝트 포맷 데이터로 리턴합니다.
@@ -344,17 +354,23 @@ public class DbTool {
 		return list.isEmpty() ? "해당 조건으로 조회된 입출고 기록이 없습니다." : list.toString();
 	}
 
-	@Tool("일일 주일 월별 년간 계획일자에 따른 생산계획수량 불량수량 작업량을 조회합니다 " + "일수까지 물어본다면 구분(sarchType)을 day로 넣어주고"
-			+ "년도만 물어보면 구분(sarchType)을 year로 넣어주는데" + "이용자가 합을 물어본다면  year_sum 평균을 물어본다면 uear_avg를 넣고 기본은 year_sum이야"
-			+ "이용자가 '어제', '오늘' 혹은 '특정 날짜'를 언급하면, 분석된 날짜를 반드시 today 매개변수에 YYYY-MM-DD 형식으로 넣어주어야 합니다."
-
-	)
-	public String getChart(String searchType, String today, String searchItem) {
-
-		String type = (searchType != null && !searchType.isEmpty()) ? searchType : null;
-
-		List<Map<String, Object>> list = chartDAO.chartday(searchType, searchItem);
-		return list.isEmpty() ? "해당 날짜(" + today + ")로 조회된 리포트 기록이 없습니다." : list.toString();
+	@Tool("일일, 주별, 월별, 년간 계획일자에 따른 생산계획수량, 불량수량, 작업량 통계(차트) 데이터를 조회합니다. "
+			+ "1. 이용자가 '어제', '오늘' 혹은 '특정 날짜 하루'를 언급하면, 분석된 날짜를 startDate와 endDate 매개변수 양쪽에 동일하게 YYYY-MM-DD 형식으로 넣어주어야 합니다. "
+			+ "2. 이용자가 '25년 1월부터 26년 1월'처럼 특정 기간이나 범위를 지정하여 물어본다면, 시작 날짜는 startDate 매개변수에 (예: 2025-01-01), 종료 날짜는 endDate 매개변수에 (예: 2026-01-31) YYYY-MM-DD 형식으로 반드시 나누어 채워주어야 합니다. "
+			+ "3. 일수까지 물어본다면 searchType을 'day'로, 년도만 물어보면 'year'로 지정하며, 합을 물어보면 'year_sum', 평균을 물어보면 'year_avg'를 넣고 기본값은 'year_sum'입니다."
+			+ "4. 특정기간을 범위가 아닌 '25년1월1일 데이터 보여줘'처럼 단일된 날짜를 물어보면 동일하게 startDate와 endDate를 채워줍니다"
+			+ "5. '차트 보여줘'같은 조회를 하고싶어하면 단순하게 정리해서 링크를 띄어주고 통계를 원하면 자세하게 말해줘")
+	public String getChart(String searchType, String startDate, String endDate, String searchItem) {
+		try {
+			startDate = cleanParam(startDate);
+			endDate = cleanParam(endDate);
+			
+			List<Map<String, Object>> list = chartDAO.chartday(searchType, searchItem, startDate, endDate);
+			return list.isEmpty() ? "해당 조건으로 조회된 통계 데이터가 없습니다." : list.toString();
+		}	 catch (Exception e) {
+			return "퀄리티 조회중 오류: " + e.getMessage();
+		}
+		
 	}
 	
 	

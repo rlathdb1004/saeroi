@@ -14,10 +14,12 @@ public class ChartDAOImpl implements ChartDAO{
 	@Autowired
 	SqlSession sqlSession;
 	
-	public List<Map<String, Object>> chartday(String searchType,String searchItem){
+	public List<Map<String, Object>> chartday(String searchType, String startDate, String endDate, String searchItem){
 		Map<String, Object> paramMap = new HashMap<>();
 		System.out.println(searchItem);		
 		paramMap.put("searchType", searchType);
+		paramMap.put("startDate", startDate);
+		paramMap.put("endDate", endDate);
 	    paramMap.put("searchItem", searchItem);
 	    
 		List<Map<String, Object>> list = sqlSession.selectList("mapper.chart.sleect_day_data",paramMap);

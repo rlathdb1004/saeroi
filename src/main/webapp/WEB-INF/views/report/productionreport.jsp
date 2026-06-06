@@ -36,12 +36,12 @@
 				<!-- 시작일 -->
 				<div class="search-item">
 					<label class="search-label">시작일</label> <input type="date"
-						name="startDate" class="search-date" id="startDate">
+						name="startDate" class="search-date" id="startDate" value="${not empty startDate ? startDate : ''}">
 				</div>
 				<!-- 종료일 -->
 				<div class="search-item">
 					<label class="search-label">종료일</label> <input type="date"
-						name="endDate" class="search-date" id="endDate">
+						name="endDate" class="search-date" id="endDate" value="${not empty endDate ? endDate : ''}">
 				</div>
 				<div class="search-item">
 					<label class="search-label">품목구분</label> <select name="searchItem"

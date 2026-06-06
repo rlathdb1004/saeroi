@@ -12,8 +12,8 @@ public class ChartServiceImpl implements ChartService{
 	@Autowired
 	ChartDAO chartDAO;
 	
-	public List<Map<String, Object>> chartday(String searchType,String searchItem) {
-		List<Map<String, Object>> list = chartDAO.chartday(searchType,searchItem);
+	public List<Map<String, Object>> chartday(String searchType, String startDate, String endDate, String searchItem) {
+		List<Map<String, Object>> list = chartDAO.chartday(searchType, startDate, endDate, searchItem);
 		return list;
 	}
 	

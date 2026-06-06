@@ -221,7 +221,7 @@
 							style="display: none;"></th>
 
 						<th class="mobile_hidden">작업지시번호</th>
-						<th class="mobile_show">LOT번호</th>
+						<th class="mobile_show">담당자</th>
 						<th class="mobile_hidden">품목명</th>
 						<th class="mobile_show">지시수량</th>
 						<th class="mobile_hidden">작업지시일</th>
@@ -245,8 +245,8 @@
 									<td class="mobile_hidden" title="${workOrder.docNo}">
 										${workOrder.docNo}</td>
 
-									<td class="mobile_show" title="${workOrder.productLot}">
-										${workOrder.productLot}</td>
+									<td class="mobile_show" title="${workOrder.ename}">
+										${workOrder.ename}</td>
 
 									<td class="coTextLeft mobile_hidden"
 										title="${workOrder.itemName}">${workOrder.itemName}</td>

@@ -39,6 +39,7 @@ public class LangChain4j {
 				.apiKey(apikey)
 //				.modelName("gemini-3-flash-preview") 주석하고 아래꺼로 변경
 				.modelName("gemini-2.5-flash")
+				.maxRetries(3) //503등 에러가 나면 최대 3회 재시도
 				.build();
 	}
 	
