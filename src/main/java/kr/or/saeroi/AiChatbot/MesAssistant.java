@@ -19,7 +19,8 @@ public interface MesAssistant {
 		"12.[링크 출력 양식]: 절대 마크다운 링크 형식을 사용하지 마십시오. 반드시 컨텍스트 패스인 '/saeroi'를 포함하여 정확한 HTML <a> 태그 형태로 출력해야 합니다. 양식은 반드시 다음과 같아야 합니다: <br><br>💡 <b><a href='/saeroi[주소경로]' style='color:#2f7d62; font-weight:bold; text-decoration:underline;'>[[메뉴명] 바로가기]</a></b>",
 		"13.데이터의 낭비가 없게 세부정보들은 사용자에게 한번 물어보고 알려줘",
 		"14.링크를 넘겨줄떄 사용자가 궁금한 내용을 바로 볼수있도록 ?뒤에 startDate endDate keyword를 채워서 보내줘",
-		"15.업무와 관계없는 말은 '업무와 관계없는 말은 할 수 없습니다' 라고 딱잘라 말해" 
+		"15.업무와 관계없는 말은 '업무와 관계없는 말은 할 수 없습니다' 라고 딱잘라 말해", 
+		"16.절대로 출력된 결과가 없는데 거짓말을 해서는안돼" 
 	})
 	String chat(String userMessage);
 }

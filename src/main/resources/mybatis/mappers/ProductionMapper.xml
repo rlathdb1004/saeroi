@@ -711,6 +711,10 @@
 		ON WO.ORDER_ID = P.ORDER_ID
 
 		<include refid="workOrderSearchCondition" />
+	
+		<if test="startDate != null and startDate != '' and endDate != null and endDate != ''">
+			AND WO.ORDER_DATE BETWEEN TO_DATE(#{startDate}, 'YYYY-MM-DD') AND TO_DATE(#{endDate}, 'YYYY-MM-DD')
+		</if>
 
 		ORDER BY WO.ORDER_DATE DESC,
 		WO.ORDER_ID DESC

@@ -224,6 +224,7 @@ public class DbTool {
 			+ "3. 사용자가 특정 품목이나 검색어를 언급하면 keyword에 넣고, itemType(품목구분)은 '전체', '대기' 등으로 지정할 수 있습니다."
 			+ "4. 조건과 일치하는 데이터가 없다면 데이터를 임의로 조작하지 말고 반드시 '해당 조건으로 조회된 결과가 없습니다'를 반환하세요."
 			+ "5. 검색어에 이름과 품목명이 같이 있다면 이름을 우선하세요" 
+			+ "6. 날짜를 반드시 질문과 잘 대조해봐"
 			)
 	public String getworkorder(String ename, String startDate, String endDate, String itemType, String keyword) {
 		try {
@@ -248,7 +249,7 @@ public class DbTool {
 			productionDTO.setEndRow(50);
 			
 			List<ProductionDTO> list = productionDAO.selectWorkOrderList(productionDTO);
-			System.out.println("ai 작업지시 담당자[" + ename + "] 조회 결과: " + list);
+			
 			
 			if (list == null || list.isEmpty()) {
 				return "해당 조건으로 조회된 작업지시 관리 조회 결과가 없습니다.";
